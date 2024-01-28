@@ -268,30 +268,6 @@ func DeletePipelineRequest(req *protos.DeletePipelineRequest) error {
 	return nil
 }
 
-func AttachPipelineRequest(req *protos.AttachPipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	return Audience(req.Audience)
-}
-
-func DetachPipelineRequest(req *protos.DetachPipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	return Audience(req.Audience)
-}
-
 func PausePipelineRequest(req *protos.PausePipelineRequest) error {
 	if req == nil {
 		return ErrNilInput
@@ -342,6 +318,14 @@ func GetAllRequest(req *protos.GetAllRequest) error {
 	}
 
 	return nil
+}
+
+func SetPipelinesRequest(req *protos.SetPipelinesRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	return Audience(req.Audience)
 }
 
 func CreateNotificationRequest(req *protos.CreateNotificationRequest) error {

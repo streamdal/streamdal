@@ -513,47 +513,50 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 }
 
 func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
-	if err := validate.AttachPipelineRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
-	}
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		"AttachPipeline is deprecated, use SetPipelines instead"), nil
 
-	if s.Options.DemoMode {
-		return demoResponse(ctx)
-	}
-
-	// Does this pipeline exist?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if errors.Is(err, store.ErrPipelineNotFound) {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
-		}
-
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	// Send telemetry
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, []statsd.Tag{
-		{"install_id", s.Options.InstallID},
-		{"status", "attached"},
-	}...)
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, -1, 1.0, []statsd.Tag{
-		{"install_id", s.Options.InstallID},
-		{"status", "detached"},
-	}...)
-
-	// Pipeline exists, broadcast attach
-	if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' attached", req.PipelineId),
-	}, nil
+	//if err := validate.AttachPipelineRequest(req); err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	//}
+	//
+	//if s.Options.DemoMode {
+	//	return demoResponse(ctx)
+	//}
+	//
+	//// Does this pipeline exist?
+	//if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	//	if errors.Is(err, store.ErrPipelineNotFound) {
+	//		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+	//	}
+	//
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	//}
+	//
+	//if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	//}
+	//
+	//// Send telemetry
+	//_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, []statsd.Tag{
+	//	{"install_id", s.Options.InstallID},
+	//	{"status", "attached"},
+	//}...)
+	//_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, -1, 1.0, []statsd.Tag{
+	//	{"install_id", s.Options.InstallID},
+	//	{"status", "detached"},
+	//}...)
+	//
+	//// Pipeline exists, broadcast attach
+	//if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	//}
+	//
+	//return &protos.StandardResponse{
+	//	Id:      util.CtxRequestId(ctx),
+	//	Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+	//	Message: fmt.Sprintf("pipeline '%s' attached", req.PipelineId),
+	//}, nil
 }
 
 // Helper for determining what session ID's are using a pipeline ID
@@ -576,8 +579,8 @@ func (s *ExternalServer) getSessionIDsByPipelineID(ctx context.Context, pipeline
 	return sessionIDs, nil
 }
 
-func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
-	if err := validate.DetachPipelineRequest(req); err != nil {
+func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) (*protos.StandardResponse, error) {
+	if err := validate.SetPipelinesRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
@@ -585,55 +588,126 @@ func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachP
 		return demoResponse(ctx)
 	}
 
-	// Does this pipeline exist?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == store.ErrPipelineNotFound {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+	// Do these pipelines exist?
+	for _, pipelineID := range req.PipelineIds {
+		if _, err := s.Options.StoreService.GetPipeline(ctx, pipelineID); err != nil {
+			if errors.Is(err, store.ErrPipelineNotFound) {
+				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+			}
+
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 		}
-
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	// What session ID's are using this pipeline ID?
-	sessionIDs, err := s.getSessionIDsByPipelineID(ctx, req.PipelineId)
+	// Get previous number of pipelines for telemetry
+	existingPipelines, err := s.Options.StoreService.GetPipelinesByAudience(ctx, req.Audience)
 	if err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to get existing pipelines by audience: %s", err)), nil
+
 	}
 
-	s.log.Debugf("detach gRPC handler: found '%d' session ids", len(sessionIDs))
+	// Convert req t
 
-	// Inject session_id's into request
-	req.XSessionIds = make([]string, 0)
-
-	for _, sessionID := range sessionIDs {
-		req.XSessionIds = append(req.XSessionIds, sessionID)
+	// TODO: Store the new pipeline config
+	if err := s.Options.StoreService.SetPipelines(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to store pipelines: %s", err)), nil
 	}
 
-	s.log.Debugf("injected request contains '%d' session ids", len(req.XSessionIds))
-
-	// Broadcast detach to everyone
-	if err := s.Options.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	// We are able to immediately remove the config entry because the broadcast
-	// handlers are not performing a Store lookup.
-	if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
-		s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
-	}
-
-	// Send telemetry
-	telTags := []statsd.Tag{
+	// Update ACTIVE pipeline usage telemetry
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, int64(len(req.PipelineIds)), 1.0, []statsd.Tag{
 		{"install_id", s.Options.InstallID},
-		{"status", "attached"},
+		{"status", "active"},
+	}...)
+
+	delta := len(req.PipelineIds) - len(existingPipelines)
+
+	// Detach metrics are always negative
+	if delta > 0 {
+		delta = -delta
 	}
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
+
+	// Update INACTIVE pipeline usage telemetry
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, int64(delta), 1.0, []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", "inactive"},
+	}...)
+
+	// Pipeline exists, broadcast SetPipelines request
+	if err := s.Options.BusService.BroadcastSetPipelines(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
 
 	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' detached", req.PipelineId),
+		Id:   util.CtxRequestId(ctx),
+		Code: protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("successfully set '%d' pipelines for audience '%s'",
+			len(req.PipelineIds), util.AudienceToStr(req.Audience)),
 	}, nil
+}
+
+func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		"DetachPipeline is deprecated, use SetPipelines instead"), nil
+
+	//if err := validate.DetachPipelineRequest(req); err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+	//}
+	//
+	//if s.Options.DemoMode {
+	//	return demoResponse(ctx)
+	//}
+	//
+	//// Does this pipeline exist?
+	//if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
+	//	if err == store.ErrPipelineNotFound {
+	//		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+	//	}
+	//
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	//}
+	//
+	//// What session ID's are using this pipeline ID?
+	//sessionIDs, err := s.getSessionIDsByPipelineID(ctx, req.PipelineId)
+	//if err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	//}
+	//
+	//s.log.Debugf("detach gRPC handler: found '%d' session ids", len(sessionIDs))
+	//
+	//// Inject session_id's into request
+	//req.XSessionIds = make([]string, 0)
+	//
+	//for _, sessionID := range sessionIDs {
+	//	req.XSessionIds = append(req.XSessionIds, sessionID)
+	//}
+	//
+	//s.log.Debugf("injected request contains '%d' session ids", len(req.XSessionIds))
+	//
+	//// Broadcast detach to everyone
+	//if err := s.Options.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
+	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	//}
+	//
+	//// We are able to immediately remove the config entry because the broadcast
+	//// handlers are not performing a Store lookup.
+	//if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
+	//	s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
+	//}
+	//
+	//// Send telemetry
+	//telTags := []statsd.Tag{
+	//	{"install_id", s.Options.InstallID},
+	//	{"status", "attached"},
+	//}
+	//_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
+	//
+	//return &protos.StandardResponse{
+	//	Id:      util.CtxRequestId(ctx),
+	//	Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+	//	Message: fmt.Sprintf("pipeline '%s' detached", req.PipelineId),
+	//}, nil
 }
 
 func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) (*protos.StandardResponse, error) {

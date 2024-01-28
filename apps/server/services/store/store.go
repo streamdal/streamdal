@@ -139,6 +139,12 @@ type IStore interface {
 
 	// GetTailRequestById returns a TailRequest by its ID
 	GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error)
+
+	// GetPipelinesByAudience fetches pipelines assigned for a particular audience
+	GetPipelinesByAudience(ctx context.Context, audience *protos.Audience) ([]*protos.Pipeline, error)
+
+	// SetPipelines saves pipelines assigned to a particular audience
+	SetPipelines(ctx context.Context, audience *protos.Audience, pipelines []*protos.Pipeline) error
 }
 
 type Options struct {
@@ -323,6 +329,24 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	}
 
 	return pipeline, nil
+}
+
+// TODO: Implement
+func (s *Store) SetPipelines(ctx context.Context, aud *protos.Audience, pipelines []*protos.Pipeline) error {
+	llog := s.log.WithField("method", "SetPipelines")
+	llog.Debugf("received request to save pipelines for audience '%s'", util.AudienceToStr(audience))
+
+	// Convert pipelines to cmd for storage
+	for _, p := range pipelines {
+
+	}
+
+	// Save to K/V
+	if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(aud)), pipelineData, 0).Err(); err != nil {
+		return errors.Wrap(err, "error saving pipeline to store")
+	}
+
+	return nil
 }
 
 func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
