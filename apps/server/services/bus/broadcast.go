@@ -60,6 +60,10 @@ func (b *Bus) BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceR
 	return b.broadcast(ctx, "new_audience", &protos.BusEvent{Event: &protos.BusEvent_NewAudienceRequest{NewAudienceRequest: req}})
 }
 
+func (b *Bus) BroadcastSetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error {
+	return b.broadcast(ctx, "set_pipelines", &protos.BusEvent{Event: &protos.BusEvent_SetPipelinesRequest{SetPipelinesRequest: req}})
+}
+
 // BroadcastKVCreate will transform the req into a generic KVRequest and broadcast
 // it to other server nodes.
 func (b *Bus) BroadcastKVCreate(ctx context.Context, kvs []*protos.KVObject, overwrite bool) error {

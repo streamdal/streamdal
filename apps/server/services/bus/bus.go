@@ -114,6 +114,9 @@ type IBus interface {
 
 	// BroadcastTailResponse broadcasts a TailResponse to all nodes in the cluster
 	BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error
+
+	// BroadcastSetPipelines broadcasts a SetPipelinesRequest to all nodes in the cluster
+	BroadcastSetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error
 }
 
 type Bus struct {
@@ -398,6 +401,7 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 	case *protos.BusEvent_TailResponse:
 		llog.Debug("received TailResponse")
 		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
+	// TODO: ADD A SET PIPELINES REQUEST
 	default:
 		llog.Debug("received unknown event type")
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)
