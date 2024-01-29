@@ -74,11 +74,6 @@ func RedisPipelineKey(pipelineID string) string {
 	return strings.ToLower(fmt.Sprintf(RedisPipelineKeyFormat, pipelineID))
 }
 
-func RedisConfigKey(audience *protos.Audience, pipelineID string) string {
-	audStr := util.AudienceToStr(audience)
-	return strings.ToLower(fmt.Sprintf(RedisConfigKeyFormat, audStr, pipelineID))
-}
-
 func RedisNotificationConfigKey(configID string) string {
 	return strings.ToLower(fmt.Sprintf(RedisNotificationConfigKeyFormat, configID))
 }
