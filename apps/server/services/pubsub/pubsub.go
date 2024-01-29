@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 // IPubSub is an interface for an internal, in-memory pub/sub system. We use it

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/util"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )

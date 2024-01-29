@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	telTypes "github.com/streamdal/server/types"
+	telTypes "github.com/streamdal/streamdal/apps/server/types"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
 
@@ -19,10 +19,10 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/encryption"
-	"github.com/streamdal/server/services/store/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/encryption"
+	"github.com/streamdal/streamdal/apps/server/services/store/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 /*
@@ -138,6 +138,9 @@ type IStore interface {
 
 	// SetPipelines saves pipelines as SetPipelinesConfig json to $audience key in store
 	SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error
+
+	// GetSetPipelinesCommandsByService returns a slice of SetPipelines commands for a given service
+	GetSetPipelinesCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 }
 
 type Options struct {

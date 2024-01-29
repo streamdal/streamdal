@@ -204,6 +204,10 @@ github.com/smartystreets/goconvey v1.6.4 h1:fv0U8FUIMPNf1L9lnHLvLhgicrIVChEkdzIK
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/spaolacci/murmur3 v1.1.0 h1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0bLI=
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
+github.com/streamdal/protos v0.0.124 h1:vI6Qj/ySJRRaG2IzfvKhrqA0NcUDGtqinCZYiatNf6k=
+github.com/streamdal/protos v0.0.124/go.mod h1:ciPOA0/x5PG4yxOdwBtLFPwyAKwecMkuEitO3csbB7A=
+github.com/streamdal/server v0.0.12 h1:FUk2rEMfPB3dr1MD5t3XULtbrOf+dRD5VolwSM4VXC8=
+github.com/streamdal/server v0.0.12/go.mod h1:RU3Nwieb17bHl0tmY6V53AXe/J5DxCpn1c1fI4YK7tk=
 github.com/streamdal/streamdal/libs/protos v0.1.14 h1:DK1vPmBrX6fLy6uCmNJsonZdqp3zs3zXDCOaRwo3s6o=
 github.com/streamdal/streamdal/libs/protos v0.1.14/go.mod h1:WZ6qCqzJu/9Vn+P5EUMN1hcOWlxN2EHgcsxehylhgJQ=
 github.com/streamdal/streamdal/libs/protos v0.1.16 h1:e/xGg9rGBpr+wfNBAsRVPMGs8MlZLtmzfcjnYLdp2K0=

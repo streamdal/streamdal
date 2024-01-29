@@ -17,10 +17,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 const (
@@ -564,9 +564,9 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 			fmt.Sprintf("unable to get existing pipelines by audience: %s", err)), nil
 	}
 
-	// TODO: DO WE CARE IF THERE ARE EXISTING ATTACHED PIPELINES? I DON'T THINK SO?
-	// The SDKs would just receive the new setpipeline and stop executing all the
-	// other pipelines.
+	// NOTE: We do not care about any pipelines that the SDK is executing - the
+	// SDK should be dumb - it receives a new SetPipeline command and discards +
+	// replaces the pipelines it's executing with the new ones in SetPipeline cmd.
 
 	// Store the new pipeline config
 	if err := s.Options.StoreService.SetPipelines(ctx, req); err != nil {

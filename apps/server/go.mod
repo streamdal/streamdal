@@ -1,4 +1,4 @@
-module github.com/streamdal/server
+module github.com/streamdal/streamdal/apps/server
 
 go 1.21
 
@@ -33,6 +33,8 @@ require (
 	gopkg.in/relistan/rubberneck.v1 v1.1.0
 )
 
+require github.com/streamdal/server v0.0.12
+
 require (
 	github.com/DataDog/appsec-internal-go v1.4.0 // indirect
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.50.2 // indirect
@@ -66,6 +68,7 @@ require (
 	github.com/relistan/rubberneck v1.3.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
+	github.com/streamdal/protos v0.0.124 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tinylib/msgp v1.1.9 // indirect

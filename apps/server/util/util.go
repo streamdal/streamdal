@@ -16,7 +16,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
-	"github.com/streamdal/server/wasm"
+	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 const (
@@ -241,6 +241,23 @@ func ConvertConfigStrAudience(config map[*protos.Audience][]*protos.Pipeline) ma
 	}
 
 	return m
+}
+
+func GenerateSchemaInferencePipeline() *protos.Pipeline {
+	return &protos.Pipeline{
+		Id:   GenerateUUID(),
+		Name: "Schema Inference (auto-generated)",
+		Steps: []*protos.PipelineStep{
+			{
+				Name: "Infer Schema (auto-generated)",
+				Step: &protos.PipelineStep_InferSchema{
+					InferSchema: &steps.InferSchemaStep{
+						CurrentSchema: make([]byte, 0),
+					},
+				},
+			},
+		},
+	}
 }
 
 func AudienceEquals(a, b *protos.Audience) bool {

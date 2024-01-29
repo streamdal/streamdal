@@ -8,10 +8,10 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 // TODO: Needs update to support ordered pipelines!!!
@@ -170,9 +170,9 @@ func (b *Bus) getSessionIDsByAudience(ctx context.Context, audience *protos.Audi
 	return sessionIDs, nil
 }
 
-// Pipeline was attached to an audience - check if this service has an active
-// registration with the provided audience. If it does, we need to send a
-// AttachPipeline cmd to the client.
+// Broadcast handler for SetPipelinesRequest - checks if the SetPipelines request
+// is for an audience that has an active registration on this node. If it does,
+// we will inject schema inference + send a SetPipelines cmd to the SDK.
 func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipelinesRequest) error {
 	b.log.Debugf("handling attach pipeline request bus event: %v", req)
 
@@ -182,16 +182,14 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 
 	pipelines := make([]*protos.Pipeline, 0)
 
-	// WARNING: Important
-	// This needs to also handle the case that SDK has an active pipeline that
-	// is NOT in the request. Or do we? Maybe the SDK just discards whatever
-	// it is doing with other pipelines? As in, it just overwrites?
+	// Inject schema inference pipeline
+	pipelines = append(pipelines, util.GenerateSchemaInferencePipeline())
 
 	// Valid pipeline IDs?
 	for _, id := range req.PipelineIds {
 		pipeline, err := b.options.Store.GetPipeline(ctx, id)
 		if err != nil {
-			if err == store.ErrPipelineNotFound {
+			if errors.Is(err, store.ErrPipelineNotFound) {
 				b.log.Debugf("pipeline id '%s' not found - skipping", id)
 				return nil
 			}
@@ -428,6 +426,13 @@ func (b *Bus) handleDeregisterRequest(_ context.Context, req *protos.DeregisterR
 func (b *Bus) handleNewAudienceRequest(_ context.Context, req *protos.NewAudienceRequest) error {
 	b.log.Debugf("handling new audience request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience handler")
+
+	// DEV: Need to inject schema inference pipeline here
+
+	// TODO: Is this a brand new audience?
+	// TODO: If no, nothing to do
+	// TODO: If yes, inject schema inference pipeline and send to connected SDKs
+
 	return nil
 }
 

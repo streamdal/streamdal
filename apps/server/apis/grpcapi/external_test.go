@@ -19,10 +19,10 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
-	"github.com/streamdal/server/config"
-	"github.com/streamdal/server/deps"
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/config"
+	"github.com/streamdal/streamdal/apps/server/deps"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 const (
