@@ -178,6 +178,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// to the ServiceName (so we can get all active tails for that service)
 	go s.sendActiveTails(server.Context(), ch, request)
 
+	// TODO: This should be removed as it'll be injected during initial GetPipelines() called by SDK
 	// Send ephemeral schema inference pipeline for each announced audience
 	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
 
@@ -390,6 +391,7 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 	}, nil
 }
 
+// TODO: This should be updated for ordered pipelines!!!
 func (s *InternalServer) getActiveAttachPipelineCommands(
 	ctx context.Context,
 	serviceName string,
@@ -438,6 +440,7 @@ func (s *InternalServer) getActiveAttachPipelineCommands(
 	return active, paused, nil
 }
 
+// TODO: This should be removed and changed for ordered pipelines
 func (s *InternalServer) GetAttachCommandsByService(
 	ctx context.Context,
 	req *protos.GetAttachCommandsByServiceRequest,

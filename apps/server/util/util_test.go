@@ -129,7 +129,7 @@ func TestParseConfigKey(t *testing.T) {
 
 func TestGrpcMethodCounterName(t *testing.T) {
 	cases := map[string]string{
-		"/protos.External/GetConfig":             "grpc_method_external_get_config",
+		"/protos.External/GetAllConfig":          "grpc_method_external_get_config",
 		"/protos.External/AppVerifyRegistration": "grpc_method_external_app_verify_registration",
 		"/protos.Internal/Register":              "grpc_method_internal_register",
 	}
