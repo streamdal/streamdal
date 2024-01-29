@@ -86,6 +86,7 @@ func (s *InternalServer) sendToClient(ch chan *protos.Command, cmd *protos.Comma
 	ch <- cmd
 }
 
+// DEV: This should probably go away (as injection happens elsewhere)
 func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
 	// Get all audiences for this session
 	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
@@ -178,7 +179,7 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// to the ServiceName (so we can get all active tails for that service)
 	go s.sendActiveTails(server.Context(), ch, request)
 
-	// TODO: This should be removed as it'll be injected during initial GetPipelines() called by SDK
+	// DEV: This should be removed as it'll be injected during initial GetPipelines() called by SDK
 	// Send ephemeral schema inference pipeline for each announced audience
 	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
 
@@ -375,6 +376,7 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		s.log.Debugf("channel already exists for session id '%s'", req.SessionId)
 	}
 
+	// DEV: This should probably be removed here as well. Injection happens in $TBD!
 	// This is context.Background() because it's ran as a gouroutine and the request
 	// context may be finished by the time it eventually runs
 	go s.sendInferSchemaPipelines(context.Background(), cmdCh, req.SessionId)
@@ -391,7 +393,7 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 	}, nil
 }
 
-// TODO: This should be updated for ordered pipelines!!!
+// DEV: This should be updated/removed for ordered pipelines!!!
 func (s *InternalServer) getActiveAttachPipelineCommands(
 	ctx context.Context,
 	serviceName string,
@@ -440,7 +442,7 @@ func (s *InternalServer) getActiveAttachPipelineCommands(
 	return active, paused, nil
 }
 
-// TODO: This should be removed and changed for ordered pipelines
+// DEV: This should be updated/removed for ordered pipelines
 func (s *InternalServer) GetAttachCommandsByService(
 	ctx context.Context,
 	req *protos.GetAttachCommandsByServiceRequest,
