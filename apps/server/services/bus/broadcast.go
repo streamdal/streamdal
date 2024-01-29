@@ -23,15 +23,6 @@ func (b *Bus) BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePip
 	return b.broadcast(ctx, "delete_pipeline", &protos.BusEvent{Event: &protos.BusEvent_DeletePipelineRequest{DeletePipelineRequest: req}})
 }
 
-func (b *Bus) BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error {
-	return b.broadcast(ctx, "attach_pipeline", &protos.BusEvent{Event: &protos.BusEvent_AttachPipelineRequest{AttachPipelineRequest: req}})
-}
-
-func (b *Bus) BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error {
-	b.log.Debugf("detach broadcastDetachPipeline: has '%d' session ID's", len(req.XSessionIds))
-	return b.broadcast(ctx, "detach_pipeline", &protos.BusEvent{Event: &protos.BusEvent_DetachPipelineRequest{DetachPipelineRequest: req}})
-}
-
 func (b *Bus) BroadcastPauseResume(ctx context.Context, aud *protos.Audience, pipelineID string, pause bool) error {
 	b.log.Debugf("broadcastPauseResume pause set to '%t' for pipeline ID '%s'", pause, pipelineID)
 

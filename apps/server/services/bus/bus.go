@@ -357,31 +357,26 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 		llog.Debug("received DeregisterRequest")
 		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_NewAudienceRequest:
-		// DEV: New audience handler should inject a schema inference pipeline
+		// Injects schema inference pipeline
 		llog.Debug("received NewAudienceRequest")
 		err = b.handleNewAudienceRequest(shutdownCtx, busEvent.GetNewAudienceRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:
 		llog.Debug("received DeleteAudienceRequest")
 		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received UpdatePipelineRequest")
 		err = b.handleUpdatePipelineRequest(shutdownCtx, busEvent.GetUpdatePipelineRequest())
 	case *protos.BusEvent_DeletePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received DeletePipelineRequest")
 		err = b.handleDeletePipelineRequest(shutdownCtx, busEvent.GetDeletePipelineRequest())
-
-	// DEPRECATED (01.27.2024)
-	case *protos.BusEvent_AttachPipelineRequest:
-		return errors.New("AttachPipelineRequest is deprecated, use SetPipelinesRequest instead")
-
-	// DEPRECATED (01.27.2024)
-	case *protos.BusEvent_DetachPipelineRequest:
-		return errors.New("AttachPipelineRequest is deprecated, use SetPipelinesRequest instead")
-
 	case *protos.BusEvent_PausePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received PausePipelineRequest")
 		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
 	case *protos.BusEvent_ResumePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received ResumePipelineRequest")
 		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
 	case *protos.BusEvent_MetricsRequest:
@@ -397,6 +392,7 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 		llog.Debug("received TailResponse")
 		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
 	case *protos.BusEvent_SetPipelinesRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received SetPipelinesRequest")
 		err = b.handleSetPipelinesRequest(shutdownCtx, busEvent.GetSetPipelinesRequest())
 	default:

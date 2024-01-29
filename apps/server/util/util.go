@@ -176,36 +176,38 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 
 // GenerateWasmMapping will generate a map of WASM modules from the given command(s).
 // NOTE: This is primarily useful for commands that have Steps which contain
-// Wasm fields (like AttachCommand). For commands that do not have Steps w/ Wasm,
-// this will do nothing.
+// Wasm fields (like SetPipelines command). For commands that do not have Steps
+// w/ Wasm, this will do nothing.
 func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmModule {
 	wasmModules := make(map[string]*protos.WasmModule)
 
 	for _, cmd := range commands {
-		if cmd.GetAttachPipeline() == nil {
+		if cmd.GetSetPipelines() == nil {
 			continue
 		}
 
-		if cmd.GetAttachPipeline().Pipeline == nil {
-			logrus.Warnf("bug? attach pipeline command has nil pipeline. Audience: %s CommandStr: %s",
+		if cmd.GetSetPipelines().Pipelines == nil {
+			logrus.Warnf("bug? attach pipeline command has nil pipelines. Audience: %s CommandStr: %s",
 				AudienceToStr(cmd.Audience), cmd.String())
 			continue
 		}
 
 		// Inject WASM data into its own map and zero out the bytes in the steps
 		// This is to prevent the WASM data from being duplicated in the response
-		for _, step := range cmd.GetAttachPipeline().Pipeline.Steps {
-			if _, ok := wasmModules[step.GetXWasmId()]; ok {
-				step.XWasmBytes = nil
-				continue
-			}
+		for _, pipeline := range cmd.GetSetPipelines().Pipelines {
+			for _, step := range pipeline.Steps {
+				if _, ok := wasmModules[step.GetXWasmId()]; ok {
+					step.XWasmBytes = nil
+					continue
+				}
 
-			wasmModules[step.GetXWasmId()] = &protos.WasmModule{
-				Id:       step.GetXWasmId(),
-				Bytes:    step.GetXWasmBytes(),
-				Function: step.GetXWasmFunction(),
+				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
+					Id:       step.GetXWasmId(),
+					Bytes:    step.GetXWasmBytes(),
+					Function: step.GetXWasmFunction(),
+				}
+				step.XWasmBytes = nil
 			}
-			step.XWasmBytes = nil
 		}
 	}
 
@@ -260,6 +262,13 @@ func GenerateSchemaInferencePipeline() *protos.Pipeline {
 	}
 }
 
+// DEV: Test this
+// Inject schema inference pipeline BEFORE all other pipelines
+func InjectSchemaInferencePipeline(pipelines []*protos.Pipeline) []*protos.Pipeline {
+	pipelines = append([]*protos.Pipeline{GenerateSchemaInferencePipeline()}, pipelines...)
+	return pipelines
+}
+
 func AudienceEquals(a, b *protos.Audience) bool {
 	if a == nil || b == nil {
 		return false
@@ -297,30 +306,6 @@ func CounterName(name string, labels map[string]string) string {
 	}
 
 	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
-}
-
-func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
-	return &protos.Command{
-		Audience: aud,
-		Command: &protos.Command_AttachPipeline{
-			AttachPipeline: &protos.AttachPipelineCommand{
-				Pipeline: &protos.Pipeline{
-					Id:   GenerateUUID(),
-					Name: "Schema Inference",
-					Steps: []*protos.PipelineStep{
-						{
-							Name: "Infer Schema",
-							Step: &protos.PipelineStep_InferSchema{
-								InferSchema: &steps.InferSchemaStep{
-									CurrentSchema: make([]byte, 0), // TODO: get this from storage
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
 }
 
 // GrpcMethodCounterName turns a gRPC method name into a counter name for statsd

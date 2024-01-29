@@ -408,9 +408,8 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	// Send telemetry
 	s.sendStepDeltaTelemetry(originalPipeline, req.Pipeline)
 
-	// Pipeline exists - broadcast it as there might be servers that have
-	// a client that has an active registration using this pipeline (and it should
-	// get updated)
+	// Pipeline exists - broadcast the update; handlers will emit updated
+	// SetPipelines command to any connected SDKs.
 	if err := s.Options.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -523,18 +522,6 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: fmt.Sprintf("pipeline '%s' deleted", req.PipelineId),
 	}, nil
-}
-
-// DEPRECATED
-func (s *ExternalServer) AttachPipeline(ctx context.Context, _ *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
-	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
-		"AttachPipeline is deprecated, use SetPipelines instead"), nil
-}
-
-// DEPRECATED
-func (s *ExternalServer) DetachPipeline(ctx context.Context, _ *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
-	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
-		"DetachPipeline is deprecated, use SetPipelines instead"), nil
 }
 
 func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) (*protos.StandardResponse, error) {
@@ -817,7 +804,7 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 	}, nil
 }
 
-// DEV: Update for ordered pipelines
+// DEV (DONE): Update for ordered pipelines
 func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteAudienceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -861,8 +848,8 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}, nil
 }
 
-// DEV (DONE): Needs to be updated for ordered pipelines
-// TODO: Make sure to update bus handler for delete service
+// DEV (DONE): Implement
+// This is basically delete by audience - except affects more than one audience
 func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteServiceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteServiceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -874,18 +861,51 @@ func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteSe
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	if len(audiences) == 0 {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK, fmt.Sprintf("Service '%s' deleted (has no audiences)", req.ServiceName)), nil
+	}
+
+	var numDeleted int
+
 	// Determine if the audience is attached to any pipelines
 	for _, audience := range audiences {
-		if _, err := s.Options.StoreService.GetConfigByAudience(ctx, audience); err != nil {
+		configs, err := s.Options.StoreService.GetConfigByAudience(ctx, audience)
+		if err != nil {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 				fmt.Sprintf("unable to delete audience '%s' during service delete: %s", util.AudienceToStr(audience), err.Error())), nil
 		}
+
+		if len(configs) > 0 && !req.GetForce() {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+				fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(audience), len(configs))), nil
+		}
+
+		// Either there are 0 attached pipelines or force is set - either way
+		// we can update store and broadcast - the broadcast handler will know
+		// to send empty SetPipelines commands to connected SDKs.
+
+		if err := s.Options.StoreService.DeleteAudience(ctx, &protos.DeleteAudienceRequest{
+			Audience: audience,
+		}); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to delete audience '%s' during service delete: %s", util.AudienceToStr(audience), err.Error())), nil
+		}
+
+		// Broadcast delete to other nodes so that they can emit a SetPipelines cmd + update UI
+		if err := s.Options.BusService.BroadcastDeleteAudience(ctx, &protos.DeleteAudienceRequest{
+			Audience: audience,
+		}); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		}
+
+		numDeleted += 1
 	}
 
 	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("Service and audiences deleted (force '%t')", req.GetForce()),
+		Id:   util.CtxRequestId(ctx),
+		Code: protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("Service and '%d' audiences deleted (force '%t')",
+			numDeleted, req.GetForce()),
 	}, nil
 }
 
