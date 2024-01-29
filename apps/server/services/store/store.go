@@ -71,8 +71,8 @@ type IStore interface {
 	SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
-	GetAllConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
-	GetConfigByAudience(ctx context.Context, audience *protos.Audience) ([]string, error)
+	GetAllConfig(ctx context.Context) (map[*protos.Audience][]*protos.Pipeline, error)
+	GetConfigByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error)
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
@@ -80,8 +80,7 @@ type IStore interface {
 	DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
-	PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
-	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+	SetPauseResume(ctx context.Context, audience *protos.Audience, pipelineID string, pause bool) (bool, error)
 	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
@@ -92,7 +91,6 @@ type IStore interface {
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
 	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
 	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
-	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
@@ -423,7 +421,7 @@ func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 }
 
 // Sets pipeline pause status
-func (s *Store) setPause(ctx context.Context, audience *protos.Audience, pipelineID string, paused bool) (bool, error) {
+func (s *Store) SetPauseResume(ctx context.Context, audience *protos.Audience, pipelineID string, paused bool) (bool, error) {
 	llog := s.log.WithField("method", "setPause")
 	llog.Debug("received request to set pause")
 
@@ -468,22 +466,6 @@ func (s *Store) setPause(ctx context.Context, audience *protos.Audience, pipelin
 	return updated, nil
 }
 
-// DEV (DONE): Needs to be updated to work with ordered pipelines
-func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error {
-	llog := s.log.WithField("method", "PausePipeline")
-	llog.Debug("received request to pause pipeline")
-
-	if err := validate.PausePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "error validating request in store.PausePipeline()")
-	}
-
-	updated, err := s.setPause(ctx, req.Audience, req.PipelineId, true)
-
-	llog.Debugf("pipelineID '%s' pause/resume updated: %t", req.PipelineId, updated)
-
-	return err
-}
-
 // IsPaused returns if pipeline is paused and if it exists
 // DEV (DONE): Needs to be updated to work with ordered pipelines
 func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
@@ -503,21 +485,6 @@ func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelin
 	}
 
 	return false, nil
-}
-
-// DEV (DONE): Needs to be updated to work with ordered pipelines
-func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error {
-	llog := s.log.WithField("method", "ResumePipeline")
-	llog.Debug("received request to resume pipeline")
-
-	if err := validate.ResumePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "error validating request in store.ResumePipeline()")
-	}
-
-	updated, err := s.setPause(ctx, req.Audience, req.PipelineId, false)
-	llog.Debugf("pipelineID '%s' pause/resume updated: %t", req.PipelineId, updated)
-
-	return err
 }
 
 func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64) {

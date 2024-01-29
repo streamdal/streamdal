@@ -79,17 +79,8 @@ type IBus interface {
 	// BroadcastDeletePipeline broadcasts a DeletePipelineRequest to all nodes in the cluster
 	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
 
-	// BroadcastAttachPipeline broadcasts a AttachPipelineRequest to all nodes in the cluster
-	BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
-
-	// BroadcastDetachPipeline broadcasts a DetachPipelineRequest to all nodes in the cluster
-	BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
-
-	// BroadcastPausePipeline broadcasts a PausePipelineRequest to all nodes in the cluster
-	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
-
-	// BroadcastResumePipeline broadcasts a ResumePipelineRequest to all nodes in the cluster
-	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+	// BroadcastPauseResume broadcasts a PausePipelineRequest or ResumePipelineRequest to all nodes in the cluster
+	BroadcastPauseResume(ctx context.Context, aud *protos.Audience, pipelineID string, paused bool) error
 
 	// BroadcastMetrics broadcasts a MetricsRequest to all nodes in the cluster
 	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error

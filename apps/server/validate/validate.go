@@ -268,38 +268,6 @@ func DeletePipelineRequest(req *protos.DeletePipelineRequest) error {
 	return nil
 }
 
-func PausePipelineRequest(req *protos.PausePipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	if err := Audience(req.Audience); err != nil {
-		return errors.Wrap(err, "invalid audience")
-	}
-
-	return nil
-}
-
-func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	if err := Audience(req.Audience); err != nil {
-		return errors.Wrap(err, "invalid audience")
-	}
-
-	return nil
-}
-
 func NewAudienceRequest(req *protos.NewAudienceRequest) error {
 	if req == nil {
 		return ErrNilInput
@@ -318,6 +286,30 @@ func GetAllRequest(req *protos.GetAllRequest) error {
 	}
 
 	return nil
+}
+
+func PausePipelineRequest(req *protos.PausePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return Audience(req.Audience)
+}
+
+func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return Audience(req.Audience)
 }
 
 func SetPipelinesRequest(req *protos.SetPipelinesRequest) error {

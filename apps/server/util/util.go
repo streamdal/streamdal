@@ -223,7 +223,8 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 	}
 }
 
-func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]*protos.GetAllResponsePipelines {
+// DEV (DONE): Need to update for ordered pipelines
+func ConvertConfigStrAudience(config map[*protos.Audience][]*protos.Pipeline) map[string]*protos.GetAllResponsePipelines {
 	if config == nil {
 		return nil
 	}
@@ -234,8 +235,8 @@ func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]*
 		m[AudienceToStr(k)] = &protos.GetAllResponsePipelines{
 			PipelineIds: make([]string, 0),
 		}
-		for _, pipelineID := range pipelines {
-			m[AudienceToStr(k)].PipelineIds = append(m[AudienceToStr(k)].PipelineIds, pipelineID)
+		for _, p := range pipelines {
+			m[AudienceToStr(k)].PipelineIds = append(m[AudienceToStr(k)].PipelineIds, p.Id)
 		}
 	}
 
