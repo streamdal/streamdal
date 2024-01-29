@@ -14,7 +14,7 @@ import (
 	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
-// TODO: Needs update to support ordered pipelines!!!
+// DEV: Needs update to support ordered pipelines!!!
 // Pipeline was updated - check if this service has an active registration that
 // uses this pipeline id. If it does, we need to have the client "reload" the
 // pipeline. We can do this by sending a "SetPipeline" cmd to the client.
@@ -77,55 +77,6 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 	return nil
 }
 
-// Pipeline was deleted. We need to determine if we have any active clients
-// using that pipeline. If yes, we need to tell them to detach the pipeline.
-func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
-	b.log.Debugf("handling delete pipeline request bus event: %v", req)
-
-	if err := validate.DeletePipelineRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	// Determine active pipeline usage
-	usage, err := b.options.Store.GetActivePipelineUsage(ctx, req.PipelineId)
-	if err != nil {
-		return errors.Wrap(err, "error getting pipeline usage")
-	}
-
-	if len(usage) == 0 {
-		b.log.Debugf("no active pipeline usage found for pipeline id '%s' on node '%s' - skipping", req.PipelineId, b.options.NodeName)
-		return nil
-	}
-
-	b.log.Debugf("found '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", len(usage), req.PipelineId, b.options.NodeName)
-
-	notified := 0
-
-	// Inform active clients to detach pipeline
-	for _, u := range usage {
-		ch := b.options.Cmd.GetChannel(u.SessionId)
-		if ch == nil {
-			b.log.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", u.SessionId)
-			continue
-		}
-
-		ch <- &protos.Command{
-			Audience: u.Audience,
-			Command: &protos.Command_DetachPipeline{
-				DetachPipeline: &protos.DetachPipelineCommand{
-					PipelineId: req.PipelineId,
-				},
-			},
-		}
-
-		notified += 1
-	}
-
-	b.log.Debugf("notified '%d' active pipeline usage(s) for pipeline id '%s' on node '%s'", notified, req.PipelineId, b.options.NodeName)
-
-	return nil
-}
-
 // Get session id's on this node
 func (b *Bus) getSessionIDs(ctx context.Context) ([]string, error) {
 	entries, err := b.options.Store.GetLive(ctx)
@@ -146,30 +97,7 @@ func (b *Bus) getSessionIDs(ctx context.Context) ([]string, error) {
 	return sessionIDs, nil
 }
 
-// Get session id's by audience (and current node)
-func (b *Bus) getSessionIDsByAudience(ctx context.Context, audience *protos.Audience) ([]string, error) {
-	entries, err := b.options.Store.GetLive(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting live entries")
-	}
-
-	sessionIDs := make([]string, 0)
-
-	for _, e := range entries {
-		if !util.AudienceEquals(e.Audience, audience) {
-			continue
-		}
-
-		if e.NodeName != b.options.NodeName {
-			continue
-		}
-
-		sessionIDs = append(sessionIDs, e.SessionID)
-	}
-
-	return sessionIDs, nil
-}
-
+// DEV (DONE): Implemented for ordered pipelines (includes schema inference injection)
 // Broadcast handler for SetPipelinesRequest - checks if the SetPipelines request
 // is for an audience that has an active registration on this node. If it does,
 // we will inject schema inference + send a SetPipelines cmd to the SDK.
@@ -201,7 +129,7 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 		pipelines = append(pipelines, pipeline)
 	}
 
-	sessionIDs, err := b.getSessionIDsByAudience(ctx, req.Audience)
+	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(ctx, req.Audience, b.options.NodeName)
 	if err != nil {
 		b.log.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
 		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
@@ -241,7 +169,7 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 	return nil
 }
 
-// TODO: This needs to be updated to support ordered pipelines!!!
+// DEV: This needs to be updated to support ordered pipelines!!! Hmm.. Does it?
 // Pipeline was paused - check if this service has an active registration with
 // the provided audience. If it does, we need to send a PausePipeline cmd
 // to the client.
@@ -294,7 +222,7 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 	return nil
 }
 
-// TODO: This needs to be updated to support ordered pipelines!!!
+// DEV: This needs to be updated to support ordered pipelines!!! Hmm.. does it?
 // Pipeline was resumed - check if this service has an active registration with
 // the provided audience. If it does, we need to send a ResumePipeline cmd
 // to the client.
@@ -423,15 +351,69 @@ func (b *Bus) handleDeregisterRequest(_ context.Context, req *protos.DeregisterR
 	return nil
 }
 
-func (b *Bus) handleNewAudienceRequest(_ context.Context, req *protos.NewAudienceRequest) error {
-	b.log.Debugf("handling new audience request bus event: %v", req)
+// DEV (DONE): Updated for ordered pipelines (includes schema inference injection)
+func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudienceRequest) error {
+	llog := b.log.WithFields(logrus.Fields{
+		"method": "handleNewAudienceRequest",
+	})
+
+	llog.Debugf("handling new audience request bus event: %v", req)
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience handler")
 
-	// DEV: Need to inject schema inference pipeline here
+	if err := validate.NewAudienceRequest(req); err != nil {
+		llog.Errorf("validation error for new audience request: %v", err)
+		return errors.Wrap(err, "validation error")
+	}
 
-	// TODO: Is this a brand new audience?
-	// TODO: If no, nothing to do
-	// TODO: If yes, inject schema inference pipeline and send to connected SDKs
+	// Determine pipeline configuration for audience
+	existingPipelines, err := b.options.Store.GetConfigByAudience(context.Background(), req.Audience)
+	if err != nil {
+		llog.Errorf("error getting config by audience: %v", err)
+		return errors.Wrap(err, "error getting config by audience")
+	}
+
+	// If this is NOT a brand new audience, nothing to do
+	if len(existingPipelines) > 0 {
+		llog.Debugf("audience '%s' already has pipeline configuration - nothing to do", util.AudienceToStr(req.Audience))
+		return nil
+	}
+
+	newPipelines := make([]*protos.Pipeline, 0)
+
+	// Audience is brand new - inject schema inference pipeline and send to connected SDKs
+	newPipelines = append(newPipelines, util.GenerateSchemaInferencePipeline())
+
+	// Get all session IDs on this node
+	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(ctx, req.Audience, b.options.NodeName)
+	if err != nil {
+		llog.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
+		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
+	}
+
+	if len(sessionIDs) == 0 {
+		llog.Debugf("no active sessions found for audience '%s' on node '%s' - skipping", req.Audience, b.options.NodeName)
+		return nil
+	}
+
+	// Go through each session ID, get a command channel for it and send it a SetPipelines cmd
+	for _, sessionID := range sessionIDs {
+		ch := b.options.Cmd.GetChannel(sessionID)
+		if ch == nil {
+			llog.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", sessionID)
+			continue
+		}
+
+		llog.Debugf("sending infer schema pipeline to session id '%s' on node '%s'", sessionID, b.options.NodeName)
+
+		ch <- &protos.Command{
+			Audience: req.Audience,
+			Command: &protos.Command_SetPipelines{
+				SetPipelines: &protos.SetPipelinesCommand{
+					Pipelines: newPipelines,
+				},
+			},
+		}
+	}
 
 	return nil
 }

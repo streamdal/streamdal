@@ -141,6 +141,43 @@ type IStore interface {
 
 	// GetSetPipelinesCommandsByService returns a slice of SetPipelines commands for a given service
 	GetSetPipelinesCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
+
+	// GetSessionIDsByAudience returns a slice of session IDs for a given audience;
+	// accepts an optional "node name" to filter by.
+	GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error)
+}
+
+// DEV: Needs tests
+func (s *Store) GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error) {
+	llog := s.log.WithField("method", "GetSessionIDsByAudience")
+	llog.Debug("received request to get session IDs by audience")
+
+	if err := validate.Audience(aud); err != nil {
+		llog.Errorf("invalid audience: %s", err)
+		return nil, errors.Wrap(err, "error validating audience")
+	}
+
+	liveEntries, err := s.GetLive(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch live entries: %s", err)
+		return nil, errors.Wrap(err, "error fetching live entries")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, e := range liveEntries {
+		if len(nodeName) > 0 && e.NodeName != nodeName[0] {
+			continue
+		}
+
+		// Either same node or node was not specified
+		if util.AudienceEquals(aud, e.Audience) {
+			sessionIDs = append(sessionIDs, e.SessionID)
+			continue
+		}
+	}
+
+	return sessionIDs, nil
 }
 
 type Options struct {
