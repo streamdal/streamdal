@@ -280,6 +280,18 @@ func NewAudienceRequest(req *protos.NewAudienceRequest) error {
 	return Audience(req.Audience)
 }
 
+func GetSetPipelinesCommandsByServiceRequest(req *protos.GetSetPipelinesCommandsByServiceRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.ServiceName == "" {
+		return ErrEmptyField("ServiceName")
+	}
+
+	return nil
+}
+
 func GetAllRequest(req *protos.GetAllRequest) error {
 	if req == nil {
 		return ErrNilInput

@@ -11,11 +11,11 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/cmd"
-	"github.com/streamdal/server/services/metrics"
-	"github.com/streamdal/server/services/pubsub"
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/cmd"
+	"github.com/streamdal/streamdal/apps/server/services/metrics"
+	"github.com/streamdal/streamdal/apps/server/services/pubsub"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 /*
@@ -357,6 +357,7 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 		llog.Debug("received DeregisterRequest")
 		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_NewAudienceRequest:
+		// DEV: New audience handler should inject a schema inference pipeline
 		llog.Debug("received NewAudienceRequest")
 		err = b.handleNewAudienceRequest(shutdownCtx, busEvent.GetNewAudienceRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:

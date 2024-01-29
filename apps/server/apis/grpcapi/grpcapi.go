@@ -17,16 +17,16 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/config"
-	"github.com/streamdal/server/services/bus"
-	"github.com/streamdal/server/services/cmd"
-	"github.com/streamdal/server/services/kv"
-	"github.com/streamdal/server/services/metrics"
-	"github.com/streamdal/server/services/notify"
-	"github.com/streamdal/server/services/pubsub"
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/types"
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/config"
+	"github.com/streamdal/streamdal/apps/server/services/bus"
+	"github.com/streamdal/streamdal/apps/server/services/cmd"
+	"github.com/streamdal/streamdal/apps/server/services/kv"
+	"github.com/streamdal/streamdal/apps/server/services/metrics"
+	"github.com/streamdal/streamdal/apps/server/services/notify"
+	"github.com/streamdal/streamdal/apps/server/services/pubsub"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/types"
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 const (

@@ -14,9 +14,9 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
-	"github.com/streamdal/server/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 const (
@@ -84,29 +84,6 @@ func (s *InternalServer) sendToClient(ch chan *protos.Command, cmd *protos.Comma
 	}()
 
 	ch <- cmd
-}
-
-// DEV: This should probably go away (as injection happens elsewhere)
-func (s *InternalServer) sendInferSchemaPipelines(ctx context.Context, cmdCh chan *protos.Command, sessionID string) {
-	// Get all audiences for this session
-	audiences, err := s.Options.StoreService.GetAudiencesBySessionID(ctx, sessionID)
-	if err != nil {
-		s.log.Errorf("unable to get audiences by session id '%s': %v", sessionID, err)
-		return
-	}
-
-	for _, aud := range audiences {
-		// Create a new pipeline whose only step is an inferschema step
-		attachCmd := util.GenInferSchemaPipeline(aud)
-
-		// Inject WASM data
-		if err := util.PopulateWASMFields(attachCmd.GetAttachPipeline().Pipeline, s.Options.Config.WASMDir); err != nil {
-			s.log.Errorf("unable to populate WASM fields for inferschema: %v", err)
-			return
-		}
-
-		s.sendToClient(cmdCh, attachCmd)
-	}
 }
 
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
@@ -179,9 +156,21 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 	// to the ServiceName (so we can get all active tails for that service)
 	go s.sendActiveTails(server.Context(), ch, request)
 
-	// DEV: This should be removed as it'll be injected during initial GetPipelines() called by SDK
-	// Send ephemeral schema inference pipeline for each announced audience
-	go s.sendInferSchemaPipelines(server.Context(), ch, request.SessionId)
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// IMPORTANT: Schema inference pipeline is injected in THREE places:
+	//
+	// 	1. ✅In broadcast handler for SetPipelinesRequest (when pipelines are
+	//	   attached/detached for live clients)
+	//
+	// 	2. ✅In internal.GetSetPipelinesCommand() which is called when a client
+	//	   registers for the first time
+	//
+	//  3. In internal.NewAudience() which is called by SDKs when they announce a
+	//     new pipeline - we need this so that we can determine the schema even
+	//     if the audience does not have any pipelines attached to it (yet)
+	//
+	///////////////////////////////////////////////////////////////////////////
 
 	// TODO: need to figure out GaugeUsageRegistrationsTotal
 	// TODO: we need to hash the tags and store in redis/memory
@@ -368,20 +357,9 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 		}, nil
 	}
 
-	// Send AttachCommand to client with ephemeral inferschema pipeline
-	cmdCh, isNewCh := s.Options.CmdService.AddChannel(req.SessionId)
-	if isNewCh {
-		s.log.Debugf("new channel created for session id '%s'", req.SessionId)
-	} else {
-		s.log.Debugf("channel already exists for session id '%s'", req.SessionId)
-	}
-
-	// DEV: This should probably be removed here as well. Injection happens in $TBD!
-	// This is context.Background() because it's ran as a gouroutine and the request
-	// context may be finished by the time it eventually runs
-	go s.sendInferSchemaPipelines(context.Background(), cmdCh, req.SessionId)
-
-	// Broadcast audience creation so that we can notify UI GetAllStream clients
+	// Broadcast audience creation so that we can notify the UI of the new audience
+	// (via GetAllStream) and so that we can inject a schema inference pipeline
+	// in the broadcast handler.
 	if err := s.Options.BusService.BroadcastNewAudience(ctx, req); err != nil {
 		s.log.Errorf("unable to broadcast new audience: %s", err.Error())
 	}
@@ -393,70 +371,55 @@ func (s *InternalServer) NewAudience(ctx context.Context, req *protos.NewAudienc
 	}, nil
 }
 
-// DEV: This should be updated/removed for ordered pipelines!!!
-func (s *InternalServer) getActiveAttachPipelineCommands(
+func (s *InternalServer) GetSetPipelinesCommandsByService(
 	ctx context.Context,
-	serviceName string,
-) ([]*protos.Command, []*protos.Command, error) {
-	if serviceName == "" {
-		return nil, nil, errors.New("service name is required")
+	req *protos.GetSetPipelinesCommandsByServiceRequest,
+) (*protos.GetSetPipelinesCommandsByServiceResponse, error) {
+	if err := validate.GetSetPipelinesCommandsByServiceRequest(req); err != nil {
+		return nil, errors.Wrap(err, "invalid GetSetPipelinesCommandsByService request")
 	}
 
-	attaches, err := s.Options.StoreService.GetAttachCommandsByService(ctx, serviceName)
+	// Get active pipelines by service
+	setPipelinesCommands, err := s.Options.StoreService.GetSetPipelinesCommandsByService(ctx, req.ServiceName)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "unable to get attach commands by service")
+		return nil, errors.Wrapf(err, "unable to get configs for service '%s'", req.ServiceName)
 	}
 
-	pausedMap, err := s.Options.StoreService.GetPaused(ctx)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "unable to get paused pipelines")
-	}
+	numInjected := s.injectSchemaInferenceForSetPipelinesCommands(setPipelinesCommands)
 
-	active := make([]*protos.Command, 0)
-	paused := make([]*protos.Command, 0)
+	s.log.Debugf("GetSetPipelinesCommandsByService has injected '%d' schema inference pipelines for service '%s'",
+		numInjected, req.ServiceName)
 
-	for _, a := range attaches {
-		if err := validate.AttachPipelineCommand(a.GetAttachPipeline()); err != nil {
-			s.log.Warningf("invalid attach pipeline command: %s", err.Error())
-			continue
-		}
-
-		pausedEntry, ok := pausedMap[a.GetAttachPipeline().Pipeline.Id]
-		if !ok {
-			// Pipeline ID is not present in map, it is not paused
-			active = append(active, a)
-			continue
-		}
-
-		// Found pipeline id in paused, check if audience matches
-		if util.AudienceEquals(pausedEntry.Audience, a.Audience) {
-			// This is paused
-			paused = append(paused, a)
-			continue
-		}
-
-		// Audience dos not match, this is active
-		active = append(active, a)
-	}
-
-	return active, paused, nil
+	return &protos.GetSetPipelinesCommandsByServiceResponse{
+		SetPipelineCommands: setPipelinesCommands,
+		WasmModules:         util.GenerateWasmMapping(setPipelinesCommands...),
+	}, nil
 }
 
-// DEV: This should be updated/removed for ordered pipelines
-func (s *InternalServer) GetAttachCommandsByService(
-	ctx context.Context,
-	req *protos.GetAttachCommandsByServiceRequest,
-) (*protos.GetAttachCommandsByServiceResponse, error) {
-	active, paused, err := s.getActiveAttachPipelineCommands(ctx, req.ServiceName)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get attach commands by service")
+func (s *InternalServer) injectSchemaInferenceForSetPipelinesCommands(
+	cmds []*protos.Command,
+) int {
+	if len(cmds) == 0 {
+		return 0
 	}
 
-	return &protos.GetAttachCommandsByServiceResponse{
-		Active:      active,
-		Paused:      paused,
-		WasmModules: util.GenerateWasmMapping(append(active, paused...)...),
-	}, nil
+	var numInjected int
+
+	for _, cmd := range cmds {
+		if cmd.GetSetPipelines() == nil {
+			s.log.Debugf("skipping injection for non-SetPipelines command for audience '%s'", util.AudienceToStr(cmd.Audience))
+			continue
+		}
+
+		pipelines := make([]*protos.Pipeline, 0)
+		pipelines = append(pipelines, util.GenerateSchemaInferencePipeline())
+		pipelines = append(pipelines, cmd.GetSetPipelines().Pipelines...)
+
+		cmd.GetSetPipelines().Pipelines = pipelines
+		numInjected += 1
+	}
+
+	return numInjected
 }
 
 func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {

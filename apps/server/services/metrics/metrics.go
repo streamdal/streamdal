@@ -21,7 +21,7 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/types"
+	"github.com/streamdal/streamdal/apps/server/types"
 )
 
 const (

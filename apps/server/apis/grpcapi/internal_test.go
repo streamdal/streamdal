@@ -10,8 +10,8 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 // These tests expect the gRPC server and redis to be running. The server is
