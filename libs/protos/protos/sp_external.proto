@@ -10,11 +10,10 @@ import "sp_pipeline.proto";
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
 service External {
-  // Should return everything that is needed to build the initial view in the console
+  // Returns all data needed for UI; called on initial console load
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
 
-  // Temporary method to test gRPC-Web streaming
-  // DS: Is this temporary or are we using this exclusively? If so, can we remove GetAll()?
+  // Used by console to stream updates to UI; called after initial GetAll()
   rpc GetAllStream(GetAllRequest) returns (stream GetAllResponse);
 
   // Returns pipelines (_wasm_bytes field is stripped)
@@ -33,18 +32,6 @@ service External {
   rpc DeletePipeline(DeletePipelineRequest) returns (protos.StandardResponse);
 
   rpc SetPipelines(SetPipelinesRequest) returns (protos.StandardResponse);
-
-  // Attach a pipeline to an audience
-  // DEPRECATED (01.27.2024): Use SetPipelines instead
-  rpc AttachPipeline(AttachPipelineRequest) returns (protos.StandardResponse) {
-    option deprecated = true;
-  };
-
-  // Detach a pipeline from an audience
-  // DEPRECATED (01.27.2024): Use SetPipelines instead
-  rpc DetachPipeline(DetachPipelineRequest) returns (protos.StandardResponse) {
-    option deprecated = true;
-  };
 
   // Pause a pipeline; noop if pipeline is already paused
   rpc PausePipeline(PausePipelineRequest) returns (protos.StandardResponse);
@@ -173,26 +160,6 @@ message DeletePipelineRequest {
 message SetPipelinesRequest {
   repeated string pipeline_ids = 1;
   protos.Audience audience = 2;
-}
-
-// DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
-message AttachPipelineRequest {
-  option deprecated = true;
-
-  string pipeline_id = 1;
-  protos.Audience audience = 2;
-}
-
-// DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
-message DetachPipelineRequest {
-  option deprecated = true;
-
-  string pipeline_id = 1;
-  protos.Audience audience = 2;
-
-  // Filled out by detach gRPC handler so that broadcast handlers can avoid
-  // performing a lookup in NATS.
-  repeated string _session_ids = 3; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message PausePipelineRequest {

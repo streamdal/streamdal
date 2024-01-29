@@ -12,8 +12,6 @@ import { KVRequest } from "./sp_kv.js";
 import { MetricsRequest } from "./sp_internal.js";
 import { ResumePipelineRequest } from "./sp_external.js";
 import { PausePipelineRequest } from "./sp_external.js";
-import { DetachPipelineRequest } from "./sp_external.js";
-import { AttachPipelineRequest } from "./sp_external.js";
 import { UpdatePipelineRequest } from "./sp_external.js";
 import { DeletePipelineRequest } from "./sp_external.js";
 import { CreatePipelineRequest } from "./sp_external.js";
@@ -29,8 +27,6 @@ class BusEvent$Type extends MessageType {
             { no: 102, name: "create_pipeline_request", kind: "message", oneof: "event", T: () => CreatePipelineRequest },
             { no: 103, name: "delete_pipeline_request", kind: "message", oneof: "event", T: () => DeletePipelineRequest },
             { no: 104, name: "update_pipeline_request", kind: "message", oneof: "event", T: () => UpdatePipelineRequest },
-            { no: 105, name: "attach_pipeline_request", kind: "message", oneof: "event", T: () => AttachPipelineRequest },
-            { no: 106, name: "detach_pipeline_request", kind: "message", oneof: "event", T: () => DetachPipelineRequest },
             { no: 107, name: "pause_pipeline_request", kind: "message", oneof: "event", T: () => PausePipelineRequest },
             { no: 108, name: "resume_pipeline_request", kind: "message", oneof: "event", T: () => ResumePipelineRequest },
             { no: 109, name: "metrics_request", kind: "message", oneof: "event", T: () => MetricsRequest },
@@ -86,18 +82,6 @@ class BusEvent$Type extends MessageType {
                     message.event = {
                         oneofKind: "updatePipelineRequest",
                         updatePipelineRequest: UpdatePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.updatePipelineRequest)
-                    };
-                    break;
-                case /* protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true];*/ 105:
-                    message.event = {
-                        oneofKind: "attachPipelineRequest",
-                        attachPipelineRequest: AttachPipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.attachPipelineRequest)
-                    };
-                    break;
-                case /* protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true];*/ 106:
-                    message.event = {
-                        oneofKind: "detachPipelineRequest",
-                        detachPipelineRequest: DetachPipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.detachPipelineRequest)
                     };
                     break;
                 case /* protos.PausePipelineRequest pause_pipeline_request */ 107:
@@ -203,12 +187,6 @@ class BusEvent$Type extends MessageType {
         /* protos.UpdatePipelineRequest update_pipeline_request = 104; */
         if (message.event.oneofKind === "updatePipelineRequest")
             UpdatePipelineRequest.internalBinaryWrite(message.event.updatePipelineRequest, writer.tag(104, WireType.LengthDelimited).fork(), options).join();
-        /* protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true]; */
-        if (message.event.oneofKind === "attachPipelineRequest")
-            AttachPipelineRequest.internalBinaryWrite(message.event.attachPipelineRequest, writer.tag(105, WireType.LengthDelimited).fork(), options).join();
-        /* protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true]; */
-        if (message.event.oneofKind === "detachPipelineRequest")
-            DetachPipelineRequest.internalBinaryWrite(message.event.detachPipelineRequest, writer.tag(106, WireType.LengthDelimited).fork(), options).join();
         /* protos.PausePipelineRequest pause_pipeline_request = 107; */
         if (message.event.oneofKind === "pausePipelineRequest")
             PausePipelineRequest.internalBinaryWrite(message.event.pausePipelineRequest, writer.tag(107, WireType.LengthDelimited).fork(), options).join();

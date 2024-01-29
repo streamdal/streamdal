@@ -8,39 +8,19 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class AttachPipelineCommand(_message.Message):
-    __slots__ = ["pipeline"]
-    PIPELINE_FIELD_NUMBER: _ClassVar[int]
-    pipeline: _sp_pipeline_pb2.Pipeline
-    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
-
 class Command(_message.Message):
-    __slots__ = ["attach_pipeline", "audience", "detach_pipeline", "keep_alive", "kv", "pause_pipeline", "resume_pipeline", "set_pipelines", "tail"]
-    ATTACH_PIPELINE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["audience", "keep_alive", "kv", "set_pipelines", "tail"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    DETACH_PIPELINE_FIELD_NUMBER: _ClassVar[int]
     KEEP_ALIVE_FIELD_NUMBER: _ClassVar[int]
     KV_FIELD_NUMBER: _ClassVar[int]
-    PAUSE_PIPELINE_FIELD_NUMBER: _ClassVar[int]
-    RESUME_PIPELINE_FIELD_NUMBER: _ClassVar[int]
     SET_PIPELINES_FIELD_NUMBER: _ClassVar[int]
     TAIL_FIELD_NUMBER: _ClassVar[int]
-    attach_pipeline: AttachPipelineCommand
     audience: _sp_common_pb2.Audience
-    detach_pipeline: DetachPipelineCommand
     keep_alive: KeepAliveCommand
     kv: KVCommand
-    pause_pipeline: PausePipelineCommand
-    resume_pipeline: ResumePipelineCommand
     set_pipelines: SetPipelinesCommand
     tail: TailCommand
-    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., attach_pipeline: _Optional[_Union[AttachPipelineCommand, _Mapping]] = ..., detach_pipeline: _Optional[_Union[DetachPipelineCommand, _Mapping]] = ..., pause_pipeline: _Optional[_Union[PausePipelineCommand, _Mapping]] = ..., resume_pipeline: _Optional[_Union[ResumePipelineCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ...) -> None: ...
-
-class DetachPipelineCommand(_message.Message):
-    __slots__ = ["pipeline_id"]
-    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
-    pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ...) -> None: ...
 
 class KVCommand(_message.Message):
     __slots__ = ["instructions", "overwrite"]
@@ -53,18 +33,6 @@ class KVCommand(_message.Message):
 class KeepAliveCommand(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
-
-class PausePipelineCommand(_message.Message):
-    __slots__ = ["pipeline_id"]
-    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
-    pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
-
-class ResumePipelineCommand(_message.Message):
-    __slots__ = ["pipeline_id"]
-    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
-    pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
 
 class SetPipelinesCommand(_message.Message):
     __slots__ = ["pipelines"]

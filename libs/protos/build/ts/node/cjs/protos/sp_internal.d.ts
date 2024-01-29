@@ -182,47 +182,6 @@ export interface GetSetPipelinesCommandsByServiceResponse {
     };
 }
 /**
- * DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceRequest instead
- *
- * @deprecated
- * @generated from protobuf message protos.GetAttachCommandsByServiceRequest
- */
-export interface GetAttachCommandsByServiceRequest {
-    /**
-     * @generated from protobuf field: string service_name = 1;
-     */
-    serviceName: string;
-}
-/**
- * DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceResponse instead
- *
- * @deprecated
- * @generated from protobuf message protos.GetAttachCommandsByServiceResponse
- */
-export interface GetAttachCommandsByServiceResponse {
-    /**
-     * AttachCommands for all active pipelines
-     *
-     * @generated from protobuf field: repeated protos.Command active = 1;
-     */
-    active: Command[];
-    /**
-     * AttachCommands, but ones which are paused
-     * The SDK still needs to have these to support un-pausing
-     *
-     * @generated from protobuf field: repeated protos.Command paused = 2;
-     */
-    paused: Command[];
-    /**
-     * ID = wasm ID
-     *
-     * @generated from protobuf field: map<string, protos.WasmModule> wasm_modules = 3;
-     */
-    wasmModules: {
-        [key: string]: WasmModule;
-    };
-}
-/**
  * WasmModule is used to ensure we only send the wasm module once per request
  * instead of duplicated in every pipeline where it is used. This prevents
  * over-sized payloads on SDK startup
@@ -343,29 +302,6 @@ declare class GetSetPipelinesCommandsByServiceResponse$Type extends MessageType<
  * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceResponse
  */
 export declare const GetSetPipelinesCommandsByServiceResponse: GetSetPipelinesCommandsByServiceResponse$Type;
-declare class GetAttachCommandsByServiceRequest$Type extends MessageType<GetAttachCommandsByServiceRequest> {
-    constructor();
-    create(value?: PartialMessage<GetAttachCommandsByServiceRequest>): GetAttachCommandsByServiceRequest;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAttachCommandsByServiceRequest): GetAttachCommandsByServiceRequest;
-    internalBinaryWrite(message: GetAttachCommandsByServiceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @deprecated
- * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
- */
-export declare const GetAttachCommandsByServiceRequest: GetAttachCommandsByServiceRequest$Type;
-declare class GetAttachCommandsByServiceResponse$Type extends MessageType<GetAttachCommandsByServiceResponse> {
-    constructor();
-    create(value?: PartialMessage<GetAttachCommandsByServiceResponse>): GetAttachCommandsByServiceResponse;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAttachCommandsByServiceResponse): GetAttachCommandsByServiceResponse;
-    private binaryReadMap3;
-    internalBinaryWrite(message: GetAttachCommandsByServiceResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @deprecated
- * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
- */
-export declare const GetAttachCommandsByServiceResponse: GetAttachCommandsByServiceResponse$Type;
 declare class WasmModule$Type extends MessageType<WasmModule> {
     constructor();
     create(value?: PartialMessage<WasmModule>): WasmModule;

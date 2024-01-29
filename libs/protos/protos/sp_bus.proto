@@ -11,6 +11,8 @@ option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 // Type used by `server` for broadcasting events to other nodes
 message BusEvent {
+  reserved 105, 106; // Used to be attach/detach pipeline
+
   string source = 1;
 
   // This _should_ contain request messages - each server can determine
@@ -25,13 +27,6 @@ message BusEvent {
     protos.CreatePipelineRequest create_pipeline_request = 102;
     protos.DeletePipelineRequest delete_pipeline_request = 103;
     protos.UpdatePipelineRequest update_pipeline_request = 104;
-
-    // DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
-    protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true];
-
-    // DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
-    protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true];
-
     protos.PausePipelineRequest pause_pipeline_request = 107;
     protos.ResumePipelineRequest resume_pipeline_request = 108;
     protos.MetricsRequest metrics_request = 109;

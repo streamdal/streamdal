@@ -15,54 +15,30 @@ message Command {
   protos.Audience audience = 1;
 
   oneof command {
-    // DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
-    AttachPipelineCommand attach_pipeline = 100 [deprecated = true];
+    // NOTE: As of 01.29.2024, pause, resume, delete and update pipeline commands
+    // are replaced with the SetPipelinesCommand. When a pause/resume/etc. are
+    // called on server, the server will emit an appropriate SetPipelines cmd.
 
-    // DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
-    DetachPipelineCommand detach_pipeline = 101 [deprecated = true];
+    // Emitted by server when a user makes a pause, resume, delete or update
+    // pipeline and set pipelines external grpc API call.
+    // NOTE: This was introduced during ordered pipeline updates.
+    SetPipelinesCommand set_pipelines = 100;
 
-    PausePipelineCommand pause_pipeline = 102;
-    ResumePipelineCommand resume_pipeline = 103;
-    KeepAliveCommand keep_alive = 104;
+    // Server sends this periodically to SDKs to keep the connection alive
+    KeepAliveCommand keep_alive = 101;
 
     // Server will emit this when a user makes changes to the KV store
     // via the KV HTTP API.
-    KVCommand kv = 105;
+    KVCommand kv = 102;
 
     // Emitted by server when a user makes a Tail() call
     // Consumed by all server instances and by SDKs
-    TailCommand tail = 106;
-
-    // Emitted by server when a user makes an external.SetPipelines call.
-    // NOTE: This replaces attach/detach pipeline commands.
-    SetPipelinesCommand set_pipelines = 107;
+    TailCommand tail = 103;
   }
 }
 
 message SetPipelinesCommand {
   repeated protos.Pipeline pipelines = 1;
-}
-
-// DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
-message AttachPipelineCommand {
-  option deprecated = true;
-
-  protos.Pipeline pipeline = 1;
-}
-
-// DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
-message DetachPipelineCommand {
-  option deprecated = true;
-
-  string pipeline_id = 1;
-}
-
-message PausePipelineCommand {
-  string pipeline_id = 1;
-}
-
-message ResumePipelineCommand {
-  string pipeline_id = 1;
 }
 
 message KeepAliveCommand {

@@ -3,8 +3,8 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { SendSchemaRequest } from "./sp_internal";
 import type { TailResponse } from "./sp_common";
 import type { ClientStreamingCall } from "@protobuf-ts/runtime-rpc";
-import type { GetAttachCommandsByServiceResponse } from "./sp_internal";
-import type { GetAttachCommandsByServiceRequest } from "./sp_internal";
+import type { GetSetPipelinesCommandsByServiceResponse } from "./sp_internal";
+import type { GetSetPipelinesCommandsByServiceRequest } from "./sp_internal";
 import type { MetricsRequest } from "./sp_internal";
 import type { NotifyRequest } from "./sp_internal";
 import type { HeartbeatRequest } from "./sp_internal";
@@ -61,9 +61,9 @@ export interface IInternalClient {
      * Used to pull all pipeline configs for the service name in the SDK's constructor
      * This is needed because Register() is async
      *
-     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     * @generated from protobuf rpc: GetSetPipelinesCommandsByService(protos.GetSetPipelinesCommandsByServiceRequest) returns (protos.GetSetPipelinesCommandsByServiceResponse);
      */
-    getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
+    getSetPipelinesCommandsByService(input: GetSetPipelinesCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetSetPipelinesCommandsByServiceRequest, GetSetPipelinesCommandsByServiceResponse>;
     /**
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */
@@ -128,9 +128,9 @@ export declare class InternalClient implements IInternalClient, ServiceInfo {
      * Used to pull all pipeline configs for the service name in the SDK's constructor
      * This is needed because Register() is async
      *
-     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     * @generated from protobuf rpc: GetSetPipelinesCommandsByService(protos.GetSetPipelinesCommandsByServiceRequest) returns (protos.GetSetPipelinesCommandsByServiceResponse);
      */
-    getAttachCommandsByService(input: GetAttachCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse>;
+    getSetPipelinesCommandsByService(input: GetSetPipelinesCommandsByServiceRequest, options?: RpcOptions): UnaryCall<GetSetPipelinesCommandsByServiceRequest, GetSetPipelinesCommandsByServiceResponse>;
     /**
      * @generated from protobuf rpc: SendTail(stream protos.TailResponse) returns (protos.StandardResponse);
      */

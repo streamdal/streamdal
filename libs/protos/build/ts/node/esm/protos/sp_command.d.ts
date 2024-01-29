@@ -25,39 +25,21 @@ export interface Command {
      * @generated from protobuf oneof: command
      */
     command: {
-        oneofKind: "attachPipeline";
+        oneofKind: "setPipelines";
         /**
-         * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
+         * Emitted by server when a user makes a pause, resume, delete or update
+         * pipeline and set pipelines external grpc API call.
+         * NOTE: This was introduced during ordered pipeline updates.
          *
-         * @deprecated
-         * @generated from protobuf field: protos.AttachPipelineCommand attach_pipeline = 100 [deprecated = true];
+         * @generated from protobuf field: protos.SetPipelinesCommand set_pipelines = 100;
          */
-        attachPipeline: AttachPipelineCommand;
-    } | {
-        oneofKind: "detachPipeline";
-        /**
-         * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
-         *
-         * @deprecated
-         * @generated from protobuf field: protos.DetachPipelineCommand detach_pipeline = 101 [deprecated = true];
-         */
-        detachPipeline: DetachPipelineCommand;
-    } | {
-        oneofKind: "pausePipeline";
-        /**
-         * @generated from protobuf field: protos.PausePipelineCommand pause_pipeline = 102;
-         */
-        pausePipeline: PausePipelineCommand;
-    } | {
-        oneofKind: "resumePipeline";
-        /**
-         * @generated from protobuf field: protos.ResumePipelineCommand resume_pipeline = 103;
-         */
-        resumePipeline: ResumePipelineCommand;
+        setPipelines: SetPipelinesCommand;
     } | {
         oneofKind: "keepAlive";
         /**
-         * @generated from protobuf field: protos.KeepAliveCommand keep_alive = 104;
+         * Server sends this periodically to SDKs to keep the connection alive
+         *
+         * @generated from protobuf field: protos.KeepAliveCommand keep_alive = 101;
          */
         keepAlive: KeepAliveCommand;
     } | {
@@ -66,7 +48,7 @@ export interface Command {
          * Server will emit this when a user makes changes to the KV store
          * via the KV HTTP API.
          *
-         * @generated from protobuf field: protos.KVCommand kv = 105;
+         * @generated from protobuf field: protos.KVCommand kv = 102;
          */
         kv: KVCommand;
     } | {
@@ -75,18 +57,9 @@ export interface Command {
          * Emitted by server when a user makes a Tail() call
          * Consumed by all server instances and by SDKs
          *
-         * @generated from protobuf field: protos.TailCommand tail = 106;
+         * @generated from protobuf field: protos.TailCommand tail = 103;
          */
         tail: TailCommand;
-    } | {
-        oneofKind: "setPipelines";
-        /**
-         * Emitted by server when a user makes an external.SetPipelines call.
-         * NOTE: This replaces attach/detach pipeline commands.
-         *
-         * @generated from protobuf field: protos.SetPipelinesCommand set_pipelines = 107;
-         */
-        setPipelines: SetPipelinesCommand;
     } | {
         oneofKind: undefined;
     };
@@ -99,48 +72,6 @@ export interface SetPipelinesCommand {
      * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
      */
     pipelines: Pipeline[];
-}
-/**
- * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
- *
- * @deprecated
- * @generated from protobuf message protos.AttachPipelineCommand
- */
-export interface AttachPipelineCommand {
-    /**
-     * @generated from protobuf field: protos.Pipeline pipeline = 1;
-     */
-    pipeline?: Pipeline;
-}
-/**
- * DEPRECATED (01.27.2024): Use SetPipelinesCommand instead
- *
- * @deprecated
- * @generated from protobuf message protos.DetachPipelineCommand
- */
-export interface DetachPipelineCommand {
-    /**
-     * @generated from protobuf field: string pipeline_id = 1;
-     */
-    pipelineId: string;
-}
-/**
- * @generated from protobuf message protos.PausePipelineCommand
- */
-export interface PausePipelineCommand {
-    /**
-     * @generated from protobuf field: string pipeline_id = 1;
-     */
-    pipelineId: string;
-}
-/**
- * @generated from protobuf message protos.ResumePipelineCommand
- */
-export interface ResumePipelineCommand {
-    /**
-     * @generated from protobuf field: string pipeline_id = 1;
-     */
-    pipelineId: string;
 }
 /**
  * Nothing needed in here, just a ping from server to SDK
@@ -196,48 +127,6 @@ declare class SetPipelinesCommand$Type extends MessageType<SetPipelinesCommand> 
  * @generated MessageType for protobuf message protos.SetPipelinesCommand
  */
 export declare const SetPipelinesCommand: SetPipelinesCommand$Type;
-declare class AttachPipelineCommand$Type extends MessageType<AttachPipelineCommand> {
-    constructor();
-    create(value?: PartialMessage<AttachPipelineCommand>): AttachPipelineCommand;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AttachPipelineCommand): AttachPipelineCommand;
-    internalBinaryWrite(message: AttachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @deprecated
- * @generated MessageType for protobuf message protos.AttachPipelineCommand
- */
-export declare const AttachPipelineCommand: AttachPipelineCommand$Type;
-declare class DetachPipelineCommand$Type extends MessageType<DetachPipelineCommand> {
-    constructor();
-    create(value?: PartialMessage<DetachPipelineCommand>): DetachPipelineCommand;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetachPipelineCommand): DetachPipelineCommand;
-    internalBinaryWrite(message: DetachPipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @deprecated
- * @generated MessageType for protobuf message protos.DetachPipelineCommand
- */
-export declare const DetachPipelineCommand: DetachPipelineCommand$Type;
-declare class PausePipelineCommand$Type extends MessageType<PausePipelineCommand> {
-    constructor();
-    create(value?: PartialMessage<PausePipelineCommand>): PausePipelineCommand;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PausePipelineCommand): PausePipelineCommand;
-    internalBinaryWrite(message: PausePipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.PausePipelineCommand
- */
-export declare const PausePipelineCommand: PausePipelineCommand$Type;
-declare class ResumePipelineCommand$Type extends MessageType<ResumePipelineCommand> {
-    constructor();
-    create(value?: PartialMessage<ResumePipelineCommand>): ResumePipelineCommand;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResumePipelineCommand): ResumePipelineCommand;
-    internalBinaryWrite(message: ResumePipelineCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.ResumePipelineCommand
- */
-export declare const ResumePipelineCommand: ResumePipelineCommand$Type;
 declare class KeepAliveCommand$Type extends MessageType<KeepAliveCommand> {
     constructor();
     create(value?: PartialMessage<KeepAliveCommand>): KeepAliveCommand;

@@ -34,7 +34,7 @@ service Internal {
 
   // Used to pull all pipeline configs for the service name in the SDK's constructor
   // This is needed because Register() is async
-  rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
+  rpc GetSetPipelinesCommandsByService(GetSetPipelinesCommandsByServiceRequest) returns (GetSetPipelinesCommandsByServiceResponse);
 
   rpc SendTail(stream TailResponse) returns (StandardResponse);
 
@@ -120,28 +120,6 @@ message GetSetPipelinesCommandsByServiceRequest {
 message GetSetPipelinesCommandsByServiceResponse {
   // SetPipelinesCommands for all active pipelines
   repeated protos.Command set_pipeline_commands = 1;
-
-  // ID = wasm ID
-  map<string,WasmModule> wasm_modules = 3;
-}
-
-// DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceRequest instead
-message GetAttachCommandsByServiceRequest {
-  option deprecated = true;
-
-  string service_name = 1;
-}
-
-// DEPRECATED (01.27.2024): Use GetSetPipelinesCommandsByServiceResponse instead
-message GetAttachCommandsByServiceResponse {
-  option deprecated = true;
-
-  // AttachCommands for all active pipelines
-  repeated protos.Command active = 1;
-
-  // AttachCommands, but ones which are paused
-  // The SDK still needs to have these to support un-pausing
-  repeated protos.Command paused = 2;
 
   // ID = wasm ID
   map<string,WasmModule> wasm_modules = 3;

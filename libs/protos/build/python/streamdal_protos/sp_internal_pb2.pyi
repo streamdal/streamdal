@@ -16,29 +16,6 @@ class DeregisterRequest(_message.Message):
     session_id: str
     def __init__(self, service_name: _Optional[str] = ..., session_id: _Optional[str] = ...) -> None: ...
 
-class GetAttachCommandsByServiceRequest(_message.Message):
-    __slots__ = ["service_name"]
-    SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
-    service_name: str
-    def __init__(self, service_name: _Optional[str] = ...) -> None: ...
-
-class GetAttachCommandsByServiceResponse(_message.Message):
-    __slots__ = ["active", "paused", "wasm_modules"]
-    class WasmModulesEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: WasmModule
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WasmModule, _Mapping]] = ...) -> None: ...
-    ACTIVE_FIELD_NUMBER: _ClassVar[int]
-    PAUSED_FIELD_NUMBER: _ClassVar[int]
-    WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
-    active: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
-    paused: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
-    wasm_modules: _containers.MessageMap[str, WasmModule]
-    def __init__(self, active: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., paused: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
-
 class GetSetPipelinesCommandsByServiceRequest(_message.Message):
     __slots__ = ["service_name"]
     SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]

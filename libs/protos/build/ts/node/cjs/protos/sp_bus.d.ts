@@ -13,8 +13,6 @@ import { KVRequest } from "./sp_kv";
 import { MetricsRequest } from "./sp_internal";
 import { ResumePipelineRequest } from "./sp_external";
 import { PausePipelineRequest } from "./sp_external";
-import { DetachPipelineRequest } from "./sp_external";
-import { AttachPipelineRequest } from "./sp_external";
 import { UpdatePipelineRequest } from "./sp_external";
 import { DeletePipelineRequest } from "./sp_external";
 import { CreatePipelineRequest } from "./sp_external";
@@ -63,24 +61,6 @@ export interface BusEvent {
          * @generated from protobuf field: protos.UpdatePipelineRequest update_pipeline_request = 104;
          */
         updatePipelineRequest: UpdatePipelineRequest;
-    } | {
-        oneofKind: "attachPipelineRequest";
-        /**
-         * DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
-         *
-         * @deprecated
-         * @generated from protobuf field: protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true];
-         */
-        attachPipelineRequest: AttachPipelineRequest;
-    } | {
-        oneofKind: "detachPipelineRequest";
-        /**
-         * DEPRECATED (01.27.2024): Use SetPipelinesRequest instead
-         *
-         * @deprecated
-         * @generated from protobuf field: protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true];
-         */
-        detachPipelineRequest: DetachPipelineRequest;
     } | {
         oneofKind: "pausePipelineRequest";
         /**

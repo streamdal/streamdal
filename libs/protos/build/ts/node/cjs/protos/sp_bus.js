@@ -18,8 +18,6 @@ const sp_external_4 = require("./sp_external");
 const sp_external_5 = require("./sp_external");
 const sp_external_6 = require("./sp_external");
 const sp_external_7 = require("./sp_external");
-const sp_external_8 = require("./sp_external");
-const sp_external_9 = require("./sp_external");
 const sp_internal_3 = require("./sp_internal");
 const sp_internal_4 = require("./sp_internal");
 // @generated message type with reflection information, may provide speed optimized methods
@@ -29,11 +27,9 @@ class BusEvent$Type extends runtime_5.MessageType {
             { no: 1, name: "source", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 100, name: "register_request", kind: "message", oneof: "event", T: () => sp_internal_4.RegisterRequest },
             { no: 101, name: "deregister_request", kind: "message", oneof: "event", T: () => sp_internal_3.DeregisterRequest },
-            { no: 102, name: "create_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_9.CreatePipelineRequest },
-            { no: 103, name: "delete_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_8.DeletePipelineRequest },
-            { no: 104, name: "update_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_7.UpdatePipelineRequest },
-            { no: 105, name: "attach_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_6.AttachPipelineRequest },
-            { no: 106, name: "detach_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_5.DetachPipelineRequest },
+            { no: 102, name: "create_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_7.CreatePipelineRequest },
+            { no: 103, name: "delete_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_6.DeletePipelineRequest },
+            { no: 104, name: "update_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_5.UpdatePipelineRequest },
             { no: 107, name: "pause_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_4.PausePipelineRequest },
             { no: 108, name: "resume_pipeline_request", kind: "message", oneof: "event", T: () => sp_external_3.ResumePipelineRequest },
             { no: 109, name: "metrics_request", kind: "message", oneof: "event", T: () => sp_internal_2.MetricsRequest },
@@ -76,31 +72,19 @@ class BusEvent$Type extends runtime_5.MessageType {
                 case /* protos.CreatePipelineRequest create_pipeline_request */ 102:
                     message.event = {
                         oneofKind: "createPipelineRequest",
-                        createPipelineRequest: sp_external_9.CreatePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.createPipelineRequest)
+                        createPipelineRequest: sp_external_7.CreatePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.createPipelineRequest)
                     };
                     break;
                 case /* protos.DeletePipelineRequest delete_pipeline_request */ 103:
                     message.event = {
                         oneofKind: "deletePipelineRequest",
-                        deletePipelineRequest: sp_external_8.DeletePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.deletePipelineRequest)
+                        deletePipelineRequest: sp_external_6.DeletePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.deletePipelineRequest)
                     };
                     break;
                 case /* protos.UpdatePipelineRequest update_pipeline_request */ 104:
                     message.event = {
                         oneofKind: "updatePipelineRequest",
-                        updatePipelineRequest: sp_external_7.UpdatePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.updatePipelineRequest)
-                    };
-                    break;
-                case /* protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true];*/ 105:
-                    message.event = {
-                        oneofKind: "attachPipelineRequest",
-                        attachPipelineRequest: sp_external_6.AttachPipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.attachPipelineRequest)
-                    };
-                    break;
-                case /* protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true];*/ 106:
-                    message.event = {
-                        oneofKind: "detachPipelineRequest",
-                        detachPipelineRequest: sp_external_5.DetachPipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.detachPipelineRequest)
+                        updatePipelineRequest: sp_external_5.UpdatePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.updatePipelineRequest)
                     };
                     break;
                 case /* protos.PausePipelineRequest pause_pipeline_request */ 107:
@@ -199,19 +183,13 @@ class BusEvent$Type extends runtime_5.MessageType {
             sp_internal_3.DeregisterRequest.internalBinaryWrite(message.event.deregisterRequest, writer.tag(101, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.CreatePipelineRequest create_pipeline_request = 102; */
         if (message.event.oneofKind === "createPipelineRequest")
-            sp_external_9.CreatePipelineRequest.internalBinaryWrite(message.event.createPipelineRequest, writer.tag(102, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_external_7.CreatePipelineRequest.internalBinaryWrite(message.event.createPipelineRequest, writer.tag(102, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.DeletePipelineRequest delete_pipeline_request = 103; */
         if (message.event.oneofKind === "deletePipelineRequest")
-            sp_external_8.DeletePipelineRequest.internalBinaryWrite(message.event.deletePipelineRequest, writer.tag(103, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_external_6.DeletePipelineRequest.internalBinaryWrite(message.event.deletePipelineRequest, writer.tag(103, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.UpdatePipelineRequest update_pipeline_request = 104; */
         if (message.event.oneofKind === "updatePipelineRequest")
-            sp_external_7.UpdatePipelineRequest.internalBinaryWrite(message.event.updatePipelineRequest, writer.tag(104, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.AttachPipelineRequest attach_pipeline_request = 105 [deprecated = true]; */
-        if (message.event.oneofKind === "attachPipelineRequest")
-            sp_external_6.AttachPipelineRequest.internalBinaryWrite(message.event.attachPipelineRequest, writer.tag(105, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.DetachPipelineRequest detach_pipeline_request = 106 [deprecated = true]; */
-        if (message.event.oneofKind === "detachPipelineRequest")
-            sp_external_5.DetachPipelineRequest.internalBinaryWrite(message.event.detachPipelineRequest, writer.tag(106, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_external_5.UpdatePipelineRequest.internalBinaryWrite(message.event.updatePipelineRequest, writer.tag(104, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.PausePipelineRequest pause_pipeline_request = 107; */
         if (message.event.oneofKind === "pausePipelineRequest")
             sp_external_4.PausePipelineRequest.internalBinaryWrite(message.event.pausePipelineRequest, writer.tag(107, runtime_1.WireType.LengthDelimited).fork(), options).join();
