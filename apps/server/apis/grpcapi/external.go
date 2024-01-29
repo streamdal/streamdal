@@ -45,27 +45,31 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	}
 }
 
+// DEV: Needs to work with ordered pipelines
 func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) (*protos.GetAllResponse, error) {
 	if err := validate.GetAllRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get all request")
 	}
 
+	// Fetch live/connected SDK clients
 	liveInfo, err := s.getAllLive(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get live info")
 	}
 
+	// Fetch all recorded audiences
 	audiences, err := s.Options.StoreService.GetAudiences(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get audiences")
 	}
 
+	// Fetch all defined pipelines
 	pipelines, err := s.getAllPipelines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	configs, err := s.Options.StoreService.GetConfig(ctx)
+	configs, err := s.Options.StoreService.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get config")
 	}
@@ -81,6 +85,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	}, nil
 }
 
+// DEV: Needs to be updated for ordered pipelines
 func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.External_GetAllStreamServer) error {
 	if err := validate.GetAllRequest(req); err != nil {
 		return errors.Wrap(err, "invalid get all request")
@@ -169,6 +174,7 @@ MAIN:
 	return nil
 }
 
+// DEV: Does NOT need update
 func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
 	liveInfo := make([]*protos.LiveInfo, 0)
 
@@ -217,6 +223,7 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 	return liveInfo, nil
 }
 
+// DEV: Don't need to update for ordered pipelines
 func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
 	gen := make(map[string]*protos.PipelineInfo)
 
@@ -237,7 +244,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	}
 
 	// Get audience <-> pipeline mappings
-	pipelineConfig, err := s.Options.StoreService.GetConfig(ctx)
+	pipelineConfig, err := s.Options.StoreService.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipeline config")
 	}
@@ -266,6 +273,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	return gen, nil
 }
 
+// DEV: Don't need to update this
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
 	if err := validate.GetPipelinesRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipelines request")
@@ -292,6 +300,7 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 	}, nil
 }
 
+// DEV: Don't need to update this
 func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
 	if err := validate.GetPipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipeline request")
@@ -317,6 +326,7 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	}, nil
 }
 
+// DEV: Don't need to update this
 func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.CreatePipelineResponse, error) {
 	if err := validate.CreatePipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid create pipeline request")
@@ -364,6 +374,7 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	}, nil
 }
 
+// DEV: Probably needs update!!!
 func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -460,6 +471,7 @@ func (s *ExternalServer) sendStepDeltaTelemetry(original, updated *protos.Pipeli
 	}
 }
 
+// DEV: Needs to be updated for ordered pipelines
 func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeletePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -512,71 +524,16 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 	}, nil
 }
 
-func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
+// DEPRECATED
+func (s *ExternalServer) AttachPipeline(ctx context.Context, _ *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
 	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
 		"AttachPipeline is deprecated, use SetPipelines instead"), nil
-
-	//if err := validate.AttachPipelineRequest(req); err != nil {
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
-	//}
-	//
-	//if s.Options.DemoMode {
-	//	return demoResponse(ctx)
-	//}
-	//
-	//// Does this pipeline exist?
-	//if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-	//	if errors.Is(err, store.ErrPipelineNotFound) {
-	//		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
-	//	}
-	//
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	//}
-	//
-	//if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	//}
-	//
-	//// Send telemetry
-	//_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, []statsd.Tag{
-	//	{"install_id", s.Options.InstallID},
-	//	{"status", "attached"},
-	//}...)
-	//_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, -1, 1.0, []statsd.Tag{
-	//	{"install_id", s.Options.InstallID},
-	//	{"status", "detached"},
-	//}...)
-	//
-	//// Pipeline exists, broadcast attach
-	//if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	//}
-	//
-	//return &protos.StandardResponse{
-	//	Id:      util.CtxRequestId(ctx),
-	//	Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-	//	Message: fmt.Sprintf("pipeline '%s' attached", req.PipelineId),
-	//}, nil
 }
 
-// Helper for determining what session ID's are using a pipeline ID
-func (s *ExternalServer) getSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
-	usage, err := s.Options.StoreService.GetPipelineUsage(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get pipeline usage in getPipelineUsageByPipelineID")
-	}
-
-	sessionIDs := make([]string, 0)
-
-	for _, u := range usage {
-		if u.PipelineId != pipelineID {
-			continue
-		}
-
-		sessionIDs = append(sessionIDs, u.SessionId)
-	}
-
-	return sessionIDs, nil
+// DEPRECATED
+func (s *ExternalServer) DetachPipeline(ctx context.Context, _ *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		"DetachPipeline is deprecated, use SetPipelines instead"), nil
 }
 
 func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) (*protos.StandardResponse, error) {
@@ -607,7 +564,11 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 
 	}
 
-	// TODO: Store the new pipeline config
+	// TODO: DO WE CARE IF THERE ARE EXISTING ATTACHED PIPELINES? I DON'T THINK SO?
+	// The SDKs would just receive the new setpipeline and stop executing all the
+	// other pipelines.
+
+	// Store the new pipeline config
 	if err := s.Options.StoreService.SetPipelines(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 			fmt.Sprintf("unable to store pipelines: %s", err)), nil
@@ -645,69 +606,7 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 	}, nil
 }
 
-func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
-	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
-		"DetachPipeline is deprecated, use SetPipelines instead"), nil
-
-	//if err := validate.DetachPipelineRequest(req); err != nil {
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
-	//}
-	//
-	//if s.Options.DemoMode {
-	//	return demoResponse(ctx)
-	//}
-	//
-	//// Does this pipeline exist?
-	//if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-	//	if err == store.ErrPipelineNotFound {
-	//		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
-	//	}
-	//
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	//}
-	//
-	//// What session ID's are using this pipeline ID?
-	//sessionIDs, err := s.getSessionIDsByPipelineID(ctx, req.PipelineId)
-	//if err != nil {
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	//}
-	//
-	//s.log.Debugf("detach gRPC handler: found '%d' session ids", len(sessionIDs))
-	//
-	//// Inject session_id's into request
-	//req.XSessionIds = make([]string, 0)
-	//
-	//for _, sessionID := range sessionIDs {
-	//	req.XSessionIds = append(req.XSessionIds, sessionID)
-	//}
-	//
-	//s.log.Debugf("injected request contains '%d' session ids", len(req.XSessionIds))
-	//
-	//// Broadcast detach to everyone
-	//if err := s.Options.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
-	//	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	//}
-	//
-	//// We are able to immediately remove the config entry because the broadcast
-	//// handlers are not performing a Store lookup.
-	//if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
-	//	s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
-	//}
-	//
-	//// Send telemetry
-	//telTags := []statsd.Tag{
-	//	{"install_id", s.Options.InstallID},
-	//	{"status", "attached"},
-	//}
-	//_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
-	//
-	//return &protos.StandardResponse{
-	//	Id:      util.CtxRequestId(ctx),
-	//	Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-	//	Message: fmt.Sprintf("pipeline '%s' detached", req.PipelineId),
-	//}, nil
-}
-
+// DEV: Pause and resume need to be updated for ordered pipelines
 func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.PausePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -742,6 +641,7 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 	}, nil
 }
 
+// DEV: Pause and resume need to be updated for ordered pipelines
 func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.ResumePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -942,8 +842,6 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	s.log.Debugf("request contents: %+v", req)
-
 	// Force delete - detach audiences from pipelines
 	if req.GetForce() {
 		s.log.Debug("force delete requested")
@@ -969,6 +867,7 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}, nil
 }
 
+// TODO: Needs to be updated for ordered pipelines
 func (s *ExternalServer) forceDeleteAudience(ctx context.Context, attached []string, audience *protos.Audience) *protos.StandardResponse {
 	for _, pipelineID := range attached {
 		s.log.Debugf("request to force delete audience '%s'; attempting to detach pipeline '%s'",

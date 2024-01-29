@@ -377,12 +377,15 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 	case *protos.BusEvent_DeletePipelineRequest:
 		llog.Debug("received DeletePipelineRequest")
 		err = b.handleDeletePipelineRequest(shutdownCtx, busEvent.GetDeletePipelineRequest())
+
+	// DEPRECATED (01.27.2024)
 	case *protos.BusEvent_AttachPipelineRequest:
-		llog.Debug("received AttachPipelineRequest")
-		err = b.handleAttachPipelineRequest(shutdownCtx, busEvent.GetAttachPipelineRequest())
+		return errors.New("AttachPipelineRequest is deprecated, use SetPipelinesRequest instead")
+
+	// DEPRECATED (01.27.2024)
 	case *protos.BusEvent_DetachPipelineRequest:
-		llog.Debug("received DetachPipelineRequest")
-		err = b.handleDetachPipelineRequest(shutdownCtx, busEvent.GetDetachPipelineRequest())
+		return errors.New("AttachPipelineRequest is deprecated, use SetPipelinesRequest instead")
+
 	case *protos.BusEvent_PausePipelineRequest:
 		llog.Debug("received PausePipelineRequest")
 		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
@@ -401,7 +404,9 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 	case *protos.BusEvent_TailResponse:
 		llog.Debug("received TailResponse")
 		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
-	// TODO: ADD A SET PIPELINES REQUEST
+	case *protos.BusEvent_SetPipelinesRequest:
+		llog.Debug("received SetPipelinesRequest")
+		err = b.handleSetPipelinesRequest(shutdownCtx, busEvent.GetSetPipelinesRequest())
 	default:
 		llog.Debug("received unknown event type")
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)

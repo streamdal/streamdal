@@ -14,6 +14,7 @@ import (
 	"github.com/streamdal/server/validate"
 )
 
+// TODO: Needs update to support ordered pipelines!!!
 // Pipeline was updated - check if this service has an active registration that
 // uses this pipeline id. If it does, we need to have the client "reload" the
 // pipeline. We can do this by sending a "SetPipeline" cmd to the client.
@@ -172,23 +173,34 @@ func (b *Bus) getSessionIDsByAudience(ctx context.Context, audience *protos.Audi
 // Pipeline was attached to an audience - check if this service has an active
 // registration with the provided audience. If it does, we need to send a
 // AttachPipeline cmd to the client.
-func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.AttachPipelineRequest) error {
+func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipelinesRequest) error {
 	b.log.Debugf("handling attach pipeline request bus event: %v", req)
 
-	if err := validate.AttachPipelineRequest(req); err != nil {
+	if err := validate.SetPipelinesRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
 	}
 
-	// Is this a valid pipeline id?
-	pipeline, err := b.options.Store.GetPipeline(ctx, req.PipelineId)
-	if err != nil {
-		if err == store.ErrPipelineNotFound {
-			b.log.Debugf("pipeline id '%s' not found - skipping", req.PipelineId)
-			return nil
+	pipelines := make([]*protos.Pipeline, 0)
+
+	// WARNING: Important
+	// This needs to also handle the case that SDK has an active pipeline that
+	// is NOT in the request. Or do we? Maybe the SDK just discards whatever
+	// it is doing with other pipelines? As in, it just overwrites?
+
+	// Valid pipeline IDs?
+	for _, id := range req.PipelineIds {
+		pipeline, err := b.options.Store.GetPipeline(ctx, id)
+		if err != nil {
+			if err == store.ErrPipelineNotFound {
+				b.log.Debugf("pipeline id '%s' not found - skipping", id)
+				return nil
+			}
+
+			b.log.Errorf("error getting pipeline '%s' from store: %v", id, err)
+			return errors.Wrapf(err, "error getting pipeline '%s' from store", id)
 		}
 
-		b.log.Errorf("error getting pipeline '%s' from store: %v", req.PipelineId, err)
-		return errors.Wrapf(err, "error getting pipeline '%s' from store", req.PipelineId)
+		pipelines = append(pipelines, pipeline)
 	}
 
 	sessionIDs, err := b.getSessionIDsByAudience(ctx, req.Audience)
@@ -206,7 +218,7 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 
 	attached := 0
 
-	// OK we have an active audience on this node - let's tell it to attach!
+	// OK we have an active/live audience on this node - send SetPipelines cmd to it
 	for _, sessionID := range sessionIDs {
 		ch := b.options.Cmd.GetChannel(sessionID)
 		if ch == nil {
@@ -216,9 +228,9 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 
 		ch <- &protos.Command{
 			Audience: req.Audience,
-			Command: &protos.Command_AttachPipeline{
-				AttachPipeline: &protos.AttachPipelineCommand{
-					Pipeline: pipeline,
+			Command: &protos.Command_SetPipelines{
+				SetPipelines: &protos.SetPipelinesCommand{
+					Pipelines: pipelines,
 				},
 			},
 		}
@@ -226,60 +238,12 @@ func (b *Bus) handleAttachPipelineRequest(ctx context.Context, req *protos.Attac
 		attached += 1
 	}
 
-	b.log.Debugf("sent attach pipeline command to '%d' active session(s) for audience '%s'", attached, req.Audience)
+	b.log.Debugf("sent SetPipelines command to '%d' active session(s) for audience '%s'", attached, req.Audience)
 
 	return nil
 }
 
-// Pipeline was detached from an audience - request will contain session ID's
-// that use this pipeline. The session ID's are filled out by the external gRPC
-// handler. This is done for Delete and Detach requests so that we can avoid
-// having to perform a store lookup in the broadcast handlers.
-// If this node doesn't have an active session for the provided session id, then
-// it won't have a channel for it and it'll move on to the next session id.
-func (b *Bus) handleDetachPipelineRequest(_ context.Context, req *protos.DetachPipelineRequest) error {
-	llog := b.log.WithField("method", "handleDetachPipelineRequest")
-
-	llog.Debugf("handling detach pipeline request bus event: %v", req)
-
-	if err := validate.DetachPipelineRequest(req); err != nil {
-		return errors.Wrap(err, "validation error")
-	}
-
-	llog.Debugf("found '%d' session ID's in request", len(req.XSessionIds))
-
-	detached := 0
-
-	// Check if this node has a channel for the session id (ie. has a connected
-	// client with given session id) - if yes, send a detach cmd
-	for _, sessionID := range req.XSessionIds {
-		ch := b.options.Cmd.GetChannel(sessionID)
-		if ch == nil {
-			llog.Debugf("no channel for session id '%s' on node '%s' - nothing to do", sessionID, b.options.NodeName)
-			continue
-		}
-
-		llog.Debugf("found channel for session id '%s' on node '%s' - sending detach cmd", sessionID, b.options.NodeName)
-
-		ch <- &protos.Command{
-			Audience: req.Audience,
-			Command: &protos.Command_DetachPipeline{
-				DetachPipeline: &protos.DetachPipelineCommand{
-					PipelineId: req.PipelineId,
-				},
-			},
-		}
-
-		detached += 1
-	}
-
-	if detached != 0 {
-		llog.Debugf("sent detach pipeline command to '%d' active session(s) for pipeline id '%s'", detached, req.PipelineId)
-	}
-
-	return nil
-}
-
+// TODO: This needs to be updated to support ordered pipelines!!!
 // Pipeline was paused - check if this service has an active registration with
 // the provided audience. If it does, we need to send a PausePipeline cmd
 // to the client.
@@ -332,6 +296,7 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 	return nil
 }
 
+// TODO: This needs to be updated to support ordered pipelines!!!
 // Pipeline was resumed - check if this service has an active registration with
 // the provided audience. If it does, we need to send a ResumePipeline cmd
 // to the client.
