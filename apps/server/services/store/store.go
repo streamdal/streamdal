@@ -142,9 +142,38 @@ type IStore interface {
 	// GetSetPipelinesCommandsByService returns a slice of SetPipelines commands for a given service
 	GetSetPipelinesCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 
+	// GetSessionIDs returns a slice of ALL known session ids;
+	// accepts an optional "node name" to filter by.
+	GetSessionIDs(ctx context.Context, nodeName ...string) ([]string, error)
+
 	// GetSessionIDsByAudience returns a slice of session IDs for a given audience;
 	// accepts an optional "node name" to filter by.
 	GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error)
+
+	// GetSessionIDsByPipelineID returns a slice of session IDs that use a pipeline ID
+	GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error)
+}
+
+func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
+	llog := s.log.WithField("method", "GetSessionIDsByPipelineID")
+	llog.Debug("received request to get session IDs by pipeline ID")
+
+	// Get live usage
+	usage, err := s.GetActivePipelineUsage(ctx, pipelineID)
+	if err != nil {
+		llog.Errorf("unable to fetch active pipeline usage: %s", err)
+		return nil, errors.Wrap(err, "error fetching active pipeline usage")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, u := range usage {
+		if u.PipelineId == pipelineID {
+			sessionIDs = append(sessionIDs, u.SessionId)
+		}
+	}
+
+	return sessionIDs, nil
 }
 
 // DEV: Needs tests
@@ -586,7 +615,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	return nil
 }
 
-// DEV (DONE): No need to update
+// DEV (DONE): Minor update to support "force"
 func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error {
 	llog := s.log.WithField("method", "DeleteAudience")
 	llog.Debug("received request to delete audience")
@@ -597,13 +626,13 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 		return errors.Wrapf(err, "error fetching configs for audience '%s'", util.AudienceToStr(req.Audience))
 	}
 
-	if len(attached) > 0 {
+	if len(attached) > 0 && !req.GetForce() {
 		err = fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
 
 		return err
 	}
 
-	// Delete audience from bucket
+	// We can delete - either force is specified or there are no attached pipelines
 	audStr := util.AudienceToStr(req.Audience)
 	if err := s.options.RedisBackend.Del(ctx, RedisAudienceKey(audStr)).Err(); err != nil {
 		return errors.Wrap(err, "error deleting audience from store")
@@ -1199,6 +1228,26 @@ func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) 
 	}
 
 	return usage, nil
+}
+
+// GetSessionIDs will return ALL live session IDs; optionally filter by node name
+func (s *Store) GetSessionIDs(ctx context.Context, nodeName ...string) ([]string, error) {
+	entries, err := s.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting live entries")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, e := range entries {
+		if len(nodeName) > 0 && e.NodeName != nodeName[0] {
+			continue
+		}
+
+		sessionIDs = append(sessionIDs, e.SessionID)
+	}
+
+	return sessionIDs, nil
 }
 
 // GetActivePipelineUsage gets *ACTIVE* pipeline usage on the CURRENT node

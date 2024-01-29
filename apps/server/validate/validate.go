@@ -713,22 +713,6 @@ func KVRequest(r *protos.KVRequest) error {
 	return nil
 }
 
-func AttachPipelineCommand(cmd *protos.AttachPipelineCommand) error {
-	if cmd == nil {
-		return ErrNilInput
-	}
-
-	if cmd.Pipeline == nil {
-		return ErrNilField("Pipeline")
-	}
-
-	if cmd.Pipeline.Id == "" {
-		return ErrEmptyField("Pipeline.Id")
-	}
-
-	return nil
-}
-
 func StartTailRequest(r *protos.TailRequest) error {
 	return validateTailRequest(r)
 }

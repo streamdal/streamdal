@@ -27,8 +27,6 @@ const (
 	External_UpdatePipeline_FullMethodName        = "/protos.External/UpdatePipeline"
 	External_DeletePipeline_FullMethodName        = "/protos.External/DeletePipeline"
 	External_SetPipelines_FullMethodName          = "/protos.External/SetPipelines"
-	External_AttachPipeline_FullMethodName        = "/protos.External/AttachPipeline"
-	External_DetachPipeline_FullMethodName        = "/protos.External/DetachPipeline"
 	External_PausePipeline_FullMethodName         = "/protos.External/PausePipeline"
 	External_ResumePipeline_FullMethodName        = "/protos.External/ResumePipeline"
 	External_CreateNotification_FullMethodName    = "/protos.External/CreateNotification"
@@ -57,10 +55,9 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ExternalClient interface {
-	// Should return everything that is needed to build the initial view in the console
+	// Returns all data needed for UI; called on initial console load
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
-	// Temporary method to test gRPC-Web streaming
-	// DS: Is this temporary or are we using this exclusively? If so, can we remove GetAll()?
+	// Used by console to stream updates to UI; called after initial GetAll()
 	GetAllStream(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (External_GetAllStreamClient, error)
 	// Returns pipelines (_wasm_bytes field is stripped)
 	GetPipelines(ctx context.Context, in *GetPipelinesRequest, opts ...grpc.CallOption) (*GetPipelinesResponse, error)
@@ -73,14 +70,6 @@ type ExternalClient interface {
 	// Delete a pipeline
 	DeletePipeline(ctx context.Context, in *DeletePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	SetPipelines(ctx context.Context, in *SetPipelinesRequest, opts ...grpc.CallOption) (*StandardResponse, error)
-	// Deprecated: Do not use.
-	// Attach a pipeline to an audience
-	// DEPRECATED (01.27.2024): Use SetPipelines instead
-	AttachPipeline(ctx context.Context, in *AttachPipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
-	// Deprecated: Do not use.
-	// Detach a pipeline from an audience
-	// DEPRECATED (01.27.2024): Use SetPipelines instead
-	DetachPipeline(ctx context.Context, in *DetachPipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Pause a pipeline; noop if pipeline is already paused
 	PausePipeline(ctx context.Context, in *PausePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Resume a pipeline; noop if pipeline is not paused
@@ -215,26 +204,6 @@ func (c *externalClient) DeletePipeline(ctx context.Context, in *DeletePipelineR
 func (c *externalClient) SetPipelines(ctx context.Context, in *SetPipelinesRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, External_SetPipelines_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Deprecated: Do not use.
-func (c *externalClient) AttachPipeline(ctx context.Context, in *AttachPipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	out := new(StandardResponse)
-	err := c.cc.Invoke(ctx, External_AttachPipeline_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Deprecated: Do not use.
-func (c *externalClient) DetachPipeline(ctx context.Context, in *DetachPipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	out := new(StandardResponse)
-	err := c.cc.Invoke(ctx, External_DetachPipeline_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -512,10 +481,9 @@ func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc
 // All implementations must embed UnimplementedExternalServer
 // for forward compatibility
 type ExternalServer interface {
-	// Should return everything that is needed to build the initial view in the console
+	// Returns all data needed for UI; called on initial console load
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
-	// Temporary method to test gRPC-Web streaming
-	// DS: Is this temporary or are we using this exclusively? If so, can we remove GetAll()?
+	// Used by console to stream updates to UI; called after initial GetAll()
 	GetAllStream(*GetAllRequest, External_GetAllStreamServer) error
 	// Returns pipelines (_wasm_bytes field is stripped)
 	GetPipelines(context.Context, *GetPipelinesRequest) (*GetPipelinesResponse, error)
@@ -528,14 +496,6 @@ type ExternalServer interface {
 	// Delete a pipeline
 	DeletePipeline(context.Context, *DeletePipelineRequest) (*StandardResponse, error)
 	SetPipelines(context.Context, *SetPipelinesRequest) (*StandardResponse, error)
-	// Deprecated: Do not use.
-	// Attach a pipeline to an audience
-	// DEPRECATED (01.27.2024): Use SetPipelines instead
-	AttachPipeline(context.Context, *AttachPipelineRequest) (*StandardResponse, error)
-	// Deprecated: Do not use.
-	// Detach a pipeline from an audience
-	// DEPRECATED (01.27.2024): Use SetPipelines instead
-	DetachPipeline(context.Context, *DetachPipelineRequest) (*StandardResponse, error)
 	// Pause a pipeline; noop if pipeline is already paused
 	PausePipeline(context.Context, *PausePipelineRequest) (*StandardResponse, error)
 	// Resume a pipeline; noop if pipeline is not paused
@@ -601,12 +561,6 @@ func (UnimplementedExternalServer) DeletePipeline(context.Context, *DeletePipeli
 }
 func (UnimplementedExternalServer) SetPipelines(context.Context, *SetPipelinesRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetPipelines not implemented")
-}
-func (UnimplementedExternalServer) AttachPipeline(context.Context, *AttachPipelineRequest) (*StandardResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AttachPipeline not implemented")
-}
-func (UnimplementedExternalServer) DetachPipeline(context.Context, *DetachPipelineRequest) (*StandardResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DetachPipeline not implemented")
 }
 func (UnimplementedExternalServer) PausePipeline(context.Context, *PausePipelineRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PausePipeline not implemented")
@@ -830,42 +784,6 @@ func _External_SetPipelines_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ExternalServer).SetPipelines(ctx, req.(*SetPipelinesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _External_AttachPipeline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AttachPipelineRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExternalServer).AttachPipeline(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: External_AttachPipeline_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalServer).AttachPipeline(ctx, req.(*AttachPipelineRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _External_DetachPipeline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DetachPipelineRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExternalServer).DetachPipeline(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: External_DetachPipeline_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExternalServer).DetachPipeline(ctx, req.(*DetachPipelineRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1309,14 +1227,6 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetPipelines",
 			Handler:    _External_SetPipelines_Handler,
-		},
-		{
-			MethodName: "AttachPipeline",
-			Handler:    _External_AttachPipeline_Handler,
-		},
-		{
-			MethodName: "DetachPipeline",
-			Handler:    _External_DetachPipeline_Handler,
 		},
 		{
 			MethodName: "PausePipeline",
