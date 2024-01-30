@@ -201,7 +201,7 @@ func (c *Client) GetSetPipelinesCommandByService(ctx context.Context, service st
 
 	resp, err := c.Server.GetSetPipelinesCommandsByService(ctx, &protos.GetSetPipelinesCommandsByServiceRequest{ServiceName: service})
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get attach commands by service")
+		return nil, errors.Wrap(err, "unable to get set pipeline commands by service")
 	}
 
 	return resp, nil

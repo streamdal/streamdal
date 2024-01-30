@@ -104,7 +104,7 @@ var _ = Describe("Validate", func() {
 
 		It("cannot have unset tail request", func() {
 			err := TailRequestStartCommand(&protos.Command{
-				Command: &protos.Command_AttachPipeline{},
+				Command: &protos.Command_SetPipelines{},
 			})
 			Expect(err.Error()).To(Equal(ErrNilField("Tail").Error()))
 		})
@@ -159,7 +159,7 @@ var _ = Describe("Validate", func() {
 
 		It("cannot have unset tail request", func() {
 			err := TailRequestStopCommand(&protos.Command{
-				Command: &protos.Command_AttachPipeline{},
+				Command: &protos.Command_SetPipelines{},
 			})
 			Expect(err.Error()).To(Equal(ErrNilField("Tail").Error()))
 		})

@@ -34,7 +34,11 @@ type InternalServer struct {
 	protos.UnimplementedInternalServer
 }
 
-func (i *InternalServer) GetSetPipelinesCommandByService(ctx context.Context, service string) (*protos.GetSetPipelinesCommandsByServiceResponse, error) {
+// Needed for implementing fake grpc server for testing
+func (i *InternalServer) GetSetPipelinesCommandsByService(
+	_ context.Context,
+	_ *protos.GetSetPipelinesCommandsByServiceRequest,
+) (*protos.GetSetPipelinesCommandsByServiceResponse, error) {
 	return &protos.GetSetPipelinesCommandsByServiceResponse{}, nil
 }
 
@@ -183,8 +187,10 @@ var _ = Describe("Streamdal", func() {
 		})
 
 		It("returns a single pipeline", func() {
-			s.pipelines[audToStr(aud)] = map[string]*protos.Command{
-				uuid.New().String(): {},
+			s.pipelines[audToStr(aud)] = []*protos.Pipeline{
+				{
+					Id: uuid.New().String(),
+				},
 			}
 			Expect(len(s.getPipelines(ctx, aud))).To(Equal(1))
 		})
