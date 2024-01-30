@@ -606,16 +606,30 @@ func (s *ExternalServer) setPausePipeline(ctx context.Context, aud *protos.Audie
 	// Does this pipeline exist?
 	if _, err := s.Options.StoreService.GetPipeline(ctx, pipelineID); err != nil {
 		if errors.Is(err, store.ErrPipelineNotFound) {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, "pipeline not found"), nil
 		}
 
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to lookup pipeline: %s", err)), nil
+	}
+
+	// Is this pipeline being used?
+	config, err := s.Options.StoreService.GetConfigByAudience(ctx, aud)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to get config by audience: %s", err)), nil
+	}
+
+	if len(config) == 0 {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK,
+			fmt.Sprintf("nothing to do - pipeline '%s' not being used by audience '%s'", pipelineID, util.AudienceToStr(aud))), nil
 	}
 
 	// Can attempt to pause/resume; Pause/ResumePipeline() will noop if pipeline is already paused/resumed
 	updated, err := s.Options.StoreService.SetPauseResume(ctx, aud, pipelineID, pause)
 	if err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to set pause/resume for pipeline: %s", err)), nil
 	}
 
 	statusMessage := fmt.Sprintf("pipeline '%s' for audience '%s' is already %sd", pipelineID, util.AudienceToStr(aud), action)
@@ -623,7 +637,8 @@ func (s *ExternalServer) setPausePipeline(ctx context.Context, aud *protos.Audie
 	// Only broadcast change if it was actually updated
 	if updated {
 		if err := s.Options.BusService.BroadcastPauseResume(ctx, aud, pipelineID, pause); err != nil {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to broadcast pause/resume: %s", err)), nil
 		}
 
 		statusMessage = fmt.Sprintf("pipeline '%s' for audience '%s' %sd", pipelineID, util.AudienceToStr(aud), action)
@@ -1231,6 +1246,10 @@ func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*pr
 }
 
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
+	if req.Input == "" {
+		req.Input = "no input provided"
+	}
+	
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
 	}, nil

@@ -502,6 +502,10 @@ func (s *Store) SetPauseResume(ctx context.Context, audience *protos.Audience, p
 	// Fetch pipeline config for this audience
 	setPipelineConfigData, err := s.options.RedisBackend.Get(ctx, fmt.Sprintf(RedisAudienceKeyFormat, util.AudienceToStr(audience))).Result()
 	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return false, ErrConfigNotFound
+		}
+
 		return false, errors.Wrap(err, "error fetching pipeline config")
 	}
 
