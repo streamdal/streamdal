@@ -133,6 +133,9 @@ func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string)
 	}
 }
 
+// PopulateWASMFields is used for populating WASM in *protos.Pipeline because
+// the SDK may not have had audiences at startup and thus GetSetPipelinesByService()
+// would not have returned any WASM data.
 func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 	if pipeline == nil {
 		return errors.New("pipeline cannot be nil")
@@ -178,6 +181,9 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 // NOTE: This is primarily useful for commands that have Steps which contain
 // Wasm fields (like SetPipelines command). For commands that do not have Steps
 // w/ Wasm, this will do nothing.
+// This is used _specifically_ for the initial GetSetPipelinesByService() that
+// SDKs call on startup (but if the SDK does not have any audiences, this will
+// be empty).
 func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmModule {
 	wasmModules := make(map[string]*protos.WasmModule)
 
@@ -248,10 +254,10 @@ func ConvertConfigStrAudience(config map[*protos.Audience][]*protos.Pipeline) ma
 func GenerateSchemaInferencePipeline() *protos.Pipeline {
 	return &protos.Pipeline{
 		Id:   GenerateUUID(),
-		Name: "Schema Inference (auto-generated)",
+		Name: "Schema Inference (auto-generated pipeline)",
 		Steps: []*protos.PipelineStep{
 			{
-				Name: "Infer Schema (auto-generated)",
+				Name: "Infer Schema (auto-generated step)",
 				Step: &protos.PipelineStep_InferSchema{
 					InferSchema: &steps.InferSchemaStep{
 						CurrentSchema: make([]byte, 0),
@@ -263,8 +269,8 @@ func GenerateSchemaInferencePipeline() *protos.Pipeline {
 }
 
 // DEV: Test this
-// Inject schema inference pipeline BEFORE all other pipelines
-func InjectSchemaInferencePipeline(pipelines []*protos.Pipeline) []*protos.Pipeline {
+// Inject schema inference pipeline BEFORE all other pipelines + populate
+func InjectSchemaInferencePipeline(pipelines []*protos.Pipeline, wasmDir string) []*protos.Pipeline {
 	pipelines = append([]*protos.Pipeline{GenerateSchemaInferencePipeline()}, pipelines...)
 	return pipelines
 }

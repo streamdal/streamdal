@@ -87,6 +87,7 @@ func (s *InternalServer) sendToClient(ch chan *protos.Command, cmd *protos.Comma
 }
 
 func (s *InternalServer) Register(request *protos.RegisterRequest, server protos.Internal_RegisterServer) error {
+
 	// validate request
 	if err := validate.RegisterRequest(request); err != nil {
 		return errors.Wrap(err, "invalid register request")
@@ -96,6 +97,8 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 		"service_name": request.ServiceName,
 		"session_id":   request.SessionId,
 	})
+
+	llog.Debug("received register request")
 
 	// Send telemetry
 	telTags := []statsd.Tag{
@@ -263,6 +266,9 @@ MAIN:
 }
 
 func (s *InternalServer) Heartbeat(ctx context.Context, req *protos.HeartbeatRequest) (*protos.StandardResponse, error) {
+	llog := s.log.WithField("method", "Heartbeat")
+	llog.Debugf("received heartbeat for session id '%s'", req.SessionId)
+
 	if err := validate.HeartbeatRequest(req); err != nil {
 		return &protos.StandardResponse{
 			Id:      util.CtxRequestId(ctx),

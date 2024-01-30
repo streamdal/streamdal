@@ -392,7 +392,15 @@ func (b *Bus) sendSetPipelinesCommand(
 	})
 
 	// Inject schema inference pipeline
-	pipelines = util.InjectSchemaInferencePipeline(pipelines)
+	pipelines = util.InjectSchemaInferencePipeline(pipelines, b.options.WASMDir)
+
+	// Populate WASM
+	for _, p := range pipelines {
+		if err := util.PopulateWASMFields(p, b.options.WASMDir); err != nil {
+			llog.Errorf("error populating WASM fields: %s", err)
+			continue
+		}
+	}
 
 	var sent int
 
