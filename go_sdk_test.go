@@ -34,8 +34,8 @@ type InternalServer struct {
 	protos.UnimplementedInternalServer
 }
 
-func (i *InternalServer) GetAttachCommandsByService(ctx context.Context, req *protos.GetAttachCommandsByServiceRequest) (*protos.GetAttachCommandsByServiceResponse, error) {
-	return &protos.GetAttachCommandsByServiceResponse{}, nil
+func (i *InternalServer) GetSetPipelinesCommandByService(ctx context.Context, service string) (*protos.GetSetPipelinesCommandsByServiceResponse, error) {
+	return &protos.GetSetPipelinesCommandsByServiceResponse{}, nil
 }
 
 func (i *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
@@ -153,11 +153,12 @@ var _ = Describe("Streamdal", func() {
 	Context("getPipelines", func() {
 		ctx := context.Background()
 
+		// TODO: Re-generate fake
 		fakeClient := &serverfakes.FakeIServerClient{}
 
 		s := &Streamdal{
 			pipelinesMtx: &sync.RWMutex{},
-			pipelines:    map[string]map[string]*protos.Command{},
+			pipelines:    map[string][]*protos.Pipeline{},
 			serverClient: fakeClient,
 			audiencesMtx: &sync.RWMutex{},
 			audiences:    map[string]struct{}{},
@@ -536,16 +537,9 @@ func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipelin
 		tails:        map[string]map[string]*Tail{},
 		tailsMtx:     &sync.RWMutex{},
 		pipelinesMtx: &sync.RWMutex{},
-		pipelines: map[string]map[string]*protos.Command{
+		pipelines: map[string][]*protos.Pipeline{
 			audToStr(aud): {
-				pipeline.Id: {
-					Audience: aud,
-					Command: &protos.Command_AttachPipeline{
-						AttachPipeline: &protos.AttachPipelineCommand{
-							Pipeline: pipeline,
-						},
-					},
-				},
+				pipeline,
 			},
 		},
 	}
@@ -564,7 +558,7 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 
 	return &Streamdal{
 		pipelinesMtx: &sync.RWMutex{},
-		pipelines:    map[string]map[string]*protos.Command{},
+		pipelines:    map[string][]*protos.Pipeline{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
 		kv:           kvClient,

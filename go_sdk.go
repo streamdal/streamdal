@@ -98,26 +98,24 @@ type IStreamdal interface {
 
 // Streamdal is the main struct for this library
 type Streamdal struct {
-	config             *Config
-	functions          map[string]*function
-	pipelines          map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
-	pipelinesPaused    map[string]map[string]*protos.Command // k1: audienceStr k2: pipelineID
-	functionsMtx       *sync.RWMutex
-	pipelinesMtx       *sync.RWMutex
-	pipelinesPausedMtx *sync.RWMutex
-	serverClient       server.IServerClient
-	metrics            metrics.IMetrics
-	audiences          map[string]struct{} // k: audienceStr
-	audiencesMtx       *sync.RWMutex
-	sessionID          string
-	kv                 kv.IKV
-	hf                 *hostfunc.HostFunc
-	tailsMtx           *sync.RWMutex
-	tails              map[string]map[string]*Tail // k1: audienceStr k2: tailID
-	pausedTailsMtx     *sync.RWMutex
-	pausedTails        map[string]map[string]*Tail // k1: audienceStr k2: tailID
-	schemas            map[string]*protos.Schema   // k: audienceStr
-	schemasMtx         *sync.RWMutex
+	config         *Config
+	functions      map[string]*function
+	functionsMtx   *sync.RWMutex
+	pipelines      map[string][]*protos.Pipeline // k: audienceStr
+	pipelinesMtx   *sync.RWMutex
+	serverClient   server.IServerClient
+	metrics        metrics.IMetrics
+	audiences      map[string]struct{} // k: audienceStr
+	audiencesMtx   *sync.RWMutex
+	sessionID      string
+	kv             kv.IKV
+	hf             *hostfunc.HostFunc
+	tailsMtx       *sync.RWMutex
+	tails          map[string]map[string]*Tail // k1: audienceStr k2: tailID
+	pausedTailsMtx *sync.RWMutex
+	pausedTails    map[string]map[string]*Tail // k1: audienceStr k2: tailID
+	schemas        map[string]*protos.Schema   // k: audienceStr
+	schemasMtx     *sync.RWMutex
 }
 
 type Config struct {
@@ -230,26 +228,24 @@ func New(cfg *Config) (*Streamdal, error) {
 	}
 
 	s := &Streamdal{
-		functions:          make(map[string]*function),
-		functionsMtx:       &sync.RWMutex{},
-		serverClient:       serverClient,
-		pipelines:          make(map[string]map[string]*protos.Command),
-		pipelinesMtx:       &sync.RWMutex{},
-		pipelinesPaused:    make(map[string]map[string]*protos.Command),
-		pipelinesPausedMtx: &sync.RWMutex{},
-		audiences:          map[string]struct{}{},
-		audiencesMtx:       &sync.RWMutex{},
-		config:             cfg,
-		metrics:            m,
-		sessionID:          uuid.New().String(),
-		kv:                 kvInstance,
-		hf:                 hf,
-		tailsMtx:           &sync.RWMutex{},
-		tails:              make(map[string]map[string]*Tail),
-		pausedTailsMtx:     &sync.RWMutex{},
-		pausedTails:        make(map[string]map[string]*Tail),
-		schemasMtx:         &sync.RWMutex{},
-		schemas:            make(map[string]*protos.Schema),
+		functions:      make(map[string]*function),
+		functionsMtx:   &sync.RWMutex{},
+		serverClient:   serverClient,
+		pipelines:      make(map[string][]*protos.Pipeline),
+		pipelinesMtx:   &sync.RWMutex{},
+		audiences:      map[string]struct{}{},
+		audiencesMtx:   &sync.RWMutex{},
+		config:         cfg,
+		metrics:        m,
+		sessionID:      uuid.New().String(),
+		kv:             kvInstance,
+		hf:             hf,
+		tailsMtx:       &sync.RWMutex{},
+		tails:          make(map[string]map[string]*Tail),
+		pausedTailsMtx: &sync.RWMutex{},
+		pausedTails:    make(map[string]map[string]*Tail),
+		schemasMtx:     &sync.RWMutex{},
+		schemas:        make(map[string]*protos.Schema),
 	}
 
 	if cfg.DryRun {
@@ -392,36 +388,30 @@ func (s *Streamdal) watchForShutdown() {
 }
 
 func (s *Streamdal) pullInitialPipelines(ctx context.Context) error {
-	cmds, err := s.serverClient.GetAttachCommandsByService(ctx, s.config.ServiceName)
+	cmds, err := s.serverClient.GetSetPipelinesCommandByService(ctx, s.config.ServiceName)
 	if err != nil {
 		return errors.Wrap(err, "unable to pull initial pipelines")
 	}
 
-	for _, cmd := range cmds.Active {
-		s.config.Logger.Debugf("Attaching pipeline '%s'", cmd.GetAttachPipeline().Pipeline.Name)
+	// Commands won't include paused pipelines but we can check just in case
+	for _, cmd := range cmds.SetPipelineCommands {
+		for _, p := range cmd.GetSetPipelines().Pipelines {
+			s.config.Logger.Debugf("saving pipeline '%s' for audience '%s' to internal map", p.Name, audToStr(cmd.Audience))
 
-		// Fill in WASM data from the deduplication map
-		for _, step := range cmd.GetAttachPipeline().Pipeline.Steps {
-			wasmData, ok := cmds.WasmModules[step.GetXWasmId()]
-			if !ok {
-				return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
+			// Fill in WASM data from the deduplication map
+			for _, step := range p.Steps {
+				wasmData, ok := cmds.WasmModules[step.GetXWasmId()]
+				if !ok {
+					return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
+				}
+
+				step.XWasmBytes = wasmData.Bytes
 			}
 
-			step.XWasmBytes = wasmData.Bytes
+			if err := s.setPipelines(ctx, cmd); err != nil {
+				s.config.Logger.Errorf("failed to attach pipeline: %s", err)
+			}
 		}
-
-		if err := s.attachPipeline(ctx, cmd); err != nil {
-			s.config.Logger.Errorf("failed to attach pipeline: %s", err)
-		}
-	}
-
-	for _, cmd := range cmds.Paused {
-		s.config.Logger.Debugf("Pipeline '%s' is paused", cmd.GetAttachPipeline().Pipeline.Name)
-		if _, ok := s.pipelinesPaused[audToStr(cmd.Audience)]; !ok {
-			s.pipelinesPaused[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
-		}
-
-		s.pipelinesPaused[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
 	}
 
 	return nil
@@ -512,7 +502,7 @@ func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *pro
 	return resp, nil
 }
 
-func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) map[string]*protos.Command {
+func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) []*protos.Pipeline {
 	s.pipelinesMtx.RLock()
 	defer s.pipelinesMtx.RUnlock()
 
@@ -520,7 +510,7 @@ func (s *Streamdal) getPipelines(ctx context.Context, aud *protos.Audience) map[
 
 	pipelines, ok := s.pipelines[audToStr(aud)]
 	if !ok {
-		return make(map[string]*protos.Command)
+		return make([]*protos.Pipeline, 0)
 	}
 
 	return pipelines
@@ -630,19 +620,17 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	)
 
 PIPELINE:
-	for _, p := range pipelines {
+	for _, pipeline := range pipelines {
 		var isr *protos.InterStepResult
 		pIndex += 1
 
 		pipelineTimeoutCtx, pipelineTimeoutCxl := context.WithTimeout(ctx, s.config.PipelineTimeout)
 
 		pipelineStatus := &protos.PipelineStatus{
-			Id:         p.GetAttachPipeline().GetPipeline().Id,
-			Name:       p.GetAttachPipeline().GetPipeline().Name,
+			Id:         pipeline.Id,
+			Name:       pipeline.Name,
 			StepStatus: make([]*protos.StepStatus, 0),
 		}
-
-		pipeline := p.GetAttachPipeline().GetPipeline()
 
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterProcessed, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 		_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterBytes, Labels: s.getCounterLabels(req, pipeline), Value: payloadSize, Audience: aud})
