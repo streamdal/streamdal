@@ -663,27 +663,30 @@ func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience][]*proto
 		return cfgs, nil
 	}
 
-	for _, audStr := range audienceKeys {
+	for _, audStrFull := range audienceKeys {
+		// Get rid of prefix
+		audStrWithoutPrefix := strings.TrimPrefix(audStrFull, RedisAudiencePrefix+":")
+
 		// Good audience?
-		aud := util.AudienceFromStr(audStr)
+		aud := util.AudienceFromStr(audStrWithoutPrefix)
 		if aud == nil {
-			return nil, fmt.Errorf("unable to convert '%s' to audience", audStr)
+			return nil, fmt.Errorf("unable to convert '%s' to audience", audStrWithoutPrefix)
 		}
 
 		// Fetch SetPipelinesConfig for each audience
-		data, err := s.options.RedisBackend.Get(ctx, audStr).Result()
+		data, err := s.options.RedisBackend.Get(ctx, audStrFull).Result()
 		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching config '%s' from store", audStr)
+			return nil, errors.Wrapf(err, "error fetching config '%s' from store", audStrFull)
 		}
 
 		setPipelinesConfig := make([]*SetPipelinesConfig, 0)
 
 		if err := json.Unmarshal([]byte(data), &setPipelinesConfig); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshaling config for audience '%s'", audStr)
+			return nil, errors.Wrapf(err, "error unmarshaling config for audience '%s'", audStrFull)
 		}
 
 		if len(setPipelinesConfig) == 0 {
-			s.log.Debugf("empty config for audience '%s' - nothing to do", audStr)
+			s.log.Debugf("empty config for audience '%s' - nothing to do", audStrFull)
 			continue
 		}
 
@@ -695,7 +698,8 @@ func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience][]*proto
 			// Fetch pipeline config
 			pipeline, err := s.GetPipeline(ctx, cfg.PipelineID)
 			if err != nil {
-				return nil, errors.Wrapf(err, "unable to fetch pipeline '%s' for audience '%s'", cfg.PipelineID, audStr)
+				return nil, errors.Wrapf(err, "unable to fetch pipeline '%s' for audience '%s'",
+					cfg.PipelineID, audStrFull)
 			}
 
 			// Add paused status to pipeline

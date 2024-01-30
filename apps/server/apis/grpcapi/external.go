@@ -126,6 +126,8 @@ MAIN:
 			llog.Debug("server shutting down")
 			break MAIN
 		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID):
+			s.log.Debug("received update on the changes pubsub topic")
+
 			if sendInProgress {
 				llog.Debug("send in progress, skipping changes message")
 				continue
@@ -1249,7 +1251,7 @@ func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*prot
 	if req.Input == "" {
 		req.Input = "no input provided"
 	}
-	
+
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
 	}, nil

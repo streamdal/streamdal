@@ -54,6 +54,8 @@ func New() *PubSub {
 }
 
 func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
+	ps.log.Debugf("asked to listen on topic '%s', channel id '%s'", topic, channelID)
+
 	var id string
 
 	if len(channelID) > 0 {
@@ -129,6 +131,8 @@ func (ps *PubSub) Publish(topic string, m interface{}) {
 	defer ps.mtx.RUnlock()
 
 	if _, ok := ps.topics[topic]; !ok {
+		// If UI is not connected via GetAllStream(), then "changes" topic won't
+		// exist and this condition will get hit - that's okay!
 		ps.log.Debugf("pubsub.Publish: no such topic '%s' - skipping publish", topic)
 		return
 	}

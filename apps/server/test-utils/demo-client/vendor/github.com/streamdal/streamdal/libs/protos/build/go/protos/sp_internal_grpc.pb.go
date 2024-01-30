@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Internal_Register_FullMethodName                   = "/protos.Internal/Register"
-	Internal_NewAudience_FullMethodName                = "/protos.Internal/NewAudience"
-	Internal_Heartbeat_FullMethodName                  = "/protos.Internal/Heartbeat"
-	Internal_Notify_FullMethodName                     = "/protos.Internal/Notify"
-	Internal_Metrics_FullMethodName                    = "/protos.Internal/Metrics"
-	Internal_GetAttachCommandsByService_FullMethodName = "/protos.Internal/GetAttachCommandsByService"
-	Internal_SendTail_FullMethodName                   = "/protos.Internal/SendTail"
-	Internal_SendSchema_FullMethodName                 = "/protos.Internal/SendSchema"
+	Internal_Register_FullMethodName                         = "/protos.Internal/Register"
+	Internal_NewAudience_FullMethodName                      = "/protos.Internal/NewAudience"
+	Internal_Heartbeat_FullMethodName                        = "/protos.Internal/Heartbeat"
+	Internal_Notify_FullMethodName                           = "/protos.Internal/Notify"
+	Internal_Metrics_FullMethodName                          = "/protos.Internal/Metrics"
+	Internal_GetSetPipelinesCommandsByService_FullMethodName = "/protos.Internal/GetSetPipelinesCommandsByService"
+	Internal_SendTail_FullMethodName                         = "/protos.Internal/SendTail"
+	Internal_SendSchema_FullMethodName                       = "/protos.Internal/SendSchema"
 )
 
 // InternalClient is the client API for Internal service.
@@ -53,7 +53,7 @@ type InternalClient interface {
 	Metrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Used to pull all pipeline configs for the service name in the SDK's constructor
 	// This is needed because Register() is async
-	GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error)
+	GetSetPipelinesCommandsByService(ctx context.Context, in *GetSetPipelinesCommandsByServiceRequest, opts ...grpc.CallOption) (*GetSetPipelinesCommandsByServiceResponse, error)
 	SendTail(ctx context.Context, opts ...grpc.CallOption) (Internal_SendTailClient, error)
 	// Used by SDK to send a new schema to the server
 	SendSchema(ctx context.Context, in *SendSchemaRequest, opts ...grpc.CallOption) (*StandardResponse, error)
@@ -135,9 +135,9 @@ func (c *internalClient) Metrics(ctx context.Context, in *MetricsRequest, opts .
 	return out, nil
 }
 
-func (c *internalClient) GetAttachCommandsByService(ctx context.Context, in *GetAttachCommandsByServiceRequest, opts ...grpc.CallOption) (*GetAttachCommandsByServiceResponse, error) {
-	out := new(GetAttachCommandsByServiceResponse)
-	err := c.cc.Invoke(ctx, Internal_GetAttachCommandsByService_FullMethodName, in, out, opts...)
+func (c *internalClient) GetSetPipelinesCommandsByService(ctx context.Context, in *GetSetPipelinesCommandsByServiceRequest, opts ...grpc.CallOption) (*GetSetPipelinesCommandsByServiceResponse, error) {
+	out := new(GetSetPipelinesCommandsByServiceResponse)
+	err := c.cc.Invoke(ctx, Internal_GetSetPipelinesCommandsByService_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ type InternalServer interface {
 	Metrics(context.Context, *MetricsRequest) (*StandardResponse, error)
 	// Used to pull all pipeline configs for the service name in the SDK's constructor
 	// This is needed because Register() is async
-	GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error)
+	GetSetPipelinesCommandsByService(context.Context, *GetSetPipelinesCommandsByServiceRequest) (*GetSetPipelinesCommandsByServiceResponse, error)
 	SendTail(Internal_SendTailServer) error
 	// Used by SDK to send a new schema to the server
 	SendSchema(context.Context, *SendSchemaRequest) (*StandardResponse, error)
@@ -237,8 +237,8 @@ func (UnimplementedInternalServer) Notify(context.Context, *NotifyRequest) (*Sta
 func (UnimplementedInternalServer) Metrics(context.Context, *MetricsRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Metrics not implemented")
 }
-func (UnimplementedInternalServer) GetAttachCommandsByService(context.Context, *GetAttachCommandsByServiceRequest) (*GetAttachCommandsByServiceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAttachCommandsByService not implemented")
+func (UnimplementedInternalServer) GetSetPipelinesCommandsByService(context.Context, *GetSetPipelinesCommandsByServiceRequest) (*GetSetPipelinesCommandsByServiceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSetPipelinesCommandsByService not implemented")
 }
 func (UnimplementedInternalServer) SendTail(Internal_SendTailServer) error {
 	return status.Errorf(codes.Unimplemented, "method SendTail not implemented")
@@ -352,20 +352,20 @@ func _Internal_Metrics_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Internal_GetAttachCommandsByService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAttachCommandsByServiceRequest)
+func _Internal_GetSetPipelinesCommandsByService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSetPipelinesCommandsByServiceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(InternalServer).GetAttachCommandsByService(ctx, in)
+		return srv.(InternalServer).GetSetPipelinesCommandsByService(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Internal_GetAttachCommandsByService_FullMethodName,
+		FullMethod: Internal_GetSetPipelinesCommandsByService_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(InternalServer).GetAttachCommandsByService(ctx, req.(*GetAttachCommandsByServiceRequest))
+		return srv.(InternalServer).GetSetPipelinesCommandsByService(ctx, req.(*GetSetPipelinesCommandsByServiceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -438,8 +438,8 @@ var Internal_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Internal_Metrics_Handler,
 		},
 		{
-			MethodName: "GetAttachCommandsByService",
-			Handler:    _Internal_GetAttachCommandsByService_Handler,
+			MethodName: "GetSetPipelinesCommandsByService",
+			Handler:    _Internal_GetSetPipelinesCommandsByService_Handler,
 		},
 		{
 			MethodName: "SendSchema",
