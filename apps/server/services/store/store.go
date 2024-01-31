@@ -841,11 +841,22 @@ func (s *Store) GetSetPipelinesCommandsByService(ctx context.Context, serviceNam
 			continue
 		}
 
+		pipelines := make([]*protos.Pipeline, 0)
+
+		// Skip any pipelines that should be paused
+		for _, p := range perAudiencePipelines {
+			if p.GetXPaused() {
+				continue
+			}
+
+			pipelines = append(pipelines, p)
+		}
+
 		cmds = append(cmds, &protos.Command{
 			Audience: aud,
 			Command: &protos.Command_SetPipelines{
 				SetPipelines: &protos.SetPipelinesCommand{
-					Pipelines: perAudiencePipelines,
+					Pipelines: pipelines,
 				},
 			},
 		})
