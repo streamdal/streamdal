@@ -391,7 +391,12 @@ func (s *InternalServer) GetSetPipelinesCommandsByService(
 		return nil, errors.Wrapf(err, "unable to get configs for service '%s'", req.ServiceName)
 	}
 
-	numInjected := s.injectSchemaInferenceForSetPipelinesCommands(setPipelinesCommands)
+	fmt.Println("Before injection: ", len(setPipelinesCommands[0].GetSetPipelines().Pipelines))
+	numInjected, err := util.InjectSchemaInferenceForSetPipelinesCommands(setPipelinesCommands, s.Options.Config.WASMDir)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to inject schema inference pipelines")
+	}
+	fmt.Println("After injection: ", len(setPipelinesCommands[0].GetSetPipelines().Pipelines))
 
 	s.log.Debugf("GetSetPipelinesCommandsByService has injected '%d' schema inference pipelines for service '%s'",
 		numInjected, req.ServiceName)
@@ -400,32 +405,6 @@ func (s *InternalServer) GetSetPipelinesCommandsByService(
 		SetPipelineCommands: setPipelinesCommands,
 		WasmModules:         util.GenerateWasmMapping(setPipelinesCommands...),
 	}, nil
-}
-
-func (s *InternalServer) injectSchemaInferenceForSetPipelinesCommands(
-	cmds []*protos.Command,
-) int {
-	if len(cmds) == 0 {
-		return 0
-	}
-
-	var numInjected int
-
-	for _, cmd := range cmds {
-		if cmd.GetSetPipelines() == nil {
-			s.log.Debugf("skipping injection for non-SetPipelines command for audience '%s'", util.AudienceToStr(cmd.Audience))
-			continue
-		}
-
-		pipelines := make([]*protos.Pipeline, 0)
-		pipelines = append(pipelines, util.GenerateSchemaInferencePipeline())
-		pipelines = append(pipelines, cmd.GetSetPipelines().Pipelines...)
-
-		cmd.GetSetPipelines().Pipelines = pipelines
-		numInjected += 1
-	}
-
-	return numInjected
 }
 
 func (s *InternalServer) SendTail(srv protos.Internal_SendTailServer) error {
