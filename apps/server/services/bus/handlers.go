@@ -16,7 +16,8 @@ import (
 
 // DEV (DONE): Implement
 func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.UpdatePipelineRequest) error {
-	b.log.Debugf("handling update pipeline request bus event: %v", req.Pipeline.Name)
+	llog := b.log.WithField("method", "handleUpdatePipelineRequest")
+	llog.Debugf("handling update pipeline request bus event: %v", req.Pipeline.Name)
 
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
@@ -29,7 +30,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 	}
 
 	if len(usage) == 0 {
-		b.log.Debugf("pipeline id '%s' is not in use on node '%s'- skipping",
+		llog.Debugf("pipeline id '%s' is not in use on node '%s'- skipping",
 			req.Pipeline.Id, b.options.NodeName)
 		return nil
 	}
@@ -43,12 +44,16 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 		}
 
 		// Send SetPipelines command for session ID
-		b.sendSetPipelinesCommand(u.Audience, configs, u.SessionId)
-		b.log.Debugf("sent SetPipeline command to session '%s' for audience '%s'",
+		if _, err := b.sendSetPipelinesCommand(u.Audience, configs, u.SessionId); err != nil {
+			llog.Errorf("unable to send SetPipelines command: %v", err)
+			return errors.Wrap(err, "error sending SetPipelines command")
+		}
+
+		llog.Debugf("sent SetPipeline command to session '%s' for audience '%s'",
 			u.SessionId, util.AudienceToStr(u.Audience))
 	}
 
-	b.log.Debugf("sent SetPipelines commands to '%d' active session(s) for pipeline id '%s'",
+	llog.Debugf("sent SetPipelines commands to '%d' active session(s) for pipeline id '%s'",
 		len(usage), req.Pipeline.Id)
 
 	return nil
@@ -85,7 +90,11 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 		}
 
 		// Send SetPipelines command for session ID
-		b.sendSetPipelinesCommand(u.Audience, configs, u.SessionId)
+		if _, err := b.sendSetPipelinesCommand(u.Audience, configs, u.SessionId); err != nil {
+			llog.Debugf("error sending SetPipelines command: %v", err)
+			return errors.Wrap(err, "error sending SetPipelines command")
+		}
+
 		llog.Debugf("sent SetPipeline command to session '%s' for audience '%s'",
 			u.SessionId, util.AudienceToStr(u.Audience))
 	}
@@ -112,7 +121,10 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 	}
 
 	// Send empty SetPipelines command to each session
-	b.sendSetPipelinesCommand(req.Audience, make([]*protos.Pipeline, 0), sessionIDs...)
+	if _, err := b.sendSetPipelinesCommand(req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
+		llog.Errorf("unable to send SetPipelines command: %v", err)
+		return errors.Wrap(err, "error sending SetPipelines command")
+	}
 
 	return nil
 }
@@ -122,7 +134,8 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 // is for an audience that has an active registration on this node. If it does,
 // we will inject schema inference + send a SetPipelines cmd to the SDK.
 func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipelinesRequest) error {
-	b.log.Debugf("handling attach pipeline request bus event: %v", req)
+	llog := b.log.WithField("method", "handleSetPipelinesRequest")
+	llog.Debugf("handling attach pipeline request bus event: %v", req)
 
 	if err := validate.SetPipelinesRequest(req); err != nil {
 		return errors.Wrap(err, "validation error")
@@ -138,11 +151,11 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 		pipeline, err := b.options.Store.GetPipeline(ctx, id)
 		if err != nil {
 			if errors.Is(err, store.ErrPipelineNotFound) {
-				b.log.Debugf("pipeline id '%s' not found - skipping", id)
+				llog.Debugf("pipeline id '%s' not found - skipping", id)
 				return nil
 			}
 
-			b.log.Errorf("error getting pipeline '%s' from store: %v", id, err)
+			llog.Errorf("error getting pipeline '%s' from store: %v", id, err)
 			return errors.Wrapf(err, "error getting pipeline '%s' from store", id)
 		}
 
@@ -151,21 +164,25 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 
 	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(ctx, req.Audience, b.options.NodeName)
 	if err != nil {
-		b.log.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
+		llog.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
 		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
 	}
 
 	if len(sessionIDs) == 0 {
-		b.log.Debugf("no active sessions found for audience '%s' on node '%s' - skipping", req.Audience, b.options.NodeName)
+		llog.Debugf("no active sessions found for audience '%s' on node '%s' - skipping", req.Audience, b.options.NodeName)
 		return nil
 	}
 
-	b.log.Debugf("found '%d' active session(s) for audience '%s' on node '%s'", len(sessionIDs), req.Audience, b.options.NodeName)
+	llog.Debugf("found '%d' active session(s) for audience '%s' on node '%s'", len(sessionIDs), req.Audience, b.options.NodeName)
 
 	// OK we have an active/live audience on this node - send SetPipelines cmd to it
-	numSent := b.sendSetPipelinesCommand(req.Audience, pipelines, sessionIDs...)
+	numSent, err := b.sendSetPipelinesCommand(req.Audience, pipelines, sessionIDs...)
+	if err != nil {
+		llog.Debugf("error sending SetPipelines command: %v", err)
+		return errors.Wrap(err, "error sending SetPipelines command")
+	}
 
-	b.log.Debugf("sent SetPipelines command to '%d' active session(s) for audience '%s'", numSent, req.Audience)
+	llog.Debugf("sent SetPipelines command to '%d' active session(s) for audience '%s'", numSent, req.Audience)
 
 	return nil
 }
@@ -221,7 +238,10 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 		llog.Debugf("sending SetPipelines command to session id '%s' for audience '%s'",
 			u.SessionId, util.AudienceToStr(u.Audience))
 
-		b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId)
+		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
+			llog.Errorf("unable to send SetPipelines command: %v", err)
+			return errors.Wrap(err, "error sending SetPipelines command")
+		}
 	}
 
 	return nil
@@ -255,7 +275,10 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 		llog.Debugf("sending SetPipelines command to session id '%s' for audience '%s'",
 			u.SessionId, util.AudienceToStr(u.Audience))
 
-		b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId)
+		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
+			llog.Errorf("unable to send SetPipelines command: %v", err)
+			return errors.Wrap(err, "error sending SetPipelines command")
+		}
 	}
 
 	return nil
@@ -372,7 +395,10 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 	}
 
 	// Send SetPipelines command to each session ID
-	b.sendSetPipelinesCommand(req.Audience, make([]*protos.Pipeline, 0), sessionIDs...)
+	if _, err := b.sendSetPipelinesCommand(req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
+		llog.Errorf("unable to send SetPipelines command: %v", err)
+		return errors.Wrap(err, "error sending SetPipelines command")
+	}
 
 	llog.Debugf("sent SetPipelineCommands for '%d' sessions", len(sessionIDs))
 
@@ -386,19 +412,26 @@ func (b *Bus) sendSetPipelinesCommand(
 	aud *protos.Audience,
 	pipelines []*protos.Pipeline,
 	sessionIDs ...string,
-) int {
+) (int, error) {
 	llog := b.log.WithFields(logrus.Fields{
 		"method": "sendSetPipelinesCommand",
 	})
 
 	// Inject schema inference pipeline
-	pipelines = util.InjectSchemaInferencePipeline(pipelines, b.options.WASMDir)
+	updatedPipelines, err := util.InjectSchemaInferenceForPipelines(pipelines, b.options.WASMDir)
+	if err != nil {
+		llog.Errorf("error injecting schema inference pipeline: %s", err)
+		return 0, errors.Wrap(err, "error injecting schema inference pipeline")
+	}
 
 	// Populate WASM
-	for _, p := range pipelines {
+	for _, p := range updatedPipelines {
+		// NOTE: Command_SetPipelines does not have a WasmModules field (like
+		// the internal.GetSetPipelinesCommandsByServiceResponse), so we need
+		// to fill out all of the wasm fields.
 		if err := util.PopulateWASMFields(p, b.options.WASMDir); err != nil {
 			llog.Errorf("error populating WASM fields: %s", err)
-			continue
+			return 0, errors.Wrap(err, "error populating WASM fields")
 		}
 	}
 
@@ -428,7 +461,7 @@ func (b *Bus) sendSetPipelinesCommand(
 		sent += 1
 	}
 
-	return sent
+	return sent, nil
 }
 
 func (b *Bus) handleTailCommand(ctx context.Context, req *protos.TailRequest) error {

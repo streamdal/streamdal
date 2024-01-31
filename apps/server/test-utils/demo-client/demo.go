@@ -282,9 +282,10 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 
 	tw.AppendRow(gopretty.Row{bold("Date"), now})
 	tw.AppendRow(gopretty.Row{bold("Status"), status})
-	tw.AppendRow(gopretty.Row{bold("Message"), message})
+	tw.AppendRow(gopretty.Row{bold("Status Message"), message})
 
 	if !r.config.Quiet {
+		tw.AppendRow(gopretty.Row{bold("Pipeline(s)"), summarizePipelineStatus(post.PipelineStatus)})
 		tw.AppendSeparator()
 		tw.AppendRow(gopretty.Row{bold("Pre-Process"), bold(postTitle)})
 		tw.AppendSeparator()
@@ -292,4 +293,25 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	}
 
 	fmt.Printf(tw.Render() + "\n")
+}
+
+func summarizePipelineStatus(pipelineStatus []*protos.PipelineStatus) string {
+	if len(pipelineStatus) == 0 {
+		return "no pipelines"
+	}
+
+	// Want:
+	// Pipeline 1: $Name ID: iasdfsdfa-asdfasdf-asdf-asdfasdf Num Steps: 3 Status: true
+	// Pipeline 2: $Name ($ID) Steps: 4 Status: false
+
+	var status string
+
+	for i, p := range pipelineStatus {
+		lastStepStatus := p.StepStatus[len(p.StepStatus)-1].Status
+
+		status += fmt.Sprintf("(%d) %s (ID: %s) LastStepStatus: %s\n",
+			i+1, p.Name, p.Id, lastStepStatus)
+	}
+
+	return status
 }

@@ -202,6 +202,10 @@ func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmMod
 		// This is to prevent the WASM data from being duplicated in the response
 		for _, pipeline := range cmd.GetSetPipelines().Pipelines {
 			for _, step := range pipeline.Steps {
+				fmt.Printf("generating wasm mapping for pipeline id '%s', pipeline name: '%s' "+
+					"step name '%s', step wasm id: %s, step wasm len: %d\n", pipeline.Id, pipeline.Name,
+					step.Name, step.GetXWasmId(), len(step.GetXWasmBytes()))
+
 				if _, ok := wasmModules[step.GetXWasmId()]; ok {
 					step.XWasmBytes = nil
 					continue
@@ -251,8 +255,8 @@ func ConvertConfigStrAudience(config map[*protos.Audience][]*protos.Pipeline) ma
 	return m
 }
 
-func GenerateSchemaInferencePipeline() *protos.Pipeline {
-	return &protos.Pipeline{
+func GenerateSchemaInferencePipeline(wasmDir string) (*protos.Pipeline, error) {
+	pipeline := &protos.Pipeline{
 		Id:   GenerateUUID(),
 		Name: "Schema Inference (auto-generated pipeline)",
 		Steps: []*protos.PipelineStep{
@@ -266,13 +270,55 @@ func GenerateSchemaInferencePipeline() *protos.Pipeline {
 			},
 		},
 	}
+
+	if err := PopulateWASMFields(pipeline, wasmDir); err != nil {
+		return nil, errors.Wrap(err, "error populating WASM fields")
+	}
+
+	return pipeline, nil
 }
 
-// DEV: Test this
-// Inject schema inference pipeline BEFORE all other pipelines + populate
-func InjectSchemaInferencePipeline(pipelines []*protos.Pipeline, wasmDir string) []*protos.Pipeline {
-	pipelines = append([]*protos.Pipeline{GenerateSchemaInferencePipeline()}, pipelines...)
-	return pipelines
+// InjectSchemaInferenceForSetPipelinesCommands is a helper function for injecting
+// a schema inference pipeline into a slice of SetPipelines commands. This is
+// basically InjectSchemaInferenceForPipeline() but for commands.
+func InjectSchemaInferenceForSetPipelinesCommands(
+	cmds []*protos.Command,
+	wasmDir string,
+) (int, error) {
+	if len(cmds) == 0 {
+		return 0, nil
+	}
+
+	var numInjected int
+
+	for _, cmd := range cmds {
+		if cmd.GetSetPipelines() == nil {
+			fmt.Printf("skipping injection for non-SetPipelines command for audience '%s'\n", AudienceToStr(cmd.Audience))
+			continue
+		}
+
+		updatedPipelines, err := InjectSchemaInferenceForPipelines(cmd.GetSetPipelines().Pipelines, wasmDir)
+		if err != nil {
+			return 0, errors.Wrap(err, "error injecting schema inference pipeline")
+		}
+
+		cmd.GetSetPipelines().Pipelines = updatedPipelines
+
+		numInjected += 1
+	}
+
+	return numInjected, nil
+}
+
+// InjectSchemaInferenceForPipelines will inject a schema inference pipeline into
+// the given slice of pipelines. This is useful
+func InjectSchemaInferenceForPipelines(pipelines []*protos.Pipeline, wasmDir string) ([]*protos.Pipeline, error) {
+	schemaInferencePipeline, err := GenerateSchemaInferencePipeline(wasmDir)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to generate schema inference pipeline")
+	}
+
+	return append([]*protos.Pipeline{schemaInferencePipeline}, pipelines...), nil
 }
 
 func AudienceEquals(a, b *protos.Audience) bool {
