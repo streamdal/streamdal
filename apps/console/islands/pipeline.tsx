@@ -426,7 +426,7 @@ const PipelineDetail = (
                 errors={errors}
               />
             </div>
-            {<PipelineMenu id={pipeline?.id} />}
+            <PipelineMenu id={pipeline?.id} />
           </div>
           <div>
             <a href="/" f-partial="/partials">
