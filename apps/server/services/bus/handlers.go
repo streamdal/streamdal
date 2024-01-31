@@ -188,9 +188,8 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 }
 
 // Helper for generating pipelines for Pause and Resume pipeline requests.
-// Will skip or include pipelines depending on their XPaused status and the
-// pause argument.
-func (b *Bus) generatePipelinesForPauseResume(ctx context.Context, aud *protos.Audience, pause bool) ([]*protos.Pipeline, error) {
+// Will skip paused pipelines.
+func (b *Bus) generatePipelinesForPauseResume(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error) {
 	configs, err := b.options.Store.GetConfigByAudience(ctx, aud)
 	if err != nil {
 		b.log.Errorf("error getting config by audience '%s' from store: %v", aud, err)
@@ -200,7 +199,7 @@ func (b *Bus) generatePipelinesForPauseResume(ctx context.Context, aud *protos.A
 	pipelines := make([]*protos.Pipeline, 0)
 
 	for _, pipeline := range configs {
-		if pipeline.GetXPaused() == pause {
+		if !pipeline.GetXPaused() {
 			pipelines = append(pipelines, pipeline)
 		}
 	}
@@ -229,7 +228,7 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 	// For each audience, generate pipeline config that EXCLUDE paused pipeline
 	// and send the updated SetPipelines command to each session ID
 	for _, u := range usage {
-		pipelines, err := b.generatePipelinesForPauseResume(ctx, u.Audience, true)
+		pipelines, err := b.generatePipelinesForPauseResume(ctx, u.Audience)
 		if err != nil {
 			llog.Errorf("error generating pipelines for pause: %v", err)
 			return errors.Wrap(err, "error generating pipelines for pause")
@@ -263,10 +262,10 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 		return errors.Wrapf(err, "error getting active pipeline usage for pipeline id '%s'", req.PipelineId)
 	}
 
-	// For each audience, generate pipeline config that EXCLUDE paused pipeline
+	// For each audience, generate pipeline config that paused pipeline
 	// and send the updated SetPipelines command to each session ID
 	for _, u := range usage {
-		pipelines, err := b.generatePipelinesForPauseResume(ctx, u.Audience, false)
+		pipelines, err := b.generatePipelinesForPauseResume(ctx, u.Audience)
 		if err != nil {
 			llog.Errorf("error generating pipelines for pause: %v", err)
 			return errors.Wrap(err, "error generating pipelines for pause")
