@@ -391,12 +391,10 @@ func (s *InternalServer) GetSetPipelinesCommandsByService(
 		return nil, errors.Wrapf(err, "unable to get configs for service '%s'", req.ServiceName)
 	}
 
-	fmt.Println("Before injection: ", len(setPipelinesCommands[0].GetSetPipelines().Pipelines))
 	numInjected, err := util.InjectSchemaInferenceForSetPipelinesCommands(setPipelinesCommands, s.Options.Config.WASMDir)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to inject schema inference pipelines")
 	}
-	fmt.Println("After injection: ", len(setPipelinesCommands[0].GetSetPipelines().Pipelines))
 
 	s.log.Debugf("GetSetPipelinesCommandsByService has injected '%d' schema inference pipelines for service '%s'",
 		numInjected, req.ServiceName)
