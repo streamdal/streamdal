@@ -594,7 +594,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.New("request cannot be nil")
 	}
 
-	// Add it to the live bucket
+	// Add live key (or update and reset TTL)
 	if err := s.options.RedisBackend.Set(
 		ctx,
 		RedisLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
@@ -604,15 +604,24 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
-	// And add it to more permanent storage (that doesn't care about the session id)
-	if err := s.options.RedisBackend.Set(
+	// And add it to more permanent storage (if it doesn't already exist)
+	if err := s.options.RedisBackend.SetArgs(
 		ctx,
 		RedisAudienceKey(util.AudienceToStr(req.Audience)),
 		[]byte(`[]`),
-		0,
+		redis.SetArgs{
+			Mode: "NX",
+		},
 	).Err(); err != nil {
+		if errors.Is(err, redis.Nil) {
+			// Key already exists, nothing to do
+			return nil
+		}
+
 		return errors.Wrap(err, "error saving audience to store")
 	}
+
+	s.log.Debugf("successfully setnx for aud '%s'", util.AudienceToStr(req.Audience))
 
 	s.sendAudienceTelemetry(ctx, req.Audience, 1)
 
