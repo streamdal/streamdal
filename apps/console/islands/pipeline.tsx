@@ -426,7 +426,7 @@ const PipelineDetail = (
                 errors={errors}
               />
             </div>
-            {<PipelineMenu id={pipeline?.id} />}
+            <PipelineMenu id={pipeline?.id} />
           </div>
           <div>
             <a href="/" f-partial="/partials">
@@ -519,6 +519,7 @@ const PipelineDetail = (
                         data={data}
                         setData={setData}
                         errors={errors}
+                        defaultValue={`Step #${i + 1}`}
                       />
                     </div>
                     <StepMenu
