@@ -519,6 +519,7 @@ const PipelineDetail = (
                         data={data}
                         setData={setData}
                         errors={errors}
+                        defaultValue={`Step #${i + 1}`}
                       />
                     </div>
                     <StepMenu
