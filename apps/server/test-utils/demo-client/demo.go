@@ -300,16 +300,12 @@ func summarizePipelineStatus(pipelineStatus []*protos.PipelineStatus) string {
 		return "no pipelines"
 	}
 
-	// Want:
-	// Pipeline 1: $Name ID: iasdfsdfa-asdfasdf-asdf-asdfasdf Num Steps: 3 Status: true
-	// Pipeline 2: $Name ($ID) Steps: 4 Status: false
-
 	var status string
 
 	for i, p := range pipelineStatus {
 		lastStepStatus := p.StepStatus[len(p.StepStatus)-1].Status
 
-		status += fmt.Sprintf("(%d) %s (ID: %s) LastStepStatus: %s\n",
+		status += fmt.Sprintf("(%d) Name: %s ID: %s LastStepStatus: %s\n",
 			i+1, p.Name, p.Id, lastStepStatus)
 	}
 

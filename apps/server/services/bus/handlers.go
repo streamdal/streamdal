@@ -453,7 +453,7 @@ func (b *Bus) sendSetPipelinesCommand(
 			Audience: aud,
 			Command: &protos.Command_SetPipelines{
 				SetPipelines: &protos.SetPipelinesCommand{
-					Pipelines: pipelines,
+					Pipelines: updatedPipelines,
 				},
 			},
 		}
