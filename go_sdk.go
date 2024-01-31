@@ -72,6 +72,12 @@ const (
 	AbortAllStr     = "aborted all pipelines"
 	AbortCurrentStr = "aborted current pipeline"
 	AbortNoneStr    = "no abort condition"
+
+	// ExecStatusTrue & ExecStatusFalse & ExecStatusError are used to indicate
+	// the execution status of a step.
+	ExecStatusTrue  = protos.ExecStatus_EXEC_STATUS_TRUE
+	ExecStatusFalse = protos.ExecStatus_EXEC_STATUS_FALSE
+	ExecStatusError = protos.ExecStatus_EXEC_STATUS_ERROR
 )
 
 var (
