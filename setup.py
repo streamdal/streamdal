@@ -12,7 +12,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 setup(
     name="streamdal",
-    version="0.0.44",
+    version='0.0.45',
     description="Python client SDK for Streamdal's open source observability server",
     long_description=long_description,
     long_description_content_type="text/markdown",
