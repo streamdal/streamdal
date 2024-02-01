@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -508,7 +509,7 @@ var _ = Describe("External gRPC API", func() {
 			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
 			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
-			// Attach it to an audience
+			// SetPipelines for an audience
 			attachResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
 				PipelineIds: []string{createdResp.PipelineId},
 				Audience:    audience,
@@ -519,62 +520,29 @@ var _ = Describe("External gRPC API", func() {
 			Expect(attachResp.Message).To(ContainSubstring("successfully set '1' pipelines for audience"))
 			Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// Should have an entry in streamdal_config
-			// TODO: Update test
-			//key := store.RedisAudienceKey(audience, createdResp.PipelineId)
-			//err = redisClient.Get(context.Background(), key).Err()
-			//Expect(err).ToNot(HaveOccurred())
+			// Should have an entry in streamdal_audience:$audienceStr
+			key := store.RedisAudienceKey(util.AudienceToStr(audience))
+			result, err := redisClient.Get(context.Background(), key).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeEmpty())
 
-			//_, storedPipelineID := util.ParseConfigKey(key)
-			//Expect(storedPipelineID).ToNot(BeEmpty())
-			//Expect(storedPipelineID).To(Equal(createdResp.PipelineId))
+			// Contents should be properly filled out
+			pipelineConfigs := make([]*store.SetPipelinesConfig, 0)
+			err = json.Unmarshal([]byte(result), &pipelineConfigs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(pipelineConfigs)).To(Equal(1))
+			Expect(pipelineConfigs[0].PipelineID).To(Equal(createdResp.PipelineId))
+			Expect(pipelineConfigs[0].CreatedAtUnixTimestampUTC).ToNot(BeZero())
+			Expect(pipelineConfigs[0].Paused).To(BeFalse())
 		})
 
-		// TODO: Update
-		//It("should allow multiple pipelines for a single audience", func() {
-		//	audience := &protos.Audience{
-		//		ServiceName:   "secret-service",
-		//		ComponentName: "sqlite",
-		//		OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
-		//		OperationName: "multi-pipeline",
-		//	}
-		//
-		//	for i := 0; i < 5; i++ {
-		//		createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
-		//			Pipeline: newPipeline(),
-		//		})
-		//
-		//		Expect(err).ToNot(HaveOccurred())
-		//		Expect(createdResp).ToNot(BeNil())
-		//		Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
-		//		Expect(createdResp.PipelineId).ToNot(BeEmpty())
-		//
-		//		// Attach it to an audience
-		//		attachResp, err := externalClient.AttachPipeline(ctxWithGoodAuth, &protos.AttachPipelineRequest{
-		//			PipelineId: createdResp.PipelineId,
-		//			Audience:   audience,
-		//		})
-		//
-		//		Expect(err).ToNot(HaveOccurred())
-		//		Expect(attachResp).ToNot(BeNil())
-		//		Expect(attachResp.Message).To(ContainSubstring("attached"))
-		//		Expect(attachResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
-		//	}
-		//
-		//	getAllResp, err := externalClient.GetAll(ctxWithGoodAuth, &protos.GetAllRequest{})
-		//	Expect(err).ToNot(HaveOccurred())
-		//
-		//	var total int
-		//	for _, pipe := range getAllResp.Pipelines {
-		//		for _, aud := range pipe.Audiences {
-		//			if util.AudienceEquals(aud, audience) {
-		//				total++
-		//			}
-		//		}
-		//	}
-		//
-		//	Expect(total).To(Equal(5))
-		//})
+		// TODO: Cases to test:
+		// 1. SetPipelines for non-existing pipeline ID should error
+		// 2. SetPipelines for multiple pipeline IDs should work
+		// 3. SetPipelines for multiple pipeline IDs should error if one of them is invalid
+		// 4. SetPipelines with empty pipeline IDs should save as empty array in store
+		// 5. Same pipeline ID can be used for a different audience
+		// 6. external.SetPipeline call causes a broadcast to occur
 	})
 
 	Describe("PausePipeline", func() {
@@ -597,6 +565,16 @@ var _ = Describe("External gRPC API", func() {
 			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
 			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
+			// Assign it to an audience
+			setPipelinesResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{createdResp.PipelineId},
+				Audience:    audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(setPipelinesResp).ToNot(BeNil())
+			Expect(setPipelinesResp.Message).To(ContainSubstring("successfully set '1' pipelines for audience"))
+
 			// Pause it
 			pauseResp, err := externalClient.PausePipeline(ctxWithGoodAuth, &protos.PausePipelineRequest{
 				PipelineId: createdResp.PipelineId,
@@ -608,14 +586,26 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 			Expect(pauseResp.Message).To(ContainSubstring("paused"))
 
-			// TODO: Update test
-			//pausedKey := store.RedisPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
-			//
-			//// Should have an entry in streamdal_paused
-			//value, err := redisClient.Get(context.Background(), pausedKey).Result()
-			//Expect(err).ToNot(HaveOccurred())
-			//Expect(value).To(BeEmpty())
+			// Paused state should be recorded in config in redis
+			key := store.RedisAudienceKey(util.AudienceToStr(audience))
+			result, err := redisClient.Get(context.Background(), key).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeEmpty())
+
+			pipelineConfigs := make([]*store.SetPipelinesConfig, 0)
+
+			err = json.Unmarshal([]byte(result), &pipelineConfigs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(pipelineConfigs)).To(Equal(1))
+			Expect(pipelineConfigs[0].Paused).To(BeTrue())
 		})
+
+		// TODO: Cases to test:
+		// 1. Pausing a pipeline that is already paused is a no-op
+		// 2. Pausing a pipeline without pipeline ID or audience should error
+		// 3. Pausing a pipeline that does not exist should error
+		// 4. Pausing a pipeline should cause a broadcast to occur
+		//      - Not sure about how to test this (yet)
 	})
 
 	Describe("ResumePipeline", func() {
@@ -638,6 +628,16 @@ var _ = Describe("External gRPC API", func() {
 			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
 			Expect(createdResp.PipelineId).ToNot(BeEmpty())
 
+			// Assign it to an audience
+			setPipelinesResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{createdResp.PipelineId},
+				Audience:    audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(setPipelinesResp).ToNot(BeNil())
+			Expect(setPipelinesResp.Message).To(ContainSubstring("successfully set '1' pipelines for audience"))
+
 			// Pause it
 			pauseResp, err := externalClient.PausePipeline(ctxWithGoodAuth, &protos.PausePipelineRequest{
 				PipelineId: createdResp.PipelineId,
@@ -649,13 +649,18 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pauseResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 			Expect(pauseResp.Message).To(ContainSubstring("paused"))
 
-			// TODO: Update
-			//pausedKey := store.RedisPausedKey(util.AudienceToStr(audience), createdResp.PipelineId)
-			//
-			//// Should have an entry in streamdal_paused
-			//value, err := redisClient.Get(context.Background(), pausedKey).Result()
-			//Expect(err).ToNot(HaveOccurred())
-			//Expect(value).To(BeEmpty())
+			// Verify config in redis is correct
+			key := store.RedisAudienceKey(util.AudienceToStr(audience))
+			result, err := redisClient.Get(context.Background(), key).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeEmpty())
+
+			pipelineConfigs := make([]*store.SetPipelinesConfig, 0)
+
+			err = json.Unmarshal([]byte(result), &pipelineConfigs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(pipelineConfigs)).To(Equal(1))
+			Expect(pipelineConfigs[0].Paused).To(BeTrue())
 
 			// Resume it
 			resumeResp, err := externalClient.ResumePipeline(ctxWithGoodAuth, &protos.ResumePipelineRequest{
@@ -667,13 +672,24 @@ var _ = Describe("External gRPC API", func() {
 			Expect(resumeResp).ToNot(BeNil())
 			Expect(resumeResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
 
-			// TODO: Update
-			// Entry should be removed from streamdal_paused
-			//value, err = redisClient.Get(context.Background(), pausedKey).Result()
-			//Expect(err).To(HaveOccurred())
-			//Expect(value).To(BeEmpty())
-			//Expect(err).To(Equal(redis.Nil))
+			// Verify redis config is correct
+			result, err = redisClient.Get(context.Background(), key).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeEmpty())
+
+			pipelineConfigs = make([]*store.SetPipelinesConfig, 0)
+
+			err = json.Unmarshal([]byte(result), &pipelineConfigs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(pipelineConfigs)).To(Equal(1))
+			Expect(pipelineConfigs[0].Paused).To(BeFalse())
 		})
+
+		// TODO: Cases to test:
+		// 1. Resuming a pipeline that is already resumed is a no-op
+		// 2. Resuming a pipeline without a pipeline ID results in an error
+		// 3. Resuming a pipeline that does not exist results in an error
+		// 4. Resuming a pipeline should cause a broadcast to occur
 	})
 
 	Describe("DeleteAudience", func() {
@@ -685,16 +701,25 @@ var _ = Describe("External gRPC API", func() {
 				ServiceName:   "test-service",
 			}
 
-			// Put audience key in streamdal_audience
-			audKey := store.RedisAudienceKey(util.AudienceToStr(audience))
-			err := redisClient.Set(context.Background(), audKey, []byte(``), 0).Err()
-			Expect(err).ToNot(HaveOccurred())
+			// Create a pipeline
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: newPipeline(),
+			})
 
-			// TODO: Update
-			// Put audience-pipeline mapping in streamdal_config
-			//configKey := store.RedisConfigKey(audience, "test-pipeline-id")
-			//err = redisClient.Set(context.Background(), configKey, []byte(``), 0).Err()
-			//Expect(err).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
+
+			// Assign it to an audience
+			setPipelinesResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{createdResp.PipelineId},
+				Audience:    audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(setPipelinesResp).ToNot(BeNil())
+			Expect(setPipelinesResp.Message).To(ContainSubstring("successfully set '1' pipelines for audience"))
 
 			// Try to delete audience
 			resp, err := externalClient.DeleteAudience(ctxWithGoodAuth, &protos.DeleteAudienceRequest{
@@ -702,19 +727,22 @@ var _ = Describe("External gRPC API", func() {
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(resp).ToNot(BeNil())
-			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR))
+			Expect(resp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST))
+			Expect(resp.Message).To(ContainSubstring("has '1' attached pipelines, specify force to remove"))
 
 			// Verify key still exists in redis
-			err = redisClient.Get(context.Background(), audKey).Err()
-			Expect(err).ToNot(HaveOccurred())
+			audKey := store.RedisAudienceKey(util.AudienceToStr(audience))
+			pipelineKey := store.RedisPipelineKey(createdResp.PipelineId)
 
-			// TODO: Update
-			// Cleanup key
-			//err = redisClient.Del(context.Background(), configKey).Err()
-			//Expect(err).ToNot(HaveOccurred())
-			//
-			//err = redisClient.Del(context.Background(), audKey).Err()
-			//Expect(err).ToNot(HaveOccurred())
+			result, err := redisClient.Get(context.Background(), store.RedisAudienceKey(util.AudienceToStr(audience))).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeEmpty())
+
+			// Cleanup - remove key from redis
+			err = redisClient.Del(context.Background(), audKey).Err()
+			Expect(err).ToNot(HaveOccurred())
+			err = redisClient.Del(context.Background(), pipelineKey).Err()
+			Expect(err).ToNot(HaveOccurred())
 		})
 
 		It("should delete the audience", func() {
@@ -744,6 +772,13 @@ var _ = Describe("External gRPC API", func() {
 			Expect(err).To(HaveOccurred())
 			Expect(err).To(Equal(redis.Nil))
 		})
+
+		// TODO: Cases to test:
+		// 1. Deleting an audience that does not exist should error
+		// 2. Deleting an audience that has attached pipeline(s) WITH force should:
+		//    - Delete the audience key from redis
+		//    - Broadcast a DeleteAudience message
+		// 3. Deleting an audience without specifying audience should error
 	})
 })
 
