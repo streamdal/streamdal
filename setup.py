@@ -3,7 +3,8 @@ from pathlib import Path
 
 
 def parse_requires():
-    with open("requirements.txt") as f:
+    cur_dir = Path(__file__).parent
+    with open((cur_dir / "requirements.txt")) as f:
         return f.read().splitlines()
 
 
