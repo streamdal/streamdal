@@ -8,19 +8,23 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import {
   AppRegisterRejectRequest,
   AppRegistrationRequest,
-  AttachPipelineRequest,
   CreateNotificationRequest,
   CreatePipelineRequest,
   DeleteAudienceRequest,
   DeleteServiceRequest,
-  DetachPipelineRequest,
   PausePipelineRequest,
   ResumePipelineRequest,
+  SetPipelinesRequest,
   UpdateNotificationRequest,
   UpdatePipelineRequest,
 } from "streamdal-protos/protos/sp_external.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { getPipeline } from "./fetch.ts";
+import {
+  serviceSignal,
+  setPipelines,
+} from "../components/serviceMap/serviceSignal.ts";
+import { audienceKey } from "./utils.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
   pipelineId?: string;
@@ -99,11 +103,22 @@ export const attachPipeline = async (
   audience: Audience,
 ) => {
   try {
-    const request: AttachPipelineRequest = { audience, pipelineId };
-    const { response } = await client.attachPipeline(
+    const key = audienceKey(audience);
+    const { pipelineIds: existingIds = [] } =
+      serviceSignal?.value?.config[key] ?? [];
+    const pipelineIds = [...existingIds, ...[pipelineId]];
+
+    const request: SetPipelinesRequest = SetPipelinesRequest.create({
+      audience,
+      pipelineIds,
+    });
+    const { response } = await client.setPipelines(
       request,
       meta,
     );
+
+    setPipelines(key, pipelineIds);
+
     return response;
   } catch (error) {
     return {
@@ -119,11 +134,21 @@ export const detachPipeline = async (
   audience: Audience,
 ) => {
   try {
-    const request = DetachPipelineRequest.create({ audience, pipelineId });
-    const { response } = await client.detachPipeline(
+    const key = audienceKey(audience);
+    const { pipelineIds: existingIds = [] } =
+      serviceSignal?.value?.config[key] ?? [];
+    const pipelineIds = existingIds?.filter((id: string) => id !== pipelineId);
+    const request: SetPipelinesRequest = SetPipelinesRequest.create({
+      audience,
+      pipelineIds,
+    });
+    const { response } = await client.setPipelines(
       request,
       meta,
     );
+
+    setPipelines(key, pipelineIds);
+
     return response;
   } catch (error) {
     console.error("error detaching pipeline", error);
