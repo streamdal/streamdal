@@ -60,6 +60,16 @@ func init() {
 	time.Sleep(time.Second)
 }
 
+type SetPipelinesTest struct {
+	Name                          string
+	PipelineIDs                   []string
+	Audience                      *protos.Audience
+	ExpectResponseCode            protos.ResponseCode
+	ExpectResponseMessageContains string
+	ShouldError                   bool
+	ErrorShouldContain            string
+}
+
 type AuthTest struct {
 	Name               string
 	Func               func() error
@@ -536,13 +546,170 @@ var _ = Describe("External gRPC API", func() {
 			Expect(pipelineConfigs[0].Paused).To(BeFalse())
 		})
 
+		It("SetPipeline basic error cases", func() {
+			aud := newAudience("test-service")
+
+			setPipelineTests := []SetPipelinesTest{
+				{
+					Name:                          "not having an audience in req will return resp with bad request code",
+					PipelineIDs:                   []string{},
+					Audience:                      nil,
+					ExpectResponseCode:            protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+					ExpectResponseMessageContains: "field 'Audience' cannot be nil",
+					ShouldError:                   false,
+				},
+				{
+					Name:                          "unknown pipeline ID in req will return resp with not found code",
+					PipelineIDs:                   []string{"does-not-exist"},
+					Audience:                      aud,
+					ExpectResponseCode:            protos.ResponseCode_RESPONSE_CODE_NOT_FOUND,
+					ExpectResponseMessageContains: "pipeline not found",
+					ShouldError:                   false,
+				},
+			}
+
+			for _, testCase := range setPipelineTests {
+				// fmt.Println("Running test case: ", testCase.Name)
+
+				resp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+					PipelineIds: testCase.PipelineIDs,
+					Audience:    testCase.Audience,
+				})
+
+				if testCase.ShouldError {
+					Expect(err).To(HaveOccurred())
+					Expect(resp).To(BeNil())
+				} else {
+					Expect(err).ToNot(HaveOccurred())
+					Expect(resp).ToNot(BeNil())
+					Expect(resp.Code).To(Equal(testCase.ExpectResponseCode))
+					Expect(resp.Message).To(ContainSubstring(testCase.ExpectResponseMessageContains))
+				}
+			}
+		})
+
+		It("SetPipeline with multiple pipeline IDs", func() {
+			newPipeline1 := newPipeline()
+			newPipeline1.Name = "pipeline-1"
+			newPipeline2 := newPipeline()
+			newPipeline2.Name = "pipeline-2"
+
+			// Create pipelines
+			for _, pipeline := range []*protos.Pipeline{newPipeline1, newPipeline2} {
+				createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+					Pipeline: pipeline,
+				})
+
+				Expect(err).ToNot(HaveOccurred())
+				Expect(createdResp).ToNot(BeNil())
+				Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+				Expect(createdResp.PipelineId).ToNot(BeEmpty())
+
+				// Set this so we can use it later
+				pipeline.Id = createdResp.PipelineId
+			}
+
+			// SetPipelines
+			audience := newAudience("test-service")
+
+			setPipelinesResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{newPipeline1.Id, newPipeline2.Id},
+				Audience:    audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(setPipelinesResp).ToNot(BeNil())
+			Expect(setPipelinesResp.Message).To(ContainSubstring("successfully set '2' pipelines for audience"))
+		})
+
+		It("SetPipeline with empty pipeline IDs works", func() {
+			audience := newAudience("test-service")
+
+			setPipelinesResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{},
+				Audience:    audience,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(setPipelinesResp).ToNot(BeNil())
+			Expect(setPipelinesResp.Message).To(ContainSubstring("successfully set '0' pipelines for audience"))
+
+			// Verify it saved as an empty array in the store
+			key := store.RedisAudienceKey(util.AudienceToStr(audience))
+			result, err := redisClient.Get(context.Background(), key).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeEmpty())
+
+			pipelineConfigs := make([]*store.SetPipelinesConfig, 0)
+
+			err = json.Unmarshal([]byte(result), &pipelineConfigs)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(pipelineConfigs)).To(Equal(0))
+		})
+
+		It("SetPipeline with same pipeline ID for different audiences works", func() {
+			pipeline := newPipeline()
+
+			// Create pipeline
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: pipeline,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
+
+			pipeline.Id = createdResp.PipelineId
+
+			aud1 := newAudience("test-service-1")
+			aud2 := newAudience("test-service-2")
+
+			setResp1, err1 := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{pipeline.Id},
+				Audience:    aud1,
+			})
+			Expect(err1).ToNot(HaveOccurred())
+			Expect(setResp1).ToNot(BeNil())
+			Expect(setResp1.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+
+			setResp2, err2 := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{pipeline.Id},
+				Audience:    aud2,
+			})
+			Expect(err2).ToNot(HaveOccurred())
+			Expect(setResp2).ToNot(BeNil())
+			Expect(setResp2.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_OK))
+		})
+
+		It("SetPipelines should error if one pipeline ID does not exist", func() {
+			pipeline := newPipeline()
+
+			// Create pipeline
+			createdResp, err := externalClient.CreatePipeline(ctxWithGoodAuth, &protos.CreatePipelineRequest{
+				Pipeline: pipeline,
+			})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdResp).ToNot(BeNil())
+			Expect(createdResp.Message).To(ContainSubstring("Pipeline created successfully"))
+			Expect(createdResp.PipelineId).ToNot(BeEmpty())
+
+			pipeline.Id = createdResp.PipelineId
+
+			// SetPipelines with one invalid pipeline ID
+			setPipelinesResp, err := externalClient.SetPipelines(ctxWithGoodAuth, &protos.SetPipelinesRequest{
+				PipelineIds: []string{pipeline.Id, "does-not-exist"},
+				Audience:    newAudience("test-service"),
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(setPipelinesResp).ToNot(BeNil())
+			Expect(setPipelinesResp.Code).To(Equal(protos.ResponseCode_RESPONSE_CODE_NOT_FOUND))
+			Expect(setPipelinesResp.Message).To(ContainSubstring("pipeline not found"))
+		})
+
 		// TODO: Cases to test:
-		// 1. SetPipelines for non-existing pipeline ID should error
-		// 2. SetPipelines for multiple pipeline IDs should work
-		// 3. SetPipelines for multiple pipeline IDs should error if one of them is invalid
-		// 4. SetPipelines with empty pipeline IDs should save as empty array in store
-		// 5. Same pipeline ID can be used for a different audience
-		// 6. external.SetPipeline call causes a broadcast to occur
+		// 1. external.SetPipeline call causes a broadcast to occur
 	})
 
 	Describe("PausePipeline", func() {
@@ -890,5 +1057,14 @@ func newPipeline() *protos.Pipeline {
 func clearRedis() {
 	if err := redisClient.FlushAll(context.Background()).Err(); err != nil {
 		panic(fmt.Sprintf("error flushing redis: %s", err.Error()))
+	}
+}
+
+func newAudience(serviceName string) *protos.Audience {
+	return &protos.Audience{
+		ServiceName:   serviceName,
+		ComponentName: "test-component",
+		OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
+		OperationName: "test-operation",
 	}
 }
