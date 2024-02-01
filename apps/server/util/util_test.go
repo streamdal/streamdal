@@ -100,6 +100,16 @@ func TestAudienceFromStr(t *testing.T) {
 	}
 }
 
+func TestInjectSchemaInferenceForSetPipelinesCommands(t *testing.T) {
+	t.Skip()
+	g := gomega.NewWithT(t)
+
+	// Empty commands should return empty commands
+	numInjected, err := InjectSchemaInferenceForSetPipelinesCommands(make([]*protos.Command, 0), "wasmDir")
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(numInjected).To(gomega.Equal(0))
+}
+
 func TestAudienceToStr(t *testing.T) {
 	t.Skip()
 	g := gomega.NewWithT(t)
@@ -108,23 +118,6 @@ func TestAudienceToStr(t *testing.T) {
 		testAud := AudienceToStr(entry.Audience)
 		g.Expect(testAud).To(gomega.Equal(entry.StrAudience), "test audience '%+v' does not equal expected audience '%+v'", testAud, entry.StrAudience)
 	}
-}
-
-func TestParseConfigKey(t *testing.T) {
-	t.Skip()
-	g := gomega.NewWithT(t)
-
-	aud := &protos.Audience{
-		ServiceName:   "secret service",
-		OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
-		OperationName: "multi pipeline",
-		ComponentName: "sqlite and something else",
-	}
-
-	configKey := "secret__SPACE__service/operation_type_consumer/multi__SPACE__pipeline/sqlite__SPACE__and__SPACE__something__SPACE__else/0fd3dcc1-c2f1-42d9-af78-9060588fc652"
-	audience, pipelineID := ParseConfigKey(configKey)
-	g.Expect(pipelineID).To(gomega.Equal("0fd3dcc1-c2f1-42d9-af78-9060588fc652"))
-	g.Expect(AudienceEquals(audience, aud)).To(gomega.BeTrue())
 }
 
 func TestGrpcMethodCounterName(t *testing.T) {

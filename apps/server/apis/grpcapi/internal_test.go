@@ -204,10 +204,18 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err.Error()).To(ContainSubstring("field 'SessionId' cannot be empty"))
 			Expect(cmd).To(BeNil())
 		})
+
+		It("registering with an audience should create a new audience", func() {
+
+		})
+
+		// TODO: Cases to test:
+		// 1. Registering without filled out fields should error
+		// 2. Registering with an audience should create a new audience (is this a thing in the protos?)
 	})
 
 	Describe("NewAudience", func() {
-		It("should create a new audience in live bucket", func() {
+		It("should create a new audience in store", func() {
 			sessionID := util.GenerateUUID()
 			audience := &protos.Audience{
 				ServiceName:   "test-service",
@@ -232,7 +240,7 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(liveKeys).ToNot(BeEmpty())
 
-			// Verify that K/V is created in `streamdal_live` bucket
+			// TODO: Verify that K/V is created with `streamdal_live` prefix
 			liveData, err := redisClient.Get(
 				context.Background(),
 				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
@@ -241,7 +249,12 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(liveData).ToNot(BeNil())
 
-			// Verify that entry is created in `streamdal_audience` bucket
+			// Verify key has a TTL
+			ttl, err := redisClient.TTL(context.Background(), store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience))).Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(ttl).To(BeNumerically(">", 0))
+
+			// Verify that entry is created with `streamdal_audience` prefix
 			audienceData, err := redisClient.Get(
 				context.Background(),
 				store.RedisAudienceKey(util.AudienceToStr(audience)),
@@ -250,12 +263,52 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(audienceData).ToNot(BeNil())
 		})
+
+		It("should error with no session ID", func() {
+
+		})
+
+		It("should error with no audience", func() {
+
+		})
+
+		It("should no-op when adding an audience with session id that already exists", func() {
+
+		})
+
+		It("should create a new audience LIVE key when using pre-existing audience but new session ID", func() {
+
+		})
+
+		It("should cause a broadcast to occur", func() {
+			// The broadcast handler SHOULD see the broadcast message and emit
+			// a SetPipelinesCommand to the SDK that contains an injected schema
+			// inference pipeline.
+		})
 	})
 
 	Describe("Metrics", func() {
 	})
 
 	Describe("Notify", func() {
+	})
+
+	Describe("GetSetPipelinesCommandsByService", func() {
+		It("returns a list of pipeline commands", func() {
+
+		})
+
+		It("injects schema inference pipeline into the list of pipeline commands", func() {
+
+		})
+
+		It("returns an error if the service name is empty", func() {
+
+		})
+
+		It("receives empty SetPipelines when service is not known", func() {
+
+		})
 	})
 })
 

@@ -834,7 +834,8 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	// Determine if the audience is attached to any pipelines
 	pipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
 	if err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to fetch config by audience: %s", err.Error())), nil
 	}
 
 	if len(pipelines) > 0 && !req.GetForce() {

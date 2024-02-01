@@ -74,17 +74,6 @@ func CtxRequestId(ctx context.Context) string {
 	return CtxStringValue(ctx, GRPCRequestIDMetadataKey)
 }
 
-func ParseConfigKey(key string) (*protos.Audience, string) {
-	key = strings.TrimPrefix(key, "streamdal_config:")
-	parts := strings.Split(key, ":")
-	if len(parts) < 5 {
-		return nil, ""
-	}
-
-	audStr := strings.Join(parts[:len(parts)-1], ":")
-	return AudienceFromStr(audStr), parts[len(parts)-1]
-}
-
 func AudienceToStr(audience *protos.Audience) string {
 	if audience == nil {
 		return ""
