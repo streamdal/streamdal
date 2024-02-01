@@ -6,7 +6,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability)
 [![GitHub](https://img.shields.io/github/license/streamdal/python-sdk)](https://github.com/streamdal/python-sdk)
 
-python-sdk is the python client SDK for Streamdal's open source observability server https://github.com/streamdal/server
+python-sdk is the python client SDK for Streamdal's open source observability server https://github.com/streamdal/streamdal
 
 ### Documentation
 

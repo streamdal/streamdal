@@ -10,7 +10,7 @@ import streamdal_protos.protos as protos
 import socket
 import time
 import uuid
-import streamdal.validation
+import streamdal.validation as validation
 from betterproto import which_one_of
 from copy import copy
 from dataclasses import dataclass, field
