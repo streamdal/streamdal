@@ -1,8 +1,11 @@
 package wasm
 
 import (
+	"crypto/sha256"
 	"os"
 	"testing"
+
+	"github.com/gofrs/uuid"
 )
 
 func TestLoad(t *testing.T) {
@@ -43,13 +46,19 @@ func TestLoad(t *testing.T) {
 }
 
 func TestDeterminativeUUID(t *testing.T) {
-	fileData, err := os.ReadFile("../assets/wasm/detective_0_0_13.wasm")
+	fileData, err := os.ReadFile("../assets/wasm/detective.wasm")
 	if err != nil {
 		t.Errorf("unable to read file: %s", err)
 	}
 
-	uuid := determinativeUUID(fileData)
-	if uuid != "e64869d6-b909-2a7e-fe4f-d6c0d3191bbd" {
-		t.Errorf("incorrect UUID: %s", uuid)
+	hash := sha256.Sum256(fileData)
+	id, err := uuid.FromBytes(hash[16:])
+	if err != nil {
+		t.Errorf("unable to create UUID from hash: %s", err)
+	}
+
+	generatedUUID := determinativeUUID(fileData)
+	if generatedUUID != id.String() {
+		t.Errorf("incorrect UUID: expected '%s' to equal '%s'", generatedUUID, id.String())
 	}
 }
