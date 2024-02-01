@@ -162,7 +162,7 @@ test: GOFLAGS=
 test:
 	@echo "Make sure to bring up deps first via 'make run/dev'"
 	cd assets/wasm && bash ./download-wasm.sh && cd - && \
-	TEST=true $(GO) test ./apis/grpcapi/... -v -count=1
+	TEST=true $(GO) test ./... -v -count=1
 
 ### Docker
 

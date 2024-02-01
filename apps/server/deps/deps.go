@@ -107,7 +107,7 @@ func New(cfg *config.Config) (*Dependencies, error) {
 }
 
 func (d *Dependencies) validateWASM() error {
-	// Lame... means that tests need to be ran through `make test`
+	// Lame... means that tests need to have TEST=true env var set
 	if os.Getenv("TEST") != "" {
 		os.Chdir("../..")
 	}
