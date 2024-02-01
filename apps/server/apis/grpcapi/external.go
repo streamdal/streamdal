@@ -546,6 +546,8 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 		}
 	}
 
+	// TODO: @MG: Should we check if audience exists?
+
 	// Get previous pipelines for telemetry
 	existingPipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
 	if err != nil {

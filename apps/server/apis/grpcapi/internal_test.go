@@ -240,7 +240,7 @@ var _ = Describe("Internal gRPC API", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(liveKeys).ToNot(BeEmpty())
 
-			// TODO: Verify that K/V is created with `streamdal_live` prefix
+			// Verify that K/V is created with `streamdal_live` prefix
 			liveData, err := redisClient.Get(
 				context.Background(),
 				store.RedisLiveKey(sessionID, TestNodeName, util.AudienceToStr(audience)),
