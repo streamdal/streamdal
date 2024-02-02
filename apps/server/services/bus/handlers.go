@@ -14,7 +14,7 @@ import (
 	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
-// DEV (DONE): Implement
+// DEV: Ordered-pipelines (DONE)
 func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.UpdatePipelineRequest) error {
 	llog := b.log.WithField("method", "handleUpdatePipelineRequest")
 	llog.Debugf("handling update pipeline request bus event: %v", req.Pipeline.Name)
@@ -56,10 +56,13 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 	llog.Debugf("sent SetPipelines commands to '%d' active session(s) for pipeline id '%s'",
 		len(usage), req.Pipeline.Id)
 
+	// Inform the UI that changes have occurred
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via update pipeline broadcast handler")
+
 	return nil
 }
 
-// DEV (DONE): Implement
+// DEV: Ordered-pipelines (DONE)
 // This is mostly a copy of handleUpdatePipelineRequest (just with diff validation)
 func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
 	llog := b.log.WithField("method", "handleDeletePipelineRequest")
@@ -102,17 +105,20 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 	llog.Debugf("sent SetPipelines commands to '%d' active session(s) for pipeline id '%s'",
 		len(usage), req.PipelineId)
 
+	// Inform the UI that changes have occurred
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete pipeline broadcast handler")
+
 	return nil
 }
 
-// DEV (DONE): Implement
+// DEV: Ordered-pipelines (DONE)
 // Broadcast handler for DeleteAudienceRequest will send a SetPipelines command
 // with empty pipelines to all sessions that have the audience.
 func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.DeleteAudienceRequest) error {
 	llog := b.log.WithField("method", "handleDeleteAudienceRequest")
 	llog.Debugf("handling delete audience request bus event: %v", req)
 
-	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience handler")
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience broadcast handler")
 
 	// Get session IDs for audience on this node
 	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(context.Background(), req.Audience, b.options.NodeName)
@@ -129,7 +135,7 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 	return nil
 }
 
-// DEV (DONE): Implemented
+// DEV: Ordered-pipelines (DONE)
 // Broadcast handler for SetPipelinesRequest - checks if the SetPipelines request
 // is for an audience that has an active registration on this node. If it does,
 // we will inject schema inference + send a SetPipelines cmd to the SDK.
@@ -184,6 +190,9 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 
 	llog.Debugf("sent SetPipelines command to '%d' active session(s) for audience '%s'", numSent, req.Audience)
 
+	// Inform the UI that changes have occurred
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via set pipelines broadcast handler")
+
 	return nil
 }
 
@@ -207,7 +216,7 @@ func (b *Bus) generatePipelinesForPauseResume(ctx context.Context, aud *protos.A
 	return pipelines, nil
 }
 
-// DEV (DONE): This needs to be updated to support ordered pipelines!!!
+// DEV: Ordered-pipelines (DONE)
 // Broadcast handler for PausePipelineRequest emits a SetPipelines command that
 // OMITS any paused pipelines.
 func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PausePipelineRequest) error {
@@ -246,7 +255,7 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 	return nil
 }
 
-// DEV (DONE): This needs to be updated to support ordered pipelines!!!
+// DEV: Ordered-pipelines (DONE)
 func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.ResumePipelineRequest) error {
 	llog := b.log.WithField("method", "handleResumePipelineRequest")
 	llog.Debugf("handling resume pipeline request bus event: %v", req)
@@ -343,13 +352,13 @@ func (b *Bus) handleKVRequest(ctx context.Context, req *protos.KVRequest) error 
 
 func (b *Bus) handleRegisterRequest(_ context.Context, req *protos.RegisterRequest) error {
 	b.log.Debugf("handling register request bus event: %v", req)
-	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via register handler")
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via register broadcast handler")
 	return nil
 }
 
 func (b *Bus) handleDeregisterRequest(_ context.Context, req *protos.DeregisterRequest) error {
 	b.log.Debugf("handling delete register request bus event: %v", req)
-	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via deregister handler")
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via deregister broadcast handler")
 	return nil
 }
 
@@ -359,9 +368,6 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 	llog := b.log.WithFields(logrus.Fields{
 		"method": "handleNewAudienceRequest",
 	})
-
-	llog.Debugf("handling new audience request bus event: %v", req)
-	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience handler")
 
 	if err := validate.NewAudienceRequest(req); err != nil {
 		llog.Errorf("validation error for new audience request: %v", err)
@@ -398,6 +404,9 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 		llog.Errorf("unable to send SetPipelines command: %v", err)
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
+
+	// Inform the UI that changes have occurred
+	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience broadcast handler")
 
 	llog.Debugf("sent SetPipelineCommands for '%d' sessions", len(sessionIDs))
 

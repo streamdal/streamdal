@@ -44,7 +44,7 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	}
 }
 
-// DEV (DONE): Needs to work with ordered pipelines
+// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) (*protos.GetAllResponse, error) {
 	if err := validate.GetAllRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get all request")
@@ -84,7 +84,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	}, nil
 }
 
-// DEV: Nothing needs to be done as long GetAll() is updated
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.External_GetAllStreamServer) error {
 	if err := validate.GetAllRequest(req); err != nil {
 		return errors.Wrap(err, "invalid get all request")
@@ -175,7 +175,7 @@ MAIN:
 	return nil
 }
 
-// DEV: Does NOT need update
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
 	liveInfo := make([]*protos.LiveInfo, 0)
 
@@ -224,7 +224,7 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 	return liveInfo, nil
 }
 
-// DEV (DONE): Needs to be updated.
+// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
 	gen := make(map[string]*protos.PipelineInfo)
 
@@ -276,7 +276,7 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 	return gen, nil
 }
 
-// DEV: Don't need to update this
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
 	if err := validate.GetPipelinesRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipelines request")
@@ -303,7 +303,7 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 	}, nil
 }
 
-// DEV: Don't need to update this
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
 	if err := validate.GetPipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipeline request")
@@ -329,7 +329,7 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	}, nil
 }
 
-// DEV: Don't need to update this
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.CreatePipelineResponse, error) {
 	if err := validate.CreatePipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid create pipeline request")
@@ -377,7 +377,7 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	}, nil
 }
 
-// DEV (DONE): Probably needs update!!! (Nothing to do)
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -473,7 +473,7 @@ func (s *ExternalServer) sendStepDeltaTelemetry(original, updated *protos.Pipeli
 	}
 }
 
-// DEV (DONE): Needs to be updated for ordered pipelines! (Nothing to do)
+// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeletePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -584,7 +584,9 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 		{"status", "inactive"},
 	}...)
 
-	// Pipeline exists, broadcast SetPipelines request
+	// Pipeline exists, broadcast SetPipelines request to other nodes so they
+	// can emit a SetPipelines command + emit a *protos.GetAllResponse update
+	// for UI.
 	if err := s.Options.BusService.BroadcastSetPipelines(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -655,7 +657,7 @@ func (s *ExternalServer) setPausePipeline(ctx context.Context, aud *protos.Audie
 	}, nil
 }
 
-// DEV (DONE): Pause and resume need to be updated for ordered pipelines
+// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.PausePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -664,7 +666,7 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 	return s.setPausePipeline(ctx, req.Audience, req.PipelineId, true)
 }
 
-// DEV (DONE): Pause and resume need to be updated for ordered pipelines
+// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.ResumePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -823,7 +825,7 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 	}, nil
 }
 
-// DEV (DONE): Update for ordered pipelines
+// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteAudienceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -868,7 +870,7 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}, nil
 }
 
-// DEV (DONE): Implement
+// DEV: Ordered-pipelines (DONE)
 // This is basically delete by audience - except affects more than one audience
 func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteServiceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteServiceRequest(req); err != nil {
