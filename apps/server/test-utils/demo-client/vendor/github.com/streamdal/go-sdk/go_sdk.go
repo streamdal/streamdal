@@ -72,6 +72,12 @@ const (
 	AbortAllStr     = "aborted all pipelines"
 	AbortCurrentStr = "aborted current pipeline"
 	AbortNoneStr    = "no abort condition"
+
+	// ExecStatusTrue & ExecStatusFalse & ExecStatusError are used to indicate
+	// the execution status of a step.
+	ExecStatusTrue  = protos.ExecStatus_EXEC_STATUS_TRUE
+	ExecStatusFalse = protos.ExecStatus_EXEC_STATUS_FALSE
+	ExecStatusError = protos.ExecStatus_EXEC_STATUS_ERROR
 )
 
 var (
@@ -396,6 +402,8 @@ func (s *Streamdal) pullInitialPipelines(ctx context.Context) error {
 	// Commands won't include paused pipelines but we can check just in case
 	for _, cmd := range cmds.SetPipelineCommands {
 		for _, p := range cmd.GetSetPipelines().Pipelines {
+			s.config.Logger.Debugf("saving pipeline '%s' for audience '%s' to internal map", p.Name, audToStr(cmd.Audience))
+
 			// Fill in WASM data from the deduplication map
 			for _, step := range p.Steps {
 				wasmData, ok := cmds.WasmModules[step.GetXWasmId()]
@@ -733,7 +741,7 @@ PIPELINE:
 				// NOT aborting, update LOCAL step & pipeline status
 				s.updateStatus(nil, pipelineStatus, stepStatus)
 
-				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution): %s", pipeline.Name, step.Name, err)
+				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution)", pipeline.Name, step.Name)
 
 				continue // Move on to the next step in the pipeline
 			}
