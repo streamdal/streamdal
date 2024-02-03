@@ -8,12 +8,12 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/streamdal/cli/util"
+	"github.com/streamdal/streamdal/apps/cli/util"
 )
 
 const (
