@@ -26,7 +26,7 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/services/store"
 )
 
 var (

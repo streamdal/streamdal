@@ -14,7 +14,7 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 func (a *HTTPAPI) getUsageKVHandler(rw http.ResponseWriter, r *http.Request) {

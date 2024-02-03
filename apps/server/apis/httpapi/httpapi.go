@@ -12,8 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/julienschmidt/httprouter"
 
-	"github.com/streamdal/server/services/bus"
-	"github.com/streamdal/server/services/kv"
+	"github.com/streamdal/streamdal/apps/server/services/bus"
+	"github.com/streamdal/streamdal/apps/server/services/kv"
 )
 
 type Options struct {

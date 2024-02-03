@@ -1,4 +1,4 @@
-module github.com/streamdal/server
+module github.com/streamdal/streamdal/apps/server
 
 go 1.21
 
@@ -23,15 +23,17 @@ require (
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
 	github.com/sirupsen/logrus v1.9.3
 	github.com/slack-go/slack v0.12.3
-	github.com/streamdal/streamdal/libs/protos v0.1.16
+	github.com/streamdal/streamdal/libs/protos v0.1.17
+	github.com/tidwall/gjson v1.16.0
 	golang.org/x/crypto v0.18.0
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.59.0
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/relistan/rubberneck.v1 v1.1.0
-	github.com/tidwall/gjson v1.16.0
 )
+
+require github.com/streamdal/server v0.0.12
 
 require (
 	github.com/DataDog/appsec-internal-go v1.4.0 // indirect
@@ -66,6 +68,7 @@ require (
 	github.com/relistan/rubberneck v1.3.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
+	github.com/streamdal/protos v0.0.124 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tinylib/msgp v1.1.9 // indirect

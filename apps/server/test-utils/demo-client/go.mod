@@ -10,8 +10,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/streamdal/go-sdk v0.0.84
-	github.com/streamdal/streamdal/libs/protos v0.1.16
+	github.com/streamdal/go-sdk v0.0.85
+	github.com/streamdal/streamdal/libs/protos v0.1.17
 )
 
 require (

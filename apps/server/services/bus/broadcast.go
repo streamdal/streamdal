@@ -12,7 +12,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 func (b *Bus) BroadcastUpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) error {
@@ -23,17 +23,29 @@ func (b *Bus) BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePip
 	return b.broadcast(ctx, "delete_pipeline", &protos.BusEvent{Event: &protos.BusEvent_DeletePipelineRequest{DeletePipelineRequest: req}})
 }
 
-func (b *Bus) BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error {
-	return b.broadcast(ctx, "attach_pipeline", &protos.BusEvent{Event: &protos.BusEvent_AttachPipelineRequest{AttachPipelineRequest: req}})
-}
+func (b *Bus) BroadcastPauseResume(ctx context.Context, aud *protos.Audience, pipelineID string, pause bool) error {
+	b.log.Debugf("broadcastPauseResume pause set to '%t' for pipeline ID '%s'", pause, pipelineID)
 
-func (b *Bus) BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error {
-	b.log.Debugf("detach broadcastDetachPipeline: has '%d' session ID's", len(req.XSessionIds))
-	return b.broadcast(ctx, "detach_pipeline", &protos.BusEvent{Event: &protos.BusEvent_DetachPipelineRequest{DetachPipelineRequest: req}})
-}
+	if pause {
+		return b.broadcast(ctx, "pause_pipeline", &protos.BusEvent{
+			Event: &protos.BusEvent_PausePipelineRequest{
+				PausePipelineRequest: &protos.PausePipelineRequest{
+					PipelineId: pipelineID,
+					Audience:   aud,
+				},
+			},
+		})
+	} else {
+		return b.broadcast(ctx, "resume_pipeline", &protos.BusEvent{
+			Event: &protos.BusEvent_ResumePipelineRequest{
+				ResumePipelineRequest: &protos.ResumePipelineRequest{
+					PipelineId: pipelineID,
+					Audience:   aud,
+				},
+			},
+		})
+	}
 
-func (b *Bus) BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error {
-	return b.broadcast(ctx, "pause_pipeline", &protos.BusEvent{Event: &protos.BusEvent_PausePipelineRequest{PausePipelineRequest: req}})
 }
 
 func (b *Bus) BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error {
@@ -58,6 +70,10 @@ func (b *Bus) BroadcastDeregister(ctx context.Context, req *protos.DeregisterReq
 
 func (b *Bus) BroadcastNewAudience(ctx context.Context, req *protos.NewAudienceRequest) error {
 	return b.broadcast(ctx, "new_audience", &protos.BusEvent{Event: &protos.BusEvent_NewAudienceRequest{NewAudienceRequest: req}})
+}
+
+func (b *Bus) BroadcastSetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error {
+	return b.broadcast(ctx, "set_pipelines", &protos.BusEvent{Event: &protos.BusEvent_SetPipelinesRequest{SetPipelinesRequest: req}})
 }
 
 // BroadcastKVCreate will transform the req into a generic KVRequest and broadcast

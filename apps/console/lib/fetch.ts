@@ -6,7 +6,6 @@ import { setServiceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { serverErrorSignal } from "root/lib/serverError.ts";
 import { SERVER_ERROR } from "./serverError.ts";
 
-export type ConfigType = { [key: string]: string };
 export type PipelinesType = { [key: string]: PipelineInfo };
 
 export const initAllServices = async () => {

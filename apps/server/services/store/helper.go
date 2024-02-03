@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/util"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
@@ -16,19 +16,13 @@ const (
 	RedisLiveFormat = "streamdal_live:%s:%s:%s" // K: $session_id:$node_name:$audience
 
 	RedisAudiencePrefix    = "streamdal_audience"
-	RedisAudienceKeyFormat = "streamdal_audience:%s" // K: $audience V: NONE
+	RedisAudienceKeyFormat = "streamdal_audience:%s" // K: $audience V: SetPipelineConfig JSON
 
 	// RedisRegisterFormat key resides in the RedisLivePrefix
 	RedisRegisterFormat = "streamdal_live:%s:%s:register" // K: $session_id:$node_name:register; V: NONE
 
 	RedisPipelinePrefix    = "streamdal_pipeline"
 	RedisPipelineKeyFormat = "streamdal_pipeline:%s" // K: $pipeline_id V: serialized protos.Pipeline
-
-	RedisConfigPrefix    = "streamdal_config"
-	RedisConfigKeyFormat = "streamdal_config:%s:%s" // K: $audience V: $pipeline_id (string)
-
-	RedisPausedPrefix    = "streamdal_paused"
-	RedisPausedKeyFormat = "streamdal_paused:%s:%s" // K: $pipeline_id:$audience V: NONE
 
 	RedisNotificationConfigPrefix    = "streamdal_notification_config"
 	RedisNotificationConfigKeyFormat = "streamdal_notification_config:%s" // K: $config_id V: serialized protos.NotificationConfig
@@ -78,15 +72,6 @@ func RedisTelemetryAudience(aud *protos.Audience) string {
 
 func RedisPipelineKey(pipelineID string) string {
 	return strings.ToLower(fmt.Sprintf(RedisPipelineKeyFormat, pipelineID))
-}
-
-func RedisConfigKey(audience *protos.Audience, pipelineID string) string {
-	audStr := util.AudienceToStr(audience)
-	return strings.ToLower(fmt.Sprintf(RedisConfigKeyFormat, audStr, pipelineID))
-}
-
-func RedisPausedKey(audience, pipelineID string) string {
-	return strings.ToLower(fmt.Sprintf(RedisPausedKeyFormat, pipelineID, audience))
 }
 
 func RedisNotificationConfigKey(configID string) string {

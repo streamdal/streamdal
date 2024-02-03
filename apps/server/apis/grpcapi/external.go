@@ -15,13 +15,12 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 const (
@@ -50,22 +49,25 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "invalid get all request")
 	}
 
+	// Fetch live/connected SDK clients
 	liveInfo, err := s.getAllLive(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get live info")
 	}
 
+	// Fetch all recorded audiences
 	audiences, err := s.Options.StoreService.GetAudiences(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get audiences")
 	}
 
-	pipelines, err := s.getAllPipelines(ctx)
+	// Fetch all defined pipelines
+	pipelines, err := s.getAllPipelineInfo(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	configs, err := s.Options.StoreService.GetConfig(ctx)
+	configs, err := s.Options.StoreService.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get config")
 	}
@@ -122,6 +124,8 @@ MAIN:
 			llog.Debug("server shutting down")
 			break MAIN
 		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID):
+			s.log.Debug("received update on the changes pubsub topic")
+
 			if sendInProgress {
 				llog.Debug("send in progress, skipping changes message")
 				continue
@@ -217,7 +221,10 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 	return liveInfo, nil
 }
 
-func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
+// getAllPipelineInfo returns a map of pipeline IDs to pipeline info.
+// *protos.PipelineInfo contains the pipeline itself and a list of audiences the
+// pipeline is attached to.
+func (s *ExternalServer) getAllPipelineInfo(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
 	gen := make(map[string]*protos.PipelineInfo)
 
 	// Get all pipelines
@@ -232,40 +239,28 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 		gen[pipelineID] = &protos.PipelineInfo{
 			Audiences: make([]*protos.Audience, 0),
 			Pipeline:  pipeline,
-			Paused:    make([]*protos.Audience, 0),
 		}
 	}
 
 	// Get audience <-> pipeline mappings
-	pipelineConfig, err := s.Options.StoreService.GetConfig(ctx)
+	pipelineConfig, err := s.Options.StoreService.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipeline config")
 	}
 
 	// Update pipeline info with info about attached pipelines
-	for aud, pipelineIDs := range pipelineConfig {
-		for _, pipelineID := range pipelineIDs {
-			if _, ok := gen[pipelineID]; ok {
-				gen[pipelineID].Audiences = append(gen[pipelineID].Audiences, aud)
+	for aud, pipelines := range pipelineConfig {
+		for _, p := range pipelines {
+			if _, ok := gen[p.Id]; ok {
+				gen[p.Id].Audiences = append(gen[p.Id].Audiences, aud)
 			}
-		}
-	}
-
-	// Update pipeline info with state info
-	pausedPipelines, err := s.Options.StoreService.GetPaused(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get paused pipelines")
-	}
-
-	for _, p := range pausedPipelines {
-		if _, ok := gen[p.PipelineID]; ok {
-			gen[p.PipelineID].Paused = append(gen[p.PipelineID].Paused, p.Audience)
 		}
 	}
 
 	return gen, nil
 }
 
+// GetPipelines returns a list of all known pipelines.
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
 	if err := validate.GetPipelinesRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipelines request")
@@ -292,6 +287,7 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 	}, nil
 }
 
+// GetPipeline returns a single pipeline by ID.
 func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
 	if err := validate.GetPipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipeline request")
@@ -317,6 +313,7 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	}, nil
 }
 
+// CreatePipeline creates a new pipeline and saves it to the store.
 func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.CreatePipelineResponse, error) {
 	if err := validate.CreatePipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid create pipeline request")
@@ -364,6 +361,9 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	}, nil
 }
 
+// UpdatePipeline updates an existing pipeline (and broadcasts the update which
+// will cause the broadcast handlers to emit SetPipeline commands to any
+// connected SDKs).
 func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -396,9 +396,8 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	// Send telemetry
 	s.sendStepDeltaTelemetry(originalPipeline, req.Pipeline)
 
-	// Pipeline exists - broadcast it as there might be servers that have
-	// a client that has an active registration using this pipeline (and it should
-	// get updated)
+	// Pipeline exists - broadcast the update; handlers will emit updated
+	// SetPipelines command to any connected SDKs.
 	if err := s.Options.BusService.BroadcastUpdatePipeline(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -512,8 +511,8 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 	}, nil
 }
 
-func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) (*protos.StandardResponse, error) {
-	if err := validate.AttachPipelineRequest(req); err != nil {
+func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) (*protos.StandardResponse, error) {
+	if err := validate.SetPipelinesRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
@@ -521,118 +520,128 @@ func (s *ExternalServer) AttachPipeline(ctx context.Context, req *protos.AttachP
 		return demoResponse(ctx)
 	}
 
-	// Does this pipeline exist?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if errors.Is(err, store.ErrPipelineNotFound) {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+	// Do these pipelines exist?
+	for _, pipelineID := range req.PipelineIds {
+		if _, err := s.Options.StoreService.GetPipeline(ctx, pipelineID); err != nil {
+			if errors.Is(err, store.ErrPipelineNotFound) {
+				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+			}
+
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 		}
-
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
-	if err := s.Options.StoreService.AttachPipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	// 02.02.2024 - Decided to not require an audience check. This shouldn't
+	// cause any issues and would be helpful/needed for when we want to support
+	// setting up pipeline configurations via terraform and other automation
+	// tools.
+
+	// Get previous pipelines for telemetry
+	existingPipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to get existing pipelines by audience: %s", err)), nil
 	}
 
-	// Send telemetry
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, []statsd.Tag{
+	// NOTE: We do not care about any pipelines that the SDK is executing - the
+	// SDK should be dumb - it receives a new SetPipeline command and discards +
+	// replaces the pipelines it's executing with the new ones in SetPipeline cmd.
+
+	// Store the new pipeline config
+	if err := s.Options.StoreService.SetPipelines(ctx, req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to store pipelines: %s", err)), nil
+	}
+
+	// Update ACTIVE pipeline usage telemetry
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, int64(len(req.PipelineIds)), 1.0, []statsd.Tag{
 		{"install_id", s.Options.InstallID},
-		{"status", "attached"},
-	}...)
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, -1, 1.0, []statsd.Tag{
-		{"install_id", s.Options.InstallID},
-		{"status", "detached"},
+		{"status", "active"},
 	}...)
 
-	// Pipeline exists, broadcast attach
-	if err := s.Options.BusService.BroadcastAttachPipeline(ctx, req); err != nil {
+	delta := len(req.PipelineIds) - len(existingPipelines)
+
+	// Detach metrics are always negative
+	if delta > 0 {
+		delta = -delta
+	}
+
+	// Update INACTIVE pipeline usage telemetry
+	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, int64(delta), 1.0, []statsd.Tag{
+		{"install_id", s.Options.InstallID},
+		{"status", "inactive"},
+	}...)
+
+	// Pipeline exists, broadcast SetPipelines request to other nodes so they
+	// can emit a SetPipelines command + emit a *protos.GetAllResponse update
+	// for UI.
+	if err := s.Options.BusService.BroadcastSetPipelines(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' attached", req.PipelineId),
+		Id:   util.CtxRequestId(ctx),
+		Code: protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("successfully set '%d' pipelines for audience '%s'",
+			len(req.PipelineIds), util.AudienceToStr(req.Audience)),
 	}, nil
 }
 
-// Helper for determining what session ID's are using a pipeline ID
-func (s *ExternalServer) getSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
-	usage, err := s.Options.StoreService.GetPipelineUsage(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get pipeline usage in getPipelineUsageByPipelineID")
-	}
+// pause true == pause, false == resume
+func (s *ExternalServer) setPausePipeline(ctx context.Context, aud *protos.Audience, pipelineID string, pause bool) (*protos.StandardResponse, error) {
+	var action string
 
-	sessionIDs := make([]string, 0)
-
-	for _, u := range usage {
-		if u.PipelineId != pipelineID {
-			continue
-		}
-
-		sessionIDs = append(sessionIDs, u.SessionId)
-	}
-
-	return sessionIDs, nil
-}
-
-func (s *ExternalServer) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) (*protos.StandardResponse, error) {
-	if err := validate.DetachPipelineRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
-	}
-
-	if s.Options.DemoMode {
-		return demoResponse(ctx)
+	if pause {
+		action = "pause"
+	} else {
+		action = "resume"
 	}
 
 	// Does this pipeline exist?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == store.ErrPipelineNotFound {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
+	if _, err := s.Options.StoreService.GetPipeline(ctx, pipelineID); err != nil {
+		if errors.Is(err, store.ErrPipelineNotFound) {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, "pipeline not found"), nil
 		}
 
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to lookup pipeline: %s", err)), nil
 	}
 
-	// What session ID's are using this pipeline ID?
-	sessionIDs, err := s.getSessionIDsByPipelineID(ctx, req.PipelineId)
+	// Is this pipeline being used?
+	config, err := s.Options.StoreService.GetConfigByAudience(ctx, aud)
 	if err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to get config by audience: %s", err)), nil
 	}
 
-	s.log.Debugf("detach gRPC handler: found '%d' session ids", len(sessionIDs))
-
-	// Inject session_id's into request
-	req.XSessionIds = make([]string, 0)
-
-	for _, sessionID := range sessionIDs {
-		req.XSessionIds = append(req.XSessionIds, sessionID)
+	if len(config) == 0 {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK,
+			fmt.Sprintf("nothing to do - pipeline '%s' not being used by audience '%s'", pipelineID, util.AudienceToStr(aud))), nil
 	}
 
-	s.log.Debugf("injected request contains '%d' session ids", len(req.XSessionIds))
-
-	// Broadcast detach to everyone
-	if err := s.Options.BusService.BroadcastDetachPipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	// Can attempt to pause/resume; Pause/ResumePipeline() will noop if pipeline is already paused/resumed
+	updated, err := s.Options.StoreService.SetPauseResume(ctx, aud, pipelineID, pause)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to set pause/resume for pipeline: %s", err)), nil
 	}
 
-	// We are able to immediately remove the config entry because the broadcast
-	// handlers are not performing a Store lookup.
-	if err := s.Options.StoreService.DetachPipeline(ctx, req); err != nil {
-		s.log.Error(errors.Wrap(err, "unable to detach pipeline"))
-	}
+	statusMessage := fmt.Sprintf("pipeline '%s' for audience '%s' is already %sd", pipelineID, util.AudienceToStr(aud), action)
 
-	// Send telemetry
-	telTags := []statsd.Tag{
-		{"install_id", s.Options.InstallID},
-		{"status", "attached"},
+	// Only broadcast change if it was actually updated
+	if updated {
+		if err := s.Options.BusService.BroadcastPauseResume(ctx, aud, pipelineID, pause); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to broadcast pause/resume: %s", err)), nil
+		}
+
+		statusMessage = fmt.Sprintf("pipeline '%s' for audience '%s' %sd", pipelineID, util.AudienceToStr(aud), action)
 	}
-	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
 
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' detached", req.PipelineId),
+		Message: statusMessage,
 	}, nil
 }
 
@@ -641,33 +650,7 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	if s.Options.DemoMode {
-		return demoResponse(ctx)
-	}
-
-	// Does this pipeline exist?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == store.ErrPipelineNotFound {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
-		}
-
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	// Can attempt to pause; PausePipeline() will noop if pipeline is already paused
-	if err := s.Options.StoreService.PausePipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	if err := s.Options.BusService.BroadcastPausePipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' paused", req.PipelineId),
-	}, nil
+	return s.setPausePipeline(ctx, req.Audience, req.PipelineId, true)
 }
 
 func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
@@ -675,34 +658,7 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	if s.Options.DemoMode {
-		return demoResponse(ctx)
-	}
-
-	// Does this pipeline exist?
-	if _, err := s.Options.StoreService.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == store.ErrPipelineNotFound {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
-		}
-
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	// Can attempt to resume; ResumePipeline() will noop if pipeline is already running
-	if err := s.Options.StoreService.ResumePipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	// Pipeline exists, broadcast resume
-	if err := s.Options.BusService.BroadcastResumePipeline(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
-	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' deleted", req.PipelineId),
-	}, nil
+	return s.setPausePipeline(ctx, req.Audience, req.PipelineId, false)
 }
 
 func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.CreateNotificationRequest) (*protos.StandardResponse, error) {
@@ -855,6 +811,10 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 	}, nil
 }
 
+// DeleteAudience will delete an audience. It will error if the audience has a
+// pipeline attached to it. To get around the error, you can set the "force"
+// bool in the request to true. This will delete the audience and emit a
+// SetPipelines command set to [] for any connected SDKs.
 func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteAudienceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -865,27 +825,29 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}
 
 	// Determine if the audience is attached to any pipelines
-	attached, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
+	pipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
 	if err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to fetch config by audience: %s", err.Error())), nil
 	}
 
-	s.log.Debugf("request contents: %+v", req)
-
-	// Force delete - detach audiences from pipelines
-	if req.GetForce() {
-		s.log.Debug("force delete requested")
-		resp := s.forceDeleteAudience(ctx, attached, req.Audience)
-		if resp != nil {
-			return resp, nil
-		}
+	if len(pipelines) > 0 && !req.GetForce() {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(req.Audience),
+				len(pipelines))), nil
 	}
+
+	// Either there are 0 attached pipelines or force is not set - either way
+	// we can delete and broadcast - the broadcast handler will know to send a
+	// SetPipelines cmd set to [] for connected SDKs.
 
 	if err := s.Options.StoreService.DeleteAudience(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to delete audience from store: %s", err.Error())), nil
 	}
 
-	// Broadcast delete to other nodes so that they can emit an event for GetAllStream()
+	// Broadcast delete to other nodes so that they can emit a SetPipelines cmd
+	// set to [] and so that nodes emit a *protos.GetAll update for UI.
 	if err := s.Options.BusService.BroadcastDeleteAudience(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
@@ -893,96 +855,68 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: "Audience deleted",
+		Message: fmt.Sprintf("Audience deleted (force status '%t')", req.GetForce()),
 	}, nil
 }
 
-func (s *ExternalServer) forceDeleteAudience(ctx context.Context, attached []string, audience *protos.Audience) *protos.StandardResponse {
-	for _, pipelineID := range attached {
-		s.log.Debugf("request to force delete audience '%s'; attempting to detach pipeline '%s'",
-			util.AudienceToStr(audience), pipelineID)
-
-		resp, err := s.DetachPipeline(ctx, &protos.DetachPipelineRequest{
-			PipelineId: pipelineID,
-			Audience:   audience,
-		})
-
-		// DetachPipeline can return both an error and a resp - need to check both
-		if err != nil {
-			return util.StandardResponse(
-				ctx,
-				protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-				fmt.Sprintf("received err during force detach for pipeline '%s', audience '%s': %s", pipelineID,
-					util.AudienceToStr(audience), err),
-			)
-		}
-
-		if resp != nil && resp.Code != protos.ResponseCode_RESPONSE_CODE_OK {
-			return util.StandardResponse(
-				ctx,
-				protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
-				fmt.Sprintf("received non-OK response during force detach for pipeline '%s', audience '%s': %s", pipelineID,
-					util.AudienceToStr(audience), resp.Message),
-			)
-		}
-
-		s.log.Debugf("successfully force detached pipeline '%s' from audience '%s'", pipelineID, util.AudienceToStr(audience))
-	}
-
-	return nil
-}
-
+// DeleteService is basically DeleteAudience - the only difference is that
+// DeleteService will (potentially) delete *multiple* audiences (instead of one).
 func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteServiceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteServiceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
 
-	// find all audiences for the service
+	// Find all audiences for the service
 	audiences, err := s.Options.StoreService.GetAudiencesByService(ctx, req.ServiceName)
 	if err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
+	if len(audiences) == 0 {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK, fmt.Sprintf("Service '%s' deleted (has no audiences)", req.ServiceName)), nil
+	}
+
+	var numDeleted int
+
 	// Determine if the audience is attached to any pipelines
 	for _, audience := range audiences {
-		attached, err := s.Options.StoreService.GetConfigByAudience(ctx, audience)
+		configs, err := s.Options.StoreService.GetConfigByAudience(ctx, audience)
 		if err != nil {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to delete audience '%s' during service delete: %s", util.AudienceToStr(audience), err.Error())), nil
 		}
 
-		// If we're not forcing, and there are attached pipelines, return an error
-		if !req.GetForce() {
-			if len(attached) > 0 {
-				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, fmt.Sprintf("service '%s' still has attached pipelines, specify force to remove", req.ServiceName)), nil
-			}
+		if len(configs) > 0 && !req.GetForce() {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+				fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(audience), len(configs))), nil
 		}
 
-		// We're forcing, so detach all pipelines
-		s.log.Debug("force delete requested")
-		resp := s.forceDeleteAudience(ctx, attached, audience)
-		if resp != nil {
-			return resp, nil
-		}
+		// Either there are 0 attached pipelines or force is set - either way
+		// we can update store and broadcast - the broadcast handler will know
+		// to send empty SetPipelines commands to connected SDKs.
 
-		deleteReq := &protos.DeleteAudienceRequest{
+		if err := s.Options.StoreService.DeleteAudience(ctx, &protos.DeleteAudienceRequest{
 			Audience: audience,
-			Force:    util.Pointer(true),
+		}); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to delete audience '%s' during service delete: %s", util.AudienceToStr(audience), err.Error())), nil
 		}
 
-		if err := s.Options.StoreService.DeleteAudience(ctx, deleteReq); err != nil {
+		// Broadcast delete to other nodes so that they can emit a SetPipelines cmd + update UI
+		if err := s.Options.BusService.BroadcastDeleteAudience(ctx, &protos.DeleteAudienceRequest{
+			Audience: audience,
+		}); err != nil {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 		}
 
-		// Broadcast delete to other nodes so that they can emit an event for GetAllStream()
-		if err := s.Options.BusService.BroadcastDeleteAudience(ctx, deleteReq); err != nil {
-			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-		}
+		numDeleted += 1
 	}
 
 	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: "Service and audiences deleted",
+		Id:   util.CtxRequestId(ctx),
+		Code: protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: fmt.Sprintf("Service and '%d' audiences deleted (force '%t')",
+			numDeleted, req.GetForce()),
 	}, nil
 }
 
@@ -1308,6 +1242,10 @@ func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*pr
 }
 
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
+	if req.Input == "" {
+		req.Input = "no input provided"
+	}
+
 	return &protos.TestResponse{
 		Output: "Pong: " + req.Input,
 	}, nil

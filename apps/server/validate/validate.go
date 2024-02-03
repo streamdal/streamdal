@@ -268,62 +268,6 @@ func DeletePipelineRequest(req *protos.DeletePipelineRequest) error {
 	return nil
 }
 
-func AttachPipelineRequest(req *protos.AttachPipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	return Audience(req.Audience)
-}
-
-func DetachPipelineRequest(req *protos.DetachPipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	return Audience(req.Audience)
-}
-
-func PausePipelineRequest(req *protos.PausePipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	if err := Audience(req.Audience); err != nil {
-		return errors.Wrap(err, "invalid audience")
-	}
-
-	return nil
-}
-
-func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
-	if req == nil {
-		return ErrNilInput
-	}
-
-	if req.PipelineId == "" {
-		return ErrEmptyField("PipelineId")
-	}
-
-	if err := Audience(req.Audience); err != nil {
-		return errors.Wrap(err, "invalid audience")
-	}
-
-	return nil
-}
-
 func NewAudienceRequest(req *protos.NewAudienceRequest) error {
 	if req == nil {
 		return ErrNilInput
@@ -336,12 +280,56 @@ func NewAudienceRequest(req *protos.NewAudienceRequest) error {
 	return Audience(req.Audience)
 }
 
+func GetSetPipelinesCommandsByServiceRequest(req *protos.GetSetPipelinesCommandsByServiceRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.ServiceName == "" {
+		return ErrEmptyField("ServiceName")
+	}
+
+	return nil
+}
+
 func GetAllRequest(req *protos.GetAllRequest) error {
 	if req == nil {
 		return ErrNilInput
 	}
 
 	return nil
+}
+
+func PausePipelineRequest(req *protos.PausePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return Audience(req.Audience)
+}
+
+func ResumePipelineRequest(req *protos.ResumePipelineRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	if req.PipelineId == "" {
+		return ErrEmptyField("PipelineId")
+	}
+
+	return Audience(req.Audience)
+}
+
+func SetPipelinesRequest(req *protos.SetPipelinesRequest) error {
+	if req == nil {
+		return ErrNilInput
+	}
+
+	return Audience(req.Audience)
 }
 
 func CreateNotificationRequest(req *protos.CreateNotificationRequest) error {
@@ -720,22 +708,6 @@ func KVRequest(r *protos.KVRequest) error {
 		if err := KVInstruction(v); err != nil {
 			return errors.Wrapf(err, "instruction validation failed for kv '%v'", v.Object)
 		}
-	}
-
-	return nil
-}
-
-func AttachPipelineCommand(cmd *protos.AttachPipelineCommand) error {
-	if cmd == nil {
-		return ErrNilInput
-	}
-
-	if cmd.Pipeline == nil {
-		return ErrNilField("Pipeline")
-	}
-
-	if cmd.Pipeline.Id == "" {
-		return ErrEmptyField("Pipeline.Id")
 	}
 
 	return nil
