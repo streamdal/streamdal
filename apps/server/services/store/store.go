@@ -174,7 +174,7 @@ func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string
 	return sessionIDs, nil
 }
 
-// DEV: Needs tests
+// TODO: Needs tests
 func (s *Store) GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error) {
 	llog := s.log.WithField("method", "GetSessionIDsByAudience")
 	llog.Debug("received request to get session IDs by audience")
@@ -332,7 +332,6 @@ func (s *Store) DeleteRegistration(ctx context.Context, req *protos.DeregisterRe
 	return nil
 }
 
-// DEV: Don't need to update this
 func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error) {
 	llog := s.log.WithField("method", "GetPipelines")
 	llog.Debug("received request to get pipelines")
@@ -370,7 +369,6 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 	return pipelines, nil
 }
 
-// DEV: Don't need to update this
 func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pipeline, error) {
 	llog := s.log.WithField("method", "GetPipeline")
 	llog.Debug("received request to get pipeline")
@@ -393,14 +391,14 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	return pipeline, nil
 }
 
-// DEV: Should probably be proto
+// SetPipelinesConfig is the structure saved as JSON for []*SetPipelinesConfig
+// in store under "streamdal_audience:$audienceStr"
 type SetPipelinesConfig struct {
 	PipelineID                string
 	Paused                    bool
 	CreatedAtUnixTimestampUTC int64
 }
 
-// DEV (DONE): Implement
 func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error {
 	llog := s.log.WithField("method", "SetPipelines")
 	llog.Debugf("received request to save pipelines for audience '%s'", util.AudienceToStr(req.Audience))
@@ -700,9 +698,8 @@ func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience][]*proto
 	return cfgs, nil
 }
 
-// DEV (DONE): Needs to be updated to read audience K/V for ordered pipelines
-// DEV: Needs tests
 // GetConfigByAudience returns a list of pipelines for a given audience
+// TODO: Need tests
 func (s *Store) GetConfigByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error) {
 	pipelines := make([]*protos.Pipeline, 0)
 

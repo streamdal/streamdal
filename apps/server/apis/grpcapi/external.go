@@ -44,7 +44,6 @@ func (g *GRPCAPI) newExternalServer() *ExternalServer {
 	}
 }
 
-// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) (*protos.GetAllResponse, error) {
 	if err := validate.GetAllRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get all request")
@@ -84,7 +83,6 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.External_GetAllStreamServer) error {
 	if err := validate.GetAllRequest(req); err != nil {
 		return errors.Wrap(err, "invalid get all request")
@@ -175,7 +173,6 @@ MAIN:
 	return nil
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, error) {
 	liveInfo := make([]*protos.LiveInfo, 0)
 
@@ -242,7 +239,6 @@ func (s *ExternalServer) getAllPipelineInfo(ctx context.Context) (map[string]*pr
 		gen[pipelineID] = &protos.PipelineInfo{
 			Audiences: make([]*protos.Audience, 0),
 			Pipeline:  pipeline,
-			Paused:    make([]*protos.Audience, 0),
 		}
 	}
 
@@ -463,7 +459,6 @@ func (s *ExternalServer) sendStepDeltaTelemetry(original, updated *protos.Pipeli
 	}
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
 func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeletePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -650,7 +645,6 @@ func (s *ExternalServer) setPausePipeline(ctx context.Context, aud *protos.Audie
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.PausePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -659,7 +653,6 @@ func (s *ExternalServer) PausePipeline(ctx context.Context, req *protos.PausePip
 	return s.setPausePipeline(ctx, req.Audience, req.PipelineId, true)
 }
 
-// DEV: Ordered-pipelines (DONE)
 func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.ResumePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
