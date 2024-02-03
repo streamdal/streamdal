@@ -10,11 +10,11 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/cli/config"
-	"github.com/streamdal/cli/types"
-	"github.com/streamdal/cli/util"
+	"github.com/streamdal/streamdal/apps/cli/config"
+	"github.com/streamdal/streamdal/apps/cli/types"
+	"github.com/streamdal/streamdal/apps/cli/util"
 )
 
 const (

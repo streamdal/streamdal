@@ -14,10 +14,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rivo/tview"
 
-	"github.com/streamdal/cli/api"
-	"github.com/streamdal/cli/config"
-	"github.com/streamdal/cli/console"
-	"github.com/streamdal/cli/types"
+	"github.com/streamdal/streamdal/apps/cli/api"
+	"github.com/streamdal/streamdal/apps/cli/config"
+	"github.com/streamdal/streamdal/apps/cli/console"
+	"github.com/streamdal/streamdal/apps/cli/types"
 )
 
 const (

@@ -8,12 +8,12 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/cli/cmd"
-	"github.com/streamdal/cli/config"
-	"github.com/streamdal/cli/console"
-	"github.com/streamdal/cli/telemetry"
-	"github.com/streamdal/cli/types"
-	"github.com/streamdal/cli/util"
+	"github.com/streamdal/streamdal/apps/cli/cmd"
+	"github.com/streamdal/streamdal/apps/cli/config"
+	"github.com/streamdal/streamdal/apps/cli/console"
+	"github.com/streamdal/streamdal/apps/cli/telemetry"
+	"github.com/streamdal/streamdal/apps/cli/types"
+	"github.com/streamdal/streamdal/apps/cli/util"
 )
 
 var (

@@ -8,10 +8,10 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/cli/config"
-	"github.com/streamdal/cli/types"
+	"github.com/streamdal/streamdal/apps/cli/config"
+	"github.com/streamdal/streamdal/apps/cli/types"
 )
 
 type stackTracer interface {
