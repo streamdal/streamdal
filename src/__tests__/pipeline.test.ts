@@ -11,9 +11,8 @@ import { audienceKey, internal } from "../internal/register.js";
 const testConfigs = {
   registered: true,
   grpcClient: {
-    getAttachCommandsByService: () => ({
-      active: [],
-      paused: [],
+    getSetPipelinesCommandsByService: () => ({
+      setPipelineCommands: [],
     }),
   } as unknown as InternalClient,
   sessionId: uuidv4(),
@@ -39,8 +38,7 @@ const testPipeline: Pipeline = {
   steps: [
     {
       name: "test-step",
-      onSuccess: [],
-      onFailure: [],
+      dynamic: true,
       step: {
         oneofKind: "detective",
         detective: { args: [], type: 1013, path: "object.field" },
@@ -51,9 +49,9 @@ const testPipeline: Pipeline = {
 };
 const testAttachCommand: Command = {
   command: {
-    oneofKind: "attachPipeline",
-    attachPipeline: {
-      pipeline: testPipeline,
+    oneofKind: "setPipelines",
+    setPipelines: {
+      pipelines: [testPipeline],
     },
   },
   audience: testAudience,
@@ -61,9 +59,9 @@ const testAttachCommand: Command = {
 
 const testDetachCommand: Command = {
   command: {
-    oneofKind: "detachPipeline",
-    detachPipeline: {
-      pipelineId: testPipeline.id,
+    oneofKind: "setPipelines",
+    setPipelines: {
+      pipelines: [],
     },
   },
   audience: testAudience,
@@ -71,9 +69,9 @@ const testDetachCommand: Command = {
 
 const testPauseCommand: Command = {
   command: {
-    oneofKind: "pausePipeline",
-    pausePipeline: {
-      pipelineId: testPipeline.id,
+    oneofKind: "setPipelines",
+    setPipelines: {
+      pipelines: [...[{...testPipeline, Paused: true }]]
     },
   },
   audience: testAudience,
@@ -81,18 +79,17 @@ const testPauseCommand: Command = {
 
 const testResumeCommand: Command = {
   command: {
-    oneofKind: "resumePipeline",
-    resumePipeline: {
-      pipelineId: testPipeline.id,
+    oneofKind: "setPipelines",
+    setPipelines: {
+      pipelines: [...[{...testPipeline, Paused: false }]]
     },
   },
   audience: testAudience,
 };
 
-const testAttachCommandByServiceResponse = {
+const testGetSetPipelinesCommandsByServiceResponse = {
   response: {
-    active: [testAttachCommand],
-    paused: [],
+    setPipelineCommands : [testAttachCommand],
     wasmModules: { test: { id: "test", bytes: new Uint8Array() } },
   },
 };
@@ -101,8 +98,8 @@ describe("pipeline tests", () => {
   const key = audienceKey(testAudience);
   it("initPipelines should add a given pipeline to internal store and set pipelineInitialized ", async () => {
     sinon
-      .stub(testConfigs.grpcClient, "getAttachCommandsByService")
-      .resolves(testAttachCommandByServiceResponse as any);
+      .stub(testConfigs.grpcClient, "getSetPipelinesCommandsByService")
+      .resolves(testGetSetPipelinesCommandsByServiceResponse as any);
 
     await initPipelines(testConfigs);
 
@@ -134,7 +131,7 @@ describe("pipeline tests", () => {
 
       await processResponse(testPauseCommand);
 
-      expect(internal.pipelines.get(key)?.get(testPipeline.id)?.paused).toEqual(
+      expect(internal.pipelines.get(key)?.get(testPipeline.id)?.Paused).toEqual(
         true
       );
     });
@@ -146,7 +143,7 @@ describe("pipeline tests", () => {
       );
       await processResponse(testResumeCommand);
 
-      expect(internal.pipelines.get(key)?.get(testPipeline.id)?.paused).toEqual(
+      expect(internal.pipelines.get(key)?.get(testPipeline.id)?.Paused).toEqual(
         false
       );
     });

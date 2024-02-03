@@ -4,8 +4,9 @@ import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ClientType } from "@streamdal/protos/protos/sp_info";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 
+import { Pipeline } from "../../../streamdal/libs/protos/build/ts/node/cjs/protos/sp_pipeline.js";
 import { Configs } from "../streamdal.js";
-import { InternalPipeline, processResponse } from "./pipeline.js";
+import { processResponse } from "./pipeline.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
 
 const REGISTRATION_RETRY_INTERVAL = 5000;
@@ -29,7 +30,7 @@ export const internal = {
   // in the streamdal constructor
   registered: false,
   pipelineInitialized: false,
-  pipelines: new Map<string, Map<string, InternalPipeline>>(),
+  pipelines: new Map<string, Map<string, Pipeline>>(),
   kv: new Map<string, Uint8Array>(),
   audiences: new Map<
     string,

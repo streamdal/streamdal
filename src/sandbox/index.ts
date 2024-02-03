@@ -1,4 +1,5 @@
 import { Audience } from "@streamdal/protos/protos/sp_common";
+import { ExecStatus } from "@streamdal/protos/protos/sp_sdk";
 
 import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
 import { billingExample } from "./billing.js";
@@ -107,7 +108,7 @@ const logPipeline = async (
 ) => {
   if (QUIET) {
     console.debug = () => null;
-    console.dir = () => null;
+    // console.dir = () => null;
   }
   console.debug("--------------------------------");
   console.debug("pipeline request start", new Date());
@@ -116,27 +117,26 @@ const logPipeline = async (
       audience.operationType
     ].toLowerCase()}`
   );
-  const { error, errorMessage, metadata, data, pipelineStatus } =
-    await streamdal.process({
-      audience: audience,
-      data: new TextEncoder().encode(JSON.stringify(input)),
-    });
+  const { status, statusMessage, metadata } = await streamdal.process({
+    audience: audience,
+    data: new TextEncoder().encode(JSON.stringify(input)),
+  });
   console.debug("metadata:", metadata);
   //
   // no active pipeline messages are technically errors
   // but more informational
-  console.debug("result error", error);
-  error && console.debug("error message", errorMessage);
+  console.debug("result status", ExecStatus[status]);
+  statusMessage && console.debug("status message", statusMessage);
   console.debug("result data:");
   try {
-    data && data.length > 0
-      ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
-      : console.debug("no data returned");
+    // data && data.length > 0
+    //   ? console.dir(JSON.parse(new TextDecoder().decode(data)), { depth: 20 })
+    //   : console.debug("no data returned");
   } catch (e) {
     console.error("could not parse data", e);
   }
   console.debug("pipeline status:");
-  console.dir(pipelineStatus, { depth: 20 });
+  // console.dir(pipelineStatus, { depth: 20 });
   console.debug("pipeline request done", new Date());
   console.debug("--------------------------------");
   console.debug("\n");

@@ -1,6 +1,6 @@
 import { Command, TailCommand } from "@streamdal/protos/protos/sp_command";
 import { Audience, TailRequestType } from "@streamdal/protos/protos/sp_common";
-import { GetAttachCommandsByServiceResponse } from "@streamdal/protos/protos/sp_internal";
+import { GetSetPipelinesCommandsByServiceResponse } from "@streamdal/protos/protos/sp_internal";
 import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
 import { Configs } from "../streamdal.js";
@@ -9,10 +9,6 @@ import { audienceKey, internal, Tail } from "./register.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
 import { instantiateWasm } from "./wasm.js";
 
-export type InternalPipeline = Pipeline & {
-  paused?: boolean;
-};
-
 export const initPipelines = async (configs: Configs) => {
   try {
     if (internal.pipelineInitialized) {
@@ -20,8 +16,8 @@ export const initPipelines = async (configs: Configs) => {
     }
 
     console.debug("initializing pipelines");
-    const { response }: { response: GetAttachCommandsByServiceResponse } =
-      await configs.grpcClient.getAttachCommandsByService(
+    const { response }: { response: GetSetPipelinesCommandsByServiceResponse } =
+      await configs.grpcClient.getSetPipelinesCommandsByService(
         {
           serviceName: configs.serviceName.toLowerCase(),
         },
@@ -32,7 +28,7 @@ export const initPipelines = async (configs: Configs) => {
       await instantiateWasm(k, v.bytes);
     }
 
-    for await (const command of response.active) {
+    for await (const command of response.setPipelineCommands) {
       await processResponse(command);
     }
     internal.pipelineInitialized = true;
@@ -54,31 +50,10 @@ export const processResponse = async (response: Command) => {
   }
 
   switch (response.command.oneofKind) {
-    case "attachPipeline":
-      response.command.attachPipeline.pipeline &&
-        (await attachPipeline(
-          response.audience,
-          response.command.attachPipeline.pipeline
-        ));
-      break;
-    case "detachPipeline":
-      detachPipeline(
+    case "setPipelines":
+      await setPipelines(
         response.audience,
-        response.command.detachPipeline.pipelineId
-      );
-      break;
-    case "pausePipeline":
-      togglePausePipeline(
-        response.audience,
-        response.command.pausePipeline.pipelineId,
-        true
-      );
-      break;
-    case "resumePipeline":
-      togglePausePipeline(
-        response.audience,
-        response.command.resumePipeline.pipelineId,
-        false
+        response.command.setPipelines.pipelines
       );
       break;
     case "tail":
@@ -102,41 +77,21 @@ export const buildPipeline = async (pipeline: Pipeline): Promise<Pipeline> => {
   };
 };
 
-export const attachPipeline = async (
+export const setPipelines = async (
   audience: Audience,
-  pipeline: Pipeline
+  pipelines: Pipeline[]
 ) => {
   const key = audienceKey(audience);
-  const existing = internal.pipelines.get(key);
-  const built = await buildPipeline(pipeline);
-  internal.pipelines.set(
-    key,
-    existing
-      ? existing.set(pipeline.id, built)
-      : new Map([[pipeline.id, built]])
+  const mappedPipelines: [string, Pipeline][] = await Promise.all(
+    pipelines.map(async (p) => [p.id, await buildPipeline(p)])
   );
-};
-
-export const detachPipeline = (audience: Audience, pipelineId: string) =>
-  internal.pipelines.get(audienceKey(audience))?.delete(pipelineId);
-
-export const togglePausePipeline = (
-  audience: Audience,
-  pipelineId: string,
-  paused: boolean
-) => {
-  const key = audienceKey(audience);
-  const existing = internal.pipelines.get(key);
-  const p = existing?.get(pipelineId);
-  existing &&
-    p &&
-    internal.pipelines.set(key, existing.set(p.id, { ...p, paused }));
+  internal.pipelines.set(key, new Map<string, Pipeline>(mappedPipelines));
 };
 
 export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
   console.debug("received a tail command for audience", audience);
   if (!request) {
-    console.debug("no tail reqeuest details specified, skipping");
+    console.debug("no tail request details specified, skipping");
     return;
   }
 

@@ -1,5 +1,6 @@
 import {
   Audience,
+  ExecStatus,
   OperationType,
   SDKResponse,
   Streamdal,
@@ -55,8 +56,8 @@ export const example = async () => {
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });
 
-  if (result.error) {
-    console.error("Pipeline error", result.errorMessage);
+  if (result.status === ExecStatus.ERROR) {
+    console.error("Pipeline error", result.statusMessage);
     //
     // Optionally explore more detailed step status information
     console.dir(result.pipelineStatus);

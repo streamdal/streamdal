@@ -1,6 +1,6 @@
 import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
-import { SDKResponse } from "@streamdal/protos/protos/sp_sdk";
+import { ExecStatus, SDKResponse } from "@streamdal/protos/protos/sp_sdk";
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudiences } from "./internal/audience.js";
@@ -10,7 +10,7 @@ import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { retryProcessPipelines } from "./internal/process.js";
 import { register } from "./internal/register.js";
 
-export { Audience, OperationType, SDKResponse };
+export { Audience, ExecStatus, OperationType, SDKResponse };
 
 export interface StreamdalConfigs {
   streamdalUrl?: string;

@@ -1,6 +1,11 @@
 import { Audience } from "@streamdal/protos/protos/sp_common";
 
-import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
+import {
+  ExecStatus,
+  OperationType,
+  Streamdal,
+  StreamdalConfigs,
+} from "../streamdal.js";
 import { loadData } from "./billing.js";
 
 const serviceKVConfig: StreamdalConfigs = {
@@ -48,8 +53,11 @@ export const kv = () => {
     //
     // Key exists, this will result in a pipeline step running without error
     // if this is part of multi-step or multi-pipeline you will need to inspect pipelineStatus
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`key ${key0.event_id} exists:`, !result.error);
+    console.debug(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      `key ${key0.event_id} exists:`,
+      result.status === ExecStatus.TRUE
+    );
   }, 1000);
 
   //
@@ -63,7 +71,10 @@ export const kv = () => {
     //
     // Key does not exist, this will result in an error
     // if this is part of multi-step or multi-pipeline you will need to inspect pipelineStatus
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    console.debug(`key ${key1.event_id} exists:`, result.error);
+    console.debug(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      `key ${key1.event_id} exists:`,
+      result.status === ExecStatus.FALSE
+    );
   }, 1000);
 };

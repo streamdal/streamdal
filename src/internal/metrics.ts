@@ -4,10 +4,9 @@ import {
   OperationType,
 } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
-import { StepStatus } from "@streamdal/protos/protos/sp_sdk";
+import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
+import { ExecStatus, StepStatus } from "@streamdal/protos/protos/sp_sdk";
 import ReadWriteLock from "rwlock";
-
-import { InternalPipeline } from "./pipeline.js";
 
 export const METRIC_INTERVAL = 1000;
 
@@ -19,10 +18,7 @@ export interface MetricsConfigs {
   streamdalToken: string;
 }
 
-export const getStepLabels = (
-  audience: Audience,
-  pipeline: InternalPipeline
-) => ({
+export const getStepLabels = (audience: Audience, pipeline: Pipeline) => ({
   service: audience.serviceName,
   component: audience.componentName,
   operation: audience.operationName,
@@ -38,7 +34,7 @@ export const stepMetrics = async ({
 }: {
   audience: Audience;
   stepStatus: StepStatus;
-  pipeline: InternalPipeline;
+  pipeline: Pipeline;
   payloadSize: number;
   // eslint-disable-next-line @typescript-eslint/require-await
 }) => {
@@ -51,7 +47,7 @@ export const stepMetrics = async ({
     const stepProcessedKey = `counter_${opName}_processed`;
     const stepBytesKey = `counter_${opName}_bytes`;
 
-    stepStatus.error &&
+    stepStatus.status === ExecStatus.ERROR &&
       metrics.set(stepErrorKey, {
         name: stepErrorKey,
         value: (metrics.get(stepErrorKey)?.value ?? 0) + 1,
