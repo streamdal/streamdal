@@ -49,6 +49,12 @@ export interface Pipeline {
      * @generated from protobuf field: repeated protos.NotificationConfig _notification_configs = 4;
      */
     NotificationConfigs: NotificationConfig[];
+    /**
+     * Indicates whether the pipeline is paused or not. Used internally by server.
+     *
+     * @generated from protobuf field: optional bool _paused = 1000;
+     */
+    Paused?: boolean;
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.

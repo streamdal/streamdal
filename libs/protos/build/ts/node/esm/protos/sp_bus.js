@@ -3,6 +3,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { SetPipelinesRequest } from "./sp_external.js";
 import { TailResponse } from "./sp_common.js";
 import { TailRequest } from "./sp_common.js";
 import { NewAudienceRequest } from "./sp_internal.js";
@@ -11,8 +12,6 @@ import { KVRequest } from "./sp_kv.js";
 import { MetricsRequest } from "./sp_internal.js";
 import { ResumePipelineRequest } from "./sp_external.js";
 import { PausePipelineRequest } from "./sp_external.js";
-import { DetachPipelineRequest } from "./sp_external.js";
-import { AttachPipelineRequest } from "./sp_external.js";
 import { UpdatePipelineRequest } from "./sp_external.js";
 import { DeletePipelineRequest } from "./sp_external.js";
 import { CreatePipelineRequest } from "./sp_external.js";
@@ -28,8 +27,6 @@ class BusEvent$Type extends MessageType {
             { no: 102, name: "create_pipeline_request", kind: "message", oneof: "event", T: () => CreatePipelineRequest },
             { no: 103, name: "delete_pipeline_request", kind: "message", oneof: "event", T: () => DeletePipelineRequest },
             { no: 104, name: "update_pipeline_request", kind: "message", oneof: "event", T: () => UpdatePipelineRequest },
-            { no: 105, name: "attach_pipeline_request", kind: "message", oneof: "event", T: () => AttachPipelineRequest },
-            { no: 106, name: "detach_pipeline_request", kind: "message", oneof: "event", T: () => DetachPipelineRequest },
             { no: 107, name: "pause_pipeline_request", kind: "message", oneof: "event", T: () => PausePipelineRequest },
             { no: 108, name: "resume_pipeline_request", kind: "message", oneof: "event", T: () => ResumePipelineRequest },
             { no: 109, name: "metrics_request", kind: "message", oneof: "event", T: () => MetricsRequest },
@@ -38,6 +35,7 @@ class BusEvent$Type extends MessageType {
             { no: 112, name: "new_audience_request", kind: "message", oneof: "event", T: () => NewAudienceRequest },
             { no: 113, name: "tail_request", kind: "message", oneof: "event", T: () => TailRequest },
             { no: 114, name: "tail_response", kind: "message", oneof: "event", T: () => TailResponse },
+            { no: 115, name: "set_pipelines_request", kind: "message", oneof: "event", T: () => SetPipelinesRequest },
             { no: 1000, name: "_metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
@@ -86,18 +84,6 @@ class BusEvent$Type extends MessageType {
                         updatePipelineRequest: UpdatePipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.updatePipelineRequest)
                     };
                     break;
-                case /* protos.AttachPipelineRequest attach_pipeline_request */ 105:
-                    message.event = {
-                        oneofKind: "attachPipelineRequest",
-                        attachPipelineRequest: AttachPipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.attachPipelineRequest)
-                    };
-                    break;
-                case /* protos.DetachPipelineRequest detach_pipeline_request */ 106:
-                    message.event = {
-                        oneofKind: "detachPipelineRequest",
-                        detachPipelineRequest: DetachPipelineRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.detachPipelineRequest)
-                    };
-                    break;
                 case /* protos.PausePipelineRequest pause_pipeline_request */ 107:
                     message.event = {
                         oneofKind: "pausePipelineRequest",
@@ -144,6 +130,12 @@ class BusEvent$Type extends MessageType {
                     message.event = {
                         oneofKind: "tailResponse",
                         tailResponse: TailResponse.internalBinaryRead(reader, reader.uint32(), options, message.event.tailResponse)
+                    };
+                    break;
+                case /* protos.SetPipelinesRequest set_pipelines_request */ 115:
+                    message.event = {
+                        oneofKind: "setPipelinesRequest",
+                        setPipelinesRequest: SetPipelinesRequest.internalBinaryRead(reader, reader.uint32(), options, message.event.setPipelinesRequest)
                     };
                     break;
                 case /* map<string, string> _metadata */ 1000:
@@ -195,12 +187,6 @@ class BusEvent$Type extends MessageType {
         /* protos.UpdatePipelineRequest update_pipeline_request = 104; */
         if (message.event.oneofKind === "updatePipelineRequest")
             UpdatePipelineRequest.internalBinaryWrite(message.event.updatePipelineRequest, writer.tag(104, WireType.LengthDelimited).fork(), options).join();
-        /* protos.AttachPipelineRequest attach_pipeline_request = 105; */
-        if (message.event.oneofKind === "attachPipelineRequest")
-            AttachPipelineRequest.internalBinaryWrite(message.event.attachPipelineRequest, writer.tag(105, WireType.LengthDelimited).fork(), options).join();
-        /* protos.DetachPipelineRequest detach_pipeline_request = 106; */
-        if (message.event.oneofKind === "detachPipelineRequest")
-            DetachPipelineRequest.internalBinaryWrite(message.event.detachPipelineRequest, writer.tag(106, WireType.LengthDelimited).fork(), options).join();
         /* protos.PausePipelineRequest pause_pipeline_request = 107; */
         if (message.event.oneofKind === "pausePipelineRequest")
             PausePipelineRequest.internalBinaryWrite(message.event.pausePipelineRequest, writer.tag(107, WireType.LengthDelimited).fork(), options).join();
@@ -225,6 +211,9 @@ class BusEvent$Type extends MessageType {
         /* protos.TailResponse tail_response = 114; */
         if (message.event.oneofKind === "tailResponse")
             TailResponse.internalBinaryWrite(message.event.tailResponse, writer.tag(114, WireType.LengthDelimited).fork(), options).join();
+        /* protos.SetPipelinesRequest set_pipelines_request = 115; */
+        if (message.event.oneofKind === "setPipelinesRequest")
+            SetPipelinesRequest.internalBinaryWrite(message.event.setPipelinesRequest, writer.tag(115, WireType.LengthDelimited).fork(), options).join();
         /* map<string, string> _metadata = 1000; */
         for (let k of Object.keys(message.Metadata))
             writer.tag(1000, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.Metadata[k]).join();

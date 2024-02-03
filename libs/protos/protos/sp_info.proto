@@ -19,9 +19,6 @@ message PipelineInfo {
 
   // Pipeline config
   protos.Pipeline pipeline = 2;
-
-  // For what audiences this pipeline is paused (none if empty)
-  repeated protos.Audience paused = 3;
 }
 
 enum ClientType {

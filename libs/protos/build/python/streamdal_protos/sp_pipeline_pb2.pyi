@@ -21,16 +21,18 @@ ABORT_CONDITION_UNSET: AbortCondition
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Pipeline(_message.Message):
-    __slots__ = ["_notification_configs", "id", "name", "steps"]
+    __slots__ = ["_notification_configs", "_paused", "id", "name", "steps"]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STEPS_FIELD_NUMBER: _ClassVar[int]
     _NOTIFICATION_CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    _PAUSED_FIELD_NUMBER: _ClassVar[int]
     _notification_configs: _containers.RepeatedCompositeFieldContainer[_sp_notify_pb2.NotificationConfig]
+    _paused: bool
     id: str
     name: str
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ...) -> None: ...
 
 class PipelineStep(_message.Message):
     __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_false", "on_true", "schema_validation", "transform", "valid_json"]

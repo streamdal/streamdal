@@ -34,7 +34,7 @@ service Internal {
 
   // Used to pull all pipeline configs for the service name in the SDK's constructor
   // This is needed because Register() is async
-  rpc GetAttachCommandsByService(GetAttachCommandsByServiceRequest) returns (GetAttachCommandsByServiceResponse);
+  rpc GetSetPipelinesCommandsByService(GetSetPipelinesCommandsByServiceRequest) returns (GetSetPipelinesCommandsByServiceResponse);
 
   rpc SendTail(stream TailResponse) returns (StandardResponse);
 
@@ -107,17 +107,19 @@ message DeregisterRequest {
   string session_id = 2;
 }
 
-message GetAttachCommandsByServiceRequest {
+// Method used by SDKs to fetch all SetPipelinesCommands for a given service name.
+// The SDK may not know of all audiences yet so this method returns ALL
+// SetPipelinesCommands that use the same same service name. SDKs should store
+// the commands (or pipelines) in memory tied to an audience, so that if/when a
+// .Process() call occurs with an audience - the SDK will already have the
+// pipeline config in memory.
+message GetSetPipelinesCommandsByServiceRequest {
   string service_name = 1;
 }
 
-message GetAttachCommandsByServiceResponse {
-  // AttachCommands for all active pipelines
-  repeated protos.Command active = 1;
-
-  // AttachCommands, but ones which are paused
-  // The SDK still needs to have these to support un-pausing
-  repeated protos.Command paused = 2;
+message GetSetPipelinesCommandsByServiceResponse {
+  // SetPipelinesCommands for all active pipelines
+  repeated protos.Command set_pipeline_commands = 1;
 
   // ID = wasm ID
   map<string,WasmModule> wasm_modules = 3;

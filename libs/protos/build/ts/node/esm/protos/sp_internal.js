@@ -381,9 +381,9 @@ class DeregisterRequest$Type extends MessageType {
  */
 export const DeregisterRequest = new DeregisterRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetAttachCommandsByServiceRequest$Type extends MessageType {
+class GetSetPipelinesCommandsByServiceRequest$Type extends MessageType {
     constructor() {
-        super("protos.GetAttachCommandsByServiceRequest", [
+        super("protos.GetSetPipelinesCommandsByServiceRequest", [
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
@@ -424,20 +424,19 @@ class GetAttachCommandsByServiceRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceRequest
+ * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceRequest
  */
-export const GetAttachCommandsByServiceRequest = new GetAttachCommandsByServiceRequest$Type();
+export const GetSetPipelinesCommandsByServiceRequest = new GetSetPipelinesCommandsByServiceRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetAttachCommandsByServiceResponse$Type extends MessageType {
+class GetSetPipelinesCommandsByServiceResponse$Type extends MessageType {
     constructor() {
-        super("protos.GetAttachCommandsByServiceResponse", [
-            { no: 1, name: "active", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
-            { no: 2, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
+        super("protos.GetSetPipelinesCommandsByServiceResponse", [
+            { no: 1, name: "set_pipeline_commands", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Command },
             { no: 3, name: "wasm_modules", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => WasmModule } }
         ]);
     }
     create(value) {
-        const message = { active: [], paused: [], wasmModules: {} };
+        const message = { setPipelineCommands: [], wasmModules: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -448,11 +447,8 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.Command active */ 1:
-                    message.active.push(Command.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                case /* repeated protos.Command paused */ 2:
-                    message.paused.push(Command.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.Command set_pipeline_commands */ 1:
+                    message.setPipelineCommands.push(Command.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* map<string, protos.WasmModule> wasm_modules */ 3:
                     this.binaryReadMap3(message.wasmModules, reader, options);
@@ -479,18 +475,15 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
                 case 2:
                     val = WasmModule.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field protos.GetAttachCommandsByServiceResponse.wasm_modules");
+                default: throw new globalThis.Error("unknown map entry field for field protos.GetSetPipelinesCommandsByServiceResponse.wasm_modules");
             }
         }
         map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : WasmModule.create();
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.Command active = 1; */
-        for (let i = 0; i < message.active.length; i++)
-            Command.internalBinaryWrite(message.active[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated protos.Command paused = 2; */
-        for (let i = 0; i < message.paused.length; i++)
-            Command.internalBinaryWrite(message.paused[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Command set_pipeline_commands = 1; */
+        for (let i = 0; i < message.setPipelineCommands.length; i++)
+            Command.internalBinaryWrite(message.setPipelineCommands[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* map<string, protos.WasmModule> wasm_modules = 3; */
         for (let k of Object.keys(message.wasmModules)) {
             writer.tag(3, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
@@ -505,9 +498,9 @@ class GetAttachCommandsByServiceResponse$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetAttachCommandsByServiceResponse
+ * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceResponse
  */
-export const GetAttachCommandsByServiceResponse = new GetAttachCommandsByServiceResponse$Type();
+export const GetSetPipelinesCommandsByServiceResponse = new GetSetPipelinesCommandsByServiceResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class WasmModule$Type extends MessageType {
     constructor() {
@@ -632,7 +625,7 @@ export const Internal = new ServiceType("protos.Internal", [
     { name: "Heartbeat", options: {}, I: HeartbeatRequest, O: StandardResponse },
     { name: "Notify", options: {}, I: NotifyRequest, O: StandardResponse },
     { name: "Metrics", options: {}, I: MetricsRequest, O: StandardResponse },
-    { name: "GetAttachCommandsByService", options: {}, I: GetAttachCommandsByServiceRequest, O: GetAttachCommandsByServiceResponse },
+    { name: "GetSetPipelinesCommandsByService", options: {}, I: GetSetPipelinesCommandsByServiceRequest, O: GetSetPipelinesCommandsByServiceResponse },
     { name: "SendTail", clientStreaming: true, options: {}, I: TailResponse, O: StandardResponse },
     { name: "SendSchema", options: {}, I: SendSchemaRequest, O: StandardResponse }
 ]);

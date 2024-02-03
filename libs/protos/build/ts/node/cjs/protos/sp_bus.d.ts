@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { SetPipelinesRequest } from "./sp_external";
 import { TailResponse } from "./sp_common";
 import { TailRequest } from "./sp_common";
 import { NewAudienceRequest } from "./sp_internal";
@@ -12,8 +13,6 @@ import { KVRequest } from "./sp_kv";
 import { MetricsRequest } from "./sp_internal";
 import { ResumePipelineRequest } from "./sp_external";
 import { PausePipelineRequest } from "./sp_external";
-import { DetachPipelineRequest } from "./sp_external";
-import { AttachPipelineRequest } from "./sp_external";
 import { UpdatePipelineRequest } from "./sp_external";
 import { DeletePipelineRequest } from "./sp_external";
 import { CreatePipelineRequest } from "./sp_external";
@@ -63,18 +62,6 @@ export interface BusEvent {
          */
         updatePipelineRequest: UpdatePipelineRequest;
     } | {
-        oneofKind: "attachPipelineRequest";
-        /**
-         * @generated from protobuf field: protos.AttachPipelineRequest attach_pipeline_request = 105;
-         */
-        attachPipelineRequest: AttachPipelineRequest;
-    } | {
-        oneofKind: "detachPipelineRequest";
-        /**
-         * @generated from protobuf field: protos.DetachPipelineRequest detach_pipeline_request = 106;
-         */
-        detachPipelineRequest: DetachPipelineRequest;
-    } | {
         oneofKind: "pausePipelineRequest";
         /**
          * @generated from protobuf field: protos.PausePipelineRequest pause_pipeline_request = 107;
@@ -122,6 +109,12 @@ export interface BusEvent {
          * @generated from protobuf field: protos.TailResponse tail_response = 114;
          */
         tailResponse: TailResponse;
+    } | {
+        oneofKind: "setPipelinesRequest";
+        /**
+         * @generated from protobuf field: protos.SetPipelinesRequest set_pipelines_request = 115;
+         */
+        setPipelinesRequest: SetPipelinesRequest;
     } | {
         oneofKind: undefined;
     };

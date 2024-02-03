@@ -44,12 +44,6 @@ export interface PipelineInfo {
      * @generated from protobuf field: protos.Pipeline pipeline = 2;
      */
     pipeline?: Pipeline;
-    /**
-     * For what audiences this pipeline is paused (none if empty)
-     *
-     * @generated from protobuf field: repeated protos.Audience paused = 3;
-     */
-    paused: Audience[];
 }
 /**
  * Most of this is constructed by client SDKs and provided during Register call
@@ -172,12 +166,11 @@ class PipelineInfo$Type extends MessageType<PipelineInfo> {
     constructor() {
         super("protos.PipelineInfo", [
             { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
-            { no: 2, name: "pipeline", kind: "message", T: () => Pipeline },
-            { no: 3, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
+            { no: 2, name: "pipeline", kind: "message", T: () => Pipeline }
         ]);
     }
     create(value?: PartialMessage<PipelineInfo>): PipelineInfo {
-        const message = { audiences: [], paused: [] };
+        const message = { audiences: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<PipelineInfo>(this, message, value);
@@ -193,9 +186,6 @@ class PipelineInfo$Type extends MessageType<PipelineInfo> {
                     break;
                 case /* protos.Pipeline pipeline */ 2:
                     message.pipeline = Pipeline.internalBinaryRead(reader, reader.uint32(), options, message.pipeline);
-                    break;
-                case /* repeated protos.Audience paused */ 3:
-                    message.paused.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -215,9 +205,6 @@ class PipelineInfo$Type extends MessageType<PipelineInfo> {
         /* protos.Pipeline pipeline = 2; */
         if (message.pipeline)
             Pipeline.internalBinaryWrite(message.pipeline, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* repeated protos.Audience paused = 3; */
-        for (let i = 0; i < message.paused.length; i++)
-            Audience.internalBinaryWrite(message.paused[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

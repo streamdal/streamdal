@@ -41,7 +41,8 @@ class Pipeline$Type extends MessageType {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep },
-            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig }
+            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
+            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -68,6 +69,9 @@ class Pipeline$Type extends MessageType {
                 case /* repeated protos.NotificationConfig _notification_configs */ 4:
                     message.NotificationConfigs.push(NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* optional bool _paused */ 1000:
+                    message.Paused = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -92,6 +96,9 @@ class Pipeline$Type extends MessageType {
         /* repeated protos.NotificationConfig _notification_configs = 4; */
         for (let i = 0; i < message.NotificationConfigs.length; i++)
             NotificationConfig.internalBinaryWrite(message.NotificationConfigs[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* optional bool _paused = 1000; */
+        if (message.Paused !== undefined)
+            writer.tag(1000, WireType.Varint).bool(message.Paused);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

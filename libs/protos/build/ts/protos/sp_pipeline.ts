@@ -56,6 +56,12 @@ export interface Pipeline {
      * @generated from protobuf field: repeated protos.NotificationConfig _notification_configs = 4;
      */
     NotificationConfigs: NotificationConfig[]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Indicates whether the pipeline is paused or not. Used internally by server.
+     *
+     * @generated from protobuf field: optional bool _paused = 1000;
+     */
+    Paused?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
@@ -233,7 +239,8 @@ class Pipeline$Type extends MessageType<Pipeline> {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep },
-            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig }
+            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
+            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<Pipeline>): Pipeline {
@@ -260,6 +267,9 @@ class Pipeline$Type extends MessageType<Pipeline> {
                 case /* repeated protos.NotificationConfig _notification_configs */ 4:
                     message.NotificationConfigs.push(NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* optional bool _paused */ 1000:
+                    message.Paused = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -284,6 +294,9 @@ class Pipeline$Type extends MessageType<Pipeline> {
         /* repeated protos.NotificationConfig _notification_configs = 4; */
         for (let i = 0; i < message.NotificationConfigs.length; i++)
             NotificationConfig.internalBinaryWrite(message.NotificationConfigs[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* optional bool _paused = 1000; */
+        if (message.Paused !== undefined)
+            writer.tag(1000, WireType.Varint).bool(message.Paused);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
