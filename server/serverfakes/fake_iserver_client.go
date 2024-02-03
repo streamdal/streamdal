@@ -11,18 +11,18 @@ import (
 )
 
 type FakeIServerClient struct {
-	GetAttachCommandsByServiceStub        func(context.Context, string) (*protos.GetAttachCommandsByServiceResponse, error)
-	getAttachCommandsByServiceMutex       sync.RWMutex
-	getAttachCommandsByServiceArgsForCall []struct {
+	GetSetPipelinesCommandByServiceStub        func(context.Context, string) (*protos.GetSetPipelinesCommandsByServiceResponse, error)
+	getSetPipelinesCommandByServiceMutex       sync.RWMutex
+	getSetPipelinesCommandByServiceArgsForCall []struct {
 		arg1 context.Context
 		arg2 string
 	}
-	getAttachCommandsByServiceReturns struct {
-		result1 *protos.GetAttachCommandsByServiceResponse
+	getSetPipelinesCommandByServiceReturns struct {
+		result1 *protos.GetSetPipelinesCommandsByServiceResponse
 		result2 error
 	}
-	getAttachCommandsByServiceReturnsOnCall map[int]struct {
-		result1 *protos.GetAttachCommandsByServiceResponse
+	getSetPipelinesCommandByServiceReturnsOnCall map[int]struct {
+		result1 *protos.GetSetPipelinesCommandsByServiceResponse
 		result2 error
 	}
 	GetTailStreamStub        func(context.Context) (protos.Internal_SendTailClient, error)
@@ -130,17 +130,17 @@ type FakeIServerClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByService(arg1 context.Context, arg2 string) (*protos.GetAttachCommandsByServiceResponse, error) {
-	fake.getAttachCommandsByServiceMutex.Lock()
-	ret, specificReturn := fake.getAttachCommandsByServiceReturnsOnCall[len(fake.getAttachCommandsByServiceArgsForCall)]
-	fake.getAttachCommandsByServiceArgsForCall = append(fake.getAttachCommandsByServiceArgsForCall, struct {
+func (fake *FakeIServerClient) GetSetPipelinesCommandByService(arg1 context.Context, arg2 string) (*protos.GetSetPipelinesCommandsByServiceResponse, error) {
+	fake.getSetPipelinesCommandByServiceMutex.Lock()
+	ret, specificReturn := fake.getSetPipelinesCommandByServiceReturnsOnCall[len(fake.getSetPipelinesCommandByServiceArgsForCall)]
+	fake.getSetPipelinesCommandByServiceArgsForCall = append(fake.getSetPipelinesCommandByServiceArgsForCall, struct {
 		arg1 context.Context
 		arg2 string
 	}{arg1, arg2})
-	stub := fake.GetAttachCommandsByServiceStub
-	fakeReturns := fake.getAttachCommandsByServiceReturns
-	fake.recordInvocation("GetAttachCommandsByService", []interface{}{arg1, arg2})
-	fake.getAttachCommandsByServiceMutex.Unlock()
+	stub := fake.GetSetPipelinesCommandByServiceStub
+	fakeReturns := fake.getSetPipelinesCommandByServiceReturns
+	fake.recordInvocation("GetSetPipelinesCommandByService", []interface{}{arg1, arg2})
+	fake.getSetPipelinesCommandByServiceMutex.Unlock()
 	if stub != nil {
 		return stub(arg1, arg2)
 	}
@@ -150,47 +150,47 @@ func (fake *FakeIServerClient) GetAttachCommandsByService(arg1 context.Context, 
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceCallCount() int {
-	fake.getAttachCommandsByServiceMutex.RLock()
-	defer fake.getAttachCommandsByServiceMutex.RUnlock()
-	return len(fake.getAttachCommandsByServiceArgsForCall)
+func (fake *FakeIServerClient) GetSetPipelinesCommandByServiceCallCount() int {
+	fake.getSetPipelinesCommandByServiceMutex.RLock()
+	defer fake.getSetPipelinesCommandByServiceMutex.RUnlock()
+	return len(fake.getSetPipelinesCommandByServiceArgsForCall)
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceCalls(stub func(context.Context, string) (*protos.GetAttachCommandsByServiceResponse, error)) {
-	fake.getAttachCommandsByServiceMutex.Lock()
-	defer fake.getAttachCommandsByServiceMutex.Unlock()
-	fake.GetAttachCommandsByServiceStub = stub
+func (fake *FakeIServerClient) GetSetPipelinesCommandByServiceCalls(stub func(context.Context, string) (*protos.GetSetPipelinesCommandsByServiceResponse, error)) {
+	fake.getSetPipelinesCommandByServiceMutex.Lock()
+	defer fake.getSetPipelinesCommandByServiceMutex.Unlock()
+	fake.GetSetPipelinesCommandByServiceStub = stub
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceArgsForCall(i int) (context.Context, string) {
-	fake.getAttachCommandsByServiceMutex.RLock()
-	defer fake.getAttachCommandsByServiceMutex.RUnlock()
-	argsForCall := fake.getAttachCommandsByServiceArgsForCall[i]
+func (fake *FakeIServerClient) GetSetPipelinesCommandByServiceArgsForCall(i int) (context.Context, string) {
+	fake.getSetPipelinesCommandByServiceMutex.RLock()
+	defer fake.getSetPipelinesCommandByServiceMutex.RUnlock()
+	argsForCall := fake.getSetPipelinesCommandByServiceArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceReturns(result1 *protos.GetAttachCommandsByServiceResponse, result2 error) {
-	fake.getAttachCommandsByServiceMutex.Lock()
-	defer fake.getAttachCommandsByServiceMutex.Unlock()
-	fake.GetAttachCommandsByServiceStub = nil
-	fake.getAttachCommandsByServiceReturns = struct {
-		result1 *protos.GetAttachCommandsByServiceResponse
+func (fake *FakeIServerClient) GetSetPipelinesCommandByServiceReturns(result1 *protos.GetSetPipelinesCommandsByServiceResponse, result2 error) {
+	fake.getSetPipelinesCommandByServiceMutex.Lock()
+	defer fake.getSetPipelinesCommandByServiceMutex.Unlock()
+	fake.GetSetPipelinesCommandByServiceStub = nil
+	fake.getSetPipelinesCommandByServiceReturns = struct {
+		result1 *protos.GetSetPipelinesCommandsByServiceResponse
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *FakeIServerClient) GetAttachCommandsByServiceReturnsOnCall(i int, result1 *protos.GetAttachCommandsByServiceResponse, result2 error) {
-	fake.getAttachCommandsByServiceMutex.Lock()
-	defer fake.getAttachCommandsByServiceMutex.Unlock()
-	fake.GetAttachCommandsByServiceStub = nil
-	if fake.getAttachCommandsByServiceReturnsOnCall == nil {
-		fake.getAttachCommandsByServiceReturnsOnCall = make(map[int]struct {
-			result1 *protos.GetAttachCommandsByServiceResponse
+func (fake *FakeIServerClient) GetSetPipelinesCommandByServiceReturnsOnCall(i int, result1 *protos.GetSetPipelinesCommandsByServiceResponse, result2 error) {
+	fake.getSetPipelinesCommandByServiceMutex.Lock()
+	defer fake.getSetPipelinesCommandByServiceMutex.Unlock()
+	fake.GetSetPipelinesCommandByServiceStub = nil
+	if fake.getSetPipelinesCommandByServiceReturnsOnCall == nil {
+		fake.getSetPipelinesCommandByServiceReturnsOnCall = make(map[int]struct {
+			result1 *protos.GetSetPipelinesCommandsByServiceResponse
 			result2 error
 		})
 	}
-	fake.getAttachCommandsByServiceReturnsOnCall[i] = struct {
-		result1 *protos.GetAttachCommandsByServiceResponse
+	fake.getSetPipelinesCommandByServiceReturnsOnCall[i] = struct {
+		result1 *protos.GetSetPipelinesCommandsByServiceResponse
 		result2 error
 	}{result1, result2}
 }
@@ -704,8 +704,8 @@ func (fake *FakeIServerClient) SendSchemaReturnsOnCall(i int, result1 error) {
 func (fake *FakeIServerClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.getAttachCommandsByServiceMutex.RLock()
-	defer fake.getAttachCommandsByServiceMutex.RUnlock()
+	fake.getSetPipelinesCommandByServiceMutex.RLock()
+	defer fake.getSetPipelinesCommandByServiceMutex.RUnlock()
 	fake.getTailStreamMutex.RLock()
 	defer fake.getTailStreamMutex.RUnlock()
 	fake.heartBeatMutex.RLock()

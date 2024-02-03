@@ -20,9 +20,9 @@ import (
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IServerClient
 type IServerClient interface {
-	// GetAttachCommandsByService is called in New() in order to get all AttachCommands in a synchronous manner
+	// GetSetPipelinesCommandByService is called in New() in order to get all AttachCommands in a synchronous manner
 	// before we allow the client to start processing.
-	GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error)
+	GetSetPipelinesCommandByService(ctx context.Context, service string) (*protos.GetSetPipelinesCommandsByServiceResponse, error)
 
 	// GetTailStream returns a gRPC client stream used to send TailResponses to the streamdal server
 	GetTailStream(ctx context.Context) (protos.Internal_SendTailClient, error)
@@ -196,12 +196,12 @@ func (c *Client) HeartBeat(ctx context.Context, req *protos.HeartbeatRequest) er
 	return err
 }
 
-func (c *Client) GetAttachCommandsByService(ctx context.Context, service string) (*protos.GetAttachCommandsByServiceResponse, error) {
+func (c *Client) GetSetPipelinesCommandByService(ctx context.Context, service string) (*protos.GetSetPipelinesCommandsByServiceResponse, error) {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
-	resp, err := c.Server.GetAttachCommandsByService(ctx, &protos.GetAttachCommandsByServiceRequest{ServiceName: service})
+	resp, err := c.Server.GetSetPipelinesCommandsByService(ctx, &protos.GetSetPipelinesCommandsByServiceRequest{ServiceName: service})
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get attach commands by service")
+		return nil, errors.Wrap(err, "unable to get set pipeline commands by service")
 	}
 
 	return resp, nil

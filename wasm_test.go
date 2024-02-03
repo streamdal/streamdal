@@ -41,7 +41,7 @@ var _ = Describe("WASM Modules", func() {
 
 			s = &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string]map[string]*protos.Command{},
+				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
@@ -110,7 +110,7 @@ var _ = Describe("WASM Modules", func() {
 
 			s := &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string]map[string]*protos.Command{},
+				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
@@ -172,7 +172,7 @@ var _ = Describe("WASM Modules", func() {
 
 			s = &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string]map[string]*protos.Command{},
+				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
@@ -263,7 +263,7 @@ var _ = Describe("WASM Modules", func() {
 		BeforeEach(func() {
 			s = &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string]map[string]*protos.Command{},
+				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
@@ -497,7 +497,7 @@ var _ = Describe("WASM Modules", func() {
 
 			s = &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string]map[string]*protos.Command{},
+				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
@@ -581,7 +581,7 @@ var _ = Describe("WASM Modules", func() {
 
 			s = &Streamdal{
 				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string]map[string]*protos.Command{},
+				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
 			}
