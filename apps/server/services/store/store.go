@@ -74,14 +74,12 @@ type IStore interface {
 	GetAllConfig(ctx context.Context) (map[*protos.Audience][]*protos.Pipeline, error)
 	GetConfigByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error)
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
-	GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
 	DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	SetPauseResume(ctx context.Context, audience *protos.Audience, pipelineID string, pause bool) (bool, error)
-	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
@@ -430,8 +428,10 @@ func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesReques
 	}
 
 	// Save to K/V
-	if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(req.Audience)), data, 0).Err(); err != nil {
-		return errors.Wrap(err, "error saving pipeline to store")
+	key := RedisAudienceKey(util.AudienceToStr(req.Audience))
+
+	if err := s.options.RedisBackend.Set(ctx, key, data, 0).Err(); err != nil {
+		return errors.Wrapf(err, "error saving pipeline to store in key '%s'", key)
 	}
 
 	return nil
@@ -500,13 +500,15 @@ func (s *Store) SetPauseResume(ctx context.Context, audience *protos.Audience, p
 	}
 
 	// Fetch pipeline config for this audience
-	setPipelineConfigData, err := s.options.RedisBackend.Get(ctx, fmt.Sprintf(RedisAudienceKeyFormat, util.AudienceToStr(audience))).Result()
+	key := RedisAudienceKey(util.AudienceToStr(audience))
+
+	setPipelineConfigData, err := s.options.RedisBackend.Get(ctx, key).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return false, ErrConfigNotFound
 		}
 
-		return false, errors.Wrap(err, "error fetching pipeline config")
+		return false, errors.Wrapf(err, "error fetching pipeline config under key '%s'", key)
 	}
 
 	setPipelineConfigs := make([]*SetPipelinesConfig, 0)
@@ -537,27 +539,6 @@ func (s *Store) SetPauseResume(ctx context.Context, audience *protos.Audience, p
 	}
 
 	return updated, nil
-}
-
-// IsPaused returns if pipeline is paused and if it exists
-// DEV (DONE): Needs to be updated to work with ordered pipelines
-func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
-	llog := s.log.WithField("method", "IsPaused")
-	llog.Debug("received request to check if pipeline is paused")
-
-	// Fetch pipeline config
-	pipelines, err := s.GetConfigByAudience(ctx, audience)
-	if err != nil {
-		return false, errors.Wrapf(err, "unable to fetch pipeline '%s' for audience '%s'", pipelineID, util.AudienceToStr(audience))
-	}
-
-	for _, p := range pipelines {
-		if p.Id == pipelineID {
-			return p.GetXPaused(), nil
-		}
-	}
-
-	return false, nil
 }
 
 func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64) {
@@ -657,9 +638,7 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	return nil
 }
 
-// DEV (DONE): Updated
-// DEV: Needs tests
-// Returns a map of audience -> pipeline IDs
+// GetAllConfig returns all audience -> pipeline configuration mappings
 func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience][]*protos.Pipeline, error) {
 	cfgs := make(map[*protos.Audience][]*protos.Pipeline)
 
@@ -1152,30 +1131,6 @@ func (s *Store) GetAudiencesByService(ctx context.Context, serviceName string) (
 	}
 
 	return audiences, nil
-}
-
-// DEV (DONE): Needs to be updated to read all audience K/V's for ordered pipelines
-func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error) {
-	// Get all configs
-	cfgs, err := s.GetAllConfig(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "error getting all configs")
-	}
-
-	pausedMap := make(map[string]*types.PausedEntry)
-
-	for aud, pipelines := range cfgs {
-		for _, pipeline := range pipelines {
-			if pipeline.XPaused != nil && *pipeline.XPaused == true {
-				pausedMap[pipeline.Id] = &types.PausedEntry{
-					Audience:   aud,
-					PipelineID: pipeline.Id,
-				}
-			}
-		}
-	}
-
-	return pausedMap, nil
 }
 
 // DEV (DONE): Needs to be updated to read all audience K/V's for ordered pipelines

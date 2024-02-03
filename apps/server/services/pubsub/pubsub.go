@@ -54,8 +54,6 @@ func New() *PubSub {
 }
 
 func (ps *PubSub) Listen(topic string, channelID ...string) chan interface{} {
-	ps.log.Debugf("asked to listen on topic '%s', channel id '%s'", topic, channelID)
-
 	var id string
 
 	if len(channelID) > 0 {

@@ -63,7 +63,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 	}
 
 	// Fetch all defined pipelines
-	pipelines, err := s.getAllPipelines(ctx)
+	pipelines, err := s.getAllPipelineInfo(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
@@ -224,8 +224,10 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 	return liveInfo, nil
 }
 
-// DEV: Ordered-pipelines (DONE)
-func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
+// getAllPipelineInfo returns a map of pipeline IDs to pipeline info.
+// *protos.PipelineInfo contains the pipeline itself and a list of audiences the
+// pipeline is attached to.
+func (s *ExternalServer) getAllPipelineInfo(ctx context.Context) (map[string]*protos.PipelineInfo, error) {
 	gen := make(map[string]*protos.PipelineInfo)
 
 	// Get all pipelines
@@ -259,24 +261,10 @@ func (s *ExternalServer) getAllPipelines(ctx context.Context) (map[string]*proto
 		}
 	}
 
-	// Update pipeline info with state info
-	// TODO: As of 01.27.2024, this is unnecessary as Paused status is stored
-	// in *protos.Pipeline. Keeping this here to reduce refactor size in UI.
-	pausedPipelines, err := s.Options.StoreService.GetPaused(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get paused pipelines")
-	}
-
-	for _, p := range pausedPipelines {
-		if _, ok := gen[p.PipelineID]; ok {
-			gen[p.PipelineID].Paused = append(gen[p.PipelineID].Paused, p.Audience)
-		}
-	}
-
 	return gen, nil
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
+// GetPipelines returns a list of all known pipelines.
 func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipelinesRequest) (*protos.GetPipelinesResponse, error) {
 	if err := validate.GetPipelinesRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipelines request")
@@ -303,7 +291,7 @@ func (s *ExternalServer) GetPipelines(ctx context.Context, req *protos.GetPipeli
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
+// GetPipeline returns a single pipeline by ID.
 func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelineRequest) (*protos.GetPipelineResponse, error) {
 	if err := validate.GetPipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid get pipeline request")
@@ -329,7 +317,7 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
+// CreatePipeline creates a new pipeline and saves it to the store.
 func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreatePipelineRequest) (*protos.CreatePipelineResponse, error) {
 	if err := validate.CreatePipelineRequest(req); err != nil {
 		return nil, errors.Wrap(err, "invalid create pipeline request")
@@ -377,7 +365,9 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE - nothing to do)
+// UpdatePipeline updates an existing pipeline (and broadcasts the update which
+// will cause the broadcast handlers to emit SetPipeline commands to any
+// connected SDKs).
 func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdatePipelineRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdatePipelineRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -546,7 +536,10 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 		}
 	}
 
-	// TODO: @MG: Should we check if audience exists?
+	// 02.02.2024 - Decided to not require an audience check. This shouldn't
+	// cause any issues and would be helpful/needed for when we want to support
+	// setting up pipeline configurations via terraform and other automation
+	// tools.
 
 	// Get previous pipelines for telemetry
 	existingPipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
@@ -825,7 +818,10 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.Det
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE)
+// DeleteAudience will delete an audience. It will error if the audience has a
+// pipeline attached to it. To get around the error, you can set the "force"
+// bool in the request to true. This will delete the audience and emit a
+// SetPipelines command set to [] for any connected SDKs.
 func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteAudienceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
@@ -870,8 +866,8 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}, nil
 }
 
-// DEV: Ordered-pipelines (DONE)
-// This is basically delete by audience - except affects more than one audience
+// DeleteService is basically DeleteAudience - the only difference is that
+// DeleteService will (potentially) delete *multiple* audiences (instead of one).
 func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteServiceRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteServiceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil

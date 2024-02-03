@@ -454,9 +454,9 @@ func (b *Bus) sendSetPipelinesCommand(
 
 		llog.Debugf("sending SetPipelines command to session id '%s' on node '%s'", sessionID, b.options.NodeName)
 
-		// TODO: Need a more reliable writing mechanism - we can currently get
-		// stuck if ch goes away (SDK disconnects).
-
+		// TODO: Need to investigate and determine if this could panic as a
+		// result an SDK disconnecting and having the channel get closed. If so,
+		// need to implement a more reliable way to push the command.
 		ch <- &protos.Command{
 			Audience: aud,
 			Command: &protos.Command_SetPipelines{

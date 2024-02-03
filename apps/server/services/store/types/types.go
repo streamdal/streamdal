@@ -12,8 +12,3 @@ type LiveEntry struct {
 	Audience  *protos.Audience
 	Register  bool
 }
-
-type PausedEntry struct {
-	Audience   *protos.Audience
-	PipelineID string
-}

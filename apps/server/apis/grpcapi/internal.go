@@ -161,17 +161,23 @@ func (s *InternalServer) Register(request *protos.RegisterRequest, server protos
 
 	///////////////////////////////////////////////////////////////////////////
 	//
-	// IMPORTANT: Schema inference pipeline is injected in THREE places:
+	// IMPORTANT: Some info about schema inference pipeline injection
 	//
-	// 	1. ✅In broadcast handler for SetPipelinesRequest (when pipelines are
-	//	   attached/detached for live clients)
+	// 	1. Schema inference is a pipeline that consists of one step (infer schema)
+	//     and always return true (even if it runs into an error).
 	//
-	// 	2. ✅In internal.GetSetPipelinesCommand() which is called when a client
-	//	   registers for the first time
+	// 	2. SDKs should be aware of when they are executing a schema inference
+	//     pipeline and should be able to determine if schema has changed.
+	//     If it has, they should send the new schema to the server.
 	//
-	//  3. In internal.NewAudience() which is called by SDKs when they announce a
-	//     new pipeline - we need this so that we can determine the schema even
-	//     if the audience does not have any pipelines attached to it (yet)
+	//  3. Schema inference pipeline injection happens in multiple places:
+	//     handle{SetPipeline, DeletePipeline, DeleteAudience, PausePipeline,
+	//     ResumePipeline, NewAudience}Request and GetSetPipelinesCommandsByService.
+	//
+	//  4. Schema inference is *ALWAYS* injected as the *first* pipeline.
+	//
+	//  5. Schema inference is injected EVEN if an SDK has no pipelines attached
+	//     to it.
 	//
 	///////////////////////////////////////////////////////////////////////////
 

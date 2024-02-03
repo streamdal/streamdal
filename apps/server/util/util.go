@@ -191,10 +191,6 @@ func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmMod
 		// This is to prevent the WASM data from being duplicated in the response
 		for _, pipeline := range cmd.GetSetPipelines().Pipelines {
 			for _, step := range pipeline.Steps {
-				fmt.Printf("generating wasm mapping for pipeline id '%s', pipeline name: '%s' "+
-					"step name '%s', step wasm id: %s, step wasm len: %d\n", pipeline.Id, pipeline.Name,
-					step.Name, step.GetXWasmId(), len(step.GetXWasmBytes()))
-
 				if _, ok := wasmModules[step.GetXWasmId()]; ok {
 					step.XWasmBytes = nil
 					continue
