@@ -456,9 +456,6 @@ class PipelineInfo(betterproto.Message):
     pipeline: "Pipeline" = betterproto.message_field(2)
     """Pipeline config"""
 
-    paused: List["Audience"] = betterproto.message_field(3)
-    """For what audiences this pipeline is paused (none if empty)"""
-
 
 @dataclass(eq=False, repr=False)
 class ClientInfo(betterproto.Message):

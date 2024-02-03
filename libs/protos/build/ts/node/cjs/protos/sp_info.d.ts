@@ -37,12 +37,6 @@ export interface PipelineInfo {
      * @generated from protobuf field: protos.Pipeline pipeline = 2;
      */
     pipeline?: Pipeline;
-    /**
-     * For what audiences this pipeline is paused (none if empty)
-     *
-     * @generated from protobuf field: repeated protos.Audience paused = 3;
-     */
-    paused: Audience[];
 }
 /**
  * Most of this is constructed by client SDKs and provided during Register call

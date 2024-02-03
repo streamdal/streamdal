@@ -42,14 +42,12 @@ class LiveInfo(_message.Message):
     def __init__(self, audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., client: _Optional[_Union[ClientInfo, _Mapping]] = ...) -> None: ...
 
 class PipelineInfo(_message.Message):
-    __slots__ = ["audiences", "paused", "pipeline"]
+    __slots__ = ["audiences", "pipeline"]
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
-    PAUSED_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
     audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
-    paused: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
     pipeline: _sp_pipeline_pb2.Pipeline
-    def __init__(self, audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ..., paused: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
 
 class ClientType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
