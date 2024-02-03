@@ -23,7 +23,7 @@ require (
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
 	github.com/sirupsen/logrus v1.9.3
 	github.com/slack-go/slack v0.12.3
-	github.com/streamdal/streamdal/libs/protos v0.1.17-0.20240129193545-8d8c941ad631
+	github.com/streamdal/streamdal/libs/protos v0.1.17
 	github.com/tidwall/gjson v1.16.0
 	golang.org/x/crypto v0.18.0
 	google.golang.org/grpc v1.60.1
