@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   streamdal-server:
-    image: streamdal/server:latest
+    image: streamdal/server:0.0.16-40a202c
     depends_on:
       - redis
     environment:
