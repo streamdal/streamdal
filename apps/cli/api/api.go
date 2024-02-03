@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"google.golang.org/grpc"
@@ -123,6 +124,7 @@ func (a *API) Tail(ctx context.Context, audience *protos.Audience) (chan *protos
 	a.log.Debugf("sending Tail request for audience: %+v", audience)
 
 	grpcCall, err := a.client.Tail(ctx, &protos.TailRequest{
+		Id:       uuid.New().String(),
 		Type:     protos.TailRequestType_TAIL_REQUEST_TYPE_START,
 		Audience: audience,
 	})
