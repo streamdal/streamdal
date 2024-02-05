@@ -7,7 +7,7 @@ import { opModal } from "../serviceMap/opModalSignal.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { serviceSignal } from "../serviceMap/serviceSignal.ts";
 
-export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
+const updateSignal = (audience: Audience, pipeline: Pipeline) => {
   serviceSignal.value = {
     ...serviceSignal.value,
     pipelines: {
@@ -15,7 +15,9 @@ export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
       [pipeline.id]: {
         ...serviceSignal.value.pipelines[pipeline.id],
         audiences: [
-          ...serviceSignal.value.pipelines[pipeline.id].audiences,
+          ...serviceSignal.value.pipelines[pipeline.id]
+            ? serviceSignal.value.pipelines[pipeline.id].audiences
+            : [],
           ...[audience],
         ],
       },
@@ -24,15 +26,17 @@ export const attachPipeline = (audience: Audience, pipeline: Pipeline) => {
 };
 
 export const AttachPipelineModal = (
-  { audience }: { audience: Audience },
+  { audience, attachPipeline }: {
+    audience: Audience;
+    attachPipeline: Pipeline;
+  },
 ) => {
-  const pipeline = opModal.value.attachPipeline;
   const close = () =>
     opModal.value = { ...opModal.value, attachPipeline: null };
 
   const attach = async () => {
     const response = await fetch(
-      `${getAudienceOpRoute(audience)}/pipeline/${pipeline.id}/attach`,
+      `${getAudienceOpRoute(audience)}/pipeline/${attachPipeline.id}/attach`,
       {
         method: "POST",
       },
@@ -41,7 +45,7 @@ export const AttachPipelineModal = (
     const { success } = await response.json();
 
     if (success.message) {
-      attachPipeline(audience, pipeline);
+      updateSignal(audience, attachPipeline);
       toastSignal.value = {
         id: "pipelineCrud",
         type: success.status ? "success" : "error",
@@ -68,7 +72,7 @@ export const AttachPipelineModal = (
             <div class="my-4">
               Attach pipeline{" "}
               <span class="my-5 text-medium font-bold ">
-                {pipeline.name}
+                {attachPipeline.name}
               </span>{" "}
               from operation{" "}
               <span class="my-5 text-medium font-bold ">

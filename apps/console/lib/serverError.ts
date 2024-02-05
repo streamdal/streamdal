@@ -5,4 +5,4 @@ import { signal } from "@preact/signals";
 // our streaming clients lose connection.
 export const SERVER_ERROR =
   "Unable to fetch data from the Streamdal Server. Is it up and running?";
-export const serverErrorSignal = signal<string | null>(null);
+export const serverErrorSignal = signal<string>("");

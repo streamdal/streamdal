@@ -9,15 +9,13 @@ export const Schema = (
   { audience }: { audience: Audience },
 ) => {
   const getSchema = async () => {
-    const response = await fetch(`${getAudienceOpRoute(audience)}/schema`, {
-      method: "GET",
-    });
-    return response.json();
-  };
-
-  useEffect(async () => {
     try {
-      const schemaInfo = await getSchema();
+      const response = await fetch(`${getAudienceOpRoute(audience)}/schema`, {
+        method: "GET",
+      });
+
+      const schemaInfo = await response.json();
+
       opModal.value = {
         ...opModal.value,
         schemaInfo,
@@ -25,6 +23,10 @@ export const Schema = (
     } catch (e) {
       console.error("Error fetching schema", e);
     }
+  };
+
+  useEffect(() => {
+    void getSchema();
   }, [audience]);
 
   return (

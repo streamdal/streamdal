@@ -7,15 +7,15 @@ import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "../../lib/utils.ts";
 import { useEffect, useState } from "preact/hooks";
 import { initFlowbite } from "flowbite";
-import Pipeline from "../../islands/pipeline.tsx";
 import { serviceSignal } from "../serviceMap/serviceSignal.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 
 const AttachDetach = (
   { pipeline, attached }: { pipeline: Pipeline; attached: boolean },
 ) => {
   const [checked, setChecked] = useState(false);
 
-  const toggle = (e) => {
+  const toggle = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
     opModal.value = {
@@ -106,13 +106,12 @@ export const PipelineActionMenu = (
     pipeline: Pipeline;
   },
 ) => {
-  const attached = serviceSignal.value?.pipelines[pipeline.id].audiences?.some((
+  const attached = serviceSignal.value.pipelines[pipeline.id]?.audiences?.some((
     a: Audience,
   ) => audienceKey(a) === audienceKey(audience));
 
-  const paused = serviceSignal.value?.pipelines[pipeline.id].paused?.some((
-    a: Audience,
-  ) => audienceKey(a) === audienceKey(audience));
+  const paused = !!serviceSignal.value?.pipelines[pipeline.id]?.pipeline
+    ?.Paused;
 
   useEffect(() => {
     //

@@ -3,7 +3,8 @@ import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
 import { audienceKey, componentKey, groupKey, serviceKey } from "./utils.ts";
 import { ServiceMapper } from "./serviceMapper.ts";
 import { GROUP_MARGIN, GROUP_WIDTH } from "../islands/customNodes.tsx";
-import { MarkerType } from "reactflow";
+import { CoordinateExtent, MarkerType } from "reactflow";
+import { Position } from "reactflow";
 
 export type Operation = {
   audience: Audience;
@@ -20,16 +21,16 @@ export type FlowNode = {
   id: string;
   type?: string;
   dragHandle?: string;
-  draggable?: true;
-  position?: {
+  draggable?: boolean;
+  position: {
     x: number;
     y: number;
   };
-  sourcePosition?: string;
-  targetPosition?: string;
+  sourcePosition?: Position;
+  targetPosition?: Position;
   data: NodeData;
   parentNode?: string;
-  extent?: string;
+  extent?: "parent" | CoordinateExtent;
   style?: any;
 };
 

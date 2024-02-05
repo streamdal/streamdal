@@ -8,7 +8,6 @@ import {
   AbortCondition,
   Pipeline,
   PipelineStep,
-  PipelineStepConditions,
 } from "streamdal-protos/protos/sp_pipeline.ts";
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 import {
@@ -297,6 +296,8 @@ const stepSchema = z.object({
   // If this is non-dynamic transform step, path is required
   if (
     step?.step?.oneofKind === "transform" && !step.dynamic &&
+    step?.step?.transform
+        ?.options?.oneofKind !== "extractOptions" &&
     !step?.step?.transform
       ?.options[step?.step?.transform?.options?.oneofKind]?.path
   ) {
