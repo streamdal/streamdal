@@ -58,61 +58,60 @@ class TestTailRequest:
             validation.tail_request(self.cmd)
 
 
-class TestAttachPipeline:
+class TestSetPipelines:
     def test_valid_input(self):
         # Create a valid protos.Command object
         cmd = protos.Command(
             audience=protos.Audience(),
-            attach_pipeline=protos.AttachPipelineCommand(
-                pipeline=protos.Pipeline(id="some_id")
+            set_pipelines=protos.SetPipelinesCommand(
+                pipelines=[protos.Pipeline(id="some_id")]
             ),
         )
 
         # The function should not raise any exceptions for valid input
-        validation.attach_pipeline(cmd)
+        validation.set_pipelines(cmd)
 
     def test_invalid_command_type(self):
         with pytest.raises(ValueError, match="cmd must be a protos.Command"):
-            validation.attach_pipeline(
+            validation.set_pipelines(
                 None
             )  # Passing a mock object instead of a protos.Command
 
     def test_invalid_audience_type(self):
         invalid_cmd = protos.Command(
-            audience=protos.Command(),
-            attach_pipeline=protos.AttachPipelineCommand(
-                pipeline=protos.Pipeline(id="some_id")
+            audience=None,
+            set_pipelines=protos.SetPipelinesCommand(
+                pipelines=[protos.Pipeline(id="some_id")]
             ),
         )
         with pytest.raises(ValueError, match="cmd.audience must be a protos.Audience"):
-            validation.attach_pipeline(invalid_cmd)
+            validation.set_pipelines(invalid_cmd)
 
     def test_invalid_attach_pipeline_type(self):
         invalid_cmd = protos.Command(
-            audience=protos.Audience(), attach_pipeline=protos.Command()
+            audience=protos.Audience(),
+            set_pipelines=None,
         )
         with pytest.raises(
             ValueError,
-            match="cmd.attach_pipeline must be a protos.AttachPipelineCommand",
+            match="cmd.set_pipelines must be a protos.SetPipelinesCommand",
         ):
-            validation.attach_pipeline(invalid_cmd)
+            validation.set_pipelines(invalid_cmd)
 
     def test_invalid_pipeline_type(self):
         invalid_cmd = protos.Command(
             audience=protos.Audience(),
-            attach_pipeline=protos.AttachPipelineCommand(pipeline=protos.Pipeline()),
+            set_pipelines=protos.SetPipelinesCommand(pipelines=[protos.Pipeline()]),
         )
         with pytest.raises(ValueError):
-            validation.attach_pipeline(invalid_cmd)
+            validation.set_pipelines(invalid_cmd)
 
     def test_empty_pipeline_id(self):
         invalid_cmd = protos.Command(
             audience=protos.Audience(),
-            attach_pipeline=protos.AttachPipelineCommand(
-                pipeline=protos.Pipeline(id="")
+            set_pipelines=protos.SetPipelinesCommand(
+                pipelines=[protos.Pipeline(id="")]
             ),
         )
-        with pytest.raises(
-            ValueError, match="cmd.attach_pipeline.pipeline.id must be non-empty"
-        ):
-            validation.attach_pipeline(invalid_cmd)
+        with pytest.raises(ValueError, match="pipeline.id must be non-empty"):
+            validation.set_pipelines(invalid_cmd)

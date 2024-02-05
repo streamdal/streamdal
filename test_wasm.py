@@ -48,13 +48,11 @@ class TestStreamdalWasm:
     def test_detective_wasm(self):
         """Test we can execute the detective wasm file"""
 
-        with open("./assets/test/detective.wasm", "rb") as file:
+        with open("./test-assets/wasm/detective.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="detective",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -84,13 +82,11 @@ class TestStreamdalWasm:
     def test_http_request_wasm(self):
         """Test we can execute http_request wasm file"""
 
-        with open("./assets/test/httprequest.wasm", "rb") as file:
+        with open("./test-assets/wasm/httprequest.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="httprequest test",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -111,13 +107,11 @@ class TestStreamdalWasm:
     def test_infer_schema(self):
         """Test we can infer schema from json using the wasm module"""
 
-        with open("./assets/test/inferschema.wasm", "rb") as file:
+        with open("./test-assets/wasm/inferschema.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="inferschema test",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -142,13 +136,11 @@ class TestStreamdalWasm:
     def test_transform_wasm_replace(self):
         """Test we can execute the transform wasm module"""
 
-        with open("./assets/test/transform.wasm", "rb") as file:
+        with open("./test-assets/wasm/transform.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="transform test - replace",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -175,13 +167,11 @@ class TestStreamdalWasm:
     def test_transform_wasm_truncate(self):
         """Test we can execute the transform wasm module"""
 
-        with open("./assets/test/transform.wasm", "rb") as file:
+        with open("./test-assets/wasm/transform.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="transform test - truncate",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -204,13 +194,11 @@ class TestStreamdalWasm:
         assert res.output_payload == b'{"object": {"payload": "old"}}'
 
     def test_validjson_wasm(self):
-        with open("./assets/test/validjson.wasm", "rb") as file:
+        with open("./test-assets/wasm/validjson.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="valid json test",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -240,13 +228,11 @@ class TestStreamdalWasm:
 
         self.client.kv.set("test", "test")
 
-        with open("./assets/test/kv.wasm", "rb") as file:
+        with open("./test-assets/wasm/kv.wasm", "rb") as file:
             wasm_bytes = file.read()
 
         step = protos.PipelineStep(
             name="KV exists test",
-            on_success=[],
-            on_failure=[],
             wasm_bytes=wasm_bytes,
             wasm_id=uuid.uuid4().__str__(),
             wasm_function="f",
@@ -266,11 +252,43 @@ class TestStreamdalWasm:
     def test_dynamic_transform(self):
         """Test that we can pass detective results to a transform step"""
 
-        with open("./assets/test/detective.wasm", "rb") as file:
+        with open("./test-assets/wasm/detective.wasm", "rb") as file:
             detective_wasm_bytes = file.read()
 
-        with open("./assets/test/transform.wasm", "rb") as file:
+        with open("./test-assets/wasm/transform.wasm", "rb") as file:
             transform_wasm_bytes = file.read()
+
+        pipeline = protos.Pipeline(
+            id=uuid.uuid4().__str__(),
+            steps=[
+                protos.PipelineStep(
+                    name="detective",
+                    wasm_bytes=detective_wasm_bytes,
+                    wasm_id=uuid.uuid4().__str__(),
+                    wasm_function="f",
+                    detective=protos.steps.DetectiveStep(
+                        path="",  # No path, we're searching the entire payload
+                        args=[""],
+                        negate=False,
+                        type=protos.steps.DetectiveType.DETECTIVE_TYPE_PII_EMAIL,
+                    ),
+                ),
+                protos.PipelineStep(
+                    dynamic=True,
+                    name="transform",
+                    wasm_bytes=transform_wasm_bytes,
+                    wasm_id=uuid.uuid4().__str__(),
+                    wasm_function="f",
+                    transform=protos.steps.TransformStep(
+                        type=protos.steps.TransformType.TRANSFORM_TYPE_REPLACE_VALUE,
+                        replace_value_options=protos.steps.TransformReplaceValueOptions(
+                            path="",  # No path, we're getting the result from the detective step
+                            value='"REDACTED"',
+                        ),
+                    ),
+                ),
+            ],
+        )
 
         cmd = protos.Command(
             audience=protos.Audience(
@@ -279,46 +297,12 @@ class TestStreamdalWasm:
                 operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
                 operation_name="test",
             ),
-            attach_pipeline=protos.AttachPipelineCommand(
-                pipeline=protos.Pipeline(
-                    id=uuid.uuid4().__str__(),
-                    steps=[
-                        protos.PipelineStep(
-                            name="detective",
-                            on_success=[],
-                            on_failure=[],
-                            wasm_bytes=detective_wasm_bytes,
-                            wasm_id=uuid.uuid4().__str__(),
-                            wasm_function="f",
-                            detective=protos.steps.DetectiveStep(
-                                path="",  # No path, we're searching the entire payload
-                                args=[""],
-                                negate=False,
-                                type=protos.steps.DetectiveType.DETECTIVE_TYPE_PII_EMAIL,
-                            ),
-                        ),
-                        protos.PipelineStep(
-                            dynamic=True,
-                            name="transform",
-                            on_success=[],
-                            on_failure=[],
-                            wasm_bytes=transform_wasm_bytes,
-                            wasm_id=uuid.uuid4().__str__(),
-                            wasm_function="f",
-                            transform=protos.steps.TransformStep(
-                                type=protos.steps.TransformType.TRANSFORM_TYPE_REPLACE_VALUE,
-                                replace_value_options=protos.steps.TransformReplaceValueOptions(
-                                    path="",  # No path, we're getting the result from the detective step
-                                    value='"REDACTED"',
-                                ),
-                            ),
-                        ),
-                    ],
-                )
+            set_pipelines=protos.SetPipelinesCommand(
+                pipelines=[pipeline],
             ),
         )
 
-        self.client._attach_pipeline(cmd)
+        self.client._set_pipelines(cmd)
         payload = b'{"users":[{"name": "Bob","email": "bob@streamdal.com"}]}'
 
         res = self.client.process(
@@ -331,5 +315,5 @@ class TestStreamdalWasm:
         )
 
         assert res is not None
-        assert res.error is False
+        assert res.status == protos.ExecStatus.EXEC_STATUS_TRUE
         assert res.data == b'{"users":[{"name": "Bob","email": "REDACTED"}]}'

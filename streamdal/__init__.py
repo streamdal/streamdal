@@ -97,7 +97,6 @@ class StreamdalConfig:
 class StreamdalClient:
     cfg: StreamdalConfig
     pipelines: dict
-    paused_pipelines: dict
     log: logging.Logger
     metrics: Metrics
     kv: KV
@@ -155,7 +154,6 @@ class StreamdalClient:
         self.auth_token = cfg.streamdal_token
         self.grpc_timeout = 5
         self.pipelines = {}
-        self.paused_pipelines = {}
         self.audiences = {}
         self.tails = {}
         self.paused_tails = {}
@@ -196,40 +194,21 @@ class StreamdalClient:
 
     def _pull_initial_pipelines(self):
         async def call():
-            req = protos.GetAttachCommandsByServiceRequest(
-                service_name=self.cfg.service_name
+            cmds = await self.grpc_stub.get_set_pipelines_commands_by_service(
+                protos.GetSetPipelinesCommandsByServiceRequest(
+                    service_name=self.cfg.service_name
+                ),
+                metadata=self._get_metadata(),
             )
-            cmds = await self.grpc_stub.get_attach_commands_by_service(
-                req, metadata=self._get_metadata()
-            )
 
-            for cmd in cmds.active:
-                for step in cmd.attach_pipeline.pipeline.steps:
-                    if step.wasm_id in cmds.wasm_modules:
-                        step.wasm_bytes = cmds.wasm_modules[step.wasm_id]
-                    else:
-                        self.log.error(f"BUG: missing wasm module {step.wasm_id}")
-                self._attach_pipeline(cmd)
-
-            for cmd in cmds.paused:
-                for step in cmd.attach_pipeline.pipeline.steps:
-                    if step.wasm_id in cmds.wasm_modules:
-                        step.wasm_bytes = cmds.wasm_modules[step.wasm_id]
-                    else:
-                        self.log.error(f"BUG: missing wasm module {step.wasm_id}")
-
-                aud_str = common.aud_to_str(cmd.audience)
-
-                if self.paused_pipelines.get(aud_str) is None:
-                    self.paused_pipelines[aud_str] = {}
-
-                self.paused_pipelines[aud_str][cmd.attach_pipeline.pipeline.id] = cmd
-
-                self.log.debug(
-                    "Adding pipeline {} to paused pipelines".format(
-                        cmd.attach_pipeline.pipeline.id
-                    )
-                )
+            for cmd in cmds.set_pipeline_commands:
+                for pipeline in cmd.set_pipelines.pipelines:
+                    for step in pipeline.steps:
+                        if step.wasm_id in cmds.wasm_modules:
+                            step.wasm_bytes = cmds.wasm_modules[step.wasm_id]
+                        else:
+                            self.log.error(f"BUG: missing wasm module {step.wasm_id}")
+                    self._attach_pipeline(cmd)
 
         self.grpc_loop.run_until_complete(call())
 
@@ -277,8 +256,7 @@ class StreamdalClient:
 
         resp = protos.SdkResponse(
             data=copy(req.data),
-            error=False,
-            error_message="",
+            status=protos.ExecStatus.EXEC_STATUS_TRUE,
             pipeline_status=[],
         )
 
@@ -344,19 +322,16 @@ class StreamdalClient:
         # Needed for send_tail()
         original_data = copy(req.data)
 
-        pipes = pipelines.copy()
-
         # Used for passing data between steps
         isr = None
 
-        for _, cmd in pipes.items():
+        for pipeline in pipelines:
             pipeline_status = protos.PipelineStatus(
-                id=cmd.attach_pipeline.pipeline.id,
-                name=cmd.attach_pipeline.pipeline.name,
+                id=pipeline.id,
+                name=pipeline.name,
                 step_status=[],
             )
 
-            pipeline = cmd.attach_pipeline.pipeline
             self.log.debug("Running pipeline '{}'".format(pipeline.name))
 
             labels["pipeline_id"] = pipeline.id
@@ -375,9 +350,7 @@ class StreamdalClient:
             for step in pipeline.steps:
                 step_status = protos.StepStatus(
                     name=step.name,
-                    error=False,
-                    error_message="",
-                    abort_status=protos.AbortStatus.ABORT_STATUS_UNSET,
+                    status=protos.ExecStatus.EXEC_STATUS_TRUE,
                 )
 
                 # Exec wasm
@@ -391,63 +364,73 @@ class StreamdalClient:
 
                 self._handle_schema(aud, step, wasm_resp)
 
-                # If successful, continue to next step, don't need to check conditions
-                if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
-                    # Grab inter-step result and pass to next step
-                    isr = wasm_resp.inter_step_result
+                # Grab inter-step result and pass to next step
+                isr = wasm_resp.inter_step_result
 
-                    if self.cfg.dry_run:
-                        self.log.debug(
-                            f"Step '{step.name}' succeeded, continuing to next step"
-                        )
-                        continue
+                # Figure out which condition we're checking
+                cond = step.on_true
+                exec_status = protos.ExecStatus.EXEC_STATUS_TRUE
+                if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_FALSE:
+                    cond = step.on_false
+                    exec_status = protos.ExecStatus.EXEC_STATUS_FALSE
+                elif wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_ERROR:
+                    cond = step.on_failure
+                    exec_status = protos.ExecStatus.EXEC_STATUS_ERROR
+                    isr = None  # avoid passing step result on error
 
-                    continue_pipeline, continue_process = self._handle_condition(
-                        step.on_failure, pipeline, step, cmd.audience
+                # Send notification if necessary
+                self._notify_condition(pipeline, step, aud, cond, resp.data)
+
+                # Continue to next step, nothing needed
+                if self.cfg.dry_run:
+                    self.log.debug(
+                        f"Step '{step.name}' succeeded, continuing to next step"
                     )
-                    if not continue_process:
-                        # Exit function early
-                        step_status.abort_status = protos.AbortStatus.ABORT_STATUS_ALL
-                        pipeline_status.step_status.append(step_status)
-                        resp.pipeline_status.append(pipeline_status)
-                        return resp
-                    if not continue_pipeline:
-                        # Continue outer pipeline loop if there are additional pipelines
-                        step_status.abort_status = (
-                            protos.AbortStatus.ABORT_STATUS_CURRENT
-                        )
-                        pipeline_status.step_status.append(step_status)
-                        resp.pipeline_status.append(pipeline_status)
-                        break
+                    continue
 
-                    continue  # Continue to next step as default
+                # Pull metadata from step into SDKResponse
+                if cond is not None:
+                    for k, v in cond.metadata.items():
+                        resp.metadata[k] = v
 
                 # Failure conditions
                 self.metrics.incr(
                     CounterEntry(name=errors_counter, value=1.0, labels=labels, aud=aud)
                 )
 
-                continue_pipeline, continue_process = self._handle_condition(
-                    step.on_failure, pipeline, step, cmd.audience
-                )
+                if (
+                    cond is not None
+                    and cond.abort
+                    == protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT
+                ):
+                    # Abort current pipline
+                    step_status.status = (
+                        protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT
+                    )
+                    step_status.status_message = "Step returned: " + wasm_resp.exit_msg
+                    pipeline_status.step_status.append(step_status)
+                    resp.pipeline_status.append(pipeline_status)
+                    # Continue outer pipeline loop if there are additional pipelines
+                    break
+                elif (
+                    cond is not None
+                    and cond.abort == protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
+                ):
+                    # Abort all pipelines
+                    self.metrics.incr(
+                        CounterEntry(
+                            name=errors_counter, value=1.0, labels=labels, aud=aud
+                        )
+                    )
 
-                step_status.error = True
-                step_status.error_message = "Step failed: " + wasm_resp.exit_msg
-
-                if not continue_process:
                     # Exit function early
-                    resp.error = True
-                    resp.error_message = step_status.error_message
-                    step_status.abort_status = protos.AbortStatus.ABORT_STATUS_ALL
+                    resp.status = exec_status
+                    resp.status_message = "Step returned: " + wasm_resp.exit_msg
+                    step_status.status_message = "Step returned: " + wasm_resp.exit_msg
+                    step_status.status = protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
                     pipeline_status.step_status.append(step_status)
                     resp.pipeline_status.append(pipeline_status)
                     return resp
-                if not continue_pipeline:
-                    # Continue outer pipeline loop if there are additional pipelines
-                    step_status.abort_status = protos.AbortStatus.ABORT_STATUS_CURRENT
-                    pipeline_status.step_status.append(step_status)
-                    resp.pipeline_status.append(pipeline_status)
-                    break
 
                 pipeline_status.step_status.append(step_status)
 
@@ -463,8 +446,25 @@ class StreamdalClient:
         return resp
 
     def _notify_condition(
-        self, pipeline: protos.Pipeline, step: protos.PipelineStep, aud: protos.Audience
+        self,
+        pipeline: protos.Pipeline,
+        step: protos.PipelineStep,
+        aud: protos.Audience,
+        cond: protos.PipelineStepConditions,
+        payload: bytes,
     ):
+        if cond is None:
+            return
+
+        # TODO: include payload when protos are updated
+        if not cond.notify:
+            return
+
+        self.log.debug("Notifying")
+
+        if self.cfg.dry_run:
+            return
+
         async def call():
             self.metrics.incr(
                 CounterEntry(
@@ -486,54 +486,18 @@ class StreamdalClient:
                 audience=aud,
                 step_name=step.name,
                 occurred_at_unix_ts_utc=int(datetime.datetime.utcnow().timestamp()),
+                # TODO: include payload
             )
 
             await self.grpc_stub.notify(
                 req, timeout=self.grpc_timeout, metadata=self._get_metadata()
             )
 
-        self.log.debug("Notifying")
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+        loop.run_until_complete(call())
 
-        if not self.cfg.dry_run:
-            loop.run_until_complete(call())
-
-    def _handle_condition(
-        self,
-        conditions: [],
-        pipeline: protos.Pipeline,
-        step: protos.PipelineStep,
-        aud: protos.Audience,
-    ) -> (bool, bool):
-        continue_pipeline = True
-        continue_process = True
-
-        for cond in conditions:
-            if cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_NOTIFY:
-                self._notify_condition(pipeline, step, aud)
-                self.log.debug(f"Step '{step.name}' failed, notifying")
-            elif (
-                cond
-                == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_CURRENT
-            ):
-                continue_pipeline = False
-                self.log.debug(
-                    f"Step '{step.name}' failed, aborting further pipeline steps"
-                )
-            elif cond == protos.PipelineStepCondition.PIPELINE_STEP_CONDITION_ABORT_ALL:
-                continue_pipeline = False
-                continue_process = False
-                self.log.debug(
-                    f"Step '{step.name}' failed, aborting further pipelines and steps"
-                )
-            else:
-                # We still need to continue to remaining steps after other conditions have been processed
-                self.log.debug(f"Step '{step.name}' failed, continuing to next step")
-
-        return continue_pipeline, continue_process
-
-    def _get_pipelines(self, aud: protos.Audience) -> dict:
+    def _get_pipelines(self, aud: protos.Audience) -> list[protos.Pipeline]:
         """
         Get pipelines for a given mode and operation
 
@@ -543,7 +507,7 @@ class StreamdalClient:
 
         pipelines = self.pipelines.get(aud_str)
         if pipelines is None:
-            return {}
+            return []
 
         return pipelines
 
@@ -707,14 +671,8 @@ class StreamdalClient:
         (command, _) = which_one_of(cmd, "command")
 
         try:
-            if command == "attach_pipeline":
-                self._attach_pipeline(cmd)
-            elif command == "detach_pipeline":
-                self._detach_pipeline(cmd)
-            elif command == "pause_pipeline":
-                self._pause_pipeline(cmd)
-            elif command == "resume_pipeline":
-                self._resume_pipeline(cmd)
+            if command == "set_pipelines":
+                self._set_pipelines(cmd)
             elif command == "keep_alive":
                 pass
             elif command == "tail":
@@ -758,92 +716,17 @@ class StreamdalClient:
 
         return pipeline
 
-    def _detach_pipeline(self, cmd: protos.Command) -> bool:
-        """Delete pipeline from internal map of pipelines"""
-        validation.detach_pipeline(cmd)
-
-        if cmd.audience.service_name != self.cfg.service_name:
-            self.log.debug("Service name does not match, ignoring")
-            return False
+    def _set_pipelines(self, cmd: protos.Command) -> bool:
+        """
+        Put pipelines in internal map of pipelines
+        """
+        validation.set_pipelines(cmd)
 
         aud_str = common.aud_to_str(cmd.audience)
 
+        self.pipelines[aud_str] = cmd.set_pipelines.pipelines
         self.log.debug(
-            f"Deleting pipeline {cmd.detach_pipeline.pipeline_id} for audience {aud_str}"
-        )
-
-        # Delete from all maps
-        self._pop_pipeline(self.pipelines, cmd, cmd.detach_pipeline.pipeline_id)
-        self._pop_pipeline(self.paused_pipelines, cmd, cmd.detach_pipeline.pipeline_id)
-
-        return True
-
-    def _attach_pipeline(self, cmd: protos.Command) -> bool:
-        """
-        Put pipeline in internal map of pipelines
-
-        If the pipeline is paused, the paused map will be updated, otherwise active will
-        This is to ensure pauses/resumes are explicit
-        """
-        validation.attach_pipeline(cmd)
-
-        pipeline_id = cmd.attach_pipeline.pipeline.id
-
-        if self._is_paused(cmd.audience, pipeline_id):
-            self.log.debug(f"Pipeline {pipeline_id} is paused, updating in paused list")
-            self._put_pipeline(self.paused_pipelines, cmd, pipeline_id)
-        else:
-            self.log.debug(
-                f"Pipeline {pipeline_id} is not paused, updating in active list"
-            )
-            self._put_pipeline(self.pipelines, cmd, pipeline_id)
-
-        return True
-
-    def _pause_pipeline(self, cmd: protos.Command) -> bool:
-        """Pauses execution of a specified pipeline"""
-        validation.pause_pipeline(cmd)
-
-        if cmd.audience.service_name != self.cfg.service_name:
-            self.log.debug("Service name does not match, ignoring")
-            return False
-
-        # Remove from pipelines and add to paused pipelines
-        pipeline = self._pop_pipeline(
-            self.pipelines, cmd, cmd.pause_pipeline.pipeline_id
-        )
-
-        self._put_pipeline(
-            self.paused_pipelines, pipeline, cmd.pause_pipeline.pipeline_id
-        )
-
-        return True
-
-    def _resume_pipeline(self, cmd: protos.Command) -> bool:
-        """Resumes execution of a specified pipeline"""
-        validation.resume_pipeline(cmd)
-
-        if cmd is None:
-            raise ValueError("Command is None")
-
-        if cmd.audience.operation_type == protos.OperationType.OPERATION_TYPE_UNSET:
-            raise ValueError("Operation type not set")
-
-        if cmd.audience.service_name != self.cfg.service_name:
-            self.log.debug("Service name does not match, ignoring")
-            return False
-
-        if not self._is_paused(cmd.audience, cmd.resume_pipeline.pipeline_id):
-            return False
-
-        # Remove from paused pipelines and add to pipelines
-        pipeline = self._pop_pipeline(
-            self.paused_pipelines, cmd, cmd.resume_pipeline.pipeline_id
-        )
-        self._put_pipeline(self.pipelines, pipeline, cmd.resume_pipeline.pipeline_id)
-
-        self.log.debug(
-            f"Resuming pipeline {cmd.resume_pipeline.pipeline_id} for audience {cmd.audience.service_name}"
+            f"Set '{len(cmd.set_pipelines.pipelines)}' pipelines for audience '{aud_str}'"
         )
 
         return True
@@ -865,15 +748,6 @@ class StreamdalClient:
 
         return True
 
-    def _is_paused(self, aud: protos.Audience, pipeline_id: str) -> bool:
-        """Check if a pipeline is paused"""
-        aud_str = common.aud_to_str(aud)
-
-        if self.paused_pipelines.get(aud_str) is None:
-            return False
-
-        return self.paused_pipelines[aud_str].get(pipeline_id) is not None
-
     def _call_wasm(
         self, step: protos.PipelineStep, data: bytes, isr: protos.InterStepResult
     ) -> protos.WasmResponse:
@@ -891,7 +765,7 @@ class StreamdalClient:
             resp = protos.WasmResponse()
             resp.output_payload = ""
             resp.exit_msg = "Failed to execute WASM: {}".format(e)
-            resp.exit_code = protos.WasmExitCode.WASM_EXIT_CODE_INTERNAL_ERROR
+            resp.exit_code = protos.WasmExitCode.WASM_EXIT_CODE_ERROR
 
             return resp
 
@@ -1203,7 +1077,7 @@ class StreamdalClient:
             return
 
         # Only successful schema inferences
-        if resp.exit_code != protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS:
+        if resp.exit_code != protos.WasmExitCode.WASM_EXIT_CODE_TRUE:
             return
 
         # If existing schema matches, do nothing
