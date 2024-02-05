@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: streamdal-console
-          image: "streamdal/console:0.0.15" # Fixed the image and tag definition
+          image: "streamdal/console:0.0.19" # Fixed the image and tag definition
           ports:
             - containerPort: 8080
           env:
@@ -32,6 +32,8 @@ spec:
               value: {{ .Values.env.STREAMDAL_CONSOLE_SENTRY_KEY | quote }}
             - name: STREAMDAL_CONSOLE_GOOGLE_ANALYTICS_KEY
               value: {{ .Values.env.STREAMDAL_CONSOLE_GOOGLE_ANALYTICS_KEY | quote }}
+            - name: STREAMDAL_CONSOLE_SESSION_KEY
+              value: {{ .Values.env.STREAMDAL_CONSOLE_SESSION_KEY | quote }}
             - name: STREAMDAL_CONSOLE_PORT
               value: "8080"
             - name: STREAMDAL_CONSOLE_PRODUCTION

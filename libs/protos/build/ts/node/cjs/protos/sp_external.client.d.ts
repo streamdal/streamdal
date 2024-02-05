@@ -30,8 +30,7 @@ import type { UpdateNotificationRequest } from "./sp_external";
 import type { CreateNotificationRequest } from "./sp_external";
 import type { ResumePipelineRequest } from "./sp_external";
 import type { PausePipelineRequest } from "./sp_external";
-import type { DetachPipelineRequest } from "./sp_external";
-import type { AttachPipelineRequest } from "./sp_external";
+import type { SetPipelinesRequest } from "./sp_external";
 import type { DeletePipelineRequest } from "./sp_external";
 import type { StandardResponse } from "./sp_common";
 import type { UpdatePipelineRequest } from "./sp_external";
@@ -51,13 +50,13 @@ import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
  */
 export interface IExternalClient {
     /**
-     * Should return everything that is needed to build the initial view in the console
+     * Returns all data needed for UI; called on initial console load
      *
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
     /**
-     * Temporary method to test gRPC-Web streaming
+     * Used by console to stream updates to UI; called after initial GetAll()
      *
      * @generated from protobuf rpc: GetAllStream(protos.GetAllRequest) returns (stream protos.GetAllResponse);
      */
@@ -93,17 +92,9 @@ export interface IExternalClient {
      */
     deletePipeline(input: DeletePipelineRequest, options?: RpcOptions): UnaryCall<DeletePipelineRequest, StandardResponse>;
     /**
-     * Attach a pipeline to an audience
-     *
-     * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
-    attachPipeline(input: AttachPipelineRequest, options?: RpcOptions): UnaryCall<AttachPipelineRequest, StandardResponse>;
-    /**
-     * Detach a pipeline from an audience
-     *
-     * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
-     */
-    detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
+    setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *
@@ -233,13 +224,13 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
     };
     constructor(_transport: RpcTransport);
     /**
-     * Should return everything that is needed to build the initial view in the console
+     * Returns all data needed for UI; called on initial console load
      *
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
     /**
-     * Temporary method to test gRPC-Web streaming
+     * Used by console to stream updates to UI; called after initial GetAll()
      *
      * @generated from protobuf rpc: GetAllStream(protos.GetAllRequest) returns (stream protos.GetAllResponse);
      */
@@ -275,17 +266,9 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     deletePipeline(input: DeletePipelineRequest, options?: RpcOptions): UnaryCall<DeletePipelineRequest, StandardResponse>;
     /**
-     * Attach a pipeline to an audience
-     *
-     * @generated from protobuf rpc: AttachPipeline(protos.AttachPipelineRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
-    attachPipeline(input: AttachPipelineRequest, options?: RpcOptions): UnaryCall<AttachPipelineRequest, StandardResponse>;
-    /**
-     * Detach a pipeline from an audience
-     *
-     * @generated from protobuf rpc: DetachPipeline(protos.DetachPipelineRequest) returns (protos.StandardResponse);
-     */
-    detachPipeline(input: DetachPipelineRequest, options?: RpcOptions): UnaryCall<DetachPipelineRequest, StandardResponse>;
+    setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse>;
     /**
      * Pause a pipeline; noop if pipeline is already paused
      *

@@ -9,6 +9,7 @@ export type FormInputProps = {
   errors: ErrorType;
   inputClass?: string;
   wrapperClass?: string;
+  defaultValue?: string;
 };
 
 export const InlineInput = ({
@@ -19,8 +20,9 @@ export const InlineInput = ({
   placeHolder,
   inputClass,
   wrapperClass,
+  defaultValue,
 }: FormInputProps) => {
-  const value = resolveValue(data, name);
+  const value = resolveValue(data, name) || defaultValue;
 
   return (
     <div class={`flex flex-col ${wrapperClass}`}>

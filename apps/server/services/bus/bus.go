@@ -11,11 +11,11 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/cmd"
-	"github.com/streamdal/server/services/metrics"
-	"github.com/streamdal/server/services/pubsub"
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/cmd"
+	"github.com/streamdal/streamdal/apps/server/services/metrics"
+	"github.com/streamdal/streamdal/apps/server/services/pubsub"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 /*
@@ -79,17 +79,8 @@ type IBus interface {
 	// BroadcastDeletePipeline broadcasts a DeletePipelineRequest to all nodes in the cluster
 	BroadcastDeletePipeline(ctx context.Context, req *protos.DeletePipelineRequest) error
 
-	// BroadcastAttachPipeline broadcasts a AttachPipelineRequest to all nodes in the cluster
-	BroadcastAttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
-
-	// BroadcastDetachPipeline broadcasts a DetachPipelineRequest to all nodes in the cluster
-	BroadcastDetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
-
-	// BroadcastPausePipeline broadcasts a PausePipelineRequest to all nodes in the cluster
-	BroadcastPausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
-
-	// BroadcastResumePipeline broadcasts a ResumePipelineRequest to all nodes in the cluster
-	BroadcastResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
+	// BroadcastPauseResume broadcasts a PausePipelineRequest or ResumePipelineRequest to all nodes in the cluster
+	BroadcastPauseResume(ctx context.Context, aud *protos.Audience, pipelineID string, paused bool) error
 
 	// BroadcastMetrics broadcasts a MetricsRequest to all nodes in the cluster
 	BroadcastMetrics(ctx context.Context, req *protos.MetricsRequest) error
@@ -114,6 +105,9 @@ type IBus interface {
 
 	// BroadcastTailResponse broadcasts a TailResponse to all nodes in the cluster
 	BroadcastTailResponse(ctx context.Context, resp *protos.TailResponse) error
+
+	// BroadcastSetPipelines broadcasts a SetPipelinesRequest to all nodes in the cluster
+	BroadcastSetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error
 }
 
 type Bus struct {
@@ -363,27 +357,26 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 		llog.Debug("received DeregisterRequest")
 		err = b.handleDeregisterRequest(shutdownCtx, busEvent.GetDeregisterRequest())
 	case *protos.BusEvent_NewAudienceRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received NewAudienceRequest")
 		err = b.handleNewAudienceRequest(shutdownCtx, busEvent.GetNewAudienceRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:
 		llog.Debug("received DeleteAudienceRequest")
 		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received UpdatePipelineRequest")
 		err = b.handleUpdatePipelineRequest(shutdownCtx, busEvent.GetUpdatePipelineRequest())
 	case *protos.BusEvent_DeletePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received DeletePipelineRequest")
 		err = b.handleDeletePipelineRequest(shutdownCtx, busEvent.GetDeletePipelineRequest())
-	case *protos.BusEvent_AttachPipelineRequest:
-		llog.Debug("received AttachPipelineRequest")
-		err = b.handleAttachPipelineRequest(shutdownCtx, busEvent.GetAttachPipelineRequest())
-	case *protos.BusEvent_DetachPipelineRequest:
-		llog.Debug("received DetachPipelineRequest")
-		err = b.handleDetachPipelineRequest(shutdownCtx, busEvent.GetDetachPipelineRequest())
 	case *protos.BusEvent_PausePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received PausePipelineRequest")
 		err = b.handlePausePipelineRequest(shutdownCtx, busEvent.GetPausePipelineRequest())
 	case *protos.BusEvent_ResumePipelineRequest:
+		// Injects schema inference pipeline
 		llog.Debug("received ResumePipelineRequest")
 		err = b.handleResumePipelineRequest(shutdownCtx, busEvent.GetResumePipelineRequest())
 	case *protos.BusEvent_MetricsRequest:
@@ -398,6 +391,10 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 	case *protos.BusEvent_TailResponse:
 		llog.Debug("received TailResponse")
 		err = b.handleTailResponse(shutdownCtx, busEvent.GetTailResponse())
+	case *protos.BusEvent_SetPipelinesRequest:
+		// Injects schema inference pipeline
+		llog.Debug("received SetPipelinesRequest")
+		err = b.handleSetPipelinesRequest(shutdownCtx, busEvent.GetSetPipelinesRequest())
 	default:
 		llog.Debug("received unknown event type")
 		err = fmt.Errorf("unable to handle bus event: unknown event type '%v'", t)

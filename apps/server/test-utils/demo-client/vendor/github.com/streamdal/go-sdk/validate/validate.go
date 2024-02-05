@@ -47,6 +47,18 @@ func Audience(aud *protos.Audience) error {
 	return nil
 }
 
+func SetPipelinesCommand(cmd *protos.Command) error {
+	if cmd == nil {
+		return ErrNilInput
+	}
+
+	if cmd.GetSetPipelines() == nil {
+		return errors.New("not a SetPipelines command")
+	}
+
+	return nil
+}
+
 func KVInstruction(i *protos.KVInstruction) error {
 	if i == nil {
 		return errors.New("KVInstruction cannot be nil")

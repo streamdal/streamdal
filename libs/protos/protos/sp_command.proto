@@ -15,36 +15,30 @@ message Command {
   protos.Audience audience = 1;
 
   oneof command {
-    AttachPipelineCommand attach_pipeline = 100;
-    DetachPipelineCommand detach_pipeline = 101;
-    PausePipelineCommand pause_pipeline = 102;
-    ResumePipelineCommand resume_pipeline = 103;
-    KeepAliveCommand keep_alive = 104;
+    // NOTE: As of 01.29.2024, pause, resume, delete and update pipeline commands
+    // are replaced with the SetPipelinesCommand. When a pause/resume/etc. are
+    // called on server, the server will emit an appropriate SetPipelines cmd.
+
+    // Emitted by server when a user makes a pause, resume, delete or update
+    // pipeline and set pipelines external grpc API call.
+    // NOTE: This was introduced during ordered pipeline updates.
+    SetPipelinesCommand set_pipelines = 100;
+
+    // Server sends this periodically to SDKs to keep the connection alive
+    KeepAliveCommand keep_alive = 101;
 
     // Server will emit this when a user makes changes to the KV store
     // via the KV HTTP API.
-    KVCommand kv = 105;
+    KVCommand kv = 102;
 
     // Emitted by server when a user makes a Tail() call
     // Consumed by all server instances and by SDKs
-    TailCommand tail = 106;
+    TailCommand tail = 103;
   }
 }
 
-message AttachPipelineCommand {
-  protos.Pipeline pipeline = 1;
-}
-
-message DetachPipelineCommand {
-  string pipeline_id = 1;
-}
-
-message PausePipelineCommand {
-  string pipeline_id = 1;
-}
-
-message ResumePipelineCommand {
-  string pipeline_id = 1;
+message SetPipelinesCommand {
+  repeated protos.Pipeline pipelines = 1;
 }
 
 message KeepAliveCommand {

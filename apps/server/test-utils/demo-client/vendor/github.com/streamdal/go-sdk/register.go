@@ -25,7 +25,7 @@ func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "v0.0.82",
+		LibraryVersion: "v0.0.85",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
@@ -189,21 +189,12 @@ func (s *Streamdal) handleCommand(ctx context.Context, cmd *protos.Command) erro
 	var err error
 
 	switch cmd.Command.(type) {
+	case *protos.Command_SetPipelines:
+		s.config.Logger.Debug("Received set pipelines command")
+		err = s.setPipelines(ctx, cmd)
 	case *protos.Command_Kv:
 		s.config.Logger.Debug("Received kv command")
 		err = s.handleKVCommand(ctx, cmd.GetKv())
-	case *protos.Command_AttachPipeline:
-		s.config.Logger.Debug("Received attach pipeline command")
-		err = s.attachPipeline(ctx, cmd)
-	case *protos.Command_DetachPipeline:
-		s.config.Logger.Debug("Received detach pipeline command")
-		err = s.detachPipeline(ctx, cmd)
-	case *protos.Command_PausePipeline:
-		s.config.Logger.Debug("Received pause pipeline command")
-		err = s.pausePipeline(ctx, cmd)
-	case *protos.Command_ResumePipeline:
-		s.config.Logger.Debug("Received resume pipeline command")
-		err = s.resumePipeline(ctx, cmd)
 	case *protos.Command_Tail:
 		s.config.Logger.Debug("Received tail command")
 		err = s.handleTailCommand(ctx, cmd)
@@ -281,118 +272,21 @@ func (s *Streamdal) handleKVCommand(_ context.Context, kv *protos.KVCommand) err
 	return nil
 }
 
-func (s *Streamdal) attachPipeline(_ context.Context, cmd *protos.Command) error {
+func (s *Streamdal) setPipelines(_ context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		return ErrEmptyCommand
+	}
+
+	if err := validate.SetPipelinesCommand(cmd); err != nil {
+		return errors.Wrap(err, "failed to validate set pipelines command")
 	}
 
 	s.pipelinesMtx.Lock()
 	defer s.pipelinesMtx.Unlock()
 
-	if _, ok := s.pipelines[audToStr(cmd.Audience)]; !ok {
-		s.pipelines[audToStr(cmd.Audience)] = make(map[string]*protos.Command)
-	}
+	s.pipelines[audToStr(cmd.Audience)] = cmd.GetSetPipelines().Pipelines
 
-	s.pipelines[audToStr(cmd.Audience)][cmd.GetAttachPipeline().Pipeline.Id] = cmd
-
-	s.config.Logger.Debugf("Attached pipeline %s", cmd.GetAttachPipeline().Pipeline.Id)
-
-	return nil
-}
-
-func (s *Streamdal) detachPipeline(_ context.Context, cmd *protos.Command) error {
-	if cmd == nil {
-		return ErrEmptyCommand
-	}
-
-	s.pipelinesMtx.Lock()
-	defer s.pipelinesMtx.Unlock()
-
-	audStr := audToStr(cmd.Audience)
-
-	if _, ok := s.pipelines[audStr]; !ok {
-		return nil
-	}
-
-	delete(s.pipelines[audStr], cmd.GetDetachPipeline().PipelineId)
-
-	if len(s.pipelines[audStr]) == 0 {
-		delete(s.pipelines, audStr)
-	}
-
-	s.config.Logger.Debugf("Detached pipeline %s", cmd.GetDetachPipeline().PipelineId)
-
-	return nil
-}
-
-func (s *Streamdal) pausePipeline(_ context.Context, cmd *protos.Command) error {
-	if cmd == nil {
-		return ErrEmptyCommand
-	}
-
-	s.pipelinesMtx.Lock()
-	defer s.pipelinesMtx.Unlock()
-	s.pipelinesPausedMtx.Lock()
-	defer s.pipelinesPausedMtx.Unlock()
-
-	audStr := audToStr(cmd.Audience)
-
-	if _, ok := s.pipelines[audStr]; !ok {
-		return ErrPipelineNotActive
-	}
-
-	pipeline, ok := s.pipelines[audStr][cmd.GetPausePipeline().PipelineId]
-	if !ok {
-		return ErrPipelineNotActive
-	}
-
-	if _, ok := s.pipelinesPaused[audStr]; !ok {
-		s.pipelinesPaused[audStr] = make(map[string]*protos.Command)
-	}
-
-	s.pipelinesPaused[audStr][cmd.GetPausePipeline().PipelineId] = pipeline
-
-	delete(s.pipelines[audStr], cmd.GetPausePipeline().PipelineId)
-
-	if len(s.pipelines[audStr]) == 0 {
-		delete(s.pipelines, audStr)
-	}
-
-	return nil
-}
-
-func (s *Streamdal) resumePipeline(_ context.Context, cmd *protos.Command) error {
-	if cmd == nil {
-		return ErrEmptyCommand
-	}
-
-	s.pipelinesMtx.Lock()
-	defer s.pipelinesMtx.Unlock()
-	s.pipelinesPausedMtx.Lock()
-	defer s.pipelinesPausedMtx.Unlock()
-
-	audStr := audToStr(cmd.Audience)
-
-	if _, ok := s.pipelinesPaused[audStr]; !ok {
-		return ErrPipelineNotPaused
-	}
-
-	pipeline, ok := s.pipelinesPaused[audStr][cmd.GetResumePipeline().PipelineId]
-	if !ok {
-		return ErrPipelineNotPaused
-	}
-
-	if _, ok := s.pipelines[audStr]; !ok {
-		s.pipelines[audStr] = make(map[string]*protos.Command)
-	}
-
-	s.pipelines[audStr][cmd.GetResumePipeline().PipelineId] = pipeline
-
-	delete(s.pipelinesPaused[audStr], cmd.GetResumePipeline().PipelineId)
-
-	if len(s.pipelinesPaused[audStr]) == 0 {
-		delete(s.pipelinesPaused, audStr)
-	}
+	s.config.Logger.Debugf("saved '%d' pipelines for audience '%s'", len(cmd.GetSetPipelines().Pipelines), audToStr(cmd.Audience))
 
 	return nil
 }

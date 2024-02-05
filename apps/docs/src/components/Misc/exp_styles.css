@@ -28,8 +28,8 @@
     max-height: 80vh;
     overflow: auto;
     display: flex;
-    justify-content: start;
-    align-items: start;
+    justify-content: flex-start;
+    align-items: flex-start;
     overflow-x: auto;
     overflow-y: auto;
     scrollbar-width: thin

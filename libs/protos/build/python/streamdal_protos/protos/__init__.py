@@ -92,23 +92,6 @@ class AbortCondition(betterproto.Enum):
     ABORT_CONDITION_ABORT_ALL = 2
 
 
-class PipelineStepNotificationPayloadType(betterproto.Enum):
-    PAYLOAD_TYPE_UNSET = 0
-    """Same functionality as PAYLOAD_TYPE_EXCLUDE"""
-
-    PAYLOAD_TYPE_EXCLUDE = 1
-    """Default. No payload data included in notification"""
-
-    PAYLOAD_TYPE_FULL_PAYLOAD = 2
-    """Entire payload content included in notification"""
-
-    PAYLOAD_TYPE_SELECT_PATHS = 3
-    """
-    Only specified paths of payload content included in notification Only works
-    on JSON. Plaintext payloads will be ignored.
-    """
-
-
 class ClientType(betterproto.Enum):
     CLIENT_TYPE_UNSET = 0
     CLIENT_TYPE_SDK = 1
@@ -361,15 +344,15 @@ class Pipeline(betterproto.Message):
     notification_configs: List["NotificationConfig"] = betterproto.message_field(4)
     """
     Notification configs for this pipeline. Only filled out in external API
-    responses This is deprecated and the data has moved to PipelineStep
+    responses
     """
 
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("notification_configs"):
-            warnings.warn(
-                "Pipeline.notification_configs is deprecated", DeprecationWarning
-            )
+    paused: Optional[bool] = betterproto.bool_field(
+        1000, optional=True, group="X_paused"
+    )
+    """
+    Indicates whether the pipeline is paused or not. Used internally by server.
+    """
 
 
 @dataclass(eq=False, repr=False)
@@ -377,44 +360,20 @@ class PipelineStepConditions(betterproto.Message):
     """
     Conditions define how the SDK should handle a Wasm response in a step.
     Should it continue executing the pipeline, should it abort, should it
-    notify and on_error. TODO: de-pluralize this name
+    notify and on_error.
     """
 
     abort: "AbortCondition" = betterproto.enum_field(1)
     """Should we abort execution?"""
 
     notify: bool = betterproto.bool_field(2)
+    """Should we trigger a notification?"""
+
     metadata: Dict[str, str] = betterproto.map_field(
         3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     """
     Should we include additional metadata that SDK should pass back to user?
-    """
-
-    notification: "PipelineStepNotification" = betterproto.message_field(4)
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("notify"):
-            warnings.warn(
-                "PipelineStepConditions.notify is deprecated", DeprecationWarning
-            )
-
-
-@dataclass(eq=False, repr=False)
-class PipelineStepNotification(betterproto.Message):
-    notification_config_ids: List[str] = betterproto.string_field(1)
-    """
-    The UUIDs of the notification config to use This is kept separate to avoid
-    having to configure slack/email settings every time and also because that
-    config info is sensitive and is encrypted
-    """
-
-    payload_type: "PipelineStepNotificationPayloadType" = betterproto.enum_field(2)
-    paths: List[str] = betterproto.string_field(3)
-    """
-    If type == paths, then we will look here for a list of json paths to
-    include in the notification payload.
     """
 
 
@@ -496,9 +455,6 @@ class PipelineInfo(betterproto.Message):
 
     pipeline: "Pipeline" = betterproto.message_field(2)
     """Pipeline config"""
-
-    paused: List["Audience"] = betterproto.message_field(3)
-    """For what audiences this pipeline is paused (none if empty)"""
 
 
 @dataclass(eq=False, repr=False)
@@ -617,20 +573,9 @@ class DeletePipelineRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class AttachPipelineRequest(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
+class SetPipelinesRequest(betterproto.Message):
+    pipeline_ids: List[str] = betterproto.string_field(1)
     audience: "Audience" = betterproto.message_field(2)
-
-
-@dataclass(eq=False, repr=False)
-class DetachPipelineRequest(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
-    audience: "Audience" = betterproto.message_field(2)
-    session_ids: List[str] = betterproto.string_field(3)
-    """
-    Filled out by detach gRPC handler so that broadcast handlers can avoid
-    performing a lookup in NATS.
-    """
 
 
 @dataclass(eq=False, repr=False)
@@ -690,19 +635,11 @@ class AttachNotificationRequest(betterproto.Message):
     notification_id: str = betterproto.string_field(1)
     pipeline_id: str = betterproto.string_field(2)
 
-    def __post_init__(self) -> None:
-        warnings.warn("AttachNotificationRequest is deprecated", DeprecationWarning)
-        super().__post_init__()
-
 
 @dataclass(eq=False, repr=False)
 class DetachNotificationRequest(betterproto.Message):
     notification_id: str = betterproto.string_field(1)
     pipeline_id: str = betterproto.string_field(2)
-
-    def __post_init__(self) -> None:
-        warnings.warn("DetachNotificationRequest is deprecated", DeprecationWarning)
-        super().__post_init__()
 
 
 @dataclass(eq=False, repr=False)
@@ -898,26 +835,25 @@ class Command(betterproto.Message):
     KeepAliveCommand, KVCommand) do NOT use audience and will ignore it
     """
 
-    attach_pipeline: "AttachPipelineCommand" = betterproto.message_field(
+    set_pipelines: "SetPipelinesCommand" = betterproto.message_field(
         100, group="command"
     )
-    detach_pipeline: "DetachPipelineCommand" = betterproto.message_field(
-        101, group="command"
-    )
-    pause_pipeline: "PausePipelineCommand" = betterproto.message_field(
-        102, group="command"
-    )
-    resume_pipeline: "ResumePipelineCommand" = betterproto.message_field(
-        103, group="command"
-    )
-    keep_alive: "KeepAliveCommand" = betterproto.message_field(104, group="command")
-    kv: "KvCommand" = betterproto.message_field(105, group="command")
+    """
+    Emitted by server when a user makes a pause, resume, delete or update
+    pipeline and set pipelines external grpc API call. NOTE: This was
+    introduced during ordered pipeline updates.
+    """
+
+    keep_alive: "KeepAliveCommand" = betterproto.message_field(101, group="command")
+    """Server sends this periodically to SDKs to keep the connection alive"""
+
+    kv: "KvCommand" = betterproto.message_field(102, group="command")
     """
     Server will emit this when a user makes changes to the KV store via the KV
     HTTP API.
     """
 
-    tail: "TailCommand" = betterproto.message_field(106, group="command")
+    tail: "TailCommand" = betterproto.message_field(103, group="command")
     """
     Emitted by server when a user makes a Tail() call Consumed by all server
     instances and by SDKs
@@ -925,23 +861,8 @@ class Command(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class AttachPipelineCommand(betterproto.Message):
-    pipeline: "Pipeline" = betterproto.message_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class DetachPipelineCommand(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class PausePipelineCommand(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
-
-
-@dataclass(eq=False, repr=False)
-class ResumePipelineCommand(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
+class SetPipelinesCommand(betterproto.Message):
+    pipelines: List["Pipeline"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1007,14 +928,6 @@ class NotifyRequest(betterproto.Message):
     step_name: str = betterproto.string_field(2)
     audience: "Audience" = betterproto.message_field(3)
     occurred_at_unix_ts_utc: int = betterproto.int64_field(4)
-    payload: bytes = betterproto.bytes_field(5)
-    step: "PipelineStep" = betterproto.message_field(6)
-    notification: "PipelineStepNotification" = betterproto.message_field(7)
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("step_name"):
-            warnings.warn("NotifyRequest.step_name is deprecated", DeprecationWarning)
 
 
 @dataclass(eq=False, repr=False)
@@ -1062,20 +975,23 @@ class DeregisterRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class GetAttachCommandsByServiceRequest(betterproto.Message):
+class GetSetPipelinesCommandsByServiceRequest(betterproto.Message):
+    """
+    Method used by SDKs to fetch all SetPipelinesCommands for a given service
+    name. The SDK may not know of all audiences yet so this method returns ALL
+    SetPipelinesCommands that use the same same service name. SDKs should store
+    the commands (or pipelines) in memory tied to an audience, so that if/when
+    a .Process() call occurs with an audience - the SDK will already have the
+    pipeline config in memory.
+    """
+
     service_name: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class GetAttachCommandsByServiceResponse(betterproto.Message):
-    active: List["Command"] = betterproto.message_field(1)
-    """AttachCommands for all active pipelines"""
-
-    paused: List["Command"] = betterproto.message_field(2)
-    """
-    AttachCommands, but ones which are paused The SDK still needs to have these
-    to support un-pausing
-    """
+class GetSetPipelinesCommandsByServiceResponse(betterproto.Message):
+    set_pipeline_commands: List["Command"] = betterproto.message_field(1)
+    """SetPipelinesCommands for all active pipelines"""
 
     wasm_modules: Dict[str, "WasmModule"] = betterproto.map_field(
         3, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
@@ -1125,12 +1041,6 @@ class BusEvent(betterproto.Message):
     update_pipeline_request: "UpdatePipelineRequest" = betterproto.message_field(
         104, group="event"
     )
-    attach_pipeline_request: "AttachPipelineRequest" = betterproto.message_field(
-        105, group="event"
-    )
-    detach_pipeline_request: "DetachPipelineRequest" = betterproto.message_field(
-        106, group="event"
-    )
     pause_pipeline_request: "PausePipelineRequest" = betterproto.message_field(
         107, group="event"
     )
@@ -1147,6 +1057,9 @@ class BusEvent(betterproto.Message):
     )
     tail_request: "TailRequest" = betterproto.message_field(113, group="event")
     tail_response: "TailResponse" = betterproto.message_field(114, group="event")
+    set_pipelines_request: "SetPipelinesRequest" = betterproto.message_field(
+        115, group="event"
+    )
     metadata: Dict[str, str] = betterproto.map_field(
         1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
@@ -1433,34 +1346,17 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
-    async def attach_pipeline(
+    async def set_pipelines(
         self,
-        attach_pipeline_request: "AttachPipelineRequest",
+        set_pipelines_request: "SetPipelinesRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
     ) -> "StandardResponse":
         return await self._unary_unary(
-            "/protos.External/AttachPipeline",
-            attach_pipeline_request,
-            StandardResponse,
-            timeout=timeout,
-            deadline=deadline,
-            metadata=metadata,
-        )
-
-    async def detach_pipeline(
-        self,
-        detach_pipeline_request: "DetachPipelineRequest",
-        *,
-        timeout: Optional[float] = None,
-        deadline: Optional["Deadline"] = None,
-        metadata: Optional["MetadataLike"] = None
-    ) -> "StandardResponse":
-        return await self._unary_unary(
-            "/protos.External/DetachPipeline",
-            detach_pipeline_request,
+            "/protos.External/SetPipelines",
+            set_pipelines_request,
             StandardResponse,
             timeout=timeout,
             deadline=deadline,
@@ -1932,18 +1828,18 @@ class InternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
-    async def get_attach_commands_by_service(
+    async def get_set_pipelines_commands_by_service(
         self,
-        get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
+        get_set_pipelines_commands_by_service_request: "GetSetPipelinesCommandsByServiceRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "GetAttachCommandsByServiceResponse":
+    ) -> "GetSetPipelinesCommandsByServiceResponse":
         return await self._unary_unary(
-            "/protos.Internal/GetAttachCommandsByService",
-            get_attach_commands_by_service_request,
-            GetAttachCommandsByServiceResponse,
+            "/protos.Internal/GetSetPipelinesCommandsByService",
+            get_set_pipelines_commands_by_service_request,
+            GetSetPipelinesCommandsByServiceResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -2022,13 +1918,8 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def attach_pipeline(
-        self, attach_pipeline_request: "AttachPipelineRequest"
-    ) -> "StandardResponse":
-        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
-
-    async def detach_pipeline(
-        self, detach_pipeline_request: "DetachPipelineRequest"
+    async def set_pipelines(
+        self, set_pipelines_request: "SetPipelinesRequest"
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -2194,18 +2085,11 @@ class ExternalBase(ServiceBase):
         response = await self.delete_pipeline(request)
         await stream.send_message(response)
 
-    async def __rpc_attach_pipeline(
-        self, stream: "grpclib.server.Stream[AttachPipelineRequest, StandardResponse]"
+    async def __rpc_set_pipelines(
+        self, stream: "grpclib.server.Stream[SetPipelinesRequest, StandardResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.attach_pipeline(request)
-        await stream.send_message(response)
-
-    async def __rpc_detach_pipeline(
-        self, stream: "grpclib.server.Stream[DetachPipelineRequest, StandardResponse]"
-    ) -> None:
-        request = await stream.recv_message()
-        response = await self.detach_pipeline(request)
+        response = await self.set_pipelines(request)
         await stream.send_message(response)
 
     async def __rpc_pause_pipeline(
@@ -2426,16 +2310,10 @@ class ExternalBase(ServiceBase):
                 DeletePipelineRequest,
                 StandardResponse,
             ),
-            "/protos.External/AttachPipeline": grpclib.const.Handler(
-                self.__rpc_attach_pipeline,
+            "/protos.External/SetPipelines": grpclib.const.Handler(
+                self.__rpc_set_pipelines,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                AttachPipelineRequest,
-                StandardResponse,
-            ),
-            "/protos.External/DetachPipeline": grpclib.const.Handler(
-                self.__rpc_detach_pipeline,
-                grpclib.const.Cardinality.UNARY_UNARY,
-                DetachPipelineRequest,
+                SetPipelinesRequest,
                 StandardResponse,
             ),
             "/protos.External/PausePipeline": grpclib.const.Handler(
@@ -2596,10 +2474,10 @@ class InternalBase(ServiceBase):
     async def metrics(self, metrics_request: "MetricsRequest") -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def get_attach_commands_by_service(
+    async def get_set_pipelines_commands_by_service(
         self,
-        get_attach_commands_by_service_request: "GetAttachCommandsByServiceRequest",
-    ) -> "GetAttachCommandsByServiceResponse":
+        get_set_pipelines_commands_by_service_request: "GetSetPipelinesCommandsByServiceRequest",
+    ) -> "GetSetPipelinesCommandsByServiceResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def send_tail(
@@ -2650,12 +2528,12 @@ class InternalBase(ServiceBase):
         response = await self.metrics(request)
         await stream.send_message(response)
 
-    async def __rpc_get_attach_commands_by_service(
+    async def __rpc_get_set_pipelines_commands_by_service(
         self,
-        stream: "grpclib.server.Stream[GetAttachCommandsByServiceRequest, GetAttachCommandsByServiceResponse]",
+        stream: "grpclib.server.Stream[GetSetPipelinesCommandsByServiceRequest, GetSetPipelinesCommandsByServiceResponse]",
     ) -> None:
         request = await stream.recv_message()
-        response = await self.get_attach_commands_by_service(request)
+        response = await self.get_set_pipelines_commands_by_service(request)
         await stream.send_message(response)
 
     async def __rpc_send_tail(
@@ -2704,11 +2582,11 @@ class InternalBase(ServiceBase):
                 MetricsRequest,
                 StandardResponse,
             ),
-            "/protos.Internal/GetAttachCommandsByService": grpclib.const.Handler(
-                self.__rpc_get_attach_commands_by_service,
+            "/protos.Internal/GetSetPipelinesCommandsByService": grpclib.const.Handler(
+                self.__rpc_get_set_pipelines_commands_by_service,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                GetAttachCommandsByServiceRequest,
-                GetAttachCommandsByServiceResponse,
+                GetSetPipelinesCommandsByServiceRequest,
+                GetSetPipelinesCommandsByServiceResponse,
             ),
             "/protos.Internal/SendTail": grpclib.const.Handler(
                 self.__rpc_send_tail,

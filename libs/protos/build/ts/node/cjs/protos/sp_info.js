@@ -85,12 +85,11 @@ class PipelineInfo$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.PipelineInfo", [
             { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_1.Audience },
-            { no: 2, name: "pipeline", kind: "message", T: () => sp_pipeline_1.Pipeline },
-            { no: 3, name: "paused", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_1.Audience }
+            { no: 2, name: "pipeline", kind: "message", T: () => sp_pipeline_1.Pipeline }
         ]);
     }
     create(value) {
-        const message = { audiences: [], paused: [] };
+        const message = { audiences: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -106,9 +105,6 @@ class PipelineInfo$Type extends runtime_5.MessageType {
                     break;
                 case /* protos.Pipeline pipeline */ 2:
                     message.pipeline = sp_pipeline_1.Pipeline.internalBinaryRead(reader, reader.uint32(), options, message.pipeline);
-                    break;
-                case /* repeated protos.Audience paused */ 3:
-                    message.paused.push(sp_common_1.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -128,9 +124,6 @@ class PipelineInfo$Type extends runtime_5.MessageType {
         /* protos.Pipeline pipeline = 2; */
         if (message.pipeline)
             sp_pipeline_1.Pipeline.internalBinaryWrite(message.pipeline, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* repeated protos.Audience paused = 3; */
-        for (let i = 0; i < message.paused.length; i++)
-            sp_common_1.Audience.internalBinaryWrite(message.paused[i], writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

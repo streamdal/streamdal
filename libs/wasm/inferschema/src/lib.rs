@@ -12,7 +12,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 e.to_string(),
             );
         }
@@ -21,11 +21,11 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_response(
-            Some(wasm_request.input_payload.as_slice()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FAILURE,
-            format!("invalid step: {}", err.to_string()),
+            None,
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err.to_string()),
         );
     };
 
@@ -36,7 +36,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid payload json: {}", err.to_string()),
             );
         }
@@ -49,7 +49,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid payload json: {}", err.to_string()),
             );
         }
@@ -63,7 +63,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(wasm_request.input_payload.as_slice()),
             Some(payload_schema.clone().to_string().as_bytes()),
             None,
-            WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+            WASMExitCode::WASM_EXIT_CODE_TRUE,
             "inferred fresh schema".to_string(),
         );
     }
@@ -76,7 +76,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     None,
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                    WASMExitCode::WASM_EXIT_CODE_FALSE,
                     format!(
                         "unable to parse current schema into string: {}",
                         err.to_string()
@@ -92,7 +92,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("unable to parse current schema json: {}", err.to_string()),
             );
         }
@@ -106,7 +106,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(wasm_request.input_payload.as_slice()),
             Some(payload_schema.clone().to_string().as_bytes()),
             None,
-            WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+            WASMExitCode::WASM_EXIT_CODE_TRUE,
             "schema has changed".to_string(),
         );
     }
@@ -115,7 +115,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Some(wasm_request.input_payload.as_slice()),
         None,
         None,
-        WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+        WASMExitCode::WASM_EXIT_CODE_TRUE,
         "schema has not changed".to_string(),
     );
 }

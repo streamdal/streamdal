@@ -52,203 +52,56 @@ impl Command {
         ::std::default::Default::default()
     }
 
-    // .protos.AttachPipelineCommand attach_pipeline = 100;
+    // .protos.SetPipelinesCommand set_pipelines = 100;
 
-    pub fn attach_pipeline(&self) -> &AttachPipelineCommand {
+    pub fn set_pipelines(&self) -> &SetPipelinesCommand {
         match self.command {
-            ::std::option::Option::Some(command::Command::AttachPipeline(ref v)) => v,
-            _ => <AttachPipelineCommand as ::protobuf::Message>::default_instance(),
+            ::std::option::Option::Some(command::Command::SetPipelines(ref v)) => v,
+            _ => <SetPipelinesCommand as ::protobuf::Message>::default_instance(),
         }
     }
 
-    pub fn clear_attach_pipeline(&mut self) {
+    pub fn clear_set_pipelines(&mut self) {
         self.command = ::std::option::Option::None;
     }
 
-    pub fn has_attach_pipeline(&self) -> bool {
+    pub fn has_set_pipelines(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(command::Command::AttachPipeline(..)) => true,
+            ::std::option::Option::Some(command::Command::SetPipelines(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_attach_pipeline(&mut self, v: AttachPipelineCommand) {
-        self.command = ::std::option::Option::Some(command::Command::AttachPipeline(v))
+    pub fn set_set_pipelines(&mut self, v: SetPipelinesCommand) {
+        self.command = ::std::option::Option::Some(command::Command::SetPipelines(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_attach_pipeline(&mut self) -> &mut AttachPipelineCommand {
-        if let ::std::option::Option::Some(command::Command::AttachPipeline(_)) = self.command {
+    pub fn mut_set_pipelines(&mut self) -> &mut SetPipelinesCommand {
+        if let ::std::option::Option::Some(command::Command::SetPipelines(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(command::Command::AttachPipeline(AttachPipelineCommand::new()));
+            self.command = ::std::option::Option::Some(command::Command::SetPipelines(SetPipelinesCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(command::Command::AttachPipeline(ref mut v)) => v,
+            ::std::option::Option::Some(command::Command::SetPipelines(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_attach_pipeline(&mut self) -> AttachPipelineCommand {
-        if self.has_attach_pipeline() {
+    pub fn take_set_pipelines(&mut self) -> SetPipelinesCommand {
+        if self.has_set_pipelines() {
             match self.command.take() {
-                ::std::option::Option::Some(command::Command::AttachPipeline(v)) => v,
+                ::std::option::Option::Some(command::Command::SetPipelines(v)) => v,
                 _ => panic!(),
             }
         } else {
-            AttachPipelineCommand::new()
+            SetPipelinesCommand::new()
         }
     }
 
-    // .protos.DetachPipelineCommand detach_pipeline = 101;
-
-    pub fn detach_pipeline(&self) -> &DetachPipelineCommand {
-        match self.command {
-            ::std::option::Option::Some(command::Command::DetachPipeline(ref v)) => v,
-            _ => <DetachPipelineCommand as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_detach_pipeline(&mut self) {
-        self.command = ::std::option::Option::None;
-    }
-
-    pub fn has_detach_pipeline(&self) -> bool {
-        match self.command {
-            ::std::option::Option::Some(command::Command::DetachPipeline(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_detach_pipeline(&mut self, v: DetachPipelineCommand) {
-        self.command = ::std::option::Option::Some(command::Command::DetachPipeline(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_detach_pipeline(&mut self) -> &mut DetachPipelineCommand {
-        if let ::std::option::Option::Some(command::Command::DetachPipeline(_)) = self.command {
-        } else {
-            self.command = ::std::option::Option::Some(command::Command::DetachPipeline(DetachPipelineCommand::new()));
-        }
-        match self.command {
-            ::std::option::Option::Some(command::Command::DetachPipeline(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_detach_pipeline(&mut self) -> DetachPipelineCommand {
-        if self.has_detach_pipeline() {
-            match self.command.take() {
-                ::std::option::Option::Some(command::Command::DetachPipeline(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            DetachPipelineCommand::new()
-        }
-    }
-
-    // .protos.PausePipelineCommand pause_pipeline = 102;
-
-    pub fn pause_pipeline(&self) -> &PausePipelineCommand {
-        match self.command {
-            ::std::option::Option::Some(command::Command::PausePipeline(ref v)) => v,
-            _ => <PausePipelineCommand as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_pause_pipeline(&mut self) {
-        self.command = ::std::option::Option::None;
-    }
-
-    pub fn has_pause_pipeline(&self) -> bool {
-        match self.command {
-            ::std::option::Option::Some(command::Command::PausePipeline(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_pause_pipeline(&mut self, v: PausePipelineCommand) {
-        self.command = ::std::option::Option::Some(command::Command::PausePipeline(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_pause_pipeline(&mut self) -> &mut PausePipelineCommand {
-        if let ::std::option::Option::Some(command::Command::PausePipeline(_)) = self.command {
-        } else {
-            self.command = ::std::option::Option::Some(command::Command::PausePipeline(PausePipelineCommand::new()));
-        }
-        match self.command {
-            ::std::option::Option::Some(command::Command::PausePipeline(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_pause_pipeline(&mut self) -> PausePipelineCommand {
-        if self.has_pause_pipeline() {
-            match self.command.take() {
-                ::std::option::Option::Some(command::Command::PausePipeline(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            PausePipelineCommand::new()
-        }
-    }
-
-    // .protos.ResumePipelineCommand resume_pipeline = 103;
-
-    pub fn resume_pipeline(&self) -> &ResumePipelineCommand {
-        match self.command {
-            ::std::option::Option::Some(command::Command::ResumePipeline(ref v)) => v,
-            _ => <ResumePipelineCommand as ::protobuf::Message>::default_instance(),
-        }
-    }
-
-    pub fn clear_resume_pipeline(&mut self) {
-        self.command = ::std::option::Option::None;
-    }
-
-    pub fn has_resume_pipeline(&self) -> bool {
-        match self.command {
-            ::std::option::Option::Some(command::Command::ResumePipeline(..)) => true,
-            _ => false,
-        }
-    }
-
-    // Param is passed by value, moved
-    pub fn set_resume_pipeline(&mut self, v: ResumePipelineCommand) {
-        self.command = ::std::option::Option::Some(command::Command::ResumePipeline(v))
-    }
-
-    // Mutable pointer to the field.
-    pub fn mut_resume_pipeline(&mut self) -> &mut ResumePipelineCommand {
-        if let ::std::option::Option::Some(command::Command::ResumePipeline(_)) = self.command {
-        } else {
-            self.command = ::std::option::Option::Some(command::Command::ResumePipeline(ResumePipelineCommand::new()));
-        }
-        match self.command {
-            ::std::option::Option::Some(command::Command::ResumePipeline(ref mut v)) => v,
-            _ => panic!(),
-        }
-    }
-
-    // Take field
-    pub fn take_resume_pipeline(&mut self) -> ResumePipelineCommand {
-        if self.has_resume_pipeline() {
-            match self.command.take() {
-                ::std::option::Option::Some(command::Command::ResumePipeline(v)) => v,
-                _ => panic!(),
-            }
-        } else {
-            ResumePipelineCommand::new()
-        }
-    }
-
-    // .protos.KeepAliveCommand keep_alive = 104;
+    // .protos.KeepAliveCommand keep_alive = 101;
 
     pub fn keep_alive(&self) -> &KeepAliveCommand {
         match self.command {
@@ -297,7 +150,7 @@ impl Command {
         }
     }
 
-    // .protos.KVCommand kv = 105;
+    // .protos.KVCommand kv = 102;
 
     pub fn kv(&self) -> &KVCommand {
         match self.command {
@@ -346,7 +199,7 @@ impl Command {
         }
     }
 
-    // .protos.TailCommand tail = 106;
+    // .protos.TailCommand tail = 103;
 
     pub fn tail(&self) -> &TailCommand {
         match self.command {
@@ -396,40 +249,19 @@ impl Command {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(8);
+        let mut fields = ::std::vec::Vec::with_capacity(5);
         let mut oneofs = ::std::vec::Vec::with_capacity(1);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
             "audience",
             |m: &Command| { &m.audience },
             |m: &mut Command| { &mut m.audience },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, AttachPipelineCommand>(
-            "attach_pipeline",
-            Command::has_attach_pipeline,
-            Command::attach_pipeline,
-            Command::mut_attach_pipeline,
-            Command::set_attach_pipeline,
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, DetachPipelineCommand>(
-            "detach_pipeline",
-            Command::has_detach_pipeline,
-            Command::detach_pipeline,
-            Command::mut_detach_pipeline,
-            Command::set_detach_pipeline,
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, PausePipelineCommand>(
-            "pause_pipeline",
-            Command::has_pause_pipeline,
-            Command::pause_pipeline,
-            Command::mut_pause_pipeline,
-            Command::set_pause_pipeline,
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, ResumePipelineCommand>(
-            "resume_pipeline",
-            Command::has_resume_pipeline,
-            Command::resume_pipeline,
-            Command::mut_resume_pipeline,
-            Command::set_resume_pipeline,
+        fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, SetPipelinesCommand>(
+            "set_pipelines",
+            Command::has_set_pipelines,
+            Command::set_pipelines,
+            Command::mut_set_pipelines,
+            Command::set_set_pipelines,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, KeepAliveCommand>(
             "keep_alive",
@@ -475,24 +307,15 @@ impl ::protobuf::Message for Command {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
                 },
                 802 => {
-                    self.command = ::std::option::Option::Some(command::Command::AttachPipeline(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command::Command::SetPipelines(is.read_message()?));
                 },
                 810 => {
-                    self.command = ::std::option::Option::Some(command::Command::DetachPipeline(is.read_message()?));
-                },
-                818 => {
-                    self.command = ::std::option::Option::Some(command::Command::PausePipeline(is.read_message()?));
-                },
-                826 => {
-                    self.command = ::std::option::Option::Some(command::Command::ResumePipeline(is.read_message()?));
-                },
-                834 => {
                     self.command = ::std::option::Option::Some(command::Command::KeepAlive(is.read_message()?));
                 },
-                842 => {
+                818 => {
                     self.command = ::std::option::Option::Some(command::Command::Kv(is.read_message()?));
                 },
-                850 => {
+                826 => {
                     self.command = ::std::option::Option::Some(command::Command::Tail(is.read_message()?));
                 },
                 tag => {
@@ -513,19 +336,7 @@ impl ::protobuf::Message for Command {
         }
         if let ::std::option::Option::Some(ref v) = self.command {
             match v {
-                &command::Command::AttachPipeline(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
-                &command::Command::DetachPipeline(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
-                &command::Command::PausePipeline(ref v) => {
-                    let len = v.compute_size();
-                    my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-                },
-                &command::Command::ResumePipeline(ref v) => {
+                &command::Command::SetPipelines(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -554,26 +365,17 @@ impl ::protobuf::Message for Command {
         }
         if let ::std::option::Option::Some(ref v) = self.command {
             match v {
-                &command::Command::AttachPipeline(ref v) => {
+                &command::Command::SetPipelines(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(100, v, os)?;
                 },
-                &command::Command::DetachPipeline(ref v) => {
+                &command::Command::KeepAlive(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(101, v, os)?;
                 },
-                &command::Command::PausePipeline(ref v) => {
+                &command::Command::Kv(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(102, v, os)?;
                 },
-                &command::Command::ResumePipeline(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
-                },
-                &command::Command::KeepAlive(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(104, v, os)?;
-                },
-                &command::Command::Kv(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(105, v, os)?;
-                },
                 &command::Command::Tail(ref v) => {
-                    ::protobuf::rt::write_message_field_with_cached_size(106, v, os)?;
+                    ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
                 },
             };
         }
@@ -595,9 +397,6 @@ impl ::protobuf::Message for Command {
 
     fn clear(&mut self) {
         self.audience.clear();
-        self.command = ::std::option::Option::None;
-        self.command = ::std::option::Option::None;
-        self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
         self.command = ::std::option::Option::None;
@@ -639,14 +438,8 @@ pub mod command {
     #[non_exhaustive]
     // @@protoc_insertion_point(oneof:protos.Command.command)
     pub enum Command {
-        // @@protoc_insertion_point(oneof_field:protos.Command.attach_pipeline)
-        AttachPipeline(super::AttachPipelineCommand),
-        // @@protoc_insertion_point(oneof_field:protos.Command.detach_pipeline)
-        DetachPipeline(super::DetachPipelineCommand),
-        // @@protoc_insertion_point(oneof_field:protos.Command.pause_pipeline)
-        PausePipeline(super::PausePipelineCommand),
-        // @@protoc_insertion_point(oneof_field:protos.Command.resume_pipeline)
-        ResumePipeline(super::ResumePipelineCommand),
+        // @@protoc_insertion_point(oneof_field:protos.Command.set_pipelines)
+        SetPipelines(super::SetPipelinesCommand),
         // @@protoc_insertion_point(oneof_field:protos.Command.keep_alive)
         KeepAlive(super::KeepAliveCommand),
         // @@protoc_insertion_point(oneof_field:protos.Command.kv)
@@ -672,46 +465,46 @@ pub mod command {
     }
 }
 
-// @@protoc_insertion_point(message:protos.AttachPipelineCommand)
+// @@protoc_insertion_point(message:protos.SetPipelinesCommand)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct AttachPipelineCommand {
+pub struct SetPipelinesCommand {
     // message fields
-    // @@protoc_insertion_point(field:protos.AttachPipelineCommand.pipeline)
-    pub pipeline: ::protobuf::MessageField<super::sp_pipeline::Pipeline>,
+    // @@protoc_insertion_point(field:protos.SetPipelinesCommand.pipelines)
+    pub pipelines: ::std::vec::Vec<super::sp_pipeline::Pipeline>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.AttachPipelineCommand.special_fields)
+    // @@protoc_insertion_point(special_field:protos.SetPipelinesCommand.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a AttachPipelineCommand {
-    fn default() -> &'a AttachPipelineCommand {
-        <AttachPipelineCommand as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a SetPipelinesCommand {
+    fn default() -> &'a SetPipelinesCommand {
+        <SetPipelinesCommand as ::protobuf::Message>::default_instance()
     }
 }
 
-impl AttachPipelineCommand {
-    pub fn new() -> AttachPipelineCommand {
+impl SetPipelinesCommand {
+    pub fn new() -> SetPipelinesCommand {
         ::std::default::Default::default()
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::Pipeline>(
-            "pipeline",
-            |m: &AttachPipelineCommand| { &m.pipeline },
-            |m: &mut AttachPipelineCommand| { &mut m.pipeline },
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "pipelines",
+            |m: &SetPipelinesCommand| { &m.pipelines },
+            |m: &mut SetPipelinesCommand| { &mut m.pipelines },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<AttachPipelineCommand>(
-            "AttachPipelineCommand",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SetPipelinesCommand>(
+            "SetPipelinesCommand",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for AttachPipelineCommand {
-    const NAME: &'static str = "AttachPipelineCommand";
+impl ::protobuf::Message for SetPipelinesCommand {
+    const NAME: &'static str = "SetPipelinesCommand";
 
     fn is_initialized(&self) -> bool {
         true
@@ -721,7 +514,7 @@ impl ::protobuf::Message for AttachPipelineCommand {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.pipeline)?;
+                    self.pipelines.push(is.read_message()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -735,19 +528,19 @@ impl ::protobuf::Message for AttachPipelineCommand {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.pipeline.as_ref() {
-            let len = v.compute_size();
+        for value in &self.pipelines {
+            let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.pipeline.as_ref() {
+        for v in &self.pipelines {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
-        }
+        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -760,404 +553,38 @@ impl ::protobuf::Message for AttachPipelineCommand {
         &mut self.special_fields
     }
 
-    fn new() -> AttachPipelineCommand {
-        AttachPipelineCommand::new()
+    fn new() -> SetPipelinesCommand {
+        SetPipelinesCommand::new()
     }
 
     fn clear(&mut self) {
-        self.pipeline.clear();
+        self.pipelines.clear();
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static AttachPipelineCommand {
-        static instance: AttachPipelineCommand = AttachPipelineCommand {
-            pipeline: ::protobuf::MessageField::none(),
+    fn default_instance() -> &'static SetPipelinesCommand {
+        static instance: SetPipelinesCommand = SetPipelinesCommand {
+            pipelines: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
     }
 }
 
-impl ::protobuf::MessageFull for AttachPipelineCommand {
+impl ::protobuf::MessageFull for SetPipelinesCommand {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("AttachPipelineCommand").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("SetPipelinesCommand").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for AttachPipelineCommand {
+impl ::std::fmt::Display for SetPipelinesCommand {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for AttachPipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-// @@protoc_insertion_point(message:protos.DetachPipelineCommand)
-#[derive(PartialEq,Clone,Default,Debug)]
-pub struct DetachPipelineCommand {
-    // message fields
-    // @@protoc_insertion_point(field:protos.DetachPipelineCommand.pipeline_id)
-    pub pipeline_id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.DetachPipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a DetachPipelineCommand {
-    fn default() -> &'a DetachPipelineCommand {
-        <DetachPipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl DetachPipelineCommand {
-    pub fn new() -> DetachPipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "pipeline_id",
-            |m: &DetachPipelineCommand| { &m.pipeline_id },
-            |m: &mut DetachPipelineCommand| { &mut m.pipeline_id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<DetachPipelineCommand>(
-            "DetachPipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for DetachPipelineCommand {
-    const NAME: &'static str = "DetachPipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.pipeline_id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.pipeline_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.pipeline_id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.pipeline_id.is_empty() {
-            os.write_string(1, &self.pipeline_id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> DetachPipelineCommand {
-        DetachPipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.pipeline_id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static DetachPipelineCommand {
-        static instance: DetachPipelineCommand = DetachPipelineCommand {
-            pipeline_id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for DetachPipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("DetachPipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for DetachPipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for DetachPipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-// @@protoc_insertion_point(message:protos.PausePipelineCommand)
-#[derive(PartialEq,Clone,Default,Debug)]
-pub struct PausePipelineCommand {
-    // message fields
-    // @@protoc_insertion_point(field:protos.PausePipelineCommand.pipeline_id)
-    pub pipeline_id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.PausePipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a PausePipelineCommand {
-    fn default() -> &'a PausePipelineCommand {
-        <PausePipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl PausePipelineCommand {
-    pub fn new() -> PausePipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "pipeline_id",
-            |m: &PausePipelineCommand| { &m.pipeline_id },
-            |m: &mut PausePipelineCommand| { &mut m.pipeline_id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<PausePipelineCommand>(
-            "PausePipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for PausePipelineCommand {
-    const NAME: &'static str = "PausePipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.pipeline_id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.pipeline_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.pipeline_id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.pipeline_id.is_empty() {
-            os.write_string(1, &self.pipeline_id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> PausePipelineCommand {
-        PausePipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.pipeline_id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static PausePipelineCommand {
-        static instance: PausePipelineCommand = PausePipelineCommand {
-            pipeline_id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for PausePipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("PausePipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for PausePipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for PausePipelineCommand {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-// @@protoc_insertion_point(message:protos.ResumePipelineCommand)
-#[derive(PartialEq,Clone,Default,Debug)]
-pub struct ResumePipelineCommand {
-    // message fields
-    // @@protoc_insertion_point(field:protos.ResumePipelineCommand.pipeline_id)
-    pub pipeline_id: ::std::string::String,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.ResumePipelineCommand.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a ResumePipelineCommand {
-    fn default() -> &'a ResumePipelineCommand {
-        <ResumePipelineCommand as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl ResumePipelineCommand {
-    pub fn new() -> ResumePipelineCommand {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "pipeline_id",
-            |m: &ResumePipelineCommand| { &m.pipeline_id },
-            |m: &mut ResumePipelineCommand| { &mut m.pipeline_id },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<ResumePipelineCommand>(
-            "ResumePipelineCommand",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for ResumePipelineCommand {
-    const NAME: &'static str = "ResumePipelineCommand";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.pipeline_id = is.read_string()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.pipeline_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.pipeline_id);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.pipeline_id.is_empty() {
-            os.write_string(1, &self.pipeline_id)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> ResumePipelineCommand {
-        ResumePipelineCommand::new()
-    }
-
-    fn clear(&mut self) {
-        self.pipeline_id.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static ResumePipelineCommand {
-        static instance: ResumePipelineCommand = ResumePipelineCommand {
-            pipeline_id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for ResumePipelineCommand {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("ResumePipelineCommand").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for ResumePipelineCommand {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for ResumePipelineCommand {
+impl ::protobuf::reflect::ProtobufValue for SetPipelinesCommand {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -1533,94 +960,78 @@ impl ::protobuf::reflect::ProtobufValue for TailCommand {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x10sp_command.proto\x12\x06protos\x1a\x0fsp_common.proto\x1a\x0bsp_kv\
-    .proto\x1a\x11sp_pipeline.proto\"\xf2\x03\n\x07Command\x12,\n\x08audienc\
-    e\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12H\n\x0fattac\
-    h_pipeline\x18d\x20\x01(\x0b2\x1d.protos.AttachPipelineCommandH\0R\x0eat\
-    tachPipeline\x12H\n\x0fdetach_pipeline\x18e\x20\x01(\x0b2\x1d.protos.Det\
-    achPipelineCommandH\0R\x0edetachPipeline\x12E\n\x0epause_pipeline\x18f\
-    \x20\x01(\x0b2\x1c.protos.PausePipelineCommandH\0R\rpausePipeline\x12H\n\
-    \x0fresume_pipeline\x18g\x20\x01(\x0b2\x1d.protos.ResumePipelineCommandH\
-    \0R\x0eresumePipeline\x129\n\nkeep_alive\x18h\x20\x01(\x0b2\x18.protos.K\
-    eepAliveCommandH\0R\tkeepAlive\x12#\n\x02kv\x18i\x20\x01(\x0b2\x11.proto\
-    s.KVCommandH\0R\x02kv\x12)\n\x04tail\x18j\x20\x01(\x0b2\x13.protos.TailC\
-    ommandH\0R\x04tailB\t\n\x07command\"E\n\x15AttachPipelineCommand\x12,\n\
-    \x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\
-    \x15DetachPipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\n\
-    pipelineId\"7\n\x14PausePipelineCommand\x12\x1f\n\x0bpipeline_id\x18\x01\
-    \x20\x01(\tR\npipelineId\"8\n\x15ResumePipelineCommand\x12\x1f\n\x0bpipe\
-    line_id\x18\x01\x20\x01(\tR\npipelineId\"\x12\n\x10KeepAliveCommand\"d\n\
-    \tKVCommand\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos.KVIn\
-    structionR\x0cinstructions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\to\
-    verwrite\"<\n\x0bTailCommand\x12-\n\x07request\x18\x02\x20\x01(\x0b2\x13\
-    .protos.TailRequestR\x07requestB<Z:github.com/streamdal/streamdal/libs/p\
-    rotos/build/go/protosJ\xce\r\n\x06\x12\x04\0\0@\x01\n\x08\n\x01\x0c\x12\
-    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\
-    \x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0\x15\n\t\n\x02\x03\x02\x12\x03\
-    \x06\0\x1b\n\x08\n\x01\x08\x12\x03\x08\0Q\n\t\n\x02\x08\x0b\x12\x03\x08\
-    \0Q\nN\n\x02\x04\0\x12\x04\x0b\0\x1f\x01\x1aB\x20Command\x20is\x20used\
-    \x20by\x20streamdal\x20server\x20for\x20sending\x20commands\x20to\x20SDK\
-    s\n\n\n\n\x03\x04\0\x01\x12\x03\x0b\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\
-    \x12\x03\x0e\x02\x1f\x1a\x85\x01\x20Who\x20is\x20this\x20command\x20inte\
-    nded\x20for?\n\x20NOTE:\x20Some\x20commands\x20(such\x20as\x20KeepAliveC\
-    ommand,\x20KVCommand)\x20do\x20NOT\x20use\x20audience\x20and\x20will\x20\
-    ignore\x20it\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x0e\x02\x11\n\x0c\n\
-    \x05\x04\0\x02\0\x01\x12\x03\x0e\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\
-    \x03\x0e\x1d\x1e\n\x0c\n\x04\x04\0\x08\0\x12\x04\x10\x02\x1e\x03\n\x0c\n\
-    \x05\x04\0\x08\0\x01\x12\x03\x10\x08\x0f\n\x0b\n\x04\x04\0\x02\x01\x12\
-    \x03\x11\x040\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x11\x04\x19\n\x0c\n\
-    \x05\x04\0\x02\x01\x01\x12\x03\x11\x1a)\n\x0c\n\x05\x04\0\x02\x01\x03\
-    \x12\x03\x11,/\n\x0b\n\x04\x04\0\x02\x02\x12\x03\x12\x040\n\x0c\n\x05\
-    \x04\0\x02\x02\x06\x12\x03\x12\x04\x19\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
-    \x03\x12\x1a)\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x12,/\n\x0b\n\x04\
-    \x04\0\x02\x03\x12\x03\x13\x04.\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\
-    \x13\x04\x18\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03\x13\x19'\n\x0c\n\x05\
-    \x04\0\x02\x03\x03\x12\x03\x13*-\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x14\
-    \x040\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03\x14\x04\x19\n\x0c\n\x05\x04\
-    \0\x02\x04\x01\x12\x03\x14\x1a)\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\
-    \x14,/\n\x0b\n\x04\x04\0\x02\x05\x12\x03\x15\x04&\n\x0c\n\x05\x04\0\x02\
-    \x05\x06\x12\x03\x15\x04\x14\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03\x15\
-    \x15\x1f\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03\x15\"%\nd\n\x04\x04\0\x02\
-    \x06\x12\x03\x19\x04\x17\x1aW\x20Server\x20will\x20emit\x20this\x20when\
-    \x20a\x20user\x20makes\x20changes\x20to\x20the\x20KV\x20store\n\x20via\
-    \x20the\x20KV\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\x06\x06\x12\x03\
-    \x19\x04\r\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03\x19\x0e\x10\n\x0c\n\x05\
-    \x04\0\x02\x06\x03\x12\x03\x19\x13\x16\nn\n\x04\x04\0\x02\x07\x12\x03\
-    \x1d\x04\x1b\x1aa\x20Emitted\x20by\x20server\x20when\x20a\x20user\x20mak\
-    es\x20a\x20Tail()\x20call\n\x20Consumed\x20by\x20all\x20server\x20instan\
-    ces\x20and\x20by\x20SDKs\n\n\x0c\n\x05\x04\0\x02\x07\x06\x12\x03\x1d\x04\
-    \x0f\n\x0c\n\x05\x04\0\x02\x07\x01\x12\x03\x1d\x10\x14\n\x0c\n\x05\x04\0\
-    \x02\x07\x03\x12\x03\x1d\x17\x1a\n\n\n\x02\x04\x01\x12\x04!\0#\x01\n\n\n\
-    \x03\x04\x01\x01\x12\x03!\x08\x1d\n\x0b\n\x04\x04\x01\x02\0\x12\x03\"\
-    \x02\x1f\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03\"\x02\x11\n\x0c\n\x05\x04\
-    \x01\x02\0\x01\x12\x03\"\x12\x1a\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\"\
-    \x1d\x1e\n\n\n\x02\x04\x02\x12\x04%\0'\x01\n\n\n\x03\x04\x02\x01\x12\x03\
-    %\x08\x1d\n\x0b\n\x04\x04\x02\x02\0\x12\x03&\x02\x19\n\x0c\n\x05\x04\x02\
-    \x02\0\x05\x12\x03&\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03&\t\x14\
-    \n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03&\x17\x18\n\n\n\x02\x04\x03\x12\
-    \x04)\0+\x01\n\n\n\x03\x04\x03\x01\x12\x03)\x08\x1c\n\x0b\n\x04\x04\x03\
-    \x02\0\x12\x03*\x02\x19\n\x0c\n\x05\x04\x03\x02\0\x05\x12\x03*\x02\x08\n\
-    \x0c\n\x05\x04\x03\x02\0\x01\x12\x03*\t\x14\n\x0c\n\x05\x04\x03\x02\0\
-    \x03\x12\x03*\x17\x18\n\n\n\x02\x04\x04\x12\x04-\0/\x01\n\n\n\x03\x04\
-    \x04\x01\x12\x03-\x08\x1d\n\x0b\n\x04\x04\x04\x02\0\x12\x03.\x02\x19\n\
-    \x0c\n\x05\x04\x04\x02\0\x05\x12\x03.\x02\x08\n\x0c\n\x05\x04\x04\x02\0\
-    \x01\x12\x03.\t\x14\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03.\x17\x18\nD\n\
-    \x02\x04\x05\x12\x041\03\x01\"8\x20Nothing\x20needed\x20in\x20here,\x20j\
-    ust\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\x05\x01\
-    \x12\x031\x08\x18\n@\n\x02\x04\x06\x12\x046\0<\x01\x1a4\x20Sent\x20by\
-    \x20server\x20on\x20Register\x20channel(s)\x20to\x20live\x20SDKs\n\n\n\n\
-    \x03\x04\x06\x01\x12\x036\x08\x11\n\x0b\n\x04\x04\x06\x02\0\x12\x037\x02\
-    1\n\x0c\n\x05\x04\x06\x02\0\x04\x12\x037\x02\n\n\x0c\n\x05\x04\x06\x02\0\
-    \x06\x12\x037\x0b\x1f\n\x0c\n\x05\x04\x06\x02\0\x01\x12\x037\x20,\n\x0c\
-    \n\x05\x04\x06\x02\0\x03\x12\x037/0\nk\n\x04\x04\x06\x02\x01\x12\x03;\
-    \x02\x15\x1a^\x20Create\x20&\x20Update\x20specific\x20setting\x20that\
-    \x20will\x20cause\x20the\x20Create\x20or\x20Update\x20to\n\x20work\x20as\
-    \x20an\x20upsert.\n\n\x0c\n\x05\x04\x06\x02\x01\x05\x12\x03;\x02\x06\n\
-    \x0c\n\x05\x04\x06\x02\x01\x01\x12\x03;\x07\x10\n\x0c\n\x05\x04\x06\x02\
-    \x01\x03\x12\x03;\x13\x14\n\n\n\x02\x04\x07\x12\x04>\0@\x01\n\n\n\x03\
-    \x04\x07\x01\x12\x03>\x08\x13\n\x0b\n\x04\x04\x07\x02\0\x12\x03?\x02\x1a\
-    \n\x0c\n\x05\x04\x07\x02\0\x06\x12\x03?\x02\r\n\x0c\n\x05\x04\x07\x02\0\
-    \x01\x12\x03?\x0e\x15\n\x0c\n\x05\x04\x07\x02\0\x03\x12\x03?\x18\x19b\
-    \x06proto3\
+    .proto\x1a\x11sp_pipeline.proto\"\x91\x02\n\x07Command\x12,\n\x08audienc\
+    e\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x12B\n\rset_pip\
+    elines\x18d\x20\x01(\x0b2\x1b.protos.SetPipelinesCommandH\0R\x0csetPipel\
+    ines\x129\n\nkeep_alive\x18e\x20\x01(\x0b2\x18.protos.KeepAliveCommandH\
+    \0R\tkeepAlive\x12#\n\x02kv\x18f\x20\x01(\x0b2\x11.protos.KVCommandH\0R\
+    \x02kv\x12)\n\x04tail\x18g\x20\x01(\x0b2\x13.protos.TailCommandH\0R\x04t\
+    ailB\t\n\x07command\"E\n\x13SetPipelinesCommand\x12.\n\tpipelines\x18\
+    \x01\x20\x03(\x0b2\x10.protos.PipelineR\tpipelines\"\x12\n\x10KeepAliveC\
+    ommand\"d\n\tKVCommand\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.\
+    protos.KVInstructionR\x0cinstructions\x12\x1c\n\toverwrite\x18\x02\x20\
+    \x01(\x08R\toverwrite\"<\n\x0bTailCommand\x12-\n\x07request\x18\x02\x20\
+    \x01(\x0b2\x13.protos.TailRequestR\x07requestB<Z:github.com/streamdal/st\
+    reamdal/libs/protos/build/go/protosJ\xae\x0e\n\x06\x12\x04\0\0:\x01\n\
+    \x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
+    \x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0\x15\n\t\n\
+    \x02\x03\x02\x12\x03\x06\0\x1b\n\x08\n\x01\x08\x12\x03\x08\0Q\n\t\n\x02\
+    \x08\x0b\x12\x03\x08\0Q\nN\n\x02\x04\0\x12\x04\x0b\0%\x01\x1aB\x20Comman\
+    d\x20is\x20used\x20by\x20streamdal\x20server\x20for\x20sending\x20comman\
+    ds\x20to\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\x0b\x08\x0f\n\x93\x01\n\
+    \x04\x04\0\x02\0\x12\x03\x0e\x02\x1f\x1a\x85\x01\x20Who\x20is\x20this\
+    \x20command\x20intended\x20for?\n\x20NOTE:\x20Some\x20commands\x20(such\
+    \x20as\x20KeepAliveCommand,\x20KVCommand)\x20do\x20NOT\x20use\x20audienc\
+    e\x20and\x20will\x20ignore\x20it\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\
+    \x0e\x02\x11\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x0e\x12\x1a\n\x0c\n\x05\
+    \x04\0\x02\0\x03\x12\x03\x0e\x1d\x1e\n\xed\x01\n\x04\x04\0\x08\0\x12\x04\
+    \x10\x02$\x03\"\xde\x01\x20NOTE:\x20As\x20of\x2001.29.2024,\x20pause,\
+    \x20resume,\x20delete\x20and\x20update\x20pipeline\x20commands\n\x20are\
+    \x20replaced\x20with\x20the\x20SetPipelinesCommand.\x20When\x20a\x20paus\
+    e/resume/etc.\x20are\n\x20called\x20on\x20server,\x20the\x20server\x20wi\
+    ll\x20emit\x20an\x20appropriate\x20SetPipelines\x20cmd.\n\n\x0c\n\x05\
+    \x04\0\x08\0\x01\x12\x03\x10\x08\x0f\n\xc5\x01\n\x04\x04\0\x02\x01\x12\
+    \x03\x18\x04,\x1a\xb7\x01\x20Emitted\x20by\x20server\x20when\x20a\x20use\
+    r\x20makes\x20a\x20pause,\x20resume,\x20delete\x20or\x20update\n\x20pipe\
+    line\x20and\x20set\x20pipelines\x20external\x20grpc\x20API\x20call.\n\
+    \x20NOTE:\x20This\x20was\x20introduced\x20during\x20ordered\x20pipeline\
+    \x20updates.\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x18\x04\x17\n\x0c\n\
+    \x05\x04\0\x02\x01\x01\x12\x03\x18\x18%\n\x0c\n\x05\x04\0\x02\x01\x03\
+    \x12\x03\x18(+\nR\n\x04\x04\0\x02\x02\x12\x03\x1b\x04&\x1aE\x20Server\
+    \x20sends\x20this\x20periodically\x20to\x20SDKs\x20to\x20keep\x20the\x20\
+    connection\x20alive\n\n\x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x1b\x04\x14\
+    \n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x1b\x15\x1f\n\x0c\n\x05\x04\0\x02\
+    \x02\x03\x12\x03\x1b\"%\nd\n\x04\x04\0\x02\x03\x12\x03\x1f\x04\x17\x1aW\
+    \x20Server\x20will\x20emit\x20this\x20when\x20a\x20user\x20makes\x20chan\
+    ges\x20to\x20the\x20KV\x20store\n\x20via\x20the\x20KV\x20HTTP\x20API.\n\
+    \n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x1f\x04\r\n\x0c\n\x05\x04\0\x02\
+    \x03\x01\x12\x03\x1f\x0e\x10\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1f\
+    \x13\x16\nn\n\x04\x04\0\x02\x04\x12\x03#\x04\x1b\x1aa\x20Emitted\x20by\
+    \x20server\x20when\x20a\x20user\x20makes\x20a\x20Tail()\x20call\n\x20Con\
+    sumed\x20by\x20all\x20server\x20instances\x20and\x20by\x20SDKs\n\n\x0c\n\
+    \x05\x04\0\x02\x04\x06\x12\x03#\x04\x0f\n\x0c\n\x05\x04\0\x02\x04\x01\
+    \x12\x03#\x10\x14\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03#\x17\x1a\n\n\n\
+    \x02\x04\x01\x12\x04'\0)\x01\n\n\n\x03\x04\x01\x01\x12\x03'\x08\x1b\n\
+    \x0b\n\x04\x04\x01\x02\0\x12\x03(\x02)\n\x0c\n\x05\x04\x01\x02\0\x04\x12\
+    \x03(\x02\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03(\x0b\x1a\n\x0c\n\x05\
+    \x04\x01\x02\0\x01\x12\x03(\x1b$\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03('\
+    (\nD\n\x02\x04\x02\x12\x04+\0-\x01\"8\x20Nothing\x20needed\x20in\x20here\
+    ,\x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\
+    \x02\x01\x12\x03+\x08\x18\n@\n\x02\x04\x03\x12\x040\06\x01\x1a4\x20Sent\
+    \x20by\x20server\x20on\x20Register\x20channel(s)\x20to\x20live\x20SDKs\n\
+    \n\n\n\x03\x04\x03\x01\x12\x030\x08\x11\n\x0b\n\x04\x04\x03\x02\0\x12\
+    \x031\x021\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x031\x02\n\n\x0c\n\x05\x04\
+    \x03\x02\0\x06\x12\x031\x0b\x1f\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x031\
+    \x20,\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x031/0\nk\n\x04\x04\x03\x02\x01\
+    \x12\x035\x02\x15\x1a^\x20Create\x20&\x20Update\x20specific\x20setting\
+    \x20that\x20will\x20cause\x20the\x20Create\x20or\x20Update\x20to\n\x20wo\
+    rk\x20as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x035\x02\
+    \x06\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x035\x07\x10\n\x0c\n\x05\x04\
+    \x03\x02\x01\x03\x12\x035\x13\x14\n\n\n\x02\x04\x04\x12\x048\0:\x01\n\n\
+    \n\x03\x04\x04\x01\x12\x038\x08\x13\n\x0b\n\x04\x04\x04\x02\0\x12\x039\
+    \x02\x1a\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x039\x02\r\n\x0c\n\x05\x04\
+    \x04\x02\0\x01\x12\x039\x0e\x15\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x039\
+    \x18\x19b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1641,12 +1052,9 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::sp_common::file_descriptor().clone());
             deps.push(super::sp_kv::file_descriptor().clone());
             deps.push(super::sp_pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(8);
+            let mut messages = ::std::vec::Vec::with_capacity(5);
             messages.push(Command::generated_message_descriptor_data());
-            messages.push(AttachPipelineCommand::generated_message_descriptor_data());
-            messages.push(DetachPipelineCommand::generated_message_descriptor_data());
-            messages.push(PausePipelineCommand::generated_message_descriptor_data());
-            messages.push(ResumePipelineCommand::generated_message_descriptor_data());
+            messages.push(SetPipelinesCommand::generated_message_descriptor_data());
             messages.push(KeepAliveCommand::generated_message_descriptor_data());
             messages.push(KVCommand::generated_message_descriptor_data());
             messages.push(TailCommand::generated_message_descriptor_data());

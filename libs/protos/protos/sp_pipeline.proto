@@ -33,6 +33,9 @@ message Pipeline {
   // Notification configs for this pipeline. Only filled out in external API responses
   // This is deprecated and the data has moved to PipelineStep
   repeated protos.NotificationConfig _notification_configs = 4 [deprecated=true]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Indicates whether the pipeline is paused or not. Used internally by server.
+  optional bool _paused = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // Defines the ways in which a pipeline can be aborted

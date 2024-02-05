@@ -67,9 +67,9 @@ export class InternalClient {
      * Used to pull all pipeline configs for the service name in the SDK's constructor
      * This is needed because Register() is async
      *
-     * @generated from protobuf rpc: GetAttachCommandsByService(protos.GetAttachCommandsByServiceRequest) returns (protos.GetAttachCommandsByServiceResponse);
+     * @generated from protobuf rpc: GetSetPipelinesCommandsByService(protos.GetSetPipelinesCommandsByServiceRequest) returns (protos.GetSetPipelinesCommandsByServiceResponse);
      */
-    getAttachCommandsByService(input, options) {
+    getSetPipelinesCommandsByService(input, options) {
         const method = this.methods[5], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }

@@ -77,7 +77,6 @@ when wanting support, clarity, or mesmerizing software factoids 🧙 :
 - [Getting Support](https://docs.streamdal.com/en/resources-support/get-support/)
 - [FAQ](https://docs.streamdal.com/en/resources-support/faq/)
 - [Open Source](https://docs.streamdal.com/en/resources-support/open-source/)
-- [Changelog](https://docs.streamdal.com/en/resources-support/changelog/)
 
 
 

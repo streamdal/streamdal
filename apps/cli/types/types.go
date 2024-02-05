@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/streamdal/snitch-protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 const (

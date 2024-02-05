@@ -17,7 +17,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to read request: {}", e),
             );
         }
@@ -29,8 +29,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-            format!("step validation failed: {}", err),
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err),
         );
     }
 
@@ -42,7 +42,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to generate transform request: {}", e),
             );
         }
@@ -61,7 +61,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 "Unknown transform type".to_string(),
             )
         }
@@ -73,14 +73,14 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(&data.into_bytes()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+            WASMExitCode::WASM_EXIT_CODE_TRUE,
             "Successfully transformed payload".to_string(),
         ),
         Err(err) => common::write_response(
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FAILURE,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             format!(
                 "Unable to transform payload: {:?}: {}",
                 err,
@@ -130,7 +130,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             transform::Request {
                 data: wasm_request.input_payload.clone(),
                 value: "".to_string(),
-                paths: paths,
+                paths,
                 truncate_options: Some(TruncateOptions {
                     length: t.truncate_options().clone().value as usize,
                     truncate_type: tt,

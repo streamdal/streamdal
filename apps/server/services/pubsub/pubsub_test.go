@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/streamdal/server/util"
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 var _ = Describe("PubSub", func() {

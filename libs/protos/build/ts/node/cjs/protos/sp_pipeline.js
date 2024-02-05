@@ -75,7 +75,8 @@ class Pipeline$Type extends runtime_5.MessageType {
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineStep },
-            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_notify_1.NotificationConfig }
+            { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_notify_1.NotificationConfig },
+            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -102,6 +103,9 @@ class Pipeline$Type extends runtime_5.MessageType {
                 case /* repeated protos.NotificationConfig _notification_configs = 4 [deprecated = true];*/ 4:
                     message.NotificationConfigs.push(sp_notify_1.NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* optional bool _paused */ 1000:
+                    message.Paused = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -126,6 +130,9 @@ class Pipeline$Type extends runtime_5.MessageType {
         /* repeated protos.NotificationConfig _notification_configs = 4 [deprecated = true]; */
         for (let i = 0; i < message.NotificationConfigs.length; i++)
             sp_notify_1.NotificationConfig.internalBinaryWrite(message.NotificationConfigs[i], writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* optional bool _paused = 1000; */
+        if (message.Paused !== undefined)
+            writer.tag(1000, runtime_1.WireType.Varint).bool(message.Paused);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

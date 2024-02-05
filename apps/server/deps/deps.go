@@ -14,20 +14,20 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/server/backends/cache"
-	"github.com/streamdal/server/config"
-	"github.com/streamdal/server/services/bus"
-	"github.com/streamdal/server/services/cmd"
-	"github.com/streamdal/server/services/encryption"
-	"github.com/streamdal/server/services/kv"
-	"github.com/streamdal/server/services/metrics"
-	"github.com/streamdal/server/services/notify"
-	"github.com/streamdal/server/services/pubsub"
-	"github.com/streamdal/server/services/store"
-	"github.com/streamdal/server/services/telemetry"
-	"github.com/streamdal/server/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/wasm"
+	"github.com/streamdal/streamdal/apps/server/backends/cache"
+	"github.com/streamdal/streamdal/apps/server/config"
+	"github.com/streamdal/streamdal/apps/server/services/bus"
+	"github.com/streamdal/streamdal/apps/server/services/cmd"
+	"github.com/streamdal/streamdal/apps/server/services/encryption"
+	"github.com/streamdal/streamdal/apps/server/services/kv"
+	"github.com/streamdal/streamdal/apps/server/services/metrics"
+	"github.com/streamdal/streamdal/apps/server/services/notify"
+	"github.com/streamdal/streamdal/apps/server/services/pubsub"
+	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/services/telemetry"
+	"github.com/streamdal/streamdal/apps/server/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 const (
@@ -107,7 +107,7 @@ func New(cfg *config.Config) (*Dependencies, error) {
 }
 
 func (d *Dependencies) validateWASM() error {
-	// Lame... means that tests need to be ran through `make test`
+	// Lame... means that tests need to have TEST=true env var set
 	if os.Getenv("TEST") != "" {
 		os.Chdir("../..")
 	}

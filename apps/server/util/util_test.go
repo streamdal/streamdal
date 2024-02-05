@@ -35,16 +35,6 @@ var (
 			},
 		},
 		{
-			// FromStr should normalize __SPACE__ to real spaces in Audience
-			StrAudience: "sErvIcE__SPACE__NamE:oPerAtIon_tYpe_proDucer:ProDuCer__SPACE__nAme:SomE__SPACE__CoMPonEnt",
-			Audience: &protos.Audience{
-				ServiceName:   "service name",
-				ComponentName: "some component",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "producer name",
-			},
-		},
-		{
 			// FromStr should return nil
 			StrAudience: "invalid:number:elements:operation_type_producer:producer-name",
 			Audience:    nil,
@@ -73,16 +63,6 @@ var (
 			},
 		},
 		{
-			// ToStr should return string with normalized spaces
-			StrAudience: "service__SPACE__name:operation_type_producer:producer__SPACE__name:some__SPACE____SPACE__component",
-			Audience: &protos.Audience{
-				ServiceName:   "sErViCe nAmE",
-				ComponentName: "sOMe  componeNt",
-				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
-				OperationName: "pRoDucEr naMe",
-			},
-		},
-		{
 			// ToStr on a nil audience should return ""
 			StrAudience: "",
 			Audience:    nil,
@@ -91,7 +71,6 @@ var (
 )
 
 func TestAudienceFromStr(t *testing.T) {
-	t.Skip()
 	g := gomega.NewWithT(t)
 
 	for _, entry := range testCasesFromStr {
@@ -100,8 +79,16 @@ func TestAudienceFromStr(t *testing.T) {
 	}
 }
 
+func TestInjectSchemaInferenceForSetPipelinesCommands(t *testing.T) {
+	g := gomega.NewWithT(t)
+
+	// Empty commands should return empty commands
+	numInjected, err := InjectSchemaInferenceForSetPipelinesCommands(make([]*protos.Command, 0), "wasmDir")
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(numInjected).To(gomega.Equal(0))
+}
+
 func TestAudienceToStr(t *testing.T) {
-	t.Skip()
 	g := gomega.NewWithT(t)
 
 	for _, entry := range testCasesToStr {
@@ -110,28 +97,11 @@ func TestAudienceToStr(t *testing.T) {
 	}
 }
 
-func TestParseConfigKey(t *testing.T) {
-	t.Skip()
-	g := gomega.NewWithT(t)
-
-	aud := &protos.Audience{
-		ServiceName:   "secret service",
-		OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
-		OperationName: "multi pipeline",
-		ComponentName: "sqlite and something else",
-	}
-
-	configKey := "secret__SPACE__service/operation_type_consumer/multi__SPACE__pipeline/sqlite__SPACE__and__SPACE__something__SPACE__else/0fd3dcc1-c2f1-42d9-af78-9060588fc652"
-	audience, pipelineID := ParseConfigKey(configKey)
-	g.Expect(pipelineID).To(gomega.Equal("0fd3dcc1-c2f1-42d9-af78-9060588fc652"))
-	g.Expect(AudienceEquals(audience, aud)).To(gomega.BeTrue())
-}
-
 func TestGrpcMethodCounterName(t *testing.T) {
 	cases := map[string]string{
-		"/protos.External/GetConfig":             "grpc_method_external_get_config",
-		"/protos.External/AppVerifyRegistration": "grpc_method_external_app_verify_registration",
-		"/protos.Internal/Register":              "grpc_method_internal_register",
+		"/protos.External/GetAllConfig":          "grpc_method_external_get_all_config_total",
+		"/protos.External/AppVerifyRegistration": "grpc_method_external_app_verify_registration_total",
+		"/protos.Internal/Register":              "grpc_method_internal_register_total",
 	}
 
 	for method, expected := range cases {

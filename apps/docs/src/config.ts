@@ -273,11 +273,6 @@ export const SIDEBAR: Sidebar = {
             link: "en/resources-support/get-support",
           },
           {
-            text: "Changelog",
-            slug: "changelog",
-            link: "en/resources-support/changelog",
-          },
-          {
             text: "Community",
             slug: "community",
             link: "en/resources-support/community",

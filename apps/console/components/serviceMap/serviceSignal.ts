@@ -29,3 +29,12 @@ export const setServiceSignal = (
     ...mapServiceDisplay(serviceMap),
   };
 };
+
+export const setPipelines = (audienceKey: string, pipelineIds: string[]) => {
+  if (serviceSignal.value) {
+    serviceSignal.value.config[audienceKey] = {
+      ...serviceSignal.value.config[audienceKey] || {},
+      pipelineIds,
+    };
+  }
+};

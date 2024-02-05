@@ -2,12 +2,13 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
-	telTypes "github.com/streamdal/server/types"
+	telTypes "github.com/streamdal/streamdal/apps/server/types"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
 
@@ -18,10 +19,10 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/server/services/encryption"
-	"github.com/streamdal/server/services/store/types"
-	"github.com/streamdal/server/util"
-	"github.com/streamdal/server/validate"
+	"github.com/streamdal/streamdal/apps/server/services/encryption"
+	"github.com/streamdal/streamdal/apps/server/services/store/types"
+	"github.com/streamdal/streamdal/apps/server/util"
+	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
 /*
@@ -70,22 +71,16 @@ type IStore interface {
 	SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
-	GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) // v: pipeline_id
-	GetConfigByAudience(ctx context.Context, audience *protos.Audience) ([]string, error)
+	GetAllConfig(ctx context.Context) (map[*protos.Audience][]*protos.Pipeline, error)
+	GetConfigByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error)
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
-	GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
 	DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
-	AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error
-	DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error
-	PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error
-	ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error
-	IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
+	SetPauseResume(ctx context.Context, audience *protos.Audience, pipelineID string, pause bool) (bool, error)
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
-	IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error)
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
 	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
@@ -94,7 +89,6 @@ type IStore interface {
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
 	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
 	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
-	GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
@@ -139,6 +133,78 @@ type IStore interface {
 
 	// GetTailRequestById returns a TailRequest by its ID
 	GetTailRequestById(ctx context.Context, tailID string) (*protos.TailRequest, error)
+
+	// SetPipelines saves pipelines as SetPipelinesConfig json to $audience key in store
+	SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error
+
+	// GetSetPipelinesCommandsByService returns a slice of SetPipelines commands for a given service
+	GetSetPipelinesCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
+
+	// GetSessionIDs returns a slice of ALL known session ids;
+	// accepts an optional "node name" to filter by.
+	GetSessionIDs(ctx context.Context, nodeName ...string) ([]string, error)
+
+	// GetSessionIDsByAudience returns a slice of session IDs for a given audience;
+	// accepts an optional "node name" to filter by.
+	GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error)
+
+	// GetSessionIDsByPipelineID returns a slice of session IDs that use a pipeline ID
+	GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error)
+}
+
+func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
+	llog := s.log.WithField("method", "GetSessionIDsByPipelineID")
+	llog.Debug("received request to get session IDs by pipeline ID")
+
+	// Get live usage
+	usage, err := s.GetActivePipelineUsage(ctx, pipelineID)
+	if err != nil {
+		llog.Errorf("unable to fetch active pipeline usage: %s", err)
+		return nil, errors.Wrap(err, "error fetching active pipeline usage")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, u := range usage {
+		if u.PipelineId == pipelineID {
+			sessionIDs = append(sessionIDs, u.SessionId)
+		}
+	}
+
+	return sessionIDs, nil
+}
+
+// TODO: Needs tests
+func (s *Store) GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error) {
+	llog := s.log.WithField("method", "GetSessionIDsByAudience")
+	llog.Debug("received request to get session IDs by audience")
+
+	if err := validate.Audience(aud); err != nil {
+		llog.Errorf("invalid audience: %s", err)
+		return nil, errors.Wrap(err, "error validating audience")
+	}
+
+	liveEntries, err := s.GetLive(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch live entries: %s", err)
+		return nil, errors.Wrap(err, "error fetching live entries")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, e := range liveEntries {
+		if len(nodeName) > 0 && e.NodeName != nodeName[0] {
+			continue
+		}
+
+		// Either same node or node was not specified
+		if util.AudienceEquals(aud, e.Audience) {
+			sessionIDs = append(sessionIDs, e.SessionID)
+			continue
+		}
+	}
+
+	return sessionIDs, nil
 }
 
 type Options struct {
@@ -325,6 +391,50 @@ func (s *Store) GetPipeline(ctx context.Context, pipelineId string) (*protos.Pip
 	return pipeline, nil
 }
 
+// SetPipelinesConfig is the structure saved as JSON for []*SetPipelinesConfig
+// in store under "streamdal_audience:$audienceStr"
+type SetPipelinesConfig struct {
+	PipelineID                string
+	Paused                    bool
+	CreatedAtUnixTimestampUTC int64
+}
+
+func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesRequest) error {
+	llog := s.log.WithField("method", "SetPipelines")
+	llog.Debugf("received request to save pipelines for audience '%s'", util.AudienceToStr(req.Audience))
+
+	// Validate req
+	if err := validate.SetPipelinesRequest(req); err != nil {
+		return errors.Wrap(err, "error validating request in store.SetPipelines()")
+	}
+
+	pipelineConfigs := make([]*SetPipelinesConfig, 0)
+
+	// Convert pipelines to cmd for storage
+	for _, p := range req.PipelineIds {
+		cfg := &SetPipelinesConfig{
+			PipelineID:                p,
+			CreatedAtUnixTimestampUTC: time.Now().UTC().Unix(),
+		}
+
+		pipelineConfigs = append(pipelineConfigs, cfg)
+	}
+
+	data, err := json.Marshal(pipelineConfigs)
+	if err != nil {
+		return errors.Wrap(err, "error serializing pipeline configs")
+	}
+
+	// Save to K/V
+	key := RedisAudienceKey(util.AudienceToStr(req.Audience))
+
+	if err := s.options.RedisBackend.Set(ctx, key, data, 0).Err(); err != nil {
+		return errors.Wrapf(err, "error saving pipeline to store in key '%s'", key)
+	}
+
+	return nil
+}
+
 func (s *Store) CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error {
 	llog := s.log.WithField("method", "CreatePipeline")
 	llog.Debug("received request to create pipeline")
@@ -377,124 +487,56 @@ func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	return nil
 }
 
-func (s *Store) AttachPipeline(ctx context.Context, req *protos.AttachPipelineRequest) error {
-	llog := s.log.WithField("method", "AttachPipeline")
-	llog.Debug("received request to attach pipeline")
+// Sets pipeline pause status
+func (s *Store) SetPauseResume(ctx context.Context, audience *protos.Audience, pipelineID string, paused bool) (bool, error) {
+	llog := s.log.WithField("method", "setPause")
+	llog.Debug("received request to set pause")
 
 	// Does this pipeline exist?
-	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
-		return errors.Wrap(err, "error fetching pipeline")
+	if _, err := s.GetPipeline(ctx, pipelineID); err != nil {
+		return false, errors.Wrap(err, "error fetching pipeline")
 	}
 
-	// Store attachment in RedisBackend
-	key := RedisConfigKey(req.Audience, req.PipelineId)
+	// Fetch pipeline config for this audience
+	key := RedisAudienceKey(util.AudienceToStr(audience))
 
-	if err := s.options.RedisBackend.Set(ctx, key, []byte(``), 0).Err(); err != nil {
-		return errors.Wrap(err, "error saving pipeline attachment to store")
-	}
-
-	return nil
-}
-
-func (s *Store) DetachPipeline(ctx context.Context, req *protos.DetachPipelineRequest) error {
-	llog := s.log.WithField("method", "DetachPipeline")
-	llog.Debug("received request to detach pipeline")
-
-	// Does this pipeline exist?
-	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
-		if err == ErrPipelineNotFound {
-			llog.Debugf("pipeline '%s' not found - nothing to do", req.PipelineId)
-			return nil
+	setPipelineConfigData, err := s.options.RedisBackend.Get(ctx, key).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return false, ErrConfigNotFound
 		}
 
-		return errors.Wrap(err, "error fetching pipeline")
+		return false, errors.Wrapf(err, "error fetching pipeline config under key '%s'", key)
 	}
 
-	// Delete audience association
-	if err := s.options.RedisBackend.Del(ctx, RedisConfigKey(req.Audience, req.PipelineId)).Err(); err != nil {
-		return errors.Wrap(err, "error deleting pipeline attachment from store")
+	setPipelineConfigs := make([]*SetPipelinesConfig, 0)
+
+	if err := json.Unmarshal([]byte(setPipelineConfigData), &setPipelineConfigs); err != nil {
+		return false, errors.Wrap(err, "error unmarshaling pipeline config")
 	}
 
-	// Delete from paused
-	if err := s.options.RedisBackend.Del(ctx, RedisPausedKey(util.AudienceToStr(req.Audience), req.PipelineId)).Err(); err != nil {
-		return errors.Wrap(err, "error deleting pipeline pause state")
+	var updated bool
+
+	for i, cfg := range setPipelineConfigs {
+		if cfg.PipelineID == pipelineID {
+			updated = true
+			setPipelineConfigs[i].Paused = paused
+		}
 	}
 
-	return nil
-}
-
-func (s *Store) PausePipeline(ctx context.Context, req *protos.PausePipelineRequest) error {
-	llog := s.log.WithField("method", "PausePipeline")
-	llog.Debug("received request to pause pipeline")
-
-	// Does this pipeline exist?
-	if _, err := s.GetPipeline(ctx, req.PipelineId); err != nil {
-		return errors.Wrap(err, "error fetching pipeline")
-	}
-
-	paused, err := s.IsPaused(ctx, req.Audience, req.PipelineId)
-	if err != nil {
-		return errors.Wrap(err, "error checking if pipeline is paused")
-	}
-
-	if paused {
-		llog.Debugf("pipeline '%s' already paused; nothing to do", req.PipelineId)
-		return nil
-	}
-
-	llog.Debugf("pipeline '%s' not paused; setting pause state now", req.PipelineId)
-
-	if err := s.options.RedisBackend.Set(
-		ctx,
-		RedisPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
-		[]byte(``),
-		0,
-	).Err(); err != nil {
-		return errors.Wrap(err, "error saving pipeline pause state")
-	}
-
-	return nil
-}
-
-// IsPaused returns if pipeline is paused and if it exists
-func (s *Store) IsPaused(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
-	llog := s.log.WithField("method", "IsPaused")
-	llog.Debug("received request to check if pipeline is paused")
-
-	if err := s.options.RedisBackend.Get(ctx, RedisPausedKey(util.AudienceToStr(audience), pipelineID)).Err(); err != nil {
-		if err == redis.Nil {
-			return false, nil
+	// If configs were updated, we need to save them back to K/V (broadcasting change should occur on the caller)
+	if updated {
+		data, err := json.Marshal(setPipelineConfigs)
+		if err != nil {
+			return false, errors.Wrap(err, "error serializing pipeline configs")
 		}
 
-		return false, errors.Wrap(err, "error fetching pipeline pause state")
+		if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(audience)), data, 0).Err(); err != nil {
+			return false, errors.Wrap(err, "error saving updated pipelines to store")
+		}
 	}
 
-	return true, nil
-}
-
-func (s *Store) ResumePipeline(ctx context.Context, req *protos.ResumePipelineRequest) error {
-	llog := s.log.WithField("method", "ResumePipeline")
-	llog.Debug("received request to resume pipeline")
-
-	paused, err := s.IsPaused(ctx, req.Audience, req.PipelineId)
-	if err != nil {
-		return errors.Wrap(err, "error checking if pipeline is paused")
-	}
-
-	if !paused {
-		llog.Debugf("pipeline '%s' not paused; nothing to do", req.PipelineId)
-		return nil
-	}
-
-	llog.Debugf("pipeline '%s' paused; removing pause state now", req.PipelineId)
-	if err := s.options.RedisBackend.Del(
-		ctx,
-		RedisPausedKey(util.AudienceToStr(req.Audience), req.PipelineId),
-	).Err(); err != nil {
-		return errors.Wrap(err, "error deleting pipeline pause state")
-	}
-
-	return nil
+	return updated, nil
 }
 
 func (s *Store) sendAudienceTelemetry(ctx context.Context, aud *protos.Audience, val int64) {
@@ -531,7 +573,7 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.New("request cannot be nil")
 	}
 
-	// Add it to the live bucket
+	// Add live key (or update and reset TTL)
 	if err := s.options.RedisBackend.Set(
 		ctx,
 		RedisLiveKey(req.SessionId, s.options.NodeName, util.AudienceToStr(req.Audience)),
@@ -541,21 +583,31 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
-	// And add it to more permanent storage (that doesn't care about the session id)
-	if err := s.options.RedisBackend.Set(
+	// And add it to more permanent storage (if it doesn't already exist)
+	if err := s.options.RedisBackend.SetArgs(
 		ctx,
 		RedisAudienceKey(util.AudienceToStr(req.Audience)),
-		[]byte(``),
-		0,
+		[]byte(`[]`),
+		redis.SetArgs{
+			Mode: "NX",
+		},
 	).Err(); err != nil {
+		if errors.Is(err, redis.Nil) {
+			// Key already exists, nothing to do
+			return nil
+		}
+
 		return errors.Wrap(err, "error saving audience to store")
 	}
+
+	s.log.Debugf("successfully setnx for aud '%s'", util.AudienceToStr(req.Audience))
 
 	s.sendAudienceTelemetry(ctx, req.Audience, 1)
 
 	return nil
 }
 
+// DEV (DONE): Minor update to support "force"
 func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error {
 	llog := s.log.WithField("method", "DeleteAudience")
 	llog.Debug("received request to delete audience")
@@ -566,13 +618,13 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 		return errors.Wrapf(err, "error fetching configs for audience '%s'", util.AudienceToStr(req.Audience))
 	}
 
-	if len(attached) > 0 {
+	if len(attached) > 0 && !req.GetForce() {
 		err = fmt.Errorf("audience '%s' has one or more attached pipelines - cannot delete", util.AudienceToStr(req.Audience))
 
 		return err
 	}
 
-	// Delete audience from bucket
+	// We can delete - either force is specified or there are no attached pipelines
 	audStr := util.AudienceToStr(req.Audience)
 	if err := s.options.RedisBackend.Del(ctx, RedisAudienceKey(audStr)).Err(); err != nil {
 		return errors.Wrap(err, "error deleting audience from store")
@@ -584,46 +636,107 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	return nil
 }
 
-func (s *Store) GetConfig(ctx context.Context) (map[*protos.Audience][]string, error) {
-	cfgs := make(map[*protos.Audience][]string)
+// GetAllConfig returns all audience -> pipeline configuration mappings
+func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience][]*protos.Pipeline, error) {
+	cfgs := make(map[*protos.Audience][]*protos.Pipeline)
 
-	audienceKeys, err := s.options.RedisBackend.Keys(ctx, RedisConfigPrefix+":*").Result()
+	audienceKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching config keys from store")
 	}
 
-	for _, aud := range audienceKeys {
-		audience, pipelineID := util.ParseConfigKey(aud)
-		if audience == nil {
-			return nil, fmt.Errorf("invalid config key '%s'", aud)
+	if len(audienceKeys) == 0 {
+		return cfgs, nil
+	}
+
+	for _, audStrFull := range audienceKeys {
+		// Get rid of prefix
+		audStrWithoutPrefix := strings.TrimPrefix(audStrFull, RedisAudiencePrefix+":")
+
+		// Good audience?
+		aud := util.AudienceFromStr(audStrWithoutPrefix)
+		if aud == nil {
+			return nil, fmt.Errorf("unable to convert '%s' to audience", audStrWithoutPrefix)
 		}
 
-		if cfgs[audience] == nil {
-			cfgs[audience] = make([]string, 0)
+		// Fetch SetPipelinesConfig for each audience
+		data, err := s.options.RedisBackend.Get(ctx, audStrFull).Result()
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching config '%s' from store", audStrFull)
 		}
 
-		cfgs[audience] = append(cfgs[audience], pipelineID)
+		setPipelinesConfig := make([]*SetPipelinesConfig, 0)
+
+		if err := json.Unmarshal([]byte(data), &setPipelinesConfig); err != nil {
+			return nil, errors.Wrapf(err, "error unmarshaling config for audience '%s'", audStrFull)
+		}
+
+		if len(setPipelinesConfig) == 0 {
+			s.log.Debugf("empty config for audience '%s' - nothing to do", audStrFull)
+			continue
+		}
+
+		if _, ok := cfgs[aud]; !ok {
+			cfgs[aud] = make([]*protos.Pipeline, 0)
+		}
+
+		for _, cfg := range setPipelinesConfig {
+			// Fetch pipeline config
+			pipeline, err := s.GetPipeline(ctx, cfg.PipelineID)
+			if err != nil {
+				return nil, errors.Wrapf(err, "unable to fetch pipeline '%s' for audience '%s'",
+					cfg.PipelineID, audStrFull)
+			}
+
+			// Add paused status to pipeline
+			pipeline.XPaused = proto.Bool(cfg.Paused)
+
+			cfgs[aud] = append(cfgs[aud], pipeline)
+		}
 	}
 
 	return cfgs, nil
 }
 
-// GetConfigByAudience returns a list of pipeline IDs attached to given audience
-func (s *Store) GetConfigByAudience(ctx context.Context, audience *protos.Audience) ([]string, error) {
-	cfgs, err := s.GetConfig(ctx)
+// GetConfigByAudience returns a list of pipelines for a given audience
+// TODO: Need tests
+func (s *Store) GetConfigByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error) {
+	pipelines := make([]*protos.Pipeline, 0)
+
+	audStr := util.AudienceToStr(aud)
+	if audStr == "" {
+		return nil, fmt.Errorf("failed to convert audience to str (audience: %+v)", aud)
+	}
+
+	// Fetch all configs, return only single audience
+	setPipelineConfigData, err := s.options.RedisBackend.Get(ctx, fmt.Sprintf(RedisAudienceKeyFormat, audStr)).Result()
 	if err != nil {
-		return nil, errors.Wrap(err, "error fetching config from store")
-	}
-
-	pipelineIDs := make([]string, 0)
-
-	for aud, ids := range cfgs {
-		if util.AudienceEquals(aud, audience) {
-			pipelineIDs = append(pipelineIDs, ids...)
+		if errors.Is(err, redis.Nil) {
+			return pipelines, nil
 		}
+
+		return nil, errors.Wrapf(err, "error fetching config '%s' from store", audStr)
 	}
 
-	return pipelineIDs, nil
+	// Unmarshal config, generate pipeline
+	setPipelineConfigs := make([]*SetPipelinesConfig, 0)
+
+	if err := json.Unmarshal([]byte(setPipelineConfigData), &setPipelineConfigs); err != nil {
+		return nil, errors.Wrapf(err, "error unmarshaling set pipelines config for audience '%s'", audStr)
+	}
+
+	// Convert pipeline IDs to *protos.Pipeline
+	for _, cfg := range setPipelineConfigs {
+		pipeline, err := s.GetPipeline(ctx, cfg.PipelineID)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching pipeline '%s'", cfg.PipelineID)
+		}
+
+		pipeline.XPaused = proto.Bool(cfg.Paused)
+		pipelines = append(pipelines, pipeline)
+	}
+
+	return pipelines, nil
 }
 
 func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
@@ -687,36 +800,45 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	return live, nil
 }
 
-func (s *Store) GetAttachCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
+// DEV (DONE): Needs to be updated to GetSetPipelineCommandsByService for ordered pipelines
+func (s *Store) GetSetPipelinesCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
+	llog := s.log.WithField("method", "GetSetPipelinesCommandsByService")
+	llog.Debug("received request to get set pipelines commands by service")
+
 	cmds := make([]*protos.Command, 0)
 
-	search := fmt.Sprintf("%s:%s:*", RedisConfigPrefix, serviceName)
-
-	keys, err := s.options.RedisBackend.Keys(ctx, search).Result()
+	allConfigs, err := s.GetAllConfig(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "error fetching config keys from store")
+		return nil, errors.Wrap(err, "error fetching all configs")
 	}
 
-	for _, key := range keys {
-		aud, pipelineID := util.ParseConfigKey(key)
+	for aud, perAudiencePipelines := range allConfigs {
 		if aud.ServiceName != serviceName {
 			continue
 		}
 
-		pipeline, err := s.GetPipeline(ctx, pipelineID)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching pipeline '%s'", pipelineID)
+		pipelines := make([]*protos.Pipeline, 0)
+
+		// Skip any pipelines that should be paused
+		for _, p := range perAudiencePipelines {
+			if p.GetXPaused() {
+				continue
+			}
+
+			pipelines = append(pipelines, p)
 		}
 
 		cmds = append(cmds, &protos.Command{
 			Audience: aud,
-			Command: &protos.Command_AttachPipeline{
-				AttachPipeline: &protos.AttachPipelineCommand{
-					Pipeline: pipeline,
+			Command: &protos.Command_SetPipelines{
+				SetPipelines: &protos.SetPipelinesCommand{
+					Pipelines: pipelines,
 				},
 			},
 		})
 	}
+
+	llog.Debugf("returning %d commands for service '%s'", len(cmds), serviceName)
 
 	return cmds, nil
 }
@@ -1008,61 +1130,31 @@ func (s *Store) GetAudiencesByService(ctx context.Context, serviceName string) (
 	return audiences, nil
 }
 
-func (s *Store) GetPaused(ctx context.Context) (map[string]*types.PausedEntry, error) {
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisPausedPrefix+":*").Result()
-	if err != nil {
-		return nil, errors.Wrap(err, "error fetching paused keys from store")
-	}
-
-	paused := make(map[string]*types.PausedEntry)
-
-	for _, key := range keys {
-		entry := &types.PausedEntry{
-			Key:        key,
-			Audience:   nil,
-			PipelineID: "",
-		}
-
-		parts := strings.SplitN(strings.TrimPrefix(key, RedisPausedPrefix+":"), ":", 2)
-		if len(parts) != 2 {
-			return nil, errors.Errorf("invalid paused key '%s' (incorrect number of parts '%d')", key, len(parts))
-		}
-
-		pipelineID := parts[0]
-		audStr := parts[1]
-
-		aud := util.AudienceFromStr(audStr)
-		if aud == nil {
-			return nil, errors.Errorf("invalid paused key '%s' (unable to convert audience str '%s' to *Audience)", key, audStr)
-		}
-
-		entry.Audience = aud
-		entry.PipelineID = pipelineID
-
-		paused[pipelineID] = entry
-	}
-
-	return paused, nil
-}
-
-func (s *Store) IsPipelineAttached(ctx context.Context, audience *protos.Audience, pipelineID string) (bool, error) {
-	key := RedisConfigKey(audience, pipelineID)
-
-	if err := s.options.RedisBackend.Get(ctx, key).Err(); err != nil {
-		if err == redis.Nil {
-			return false, nil
-		}
-
-		return false, errors.Wrap(err, "error fetching pipeline attachment from store")
-	}
-
-	return true, nil
-}
-
+// DEV (DONE): Needs to be updated to read all audience K/V's for ordered pipelines
 func (s *Store) IsPipelineAttachedAny(ctx context.Context, pipelineID string) bool {
-	search := fmt.Sprintf(RedisConfigKeyFormat, "*", pipelineID)
-	keys := s.options.RedisBackend.Keys(ctx, search).Val()
-	return len(keys) > 0
+	if pipelineID == "" {
+		s.log.Errorf("bug? Passed an empty pipelineID to IsPipelineAttachedAny()")
+		return false
+	}
+
+	// Get all configs
+	cfgs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		s.log.Errorf("error getting all configs: %s", err)
+		return false
+	}
+
+	// Loop through all configs, if pipelineID is found anywhere, return true
+	for aud, pipelines := range cfgs {
+		for _, pipeline := range pipelines {
+			if pipeline.Id == pipelineID {
+				s.log.Debugf("pipeline '%s' is attached to audience '%s'", pipelineID, util.AudienceToStr(aud))
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 type PipelineUsage struct {
@@ -1075,17 +1167,17 @@ type PipelineUsage struct {
 
 // GetPipelineUsage gets usage across the entire cluster
 func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) {
-	pipelines := make([]*PipelineUsage, 0)
+	usage := make([]*PipelineUsage, 0)
 
-	// Get config for all pipelines & audiences
-	cfgs, err := s.GetConfig(ctx)
+	// Get config for all usage & audiences
+	cfgs, err := s.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting configs")
 	}
 
-	// No cfgs == no pipelines
+	// No cfgs == no usage
 	if len(cfgs) == 0 {
-		return pipelines, nil
+		return usage, nil
 	}
 
 	// Get live clients
@@ -1094,11 +1186,11 @@ func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) 
 		return nil, errors.Wrap(err, "error getting live audiences")
 	}
 
-	// Build list of all used pipelines
-	for aud, pipelineIDs := range cfgs {
-		for _, pid := range pipelineIDs {
+	// Build list of all used usage
+	for aud, pipelines := range cfgs {
+		for _, p := range pipelines {
 			pu := &PipelineUsage{
-				PipelineId: pid,
+				PipelineId: p.Id,
 				Audience:   aud,
 			}
 
@@ -1111,11 +1203,31 @@ func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) 
 				}
 			}
 
-			pipelines = append(pipelines, pu)
+			usage = append(usage, pu)
 		}
 	}
 
-	return pipelines, nil
+	return usage, nil
+}
+
+// GetSessionIDs will return ALL live session IDs; optionally filter by node name
+func (s *Store) GetSessionIDs(ctx context.Context, nodeName ...string) ([]string, error) {
+	entries, err := s.GetLive(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error getting live entries")
+	}
+
+	sessionIDs := make([]string, 0)
+
+	for _, e := range entries {
+		if len(nodeName) > 0 && e.NodeName != nodeName[0] {
+			continue
+		}
+
+		sessionIDs = append(sessionIDs, e.SessionID)
+	}
+
+	return sessionIDs, nil
 }
 
 // GetActivePipelineUsage gets *ACTIVE* pipeline usage on the CURRENT node

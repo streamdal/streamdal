@@ -155,37 +155,17 @@ export interface DeletePipelineRequest {
     pipelineId: string;
 }
 /**
- * @generated from protobuf message protos.AttachPipelineRequest
+ * @generated from protobuf message protos.SetPipelinesRequest
  */
-export interface AttachPipelineRequest {
+export interface SetPipelinesRequest {
     /**
-     * @generated from protobuf field: string pipeline_id = 1;
+     * @generated from protobuf field: repeated string pipeline_ids = 1;
      */
-    pipelineId: string;
+    pipelineIds: string[];
     /**
      * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
-}
-/**
- * @generated from protobuf message protos.DetachPipelineRequest
- */
-export interface DetachPipelineRequest {
-    /**
-     * @generated from protobuf field: string pipeline_id = 1;
-     */
-    pipelineId: string;
-    /**
-     * @generated from protobuf field: protos.Audience audience = 2;
-     */
-    audience?: Audience;
-    /**
-     * Filled out by detach gRPC handler so that broadcast handlers can avoid
-     * performing a lookup in NATS.
-     *
-     * @generated from protobuf field: repeated string _session_ids = 3;
-     */
-    SessionIds: string[];
 }
 /**
  * @generated from protobuf message protos.PausePipelineRequest
@@ -636,26 +616,16 @@ declare class DeletePipelineRequest$Type extends MessageType<DeletePipelineReque
  * @generated MessageType for protobuf message protos.DeletePipelineRequest
  */
 export declare const DeletePipelineRequest: DeletePipelineRequest$Type;
-declare class AttachPipelineRequest$Type extends MessageType<AttachPipelineRequest> {
+declare class SetPipelinesRequest$Type extends MessageType<SetPipelinesRequest> {
     constructor();
-    create(value?: PartialMessage<AttachPipelineRequest>): AttachPipelineRequest;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AttachPipelineRequest): AttachPipelineRequest;
-    internalBinaryWrite(message: AttachPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<SetPipelinesRequest>): SetPipelinesRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesRequest): SetPipelinesRequest;
+    internalBinaryWrite(message: SetPipelinesRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.AttachPipelineRequest
+ * @generated MessageType for protobuf message protos.SetPipelinesRequest
  */
-export declare const AttachPipelineRequest: AttachPipelineRequest$Type;
-declare class DetachPipelineRequest$Type extends MessageType<DetachPipelineRequest> {
-    constructor();
-    create(value?: PartialMessage<DetachPipelineRequest>): DetachPipelineRequest;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetachPipelineRequest): DetachPipelineRequest;
-    internalBinaryWrite(message: DetachPipelineRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.DetachPipelineRequest
- */
-export declare const DetachPipelineRequest: DetachPipelineRequest$Type;
+export declare const SetPipelinesRequest: SetPipelinesRequest$Type;
 declare class PausePipelineRequest$Type extends MessageType<PausePipelineRequest> {
     constructor();
     create(value?: PartialMessage<PausePipelineRequest>): PausePipelineRequest;

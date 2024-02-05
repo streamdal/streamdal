@@ -14,6 +14,7 @@ import (
 	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	streamdal "github.com/streamdal/go-sdk"
 )
@@ -220,11 +221,6 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 			Data:          input,
 		})
 
-		if resp.DropMessage {
-			r.log.Warn("dropping message per step condition")
-			continue
-		}
-
 		r.display(input, resp, err)
 	}
 }
@@ -237,19 +233,32 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	bold := color.New(color.Bold).SprintFunc()
 	underline := color.New(color.Underline).SprintFunc()
 
-	// Set status and msg
-	status := color.GreenString("SUCCESS")
-	message := ""
+	var (
+		status  string
+		message string
+	)
 
-	if err != nil {
-		status = color.RedString("FAILURE")
-		message = color.RedString("Process error: " + err.Error())
+	switch post.Status {
+	case protos.ExecStatus_EXEC_STATUS_TRUE:
+		status = color.GreenString("TRUE")
+	case protos.ExecStatus_EXEC_STATUS_FALSE:
+		status = color.YellowString("FALSE")
+	case protos.ExecStatus_EXEC_STATUS_ERROR:
+		status = color.RedString("ERROR")
+	default:
+		status = color.HiRedString("%s", post.Status)
+	}
+
+	message = "no status message"
+
+	if post.StatusMessage != nil {
+		message = *post.StatusMessage
 	}
 
 	// Format pre data
 	preFormatted, err := prettyjson.Format(pre)
 	if err != nil {
-		r.log.Debugf("failed to format data: %s", err)
+		r.log.Debugf("failed to format data: %s (pre: %s)", err, pre)
 
 		// Format failed, just print raw data
 		preFormatted = pre
@@ -258,7 +267,7 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	// Format post data
 	postFormatted, err := prettyjson.Format(post.Data)
 	if err != nil {
-		r.log.Debugf("failed to format data: %s", err)
+		r.log.Debugf("failed to format data: %s (post: %s)", err, post.Data)
 
 		// Format failed, just print raw data
 		postFormatted = post.Data
@@ -273,9 +282,10 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 
 	tw.AppendRow(gopretty.Row{bold("Date"), now})
 	tw.AppendRow(gopretty.Row{bold("Status"), status})
-	tw.AppendRow(gopretty.Row{bold("Message"), message})
+	tw.AppendRow(gopretty.Row{bold("Status Message"), message})
 
 	if !r.config.Quiet {
+		tw.AppendRow(gopretty.Row{bold("Pipeline(s)"), summarizePipelineStatus(post.PipelineStatus)})
 		tw.AppendSeparator()
 		tw.AppendRow(gopretty.Row{bold("Pre-Process"), bold(postTitle)})
 		tw.AppendSeparator()
@@ -283,4 +293,21 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	}
 
 	fmt.Printf(tw.Render() + "\n")
+}
+
+func summarizePipelineStatus(pipelineStatus []*protos.PipelineStatus) string {
+	if len(pipelineStatus) == 0 {
+		return "no pipelines"
+	}
+
+	var status string
+
+	for i, p := range pipelineStatus {
+		lastStepStatus := p.StepStatus[len(p.StepStatus)-1].Status
+
+		status += fmt.Sprintf("(%d) Name: %s ID: %s LastStepStatus: %s\n",
+			i+1, p.Name, p.Id, lastStepStatus)
+	}
+
+	return status
 }

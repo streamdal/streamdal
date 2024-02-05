@@ -16,7 +16,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
-	"github.com/streamdal/server/wasm"
+	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 const (
@@ -74,17 +74,6 @@ func CtxRequestId(ctx context.Context) string {
 	return CtxStringValue(ctx, GRPCRequestIDMetadataKey)
 }
 
-func ParseConfigKey(key string) (*protos.Audience, string) {
-	key = strings.TrimPrefix(key, "streamdal_config:")
-	parts := strings.Split(key, ":")
-	if len(parts) < 5 {
-		return nil, ""
-	}
-
-	audStr := strings.Join(parts[:len(parts)-1], ":")
-	return AudienceFromStr(audStr), parts[len(parts)-1]
-}
-
 func AudienceToStr(audience *protos.Audience) string {
 	if audience == nil {
 		return ""
@@ -133,6 +122,9 @@ func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string)
 	}
 }
 
+// PopulateWASMFields is used for populating WASM in *protos.Pipeline because
+// the SDK may not have had audiences at startup and thus GetSetPipelinesByService()
+// would not have returned any WASM data.
 func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 	if pipeline == nil {
 		return errors.New("pipeline cannot be nil")
@@ -176,36 +168,41 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 
 // GenerateWasmMapping will generate a map of WASM modules from the given command(s).
 // NOTE: This is primarily useful for commands that have Steps which contain
-// Wasm fields (like AttachCommand). For commands that do not have Steps w/ Wasm,
-// this will do nothing.
+// Wasm fields (like SetPipelines command). For commands that do not have Steps
+// w/ Wasm, this will do nothing.
+// This is used _specifically_ for the initial GetSetPipelinesByService() that
+// SDKs call on startup (but if the SDK does not have any audiences, this will
+// be empty).
 func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmModule {
 	wasmModules := make(map[string]*protos.WasmModule)
 
 	for _, cmd := range commands {
-		if cmd.GetAttachPipeline() == nil {
+		if cmd.GetSetPipelines() == nil {
 			continue
 		}
 
-		if cmd.GetAttachPipeline().Pipeline == nil {
-			logrus.Warnf("bug? attach pipeline command has nil pipeline. Audience: %s CommandStr: %s",
+		if cmd.GetSetPipelines().Pipelines == nil {
+			logrus.Warnf("bug? attach pipeline command has nil pipelines. Audience: %s CommandStr: %s",
 				AudienceToStr(cmd.Audience), cmd.String())
 			continue
 		}
 
 		// Inject WASM data into its own map and zero out the bytes in the steps
 		// This is to prevent the WASM data from being duplicated in the response
-		for _, step := range cmd.GetAttachPipeline().Pipeline.Steps {
-			if _, ok := wasmModules[step.GetXWasmId()]; ok {
-				step.XWasmBytes = nil
-				continue
-			}
+		for _, pipeline := range cmd.GetSetPipelines().Pipelines {
+			for _, step := range pipeline.Steps {
+				if _, ok := wasmModules[step.GetXWasmId()]; ok {
+					step.XWasmBytes = nil
+					continue
+				}
 
-			wasmModules[step.GetXWasmId()] = &protos.WasmModule{
-				Id:       step.GetXWasmId(),
-				Bytes:    step.GetXWasmBytes(),
-				Function: step.GetXWasmFunction(),
+				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
+					Id:       step.GetXWasmId(),
+					Bytes:    step.GetXWasmBytes(),
+					Function: step.GetXWasmFunction(),
+				}
+				step.XWasmBytes = nil
 			}
-			step.XWasmBytes = nil
 		}
 	}
 
@@ -223,7 +220,8 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 	}
 }
 
-func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]*protos.GetAllResponsePipelines {
+// DEV (DONE): Need to update for ordered pipelines
+func ConvertConfigStrAudience(config map[*protos.Audience][]*protos.Pipeline) map[string]*protos.GetAllResponsePipelines {
 	if config == nil {
 		return nil
 	}
@@ -234,12 +232,78 @@ func ConvertConfigStrAudience(config map[*protos.Audience][]string) map[string]*
 		m[AudienceToStr(k)] = &protos.GetAllResponsePipelines{
 			PipelineIds: make([]string, 0),
 		}
-		for _, pipelineID := range pipelines {
-			m[AudienceToStr(k)].PipelineIds = append(m[AudienceToStr(k)].PipelineIds, pipelineID)
+		for _, p := range pipelines {
+			m[AudienceToStr(k)].PipelineIds = append(m[AudienceToStr(k)].PipelineIds, p.Id)
 		}
 	}
 
 	return m
+}
+
+func GenerateSchemaInferencePipeline(wasmDir string) (*protos.Pipeline, error) {
+	pipeline := &protos.Pipeline{
+		Id:   GenerateUUID(),
+		Name: "Schema Inference (auto-generated pipeline)",
+		Steps: []*protos.PipelineStep{
+			{
+				Name: "Infer Schema (auto-generated step)",
+				Step: &protos.PipelineStep_InferSchema{
+					InferSchema: &steps.InferSchemaStep{
+						CurrentSchema: make([]byte, 0),
+					},
+				},
+			},
+		},
+	}
+
+	if err := PopulateWASMFields(pipeline, wasmDir); err != nil {
+		return nil, errors.Wrap(err, "error populating WASM fields")
+	}
+
+	return pipeline, nil
+}
+
+// InjectSchemaInferenceForSetPipelinesCommands is a helper function for injecting
+// a schema inference pipeline into a slice of SetPipelines commands. This is
+// basically InjectSchemaInferenceForPipeline() but for commands.
+func InjectSchemaInferenceForSetPipelinesCommands(
+	cmds []*protos.Command,
+	wasmDir string,
+) (int, error) {
+	if len(cmds) == 0 {
+		return 0, nil
+	}
+
+	var numInjected int
+
+	for _, cmd := range cmds {
+		if cmd.GetSetPipelines() == nil {
+			fmt.Printf("skipping injection for non-SetPipelines command for audience '%s'\n", AudienceToStr(cmd.Audience))
+			continue
+		}
+
+		updatedPipelines, err := InjectSchemaInferenceForPipelines(cmd.GetSetPipelines().Pipelines, wasmDir)
+		if err != nil {
+			return 0, errors.Wrap(err, "error injecting schema inference pipeline")
+		}
+
+		cmd.GetSetPipelines().Pipelines = updatedPipelines
+
+		numInjected += 1
+	}
+
+	return numInjected, nil
+}
+
+// InjectSchemaInferenceForPipelines will inject a schema inference pipeline into
+// the given slice of pipelines. This is useful
+func InjectSchemaInferenceForPipelines(pipelines []*protos.Pipeline, wasmDir string) ([]*protos.Pipeline, error) {
+	schemaInferencePipeline, err := GenerateSchemaInferencePipeline(wasmDir)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to generate schema inference pipeline")
+	}
+
+	return append([]*protos.Pipeline{schemaInferencePipeline}, pipelines...), nil
 }
 
 func AudienceEquals(a, b *protos.Audience) bool {
@@ -279,30 +343,6 @@ func CounterName(name string, labels map[string]string) string {
 	}
 
 	return fmt.Sprintf("%s-%s", name, strings.Join(vals, "-"))
-}
-
-func GenInferSchemaPipeline(aud *protos.Audience) *protos.Command {
-	return &protos.Command{
-		Audience: aud,
-		Command: &protos.Command_AttachPipeline{
-			AttachPipeline: &protos.AttachPipelineCommand{
-				Pipeline: &protos.Pipeline{
-					Id:   GenerateUUID(),
-					Name: "Schema Inference",
-					Steps: []*protos.PipelineStep{
-						{
-							Name: "Infer Schema",
-							Step: &protos.PipelineStep_InferSchema{
-								InferSchema: &steps.InferSchemaStep{
-									CurrentSchema: make([]byte, 0), // TODO: get this from storage
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
 }
 
 // GrpcMethodCounterName turns a gRPC method name into a counter name for statsd

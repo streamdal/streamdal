@@ -11,7 +11,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to read request: {}", e),
             );
         }
@@ -23,8 +23,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-            format!("step validation failed: {}", err),
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err),
         );
     }
 
@@ -37,7 +37,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to convert input_payload to string: {}", e),
             );
         }
@@ -48,7 +48,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(orig_payload),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+            WASMExitCode::WASM_EXIT_CODE_TRUE,
             "".to_string(),
         )
     } else {
@@ -56,7 +56,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(orig_payload),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FAILURE,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             "invalid JSON".to_string(),
         )
     }

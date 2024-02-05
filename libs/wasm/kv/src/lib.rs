@@ -15,7 +15,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(req) => req,
         Err(e) => {
             return common::write_error_response(
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to parse request: {}", e.to_string()),
             );
         }
@@ -24,8 +24,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate request
     if let Err(err) = validate_wasm_request(&wasm_request) {
         return common::write_error_response(
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-            format!("unable to validate wasm request: {}", err.to_string()),
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err.to_string()),
         );
     }
 
@@ -34,7 +34,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         KVAction::KV_ACTION_EXISTS => kvExists,
         _ => {
             return common::write_error_response(
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid action: {:?}", wasm_request.step.kv().action),
             );
         }
@@ -50,7 +50,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Ok(key_contents) => step.key = key_contents.to_string(),
             Err(err) => {
                 return common::write_error_response(
-                    WASMExitCode::WASM_EXIT_CODE_FAILURE, // TODO: This should be exit code from parse call
+                    WASMExitCode::WASM_EXIT_CODE_FALSE, // TODO: This should be exit code from parse call
                     format!("unable to complete dynamic key lookup: {}", err.to_string()),
                 );
             }
@@ -62,7 +62,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(bytes) => bytes,
         Err(e) => {
             return common::write_error_response(
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to serialize step: {}", e.to_string()),
             );
         }
@@ -93,7 +93,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         Ok(resp) => resp,
         Err(e) => {
             return common::write_error_response(
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to parse kv step response: {}", e.to_string()),
             );
         }
@@ -102,7 +102,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Validate KVResp
     if let Err(err) = validate_kv_step_response(&kv_step_response) {
         return common::write_error_response(
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             format!("unable to validate kv step response: {}", err.to_string()),
         );
     }
@@ -111,10 +111,10 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
 
     // Write + return response
     match kv_step_response.status.unwrap() {
-        KVStatus::KV_STATUS_SUCCESS => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_SUCCESS,
-        KVStatus::KV_STATUS_FAILURE => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_FAILURE,
-        KVStatus::KV_STATUS_ERROR => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-        _ => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+        KVStatus::KV_STATUS_SUCCESS => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_TRUE,
+        KVStatus::KV_STATUS_FAILURE => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_FALSE,
+        KVStatus::KV_STATUS_ERROR => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_ERROR,
+        _ => wasm_exit_code = WASMExitCode::WASM_EXIT_CODE_ERROR,
     }
 
     // This may have been a KVGet that might produce a result - we should populate it (if it's there)

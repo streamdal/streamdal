@@ -14,7 +14,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 e.to_string(),
             );
         }
@@ -26,8 +26,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             Some(wasm_request.input_payload.as_slice()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FAILURE,
-            format!("invalid step: {}", err.to_string()),
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err.to_string()),
         );
     };
 
@@ -43,7 +43,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE, // DS: Should this be an error since it's a bad request?
                 "schema type is required".to_string(),
             );
         }
@@ -57,7 +57,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid payload json: {}", err),
             );
         }
@@ -73,7 +73,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid json schema: {}", err),
             );
         }
@@ -86,7 +86,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                 Some(wasm_request.input_payload.as_slice()),
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                WASMExitCode::WASM_EXIT_CODE_FALSE,
                 format!("invalid json schema: {}", err),
             );
         }
@@ -123,7 +123,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     None,
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+                    WASMExitCode::WASM_EXIT_CODE_TRUE,
                     "payload matches schema".to_string(),
                 )
             } else {
@@ -131,7 +131,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     None,
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                    WASMExitCode::WASM_EXIT_CODE_FALSE,
                     format!(
                         "payload does not match schema, invalid fields: {}",
                         err_str.trim_end_matches(',')
@@ -145,7 +145,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     None,
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                    WASMExitCode::WASM_EXIT_CODE_FALSE,
                     "payload matches schema".to_string(),
                 )
             } else {
@@ -153,7 +153,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     None,
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+                    WASMExitCode::WASM_EXIT_CODE_TRUE,
                     format!(
                         "payload does not match schema, invalid fields: {}",
                         err_str.trim_end_matches(',')
@@ -165,7 +165,7 @@ fn validate_json_schema(wasm_request: &WASMRequest) -> u64 {
             Some(wasm_request.input_payload.as_slice()),
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_FAILURE,
+            WASMExitCode::WASM_EXIT_CODE_FALSE, // DS: Should this be an error since it's a bad request?
             "schema validation condition is required".to_string(),
         ),
     };

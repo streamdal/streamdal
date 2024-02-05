@@ -17,7 +17,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 e.to_string(),
             );
         }
@@ -29,8 +29,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
-            format!("invalid step: {}", err.to_string()),
+            WASMExitCode::WASM_EXIT_CODE_ERROR,
+            format!("invalid wasm request: {}", err.to_string()),
         );
     }
 
@@ -42,7 +42,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 None,
-                WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+                WASMExitCode::WASM_EXIT_CODE_ERROR,
                 format!("unable to serialize request: {}", e.to_string()),
             );
         }
@@ -74,7 +74,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     Some(&res.body),
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_FAILURE,
+                    WASMExitCode::WASM_EXIT_CODE_FALSE,
                     format!("Request returned non-200 response code: {}", res.code),
                 )
             } else {
@@ -82,7 +82,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                     Some(wasm_request.input_payload.as_slice()),
                     Some(&res.body),
                     None,
-                    WASMExitCode::WASM_EXIT_CODE_SUCCESS,
+                    WASMExitCode::WASM_EXIT_CODE_TRUE,
                     "completed http request".to_string(),
                 )
             }
@@ -91,7 +91,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             None,
-            WASMExitCode::WASM_EXIT_CODE_INTERNAL_ERROR,
+            WASMExitCode::WASM_EXIT_CODE_FALSE,
             format!("unable to parse response: {}", e.to_string()),
         ),
     };
