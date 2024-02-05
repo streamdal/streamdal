@@ -497,7 +497,7 @@ class StreamdalClient:
         asyncio.set_event_loop(loop)
         loop.run_until_complete(call())
 
-    def _get_pipelines(self, aud: protos.Audience) -> list[protos.Pipeline]:
+    def _get_pipelines(self, aud: protos.Audience) -> list:
         """
         Get pipelines for a given mode and operation
 
