@@ -57,10 +57,12 @@ export const MetaData = (
                   <input
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight `}
                     value={k}
-                    onChange={(e) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setMetaData(
                         metaData.map(([k, v], ki) =>
-                          ki === i ? [e.target.value, v] : [k, v]
+                          ki === i
+                            ? [(e.target as HTMLInputElement).value, v]
+                            : [k, v]
                         ),
                       )}
                     placeholder="key"
@@ -79,11 +81,13 @@ export const MetaData = (
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight ${
                       errors[`${name}.${k}`] && "border-streamdalRed"
                     } `}
-                    value={v}
-                    onChange={(e) =>
+                    value={v as string}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setMetaData(
                         metaData.map(([k, v], ki) =>
-                          ki === i ? [k, e.target.value] : [k, v]
+                          ki === i
+                            ? [k, (e.target as HTMLInputElement).value]
+                            : [k, v]
                         ),
                       )}
                     disabled={!k}

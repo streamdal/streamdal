@@ -105,7 +105,7 @@ export default function ServiceMapComponent(
     success?: SuccessType;
   },
 ) {
-  const wrapper = useRef(null);
+  const wrapper = useRef<HTMLDivElement | null>(null);
 
   const [rfInstance, setRfInstance] = useState(null);
 
@@ -126,10 +126,11 @@ export default function ServiceMapComponent(
     };
   }
 
-  const fit = (nodes: FlowNode[], rfInstance) => {
-    const { right } = wrapper?.current?.getBoundingClientRect();
+  const fit = (nodes: FlowNode[], rfInstance: any) => {
+    const rect = wrapper?.current?.getBoundingClientRect();
     if (
-      right && rfInstance && nodes.find((n: FlowNode) => n.position.x > right)
+      rect?.right && rfInstance &&
+      nodes.find((n: FlowNode) => n.position.x > rect.right)
     ) {
       //
       // TODO, use useNodesInitialized instead of a timeout hack,
@@ -155,9 +156,9 @@ export default function ServiceMapComponent(
     }
   });
 
-  const clearModal = (e) => {
+  const clearModal = (e: any) => {
     if (e.target.className === "react-flow__pane react-flow__pane") {
-      opModal.value = null;
+      opModal.value = { clients: 0 };
     }
   };
 
@@ -173,7 +174,8 @@ export default function ServiceMapComponent(
       <Toast id={"global"} />
       <ReactFlow
         onInit={(reactFlowInstance: ReactFlowInstance) => {
-          setRfInstance(reactFlowInstance, fit(nodes, reactFlowInstance));
+          fit(nodes, reactFlowInstance);
+          setRfInstance(reactFlowInstance as any);
         }}
         nodes={nodes}
         edges={edges}
@@ -182,7 +184,7 @@ export default function ServiceMapComponent(
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
         edgeTypes={edgeTypes}
-        onClick={(e) => clearModal(e)}
+        onClick={(e: React.ChangeEvent<HTMLDivElement>) => clearModal(e)}
       >
         {!serverErrorSignal.value && nodes.length === 0 && <EmptyService />}
         <Background

@@ -3,7 +3,7 @@ import { Handlers } from "$fresh/src/server/types.ts";
 
 export const handler: Handlers<SuccessRoute> = {
   async POST(req, ctx) {
-    const { session } = ctx.state;
+    const { session }: any = ctx.state;
     const success = session.flash("success");
     return ctx.render({
       success,

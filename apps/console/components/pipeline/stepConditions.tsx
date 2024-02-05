@@ -1,6 +1,4 @@
 import { ErrorType } from "../form/validate.ts";
-import { CheckboxGroup } from "../form/checkboxGroup.tsx";
-import { PipelineStepConditions } from "streamdal-protos/protos/sp_pipeline.ts";
 import { StepCondition } from "./stepCondition.tsx";
 
 export type StepConditionsType = {
@@ -20,7 +18,6 @@ export const StepConditions = (
         toolTip="Actions to take when the step condition returns true"
         data={data}
         errors={errors}
-        stepIndex={stepIndex}
       />
       <StepCondition
         name={`steps.${stepIndex}.onFalse`}
@@ -28,7 +25,6 @@ export const StepConditions = (
         toolTip="Actions to take when the step condition returns false"
         data={data}
         errors={errors}
-        stepIndex={stepIndex}
       />
       <StepCondition
         name={`steps.${stepIndex}.onError`}
@@ -36,7 +32,6 @@ export const StepConditions = (
         toolTip="Action to take when the step condition did not compelte because of an error"
         data={data}
         errors={errors}
-        stepIndex={stepIndex}
       />
     </div>
   );

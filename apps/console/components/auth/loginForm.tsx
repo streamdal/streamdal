@@ -1,5 +1,4 @@
 import { Github, Google } from "../icons/social.tsx";
-import { z } from "https://deno.land/x/zod/mod.ts";
 import { useState } from "preact/hooks";
 import { LoginFormInput } from "./loginFormInput.tsx";
 

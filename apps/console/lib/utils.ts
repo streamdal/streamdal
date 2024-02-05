@@ -81,11 +81,11 @@ export const getAudienceOpRoute = (
     encodeURIComponent(audience.operationName)
   }`;
 
-export const getAudienceFromParams = (params: AudienceParams) => {
+export const getAudienceFromParams = (params: Record<string, string>) => {
   return {
     serviceName: params.service,
     componentName: params.component,
-    operationType: OperationType[params.operationType as any],
+    operationType: OperationType[params.operationType as any] as any,
     operationName: params.operationName,
   };
 };

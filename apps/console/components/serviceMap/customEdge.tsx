@@ -8,7 +8,7 @@ import { edgeKey, formatBytes, formatNumber } from "../../lib/utils.ts";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { signal } from "@preact/signals";
 
-type RateMetrics = { bytes: string; processed: string };
+type RateMetrics = { bytes: number; processed: number };
 export const audienceMetricsSignal = signal<{ [key in string]: RateMetrics }>(
   {},
 );
@@ -16,8 +16,8 @@ export const audienceMetricsSignal = signal<{ [key in string]: RateMetrics }>(
 const EdgeLabel = (
   { transform, bytes, processed }: {
     transform: string;
-    bytes: string;
-    processed: string;
+    bytes: number;
+    processed: number;
   },
 ) => {
   return (
@@ -58,8 +58,6 @@ export const ServiceEdge = ({
     targetX,
     targetY,
     targetPosition,
-    markerStart,
-    markerEnd,
   });
 
   const x = data?.a.operationType === OperationType.CONSUMER
@@ -73,7 +71,7 @@ export const ServiceEdge = ({
   const metrics = audienceMetricsSignal.value &&
       audienceMetricsSignal.value[key]
     ? audienceMetricsSignal.value[key]
-    : { bytes: "0", processed: "0" };
+    : { bytes: 0, processed: 0 };
 
   return (
     <>
@@ -113,8 +111,6 @@ export const ComponentEdge = ({
     targetX,
     targetY,
     targetPosition,
-    markerStart,
-    markerEnd,
   });
 
   const x = data?.a.operationType === OperationType.PRODUCER
@@ -128,7 +124,7 @@ export const ComponentEdge = ({
   const metrics = audienceMetricsSignal.value &&
       audienceMetricsSignal.value[key]
     ? audienceMetricsSignal.value[key]
-    : { bytes: "0", processed: "0" };
+    : { bytes: 0, processed: 0 };
 
   return (
     <>

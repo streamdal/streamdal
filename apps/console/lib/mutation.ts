@@ -34,15 +34,17 @@ export const updatePipelineNotifications = async (
   notificationIds: string[],
   pipeline: Pipeline,
 ) => {
-  if (pipeline.id) {
-    const existing = await getPipeline(pipeline.id);
+  const existing = pipeline.id && await getPipeline(pipeline.id);
 
-    for await (const notification of existing.NotificationConfigs) {
-      client.detachNotification(
-        { notificationId: notification.id, pipelineId: pipeline.id },
-        meta,
-      );
-    }
+  if (!existing) {
+    return;
+  }
+
+  for await (const notification of existing.NotificationConfigs) {
+    notification?.id && client.detachNotification(
+      { notificationId: notification.id, pipelineId: pipeline.id },
+      meta,
+    );
   }
 
   for await (const id of notificationIds) {

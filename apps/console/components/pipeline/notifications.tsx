@@ -28,7 +28,7 @@ const NotificationCheck = (
     } else {
       setData({
         ...data,
-        notifications: data?.notifications?.filter((n) =>
+        notifications: data?.notifications?.filter((n: NotificationConfig) =>
           n.id !== notification.id
         ),
       });
@@ -48,7 +48,8 @@ const NotificationCheck = (
         className={`w-4 h-4 rounded border mx-2 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2`}
         checked={checked}
         value={notification.id}
-        onChange={(e) => setChecked(e.target.checked)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setChecked((e.target as HTMLInputElement).checked)}
       />
       <label className="text-web font-medium text-[14px]">
         {`${notification.config.oneofKind} -  ${notification.name}`}

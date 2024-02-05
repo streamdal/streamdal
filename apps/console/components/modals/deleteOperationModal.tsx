@@ -14,7 +14,7 @@ export const DeleteOperationModal = (
   },
 ) => {
   const [open, setOpen] = useState(true);
-  const close = () => opModal.value = null;
+  const close = () => opModal.value = {};
 
   const deleteOp = async () => {
     const response = await fetch(
