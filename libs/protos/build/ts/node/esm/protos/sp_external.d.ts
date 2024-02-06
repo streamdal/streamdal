@@ -10,6 +10,7 @@ import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
+import { PipelineMappings } from "./sp_pipeline.js";
 import { PipelineInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
 import { LiveInfo } from "./sp_info.js";
@@ -47,13 +48,13 @@ export interface GetAllResponse {
         [key: string]: PipelineInfo;
     };
     /**
-     * Audience to pipeline ID config/mapping.
-     * key == $audience_as_string, value = $pipeline_id
+     * Audience to pipeline mapping config.
+     * key == $audience_as_string
      *
-     * @generated from protobuf field: map<string, protos.GetAllResponsePipelines> config = 4;
+     * @generated from protobuf field: map<string, protos.PipelineMappings> config = 4;
      */
     config: {
-        [key: string]: GetAllResponsePipelines;
+        [key: string]: PipelineMappings;
     };
     /**
      * When was this response generated. This is useful for determining what is
@@ -70,17 +71,6 @@ export interface GetAllResponse {
     Keepalive?: boolean;
 }
 /**
- * @generated from protobuf message protos.GetAllResponsePipelines
- */
-export interface GetAllResponsePipelines {
-    /**
-     * List of pipeline IDs that are attached to this audience
-     *
-     * @generated from protobuf field: repeated string pipeline_ids = 1;
-     */
-    pipelineIds: string[];
-}
-/**
  * Don't think we need anything here
  *
  * @generated from protobuf message protos.GetPipelinesRequest
@@ -88,6 +78,8 @@ export interface GetAllResponsePipelines {
 export interface GetPipelinesRequest {
 }
 /**
+ * Array of pipeline definitions
+ *
  * @generated from protobuf message protos.GetPipelinesResponse
  */
 export interface GetPipelinesResponse {
@@ -524,16 +516,6 @@ declare class GetAllResponse$Type extends MessageType<GetAllResponse> {
  * @generated MessageType for protobuf message protos.GetAllResponse
  */
 export declare const GetAllResponse: GetAllResponse$Type;
-declare class GetAllResponsePipelines$Type extends MessageType<GetAllResponsePipelines> {
-    constructor();
-    create(value?: PartialMessage<GetAllResponsePipelines>): GetAllResponsePipelines;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllResponsePipelines): GetAllResponsePipelines;
-    internalBinaryWrite(message: GetAllResponsePipelines, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.GetAllResponsePipelines
- */
-export declare const GetAllResponsePipelines: GetAllResponsePipelines$Type;
 declare class GetPipelinesRequest$Type extends MessageType<GetPipelinesRequest> {
     constructor();
     create(value?: PartialMessage<GetPipelinesRequest>): GetPipelinesRequest;

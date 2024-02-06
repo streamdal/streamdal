@@ -441,6 +441,25 @@ class PipelineStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class PipelineMappings(betterproto.Message):
+    """
+    PipelineMappings is stored encoded in redis:streamdal_audience:$audStr; it
+    is also used in external.GetAllResponse:config.
+    """
+
+    mappings: List["PipelineMapping"] = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class PipelineMapping(betterproto.Message):
+    """PipelineMapping is structure used in protos.PipelineMappings"""
+
+    id: str = betterproto.string_field(1)
+    paused: bool = betterproto.bool_field(2)
+    created_at_unix_ts_utc: int = betterproto.int64_field(3)
+
+
+@dataclass(eq=False, repr=False)
 class LiveInfo(betterproto.Message):
     audiences: List["Audience"] = betterproto.message_field(1)
     """If empty, client has not announced any audiences"""
@@ -505,13 +524,10 @@ class GetAllResponse(betterproto.Message):
     attached to any audience.
     """
 
-    config: Dict[str, "GetAllResponsePipelines"] = betterproto.map_field(
+    config: Dict[str, "PipelineMappings"] = betterproto.map_field(
         4, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
-    """
-    Audience to pipeline ID config/mapping. key == $audience_as_string, value =
-    $pipeline_id
-    """
+    """Audience to pipeline mapping config. key == $audience_as_string"""
 
     generated_at_unix_ts_ns_utc: int = betterproto.int64_field(100)
     """
@@ -526,18 +542,14 @@ class GetAllResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class GetAllResponsePipelines(betterproto.Message):
-    pipeline_ids: List[str] = betterproto.string_field(1)
-    """List of pipeline IDs that are attached to this audience"""
-
-
-@dataclass(eq=False, repr=False)
 class GetPipelinesRequest(betterproto.Message):
     pass
 
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesResponse(betterproto.Message):
+    """Array of pipeline definitions"""
+
     pipelines: List["Pipeline"] = betterproto.message_field(1)
 
 

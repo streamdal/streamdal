@@ -207,6 +207,37 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
+ * PipelineMappings is stored encoded in redis:streamdal_audience:$audStr; it is
+ * also used in external.GetAllResponse:config.
+ *
+ * @generated from protobuf message protos.PipelineMappings
+ */
+export interface PipelineMappings {
+    /**
+     * @generated from protobuf field: repeated protos.PipelineMapping mappings = 1;
+     */
+    mappings: PipelineMapping[];
+}
+/**
+ * PipelineMapping is structure used in protos.PipelineMappings
+ *
+ * @generated from protobuf message protos.PipelineMapping
+ */
+export interface PipelineMapping {
+    /**
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: bool paused = 2;
+     */
+    paused: boolean;
+    /**
+     * @generated from protobuf field: int64 created_at_unix_ts_utc = 3;
+     */
+    createdAtUnixTsUtc: string;
+}
+/**
  * Defines the ways in which a pipeline can be aborted
  *
  * @generated from protobuf enum protos.AbortCondition
@@ -256,4 +287,24 @@ declare class PipelineStep$Type extends MessageType<PipelineStep> {
  * @generated MessageType for protobuf message protos.PipelineStep
  */
 export declare const PipelineStep: PipelineStep$Type;
+declare class PipelineMappings$Type extends MessageType<PipelineMappings> {
+    constructor();
+    create(value?: PartialMessage<PipelineMappings>): PipelineMappings;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineMappings): PipelineMappings;
+    internalBinaryWrite(message: PipelineMappings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineMappings
+ */
+export declare const PipelineMappings: PipelineMappings$Type;
+declare class PipelineMapping$Type extends MessageType<PipelineMapping> {
+    constructor();
+    create(value?: PartialMessage<PipelineMapping>): PipelineMapping;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineMapping): PipelineMapping;
+    internalBinaryWrite(message: PipelineMapping, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineMapping
+ */
+export declare const PipelineMapping: PipelineMapping$Type;
 export {};

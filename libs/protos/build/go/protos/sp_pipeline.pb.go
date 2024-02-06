@@ -495,6 +495,119 @@ func (*PipelineStep_ValidJson) isPipelineStep_Step() {}
 
 func (*PipelineStep_SchemaValidation) isPipelineStep_Step() {}
 
+// PipelineMappings is stored encoded in redis:streamdal_audience:$audStr; it is
+// also used in external.GetAllResponse:config.
+type PipelineMappings struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Mappings []*PipelineMapping `protobuf:"bytes,1,rep,name=mappings,proto3" json:"mappings,omitempty"`
+}
+
+func (x *PipelineMappings) Reset() {
+	*x = PipelineMappings{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sp_pipeline_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PipelineMappings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PipelineMappings) ProtoMessage() {}
+
+func (x *PipelineMappings) ProtoReflect() protoreflect.Message {
+	mi := &file_sp_pipeline_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PipelineMappings.ProtoReflect.Descriptor instead.
+func (*PipelineMappings) Descriptor() ([]byte, []int) {
+	return file_sp_pipeline_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PipelineMappings) GetMappings() []*PipelineMapping {
+	if x != nil {
+		return x.Mappings
+	}
+	return nil
+}
+
+// PipelineMapping is structure used in protos.PipelineMappings
+type PipelineMapping struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id                 string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Paused             bool   `protobuf:"varint,2,opt,name=paused,proto3" json:"paused,omitempty"`
+	CreatedAtUnixTsUtc int64  `protobuf:"varint,3,opt,name=created_at_unix_ts_utc,json=createdAtUnixTsUtc,proto3" json:"created_at_unix_ts_utc,omitempty"`
+}
+
+func (x *PipelineMapping) Reset() {
+	*x = PipelineMapping{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sp_pipeline_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PipelineMapping) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PipelineMapping) ProtoMessage() {}
+
+func (x *PipelineMapping) ProtoReflect() protoreflect.Message {
+	mi := &file_sp_pipeline_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PipelineMapping.ProtoReflect.Descriptor instead.
+func (*PipelineMapping) Descriptor() ([]byte, []int) {
+	return file_sp_pipeline_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *PipelineMapping) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *PipelineMapping) GetPaused() bool {
+	if x != nil {
+		return x.Paused
+	}
+	return false
+}
+
+func (x *PipelineMapping) GetCreatedAtUnixTsUtc() int64 {
+	if x != nil {
+		return x.CreatedAtUnixTsUtc
+	}
+	return 0
+}
+
 var File_sp_pipeline_proto protoreflect.FileDescriptor
 
 var file_sp_pipeline_proto_rawDesc = []byte{
@@ -612,18 +725,29 @@ var file_sp_pipeline_proto_rawDesc = []byte{
 	0x65, 0x70, 0x42, 0x0b, 0x0a, 0x09, 0x58, 0x5f, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x69, 0x64, 0x42,
 	0x0e, 0x0a, 0x0c, 0x58, 0x5f, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x62, 0x79, 0x74, 0x65, 0x73, 0x42,
 	0x11, 0x0a, 0x0f, 0x58, 0x5f, 0x77, 0x61, 0x73, 0x6d, 0x5f, 0x66, 0x75, 0x6e, 0x63, 0x74, 0x69,
-	0x6f, 0x6e, 0x2a, 0x6d, 0x0a, 0x0e, 0x41, 0x62, 0x6f, 0x72, 0x74, 0x43, 0x6f, 0x6e, 0x64, 0x69,
-	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x19, 0x0a, 0x15, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x43, 0x4f,
-	0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12,
-	0x21, 0x0a, 0x1d, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49,
-	0x4f, 0x4e, 0x5f, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x43, 0x55, 0x52, 0x52, 0x45, 0x4e, 0x54,
-	0x10, 0x01, 0x12, 0x1d, 0x0a, 0x19, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x43, 0x4f, 0x4e, 0x44,
-	0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x41, 0x4c, 0x4c, 0x10,
-	0x02, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d,
-	0x64, 0x61, 0x6c, 0x2f, 0x6c, 0x69, 0x62, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f,
-	0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x6e, 0x22, 0x47, 0x0a, 0x10, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x4d, 0x61,
+	0x70, 0x70, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x33, 0x0a, 0x08, 0x6d, 0x61, 0x70, 0x70, 0x69, 0x6e,
+	0x67, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x4d, 0x61, 0x70, 0x70, 0x69, 0x6e,
+	0x67, 0x52, 0x08, 0x6d, 0x61, 0x70, 0x70, 0x69, 0x6e, 0x67, 0x73, 0x22, 0x6d, 0x0a, 0x0f, 0x50,
+	0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x4d, 0x61, 0x70, 0x70, 0x69, 0x6e, 0x67, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x16,
+	0x0a, 0x06, 0x70, 0x61, 0x75, 0x73, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06,
+	0x70, 0x61, 0x75, 0x73, 0x65, 0x64, 0x12, 0x32, 0x0a, 0x16, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x64, 0x5f, 0x61, 0x74, 0x5f, 0x75, 0x6e, 0x69, 0x78, 0x5f, 0x74, 0x73, 0x5f, 0x75, 0x74, 0x63,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x12, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41,
+	0x74, 0x55, 0x6e, 0x69, 0x78, 0x54, 0x73, 0x55, 0x74, 0x63, 0x2a, 0x6d, 0x0a, 0x0e, 0x41, 0x62,
+	0x6f, 0x72, 0x74, 0x43, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x19, 0x0a, 0x15,
+	0x41, 0x42, 0x4f, 0x52, 0x54, 0x5f, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f,
+	0x55, 0x4e, 0x53, 0x45, 0x54, 0x10, 0x00, 0x12, 0x21, 0x0a, 0x1d, 0x41, 0x42, 0x4f, 0x52, 0x54,
+	0x5f, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x42, 0x4f, 0x52, 0x54,
+	0x5f, 0x43, 0x55, 0x52, 0x52, 0x45, 0x4e, 0x54, 0x10, 0x01, 0x12, 0x1d, 0x0a, 0x19, 0x41, 0x42,
+	0x4f, 0x52, 0x54, 0x5f, 0x43, 0x4f, 0x4e, 0x44, 0x49, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x42,
+	0x4f, 0x52, 0x54, 0x5f, 0x41, 0x4c, 0x4c, 0x10, 0x02, 0x42, 0x3c, 0x5a, 0x3a, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61,
+	0x6c, 0x2f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x64, 0x61, 0x6c, 0x2f, 0x6c, 0x69, 0x62, 0x73,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2f, 0x62, 0x75, 0x69, 0x6c, 0x64, 0x2f, 0x67, 0x6f,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -639,48 +763,51 @@ func file_sp_pipeline_proto_rawDescGZIP() []byte {
 }
 
 var file_sp_pipeline_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_sp_pipeline_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_sp_pipeline_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_sp_pipeline_proto_goTypes = []interface{}{
 	(AbortCondition)(0),                // 0: protos.AbortCondition
 	(*Pipeline)(nil),                   // 1: protos.Pipeline
 	(*PipelineStepConditions)(nil),     // 2: protos.PipelineStepConditions
 	(*PipelineStep)(nil),               // 3: protos.PipelineStep
-	nil,                                // 4: protos.PipelineStepConditions.MetadataEntry
-	(*NotificationConfig)(nil),         // 5: protos.NotificationConfig
-	(*steps.DetectiveStep)(nil),        // 6: protos.steps.DetectiveStep
-	(*steps.TransformStep)(nil),        // 7: protos.steps.TransformStep
-	(*steps.EncodeStep)(nil),           // 8: protos.steps.EncodeStep
-	(*steps.DecodeStep)(nil),           // 9: protos.steps.DecodeStep
-	(*steps.CustomStep)(nil),           // 10: protos.steps.CustomStep
-	(*steps.HttpRequestStep)(nil),      // 11: protos.steps.HttpRequestStep
-	(*steps.KVStep)(nil),               // 12: protos.steps.KVStep
-	(*steps.InferSchemaStep)(nil),      // 13: protos.steps.InferSchemaStep
-	(*steps.ValidJSONStep)(nil),        // 14: protos.steps.ValidJSONStep
-	(*steps.SchemaValidationStep)(nil), // 15: protos.steps.SchemaValidationStep
+	(*PipelineMappings)(nil),           // 4: protos.PipelineMappings
+	(*PipelineMapping)(nil),            // 5: protos.PipelineMapping
+	nil,                                // 6: protos.PipelineStepConditions.MetadataEntry
+	(*NotificationConfig)(nil),         // 7: protos.NotificationConfig
+	(*steps.DetectiveStep)(nil),        // 8: protos.steps.DetectiveStep
+	(*steps.TransformStep)(nil),        // 9: protos.steps.TransformStep
+	(*steps.EncodeStep)(nil),           // 10: protos.steps.EncodeStep
+	(*steps.DecodeStep)(nil),           // 11: protos.steps.DecodeStep
+	(*steps.CustomStep)(nil),           // 12: protos.steps.CustomStep
+	(*steps.HttpRequestStep)(nil),      // 13: protos.steps.HttpRequestStep
+	(*steps.KVStep)(nil),               // 14: protos.steps.KVStep
+	(*steps.InferSchemaStep)(nil),      // 15: protos.steps.InferSchemaStep
+	(*steps.ValidJSONStep)(nil),        // 16: protos.steps.ValidJSONStep
+	(*steps.SchemaValidationStep)(nil), // 17: protos.steps.SchemaValidationStep
 }
 var file_sp_pipeline_proto_depIdxs = []int32{
 	3,  // 0: protos.Pipeline.steps:type_name -> protos.PipelineStep
-	5,  // 1: protos.Pipeline._notification_configs:type_name -> protos.NotificationConfig
+	7,  // 1: protos.Pipeline._notification_configs:type_name -> protos.NotificationConfig
 	0,  // 2: protos.PipelineStepConditions.abort:type_name -> protos.AbortCondition
-	4,  // 3: protos.PipelineStepConditions.metadata:type_name -> protos.PipelineStepConditions.MetadataEntry
+	6,  // 3: protos.PipelineStepConditions.metadata:type_name -> protos.PipelineStepConditions.MetadataEntry
 	2,  // 4: protos.PipelineStep.on_true:type_name -> protos.PipelineStepConditions
 	2,  // 5: protos.PipelineStep.on_false:type_name -> protos.PipelineStepConditions
 	2,  // 6: protos.PipelineStep.on_error:type_name -> protos.PipelineStepConditions
-	6,  // 7: protos.PipelineStep.detective:type_name -> protos.steps.DetectiveStep
-	7,  // 8: protos.PipelineStep.transform:type_name -> protos.steps.TransformStep
-	8,  // 9: protos.PipelineStep.encode:type_name -> protos.steps.EncodeStep
-	9,  // 10: protos.PipelineStep.decode:type_name -> protos.steps.DecodeStep
-	10, // 11: protos.PipelineStep.custom:type_name -> protos.steps.CustomStep
-	11, // 12: protos.PipelineStep.http_request:type_name -> protos.steps.HttpRequestStep
-	12, // 13: protos.PipelineStep.kv:type_name -> protos.steps.KVStep
-	13, // 14: protos.PipelineStep.infer_schema:type_name -> protos.steps.InferSchemaStep
-	14, // 15: protos.PipelineStep.valid_json:type_name -> protos.steps.ValidJSONStep
-	15, // 16: protos.PipelineStep.schema_validation:type_name -> protos.steps.SchemaValidationStep
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	8,  // 7: protos.PipelineStep.detective:type_name -> protos.steps.DetectiveStep
+	9,  // 8: protos.PipelineStep.transform:type_name -> protos.steps.TransformStep
+	10, // 9: protos.PipelineStep.encode:type_name -> protos.steps.EncodeStep
+	11, // 10: protos.PipelineStep.decode:type_name -> protos.steps.DecodeStep
+	12, // 11: protos.PipelineStep.custom:type_name -> protos.steps.CustomStep
+	13, // 12: protos.PipelineStep.http_request:type_name -> protos.steps.HttpRequestStep
+	14, // 13: protos.PipelineStep.kv:type_name -> protos.steps.KVStep
+	15, // 14: protos.PipelineStep.infer_schema:type_name -> protos.steps.InferSchemaStep
+	16, // 15: protos.PipelineStep.valid_json:type_name -> protos.steps.ValidJSONStep
+	17, // 16: protos.PipelineStep.schema_validation:type_name -> protos.steps.SchemaValidationStep
+	5,  // 17: protos.PipelineMappings.mappings:type_name -> protos.PipelineMapping
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_sp_pipeline_proto_init() }
@@ -726,6 +853,30 @@ func file_sp_pipeline_proto_init() {
 				return nil
 			}
 		}
+		file_sp_pipeline_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PipelineMappings); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sp_pipeline_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PipelineMapping); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_sp_pipeline_proto_msgTypes[0].OneofWrappers = []interface{}{}
 	file_sp_pipeline_proto_msgTypes[2].OneofWrappers = []interface{}{
@@ -746,7 +897,7 @@ func file_sp_pipeline_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sp_pipeline_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
