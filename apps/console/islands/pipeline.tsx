@@ -51,6 +51,8 @@ import {
 } from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
 import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
 import * as uuid from "$std/uuid/mod.ts";
+import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
+import { PipelineHTTP } from "./pipelineHTTP.tsx";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -89,12 +91,14 @@ const SchemaValidationConditionEnum = z.nativeEnum(SchemaValidationCondition);
 const JSONSchemaDraftEnum = z.nativeEnum(JSONSchemaDraft);
 const KVActionTypeEnum = z.nativeEnum(KVAction);
 const KVModeTypeEnum = z.nativeEnum(KVMode);
+const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
 
 const kinds = [
   { label: "Detective", value: "detective" },
   { label: "Transform", value: "transform" },
   { label: "Key/Value", value: "kv" },
   { label: "Schema Validation", value: "schemaValidation" },
+  { label: "HTTP Request", value: "httpRequest" },
 ];
 
 const transformOptions = z.discriminatedUnion("oneofKind", [
@@ -248,6 +252,20 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         SchemaValidationCondition.MATCH,
       ),
       options: schemaValidationOptions,
+    }),
+  }),
+  z.object({
+    oneofKind: z.literal("httpRequest"),
+    httpRequest: z.object({
+      request: z.object({
+        method: zfd.numeric(HTTPMethodEnum),
+        url: z.string().url(),
+        body: z.string().transform((v) => new TextEncoder().encode(v)),
+        headers: z.record(
+          z.string().min(1, { message: "Required" }),
+          z.string().min(1, { message: "Required" }),
+        ).optional(),
+      }),
     }),
   }),
   z.object({
@@ -672,9 +690,18 @@ const PipelineDetail = (
                       />
                     </>
                   )}
+                  {"httpRequest" === step.step.oneofKind && (
+                    <PipelineHTTP
+                      stepNumber={i}
+                      data={data}
+                      setData={setData}
+                      errors={errors}
+                    />
+                  )}
                   <StepConditions
                     stepIndex={i}
                     data={data}
+                    setData={setData}
                     errors={errors}
                   />
                 </div>
