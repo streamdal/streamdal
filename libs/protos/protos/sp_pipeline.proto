@@ -99,15 +99,15 @@ message PipelineStep {
   optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
-// PipelineMappings is stored encoded in redis:streamdal_audience:$audStr; it is
+// PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is
 // also used in external.GetAllResponse:config.
-message PipelineMappings {
-  repeated PipelineMapping mappings = 1;
+message PipelineConfigs {
+  repeated PipelineConfig configs = 1;
 }
 
 
-// PipelineMapping is structure used in protos.PipelineMappings
-message PipelineMapping {
+// PipelineConfig is structure used in protos.PipelineConfigs
+message PipelineConfig {
   string id = 1;
   bool paused = 2;
   int64 created_at_unix_ts_utc = 3;

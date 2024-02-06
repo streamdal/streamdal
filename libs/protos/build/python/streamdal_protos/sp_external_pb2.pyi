@@ -121,14 +121,14 @@ class GetAllRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetAllResponse(_message.Message):
-    __slots__ = ["_keepalive", "audiences", "config", "generated_at_unix_ts_ns_utc", "live", "pipelines"]
-    class ConfigEntry(_message.Message):
+    __slots__ = ["_keepalive", "audiences", "configs", "generated_at_unix_ts_ns_utc", "live", "pipelines"]
+    class ConfigsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: _sp_pipeline_pb2.PipelineMappings
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_pipeline_pb2.PipelineMappings, _Mapping]] = ...) -> None: ...
+        value: _sp_pipeline_pb2.PipelineConfigs
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_pipeline_pb2.PipelineConfigs, _Mapping]] = ...) -> None: ...
     class PipelinesEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -137,18 +137,18 @@ class GetAllResponse(_message.Message):
         value: _sp_info_pb2.PipelineInfo
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_info_pb2.PipelineInfo, _Mapping]] = ...) -> None: ...
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
-    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
     GENERATED_AT_UNIX_TS_NS_UTC_FIELD_NUMBER: _ClassVar[int]
     LIVE_FIELD_NUMBER: _ClassVar[int]
     PIPELINES_FIELD_NUMBER: _ClassVar[int]
     _KEEPALIVE_FIELD_NUMBER: _ClassVar[int]
     _keepalive: bool
     audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
-    config: _containers.MessageMap[str, _sp_pipeline_pb2.PipelineMappings]
+    configs: _containers.MessageMap[str, _sp_pipeline_pb2.PipelineConfigs]
     generated_at_unix_ts_ns_utc: int
     live: _containers.RepeatedCompositeFieldContainer[_sp_info_pb2.LiveInfo]
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
-    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, _sp_pipeline_pb2.PipelineMappings]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
+    def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., configs: _Optional[_Mapping[str, _sp_pipeline_pb2.PipelineConfigs]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
 
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []

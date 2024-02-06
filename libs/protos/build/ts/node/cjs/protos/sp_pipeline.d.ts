@@ -207,23 +207,23 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
- * PipelineMappings is stored encoded in redis:streamdal_audience:$audStr; it is
+ * PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is
  * also used in external.GetAllResponse:config.
  *
- * @generated from protobuf message protos.PipelineMappings
+ * @generated from protobuf message protos.PipelineConfigs
  */
-export interface PipelineMappings {
+export interface PipelineConfigs {
     /**
-     * @generated from protobuf field: repeated protos.PipelineMapping mappings = 1;
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
      */
-    mappings: PipelineMapping[];
+    configs: PipelineConfig[];
 }
 /**
- * PipelineMapping is structure used in protos.PipelineMappings
+ * PipelineConfig is structure used in protos.PipelineConfigs
  *
- * @generated from protobuf message protos.PipelineMapping
+ * @generated from protobuf message protos.PipelineConfig
  */
-export interface PipelineMapping {
+export interface PipelineConfig {
     /**
      * @generated from protobuf field: string id = 1;
      */
@@ -287,24 +287,24 @@ declare class PipelineStep$Type extends MessageType<PipelineStep> {
  * @generated MessageType for protobuf message protos.PipelineStep
  */
 export declare const PipelineStep: PipelineStep$Type;
-declare class PipelineMappings$Type extends MessageType<PipelineMappings> {
+declare class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
     constructor();
-    create(value?: PartialMessage<PipelineMappings>): PipelineMappings;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineMappings): PipelineMappings;
-    internalBinaryWrite(message: PipelineMappings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfigs): PipelineConfigs;
+    internalBinaryWrite(message: PipelineConfigs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineMappings
+ * @generated MessageType for protobuf message protos.PipelineConfigs
  */
-export declare const PipelineMappings: PipelineMappings$Type;
-declare class PipelineMapping$Type extends MessageType<PipelineMapping> {
+export declare const PipelineConfigs: PipelineConfigs$Type;
+declare class PipelineConfig$Type extends MessageType<PipelineConfig> {
     constructor();
-    create(value?: PartialMessage<PipelineMapping>): PipelineMapping;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineMapping): PipelineMapping;
-    internalBinaryWrite(message: PipelineMapping, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<PipelineConfig>): PipelineConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfig): PipelineConfig;
+    internalBinaryWrite(message: PipelineConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineMapping
+ * @generated MessageType for protobuf message protos.PipelineConfig
  */
-export declare const PipelineMapping: PipelineMapping$Type;
+export declare const PipelineConfig: PipelineConfig$Type;
 export {};

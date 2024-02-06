@@ -107,9 +107,8 @@ message GetAllResponse {
   // to any audience.
   map <string, protos.PipelineInfo> pipelines = 3;
 
-  // Audience to pipeline mapping config.
-  // key == $audience_as_string
-  map <string, protos.PipelineMappings> config = 4;
+  // Audience to pipeline mapping config; key == $audience_as_string
+  map <string, protos.PipelineConfigs> configs = 4;
 
   // When was this response generated. This is useful for determining what is
   // the latest update when using GetAllStream().

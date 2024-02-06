@@ -83,13 +83,13 @@ class GetAllResponse$Type extends runtime_5.MessageType {
             { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_info_2.LiveInfo },
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_7.Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_info_1.PipelineInfo } },
-            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_pipeline_2.PipelineMappings } },
+            { no: 4, name: "configs", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_pipeline_2.PipelineConfigs } },
             { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
             { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { live: [], audiences: [], pipelines: {}, config: {}, generatedAtUnixTsNsUtc: "0" };
+        const message = { live: [], audiences: [], pipelines: {}, configs: {}, generatedAtUnixTsNsUtc: "0" };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -109,8 +109,8 @@ class GetAllResponse$Type extends runtime_5.MessageType {
                 case /* map<string, protos.PipelineInfo> pipelines */ 3:
                     this.binaryReadMap3(message.pipelines, reader, options);
                     break;
-                case /* map<string, protos.PipelineMappings> config */ 4:
-                    this.binaryReadMap4(message.config, reader, options);
+                case /* map<string, protos.PipelineConfigs> configs */ 4:
+                    this.binaryReadMap4(message.configs, reader, options);
                     break;
                 case /* int64 generated_at_unix_ts_ns_utc */ 100:
                     message.generatedAtUnixTsNsUtc = reader.int64().toString();
@@ -154,12 +154,12 @@ class GetAllResponse$Type extends runtime_5.MessageType {
                     key = reader.string();
                     break;
                 case 2:
-                    val = sp_pipeline_2.PipelineMappings.internalBinaryRead(reader, reader.uint32(), options);
+                    val = sp_pipeline_2.PipelineConfigs.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field protos.GetAllResponse.config");
+                default: throw new globalThis.Error("unknown map entry field for field protos.GetAllResponse.configs");
             }
         }
-        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : sp_pipeline_2.PipelineMappings.create();
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : sp_pipeline_2.PipelineConfigs.create();
     }
     internalBinaryWrite(message, writer, options) {
         /* repeated protos.LiveInfo live = 1; */
@@ -175,11 +175,11 @@ class GetAllResponse$Type extends runtime_5.MessageType {
             sp_info_1.PipelineInfo.internalBinaryWrite(message.pipelines[k], writer, options);
             writer.join().join();
         }
-        /* map<string, protos.PipelineMappings> config = 4; */
-        for (let k of Object.keys(message.config)) {
+        /* map<string, protos.PipelineConfigs> configs = 4; */
+        for (let k of Object.keys(message.configs)) {
             writer.tag(4, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k);
             writer.tag(2, runtime_1.WireType.LengthDelimited).fork();
-            sp_pipeline_2.PipelineMappings.internalBinaryWrite(message.config[k], writer, options);
+            sp_pipeline_2.PipelineConfigs.internalBinaryWrite(message.configs[k], writer, options);
             writer.join().join();
         }
         /* int64 generated_at_unix_ts_ns_utc = 100; */

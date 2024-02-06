@@ -214,23 +214,23 @@ export interface PipelineStep {
     WasmFunction?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
- * PipelineMappings is stored encoded in redis:streamdal_audience:$audStr; it is
+ * PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is
  * also used in external.GetAllResponse:config.
  *
- * @generated from protobuf message protos.PipelineMappings
+ * @generated from protobuf message protos.PipelineConfigs
  */
-export interface PipelineMappings {
+export interface PipelineConfigs {
     /**
-     * @generated from protobuf field: repeated protos.PipelineMapping mappings = 1;
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
      */
-    mappings: PipelineMapping[];
+    configs: PipelineConfig[];
 }
 /**
- * PipelineMapping is structure used in protos.PipelineMappings
+ * PipelineConfig is structure used in protos.PipelineConfigs
  *
- * @generated from protobuf message protos.PipelineMapping
+ * @generated from protobuf message protos.PipelineConfig
  */
-export interface PipelineMapping {
+export interface PipelineConfig {
     /**
      * @generated from protobuf field: string id = 1;
      */
@@ -612,26 +612,26 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
  */
 export const PipelineStep = new PipelineStep$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineMappings$Type extends MessageType<PipelineMappings> {
+class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
     constructor() {
-        super("protos.PipelineMappings", [
-            { no: 1, name: "mappings", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineMapping }
+        super("protos.PipelineConfigs", [
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig }
         ]);
     }
-    create(value?: PartialMessage<PipelineMappings>): PipelineMappings {
-        const message = { mappings: [] };
+    create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs {
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<PipelineMappings>(this, message, value);
+            reflectionMergePartial<PipelineConfigs>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineMappings): PipelineMappings {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfigs): PipelineConfigs {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.PipelineMapping mappings */ 1:
-                    message.mappings.push(PipelineMapping.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.PipelineConfig configs */ 1:
+                    message.configs.push(PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -644,10 +644,10 @@ class PipelineMappings$Type extends MessageType<PipelineMappings> {
         }
         return message;
     }
-    internalBinaryWrite(message: PipelineMappings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated protos.PipelineMapping mappings = 1; */
-        for (let i = 0; i < message.mappings.length; i++)
-            PipelineMapping.internalBinaryWrite(message.mappings[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+    internalBinaryWrite(message: PipelineConfigs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.PipelineConfig configs = 1; */
+        for (let i = 0; i < message.configs.length; i++)
+            PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -655,26 +655,26 @@ class PipelineMappings$Type extends MessageType<PipelineMappings> {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineMappings
+ * @generated MessageType for protobuf message protos.PipelineConfigs
  */
-export const PipelineMappings = new PipelineMappings$Type();
+export const PipelineConfigs = new PipelineConfigs$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineMapping$Type extends MessageType<PipelineMapping> {
+class PipelineConfig$Type extends MessageType<PipelineConfig> {
     constructor() {
-        super("protos.PipelineMapping", [
+        super("protos.PipelineConfig", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "paused", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "created_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
         ]);
     }
-    create(value?: PartialMessage<PipelineMapping>): PipelineMapping {
+    create(value?: PartialMessage<PipelineConfig>): PipelineConfig {
         const message = { id: "", paused: false, createdAtUnixTsUtc: "0" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<PipelineMapping>(this, message, value);
+            reflectionMergePartial<PipelineConfig>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineMapping): PipelineMapping {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfig): PipelineConfig {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -699,7 +699,7 @@ class PipelineMapping$Type extends MessageType<PipelineMapping> {
         }
         return message;
     }
-    internalBinaryWrite(message: PipelineMapping, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: PipelineConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string id = 1; */
         if (message.id !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.id);
@@ -716,6 +716,6 @@ class PipelineMapping$Type extends MessageType<PipelineMapping> {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineMapping
+ * @generated MessageType for protobuf message protos.PipelineConfig
  */
-export const PipelineMapping = new PipelineMapping$Type();
+export const PipelineConfig = new PipelineConfig$Type();

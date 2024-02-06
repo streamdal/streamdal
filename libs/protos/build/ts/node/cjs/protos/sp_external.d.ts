@@ -10,7 +10,7 @@ import { AudienceRate } from "./sp_common";
 import { Metric } from "./sp_common";
 import { NotificationConfig } from "./sp_notify";
 import { Pipeline } from "./sp_pipeline";
-import { PipelineMappings } from "./sp_pipeline";
+import { PipelineConfigs } from "./sp_pipeline";
 import { PipelineInfo } from "./sp_info";
 import { Audience } from "./sp_common";
 import { LiveInfo } from "./sp_info";
@@ -48,13 +48,12 @@ export interface GetAllResponse {
         [key: string]: PipelineInfo;
     };
     /**
-     * Audience to pipeline mapping config.
-     * key == $audience_as_string
+     * Audience to pipeline mapping config; key == $audience_as_string
      *
-     * @generated from protobuf field: map<string, protos.PipelineMappings> config = 4;
+     * @generated from protobuf field: map<string, protos.PipelineConfigs> configs = 4;
      */
-    config: {
-        [key: string]: PipelineMappings;
+    configs: {
+        [key: string]: PipelineConfigs;
     };
     /**
      * When was this response generated. This is useful for determining what is

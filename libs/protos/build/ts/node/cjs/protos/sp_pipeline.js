@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PipelineMapping = exports.PipelineMappings = exports.PipelineStep = exports.PipelineStepConditions = exports.Pipeline = exports.AbortCondition = void 0;
+exports.PipelineConfig = exports.PipelineConfigs = exports.PipelineStep = exports.PipelineStepConditions = exports.Pipeline = exports.AbortCondition = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -386,14 +386,14 @@ class PipelineStep$Type extends runtime_5.MessageType {
  */
 exports.PipelineStep = new PipelineStep$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineMappings$Type extends runtime_5.MessageType {
+class PipelineConfigs$Type extends runtime_5.MessageType {
     constructor() {
-        super("protos.PipelineMappings", [
-            { no: 1, name: "mappings", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineMapping }
+        super("protos.PipelineConfigs", [
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineConfig }
         ]);
     }
     create(value) {
-        const message = { mappings: [] };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -404,8 +404,8 @@ class PipelineMappings$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.PipelineMapping mappings */ 1:
-                    message.mappings.push(exports.PipelineMapping.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.PipelineConfig configs */ 1:
+                    message.configs.push(exports.PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -419,9 +419,9 @@ class PipelineMappings$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.PipelineMapping mappings = 1; */
-        for (let i = 0; i < message.mappings.length; i++)
-            exports.PipelineMapping.internalBinaryWrite(message.mappings[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.PipelineConfig configs = 1; */
+        for (let i = 0; i < message.configs.length; i++)
+            exports.PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -429,13 +429,13 @@ class PipelineMappings$Type extends runtime_5.MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineMappings
+ * @generated MessageType for protobuf message protos.PipelineConfigs
  */
-exports.PipelineMappings = new PipelineMappings$Type();
+exports.PipelineConfigs = new PipelineConfigs$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineMapping$Type extends runtime_5.MessageType {
+class PipelineConfig$Type extends runtime_5.MessageType {
     constructor() {
-        super("protos.PipelineMapping", [
+        super("protos.PipelineConfig", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "paused", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "created_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
@@ -490,6 +490,6 @@ class PipelineMapping$Type extends runtime_5.MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.PipelineMapping
+ * @generated MessageType for protobuf message protos.PipelineConfig
  */
-exports.PipelineMapping = new PipelineMapping$Type();
+exports.PipelineConfig = new PipelineConfig$Type();

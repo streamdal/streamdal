@@ -34,7 +34,7 @@ class Pipeline(_message.Message):
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ...) -> None: ...
 
-class PipelineMapping(_message.Message):
+class PipelineConfig(_message.Message):
     __slots__ = ["created_at_unix_ts_utc", "id", "paused"]
     CREATED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
@@ -44,11 +44,11 @@ class PipelineMapping(_message.Message):
     paused: bool
     def __init__(self, id: _Optional[str] = ..., paused: bool = ..., created_at_unix_ts_utc: _Optional[int] = ...) -> None: ...
 
-class PipelineMappings(_message.Message):
-    __slots__ = ["mappings"]
-    MAPPINGS_FIELD_NUMBER: _ClassVar[int]
-    mappings: _containers.RepeatedCompositeFieldContainer[PipelineMapping]
-    def __init__(self, mappings: _Optional[_Iterable[_Union[PipelineMapping, _Mapping]]] = ...) -> None: ...
+class PipelineConfigs(_message.Message):
+    __slots__ = ["configs"]
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    configs: _containers.RepeatedCompositeFieldContainer[PipelineConfig]
+    def __init__(self, configs: _Optional[_Iterable[_Union[PipelineConfig, _Mapping]]] = ...) -> None: ...
 
 class PipelineStep(_message.Message):
     __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_false", "on_true", "schema_validation", "transform", "valid_json"]
