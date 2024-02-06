@@ -10,6 +10,7 @@ import { FormBoolean } from "../components/form/formBoolean.tsx";
 import { FormNInput } from "../components/form/formNInput.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { useState } from "preact/hooks";
+import { FormHidden } from "../components/form/formHidden.tsx";
 
 export type PipelineTransformType = {
   stepNumber: number;
@@ -75,7 +76,6 @@ export const TransformOptions = (
   const type =
     (step.step.oneofKind === "transform" && step.step?.transform?.type) ||
     TransformType.REPLACE_VALUE;
-
   switch (Number(type)) {
     case TransformType.REPLACE_VALUE:
       return (
@@ -157,8 +157,7 @@ export const TransformOptions = (
     case TransformType.TRUNCATE_VALUE:
       return (
         <>
-          <input
-            type="hidden"
+          <FormHidden
             name={`steps.${stepNumber}.step.transform.options.oneofKind`}
             value="truncateOptions"
           />
@@ -185,8 +184,6 @@ export const TransformOptions = (
             label="Value"
             placeHolder={`Truncate after ${
               (step.step.oneofKind === "transform" &&
-                    step?.step?.transform?.options?.oneofKind ===
-                      "truncateOptions" &&
                     Number(
                       step?.step?.transform?.options?.truncateOptions?.type,
                     ) ||

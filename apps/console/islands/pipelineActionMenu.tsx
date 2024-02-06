@@ -1,13 +1,13 @@
-import { opModal } from "../serviceMap/opModalSignal.ts";
+import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import IconPlayerPlay from "tabler-icons/tsx/player-play.tsx";
-import { Tooltip } from "../tooltip/tooltip.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { audienceKey } from "../../lib/utils.ts";
-import { useEffect, useState } from "preact/hooks";
-import { initFlowbite } from "flowbite";
-import { serviceSignal } from "../serviceMap/serviceSignal.ts";
+import { audienceKey } from "../lib/utils.ts";
+import { useEffect, useLayoutEffect, useState } from "preact/hooks";
+
+import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 
 const AttachDetach = (
@@ -113,11 +113,10 @@ export const PipelineActionMenu = (
   const paused = !!serviceSignal.value?.pipelines[pipeline.id]?.pipeline
     ?.Paused;
 
-  useEffect(() => {
-    //
-    // Flowbite breaks on audience change for some reason
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
     initFlowbite();
-  }, [attached, paused]);
+  });
 
   return (
     <div

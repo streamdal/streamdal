@@ -3,6 +3,7 @@ import IconListCheck from "tabler-icons/tsx/list-check.tsx";
 import IconBell from "tabler-icons/tsx/bell.tsx";
 import { signal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
+import { tailEnabledSignal } from "./drawer/tail.tsx";
 
 export const showNav = signal<boolean>(false);
 
@@ -25,7 +26,7 @@ export const NavBar = () => {
   }, [menuRef]);
 
   return (
-    <div ref={menuRef}>
+    <div ref={menuRef} onClick={() => tailEnabledSignal.value = false}>
       <ul
         class={`${
           showNav.value ? "" : "hidden"

@@ -14,10 +14,10 @@ export const pausePipeline = (audience: Audience, pipeline: Pipeline) => {
       ...serviceSignal.value.pipelines,
       [pipeline.id]: {
         ...serviceSignal.value.pipelines[pipeline.id],
-        paused: [
-          ...serviceSignal.value.pipelines[pipeline.id].paused,
-          ...[audience],
-        ],
+        pipeline: {
+          ...serviceSignal.value.pipelines[pipeline.id].pipeline,
+          Paused: true,
+        },
       },
     },
   };

@@ -21,6 +21,7 @@ export const initServiceSignal: ServiceSignal = {
   liveAudiences: new Map(),
   nodesMap: new Map(),
   pipelines: {},
+  browserInitialized: false,
 };
 
 //
