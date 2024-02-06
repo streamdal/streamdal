@@ -1,0 +1,28 @@
+name: Execute Python Script in Subdirectory
+
+on:
+  push:
+    tags:
+      - update-deployments-* 
+
+jobs:
+  execute_script:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install Dependencies
+      run: |
+        cd scripts/helper/
+        pip3 install -r requirements.txt
+        
+    - name: Execute install-tags.py
+      run: |
+        cd scripts/helper/
+        python3 install-tags.py
