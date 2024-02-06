@@ -34,6 +34,16 @@ class Pipeline(_message.Message):
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ...) -> None: ...
 
+class PipelineConfig(_message.Message):
+    __slots__ = ["created_at_unix_ts_ns_utc", "paused", "pipeline_id"]
+    CREATED_AT_UNIX_TS_NS_UTC_FIELD_NUMBER: _ClassVar[int]
+    PAUSED_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    created_at_unix_ts_ns_utc: int
+    paused: bool
+    pipeline_id: str
+    def __init__(self, pipeline_id: _Optional[str] = ..., paused: bool = ..., created_at_unix_ts_ns_utc: _Optional[int] = ...) -> None: ...
+
 class PipelineStep(_message.Message):
     __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_false", "on_true", "schema_validation", "transform", "valid_json"]
     CUSTOM_FIELD_NUMBER: _ClassVar[int]

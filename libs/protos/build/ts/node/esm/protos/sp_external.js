@@ -15,6 +15,7 @@ import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
+import { PipelineConfig } from "./sp_pipeline.js";
 import { PipelineInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
 import { LiveInfo } from "./sp_info.js";
@@ -198,11 +199,11 @@ export const GetAllResponse = new GetAllResponse$Type();
 class GetAllResponsePipelines$Type extends MessageType {
     constructor() {
         super("protos.GetAllResponsePipelines", [
-            { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig }
         ]);
     }
     create(value) {
-        const message = { pipelineIds: [] };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -213,8 +214,8 @@ class GetAllResponsePipelines$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated string pipeline_ids */ 1:
-                    message.pipelineIds.push(reader.string());
+                case /* repeated protos.PipelineConfig configs */ 1:
+                    message.configs.push(PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -228,9 +229,9 @@ class GetAllResponsePipelines$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated string pipeline_ids = 1; */
-        for (let i = 0; i < message.pipelineIds.length; i++)
-            writer.tag(1, WireType.LengthDelimited).string(message.pipelineIds[i]);
+        /* repeated protos.PipelineConfig configs = 1; */
+        for (let i = 0; i < message.configs.length; i++)
+            PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

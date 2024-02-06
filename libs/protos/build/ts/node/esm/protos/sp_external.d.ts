@@ -10,6 +10,7 @@ import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
+import { PipelineConfig } from "./sp_pipeline.js";
 import { PipelineInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
 import { LiveInfo } from "./sp_info.js";
@@ -74,11 +75,9 @@ export interface GetAllResponse {
  */
 export interface GetAllResponsePipelines {
     /**
-     * List of pipeline IDs that are attached to this audience
-     *
-     * @generated from protobuf field: repeated string pipeline_ids = 1;
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
      */
-    pipelineIds: string[];
+    configs: PipelineConfig[];
 }
 /**
  * Don't think we need anything here

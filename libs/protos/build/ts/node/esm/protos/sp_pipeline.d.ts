@@ -207,6 +207,27 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
+ * PipelineConfig is the structure used for storing individual pipeline configuration
+ * under redis:streamdal_audience:$audienceStr (as JSON); it is also returned as
+ * part of external.GetAllResponse.
+ *
+ * @generated from protobuf message protos.PipelineConfig
+ */
+export interface PipelineConfig {
+    /**
+     * @generated from protobuf field: string pipeline_id = 1;
+     */
+    pipelineId: string;
+    /**
+     * @generated from protobuf field: bool paused = 2;
+     */
+    paused: boolean;
+    /**
+     * @generated from protobuf field: int64 created_at_unix_ts_ns_utc = 3;
+     */
+    createdAtUnixTsNsUtc: string;
+}
+/**
  * Defines the ways in which a pipeline can be aborted
  *
  * @generated from protobuf enum protos.AbortCondition
@@ -256,4 +277,14 @@ declare class PipelineStep$Type extends MessageType<PipelineStep> {
  * @generated MessageType for protobuf message protos.PipelineStep
  */
 export declare const PipelineStep: PipelineStep$Type;
+declare class PipelineConfig$Type extends MessageType<PipelineConfig> {
+    constructor();
+    create(value?: PartialMessage<PipelineConfig>): PipelineConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfig): PipelineConfig;
+    internalBinaryWrite(message: PipelineConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineConfig
+ */
+export declare const PipelineConfig: PipelineConfig$Type;
 export {};

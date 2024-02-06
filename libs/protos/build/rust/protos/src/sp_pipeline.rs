@@ -1399,6 +1399,167 @@ pub mod pipeline_step {
     }
 }
 
+///  PipelineConfig is the structure used for storing individual pipeline configuration
+///  under redis:streamdal_audience:$audienceStr (as JSON); it is also returned as
+///  part of external.GetAllResponse.
+// @@protoc_insertion_point(message:protos.PipelineConfig)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct PipelineConfig {
+    // message fields
+    // @@protoc_insertion_point(field:protos.PipelineConfig.pipeline_id)
+    pub pipeline_id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.PipelineConfig.paused)
+    pub paused: bool,
+    // @@protoc_insertion_point(field:protos.PipelineConfig.created_at_unix_ts_ns_utc)
+    pub created_at_unix_ts_ns_utc: i64,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.PipelineConfig.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a PipelineConfig {
+    fn default() -> &'a PipelineConfig {
+        <PipelineConfig as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl PipelineConfig {
+    pub fn new() -> PipelineConfig {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &PipelineConfig| { &m.pipeline_id },
+            |m: &mut PipelineConfig| { &mut m.pipeline_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "paused",
+            |m: &PipelineConfig| { &m.paused },
+            |m: &mut PipelineConfig| { &mut m.paused },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "created_at_unix_ts_ns_utc",
+            |m: &PipelineConfig| { &m.created_at_unix_ts_ns_utc },
+            |m: &mut PipelineConfig| { &mut m.created_at_unix_ts_ns_utc },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<PipelineConfig>(
+            "PipelineConfig",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for PipelineConfig {
+    const NAME: &'static str = "PipelineConfig";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.pipeline_id = is.read_string()?;
+                },
+                16 => {
+                    self.paused = is.read_bool()?;
+                },
+                24 => {
+                    self.created_at_unix_ts_ns_utc = is.read_int64()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.pipeline_id);
+        }
+        if self.paused != false {
+            my_size += 1 + 1;
+        }
+        if self.created_at_unix_ts_ns_utc != 0 {
+            my_size += ::protobuf::rt::int64_size(3, self.created_at_unix_ts_ns_utc);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.pipeline_id.is_empty() {
+            os.write_string(1, &self.pipeline_id)?;
+        }
+        if self.paused != false {
+            os.write_bool(2, self.paused)?;
+        }
+        if self.created_at_unix_ts_ns_utc != 0 {
+            os.write_int64(3, self.created_at_unix_ts_ns_utc)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> PipelineConfig {
+        PipelineConfig::new()
+    }
+
+    fn clear(&mut self) {
+        self.pipeline_id.clear();
+        self.paused = false;
+        self.created_at_unix_ts_ns_utc = 0;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static PipelineConfig {
+        static instance: PipelineConfig = PipelineConfig {
+            pipeline_id: ::std::string::String::new(),
+            paused: false,
+            created_at_unix_ts_ns_utc: 0,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for PipelineConfig {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("PipelineConfig").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for PipelineConfig {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for PipelineConfig {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  Defines the ways in which a pipeline can be aborted
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.AbortCondition)
@@ -1507,26 +1668,29 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01\x01\x12$\n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cH\x02R\tWasmBytes\
     \x88\x01\x01\x12*\n\x0e_wasm_function\x18\x92N\x20\x01(\tH\x03R\x0cWasmF\
     unction\x88\x01\x01B\x06\n\x04stepB\x0b\n\tX_wasm_idB\x0e\n\x0cX_wasm_by\
-    tesB\x11\n\x0fX_wasm_function*m\n\x0eAbortCondition\x12\x19\n\x15ABORT_C\
-    ONDITION_UNSET\x10\0\x12!\n\x1dABORT_CONDITION_ABORT_CURRENT\x10\x01\x12\
-    \x1d\n\x19ABORT_CONDITION_ABORT_ALL\x10\x02B<Z:github.com/streamdal/stre\
-    amdal/libs/protos/build/go/protosJ\xf1\x1c\n\x06\x12\x04\0\0c\x01\n\x08\
-    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\
-    \x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0%\n\t\n\x02\x03\
-    \x02\x12\x03\x06\0%\n\t\n\x02\x03\x03\x12\x03\x07\0(\n\t\n\x02\x03\x04\
-    \x12\x03\x08\0%\n\t\n\x02\x03\x05\x12\x03\t\0*\n\t\n\x02\x03\x06\x12\x03\
-    \n\0*\n\t\n\x02\x03\x07\x12\x03\x0b\0!\n\t\n\x02\x03\x08\x12\x03\x0c\00\
-    \n\t\n\x02\x03\t\x12\x03\r\0(\n\t\n\x02\x03\n\x12\x03\x0e\0)\n\x08\n\x01\
-    \x08\x12\x03\x10\0Q\n\t\n\x02\x08\x0b\x12\x03\x10\0Q\n\xc8\x01\n\x02\x04\
-    \0\x12\x04\x15\0&\x01\x1a\xbb\x01\x20Pipeline\x20is\x20a\x20structure\
-    \x20that\x20holds\x20one\x20or\x20more\x20pipeline\x20steps.\x20This\x20\
-    structure\n\x20is\x20intended\x20to\x20be\x20immutable;\x20clients\x20ar\
-    e\x20expected\x20to\x20generate\x20WASMRequest's\n\x20that\x20contain\
-    \x20a\x20pipeline\x20step.\n\n\n\n\x03\x04\0\x01\x12\x03\x15\x08\x10\n\
-    \x9f\x01\n\x04\x04\0\x02\0\x12\x03\x18\x02\x10\x1a\x91\x01\x20ID\x20shou\
-    ld\x20NOT\x20be\x20set\x20by\x20external\x20gRPC\x20client\x20on\x20Crea\
-    tePipelineRequest\x20-\x20it\n\x20will\x20be\x20ignored;\x20it\x20_does_\
-    \x20need\x20to\x20be\x20set\x20on\x20UpdatePipelineRequest.\n\n\x0c\n\
+    tesB\x11\n\x0fX_wasm_function\"\x82\x01\n\x0ePipelineConfig\x12\x1f\n\
+    \x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12\x16\n\x06paused\x18\
+    \x02\x20\x01(\x08R\x06paused\x127\n\x19created_at_unix_ts_ns_utc\x18\x03\
+    \x20\x01(\x03R\x14createdAtUnixTsNsUtc*m\n\x0eAbortCondition\x12\x19\n\
+    \x15ABORT_CONDITION_UNSET\x10\0\x12!\n\x1dABORT_CONDITION_ABORT_CURRENT\
+    \x10\x01\x12\x1d\n\x19ABORT_CONDITION_ABORT_ALL\x10\x02B<Z:github.com/st\
+    reamdal/streamdal/libs/protos/build/go/protosJ\xf7\x1f\n\x06\x12\x04\0\0\
+    l\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\
+    \n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0%\n\t\
+    \n\x02\x03\x02\x12\x03\x06\0%\n\t\n\x02\x03\x03\x12\x03\x07\0(\n\t\n\x02\
+    \x03\x04\x12\x03\x08\0%\n\t\n\x02\x03\x05\x12\x03\t\0*\n\t\n\x02\x03\x06\
+    \x12\x03\n\0*\n\t\n\x02\x03\x07\x12\x03\x0b\0!\n\t\n\x02\x03\x08\x12\x03\
+    \x0c\00\n\t\n\x02\x03\t\x12\x03\r\0(\n\t\n\x02\x03\n\x12\x03\x0e\0)\n\
+    \x08\n\x01\x08\x12\x03\x10\0Q\n\t\n\x02\x08\x0b\x12\x03\x10\0Q\n\xc8\x01\
+    \n\x02\x04\0\x12\x04\x15\0&\x01\x1a\xbb\x01\x20Pipeline\x20is\x20a\x20st\
+    ructure\x20that\x20holds\x20one\x20or\x20more\x20pipeline\x20steps.\x20T\
+    his\x20structure\n\x20is\x20intended\x20to\x20be\x20immutable;\x20client\
+    s\x20are\x20expected\x20to\x20generate\x20WASMRequest's\n\x20that\x20con\
+    tain\x20a\x20pipeline\x20step.\n\n\n\n\x03\x04\0\x01\x12\x03\x15\x08\x10\
+    \n\x9f\x01\n\x04\x04\0\x02\0\x12\x03\x18\x02\x10\x1a\x91\x01\x20ID\x20sh\
+    ould\x20NOT\x20be\x20set\x20by\x20external\x20gRPC\x20client\x20on\x20Cr\
+    eatePipelineRequest\x20-\x20it\n\x20will\x20be\x20ignored;\x20it\x20_doe\
+    s_\x20need\x20to\x20be\x20set\x20on\x20UpdatePipelineRequest.\n\n\x0c\n\
     \x05\x04\0\x02\0\x05\x12\x03\x18\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
     \x03\x18\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x18\x0e\x0f\n-\n\x04\
     \x04\0\x02\x01\x12\x03\x1b\x02\x12\x1a\x20\x20Friendly\x20name\x20for\
@@ -1637,7 +1801,20 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     IELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x02\x02\x11\x04\x12\x03b\
     \x02\n\n\x0c\n\x05\x04\x02\x02\x11\x05\x12\x03b\x0b\x11\n\x0c\n\x05\x04\
     \x02\x02\x11\x01\x12\x03b\x12\x20\n\x0c\n\x05\x04\x02\x02\x11\x03\x12\
-    \x03b#(b\x06proto3\
+    \x03b#(\n\xd2\x01\n\x02\x04\x03\x12\x04h\0l\x01\x1a\xc5\x01\x20PipelineC\
+    onfig\x20is\x20the\x20structure\x20used\x20for\x20storing\x20individual\
+    \x20pipeline\x20configuration\n\x20under\x20redis:streamdal_audience:$au\
+    dienceStr\x20(as\x20JSON);\x20it\x20is\x20also\x20returned\x20as\n\x20pa\
+    rt\x20of\x20external.GetAllResponse.\n\n\n\n\x03\x04\x03\x01\x12\x03h\
+    \x08\x16\n\x0b\n\x04\x04\x03\x02\0\x12\x03i\x02\x19\n\x0c\n\x05\x04\x03\
+    \x02\0\x05\x12\x03i\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03i\t\x14\
+    \n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03i\x17\x18\n\x0b\n\x04\x04\x03\x02\
+    \x01\x12\x03j\x02\x12\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03j\x02\x06\n\
+    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x03j\x07\r\n\x0c\n\x05\x04\x03\x02\
+    \x01\x03\x12\x03j\x10\x11\n\x0b\n\x04\x04\x03\x02\x02\x12\x03k\x02&\n\
+    \x0c\n\x05\x04\x03\x02\x02\x05\x12\x03k\x02\x07\n\x0c\n\x05\x04\x03\x02\
+    \x02\x01\x12\x03k\x08!\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x03k$%b\x06pr\
+    oto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1666,10 +1843,11 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             deps.push(super::sp_steps_schema_validation::file_descriptor().clone());
             deps.push(super::sp_steps_transform::file_descriptor().clone());
             deps.push(super::sp_steps_valid_json::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(3);
+            let mut messages = ::std::vec::Vec::with_capacity(4);
             messages.push(Pipeline::generated_message_descriptor_data());
             messages.push(PipelineStepConditions::generated_message_descriptor_data());
             messages.push(PipelineStep::generated_message_descriptor_data());
+            messages.push(PipelineConfig::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(AbortCondition::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

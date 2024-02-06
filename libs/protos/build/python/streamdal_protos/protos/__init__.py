@@ -441,6 +441,19 @@ class PipelineStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class PipelineConfig(betterproto.Message):
+    """
+    PipelineConfig is the structure used for storing individual pipeline
+    configuration under redis:streamdal_audience:$audienceStr (as JSON); it is
+    also returned as part of external.GetAllResponse.
+    """
+
+    pipeline_id: str = betterproto.string_field(1)
+    paused: bool = betterproto.bool_field(2)
+    created_at_unix_ts_ns_utc: int = betterproto.int64_field(3)
+
+
+@dataclass(eq=False, repr=False)
 class LiveInfo(betterproto.Message):
     audiences: List["Audience"] = betterproto.message_field(1)
     """If empty, client has not announced any audiences"""
@@ -527,8 +540,7 @@ class GetAllResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetAllResponsePipelines(betterproto.Message):
-    pipeline_ids: List[str] = betterproto.string_field(1)
-    """List of pipeline IDs that are attached to this audience"""
+    configs: List["PipelineConfig"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

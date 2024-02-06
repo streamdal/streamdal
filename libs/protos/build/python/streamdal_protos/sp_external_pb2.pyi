@@ -151,10 +151,10 @@ class GetAllResponse(_message.Message):
     def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., config: _Optional[_Mapping[str, GetAllResponsePipelines]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
 
 class GetAllResponsePipelines(_message.Message):
-    __slots__ = ["pipeline_ids"]
-    PIPELINE_IDS_FIELD_NUMBER: _ClassVar[int]
-    pipeline_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ...) -> None: ...
+    __slots__ = ["configs"]
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    configs: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.PipelineConfig]
+    def __init__(self, configs: _Optional[_Iterable[_Union[_sp_pipeline_pb2.PipelineConfig, _Mapping]]] = ...) -> None: ...
 
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []

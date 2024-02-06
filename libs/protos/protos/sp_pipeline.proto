@@ -98,3 +98,12 @@ message PipelineStep {
   // WASM function name to execute (set by server)
   optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
+
+// PipelineConfig is the structure used for storing individual pipeline configuration
+// under redis:streamdal_audience:$audienceStr (as JSON); it is also returned as
+// part of external.GetAllResponse.
+message PipelineConfig {
+  string pipeline_id = 1;
+  bool paused = 2;
+  int64 created_at_unix_ts_ns_utc = 3;
+}

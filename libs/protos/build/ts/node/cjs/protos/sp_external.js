@@ -18,6 +18,7 @@ const sp_common_5 = require("./sp_common");
 const sp_common_6 = require("./sp_common");
 const sp_notify_1 = require("./sp_notify");
 const sp_pipeline_1 = require("./sp_pipeline");
+const sp_pipeline_2 = require("./sp_pipeline");
 const sp_info_1 = require("./sp_info");
 const sp_common_7 = require("./sp_common");
 const sp_info_2 = require("./sp_info");
@@ -201,11 +202,11 @@ exports.GetAllResponse = new GetAllResponse$Type();
 class GetAllResponsePipelines$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.GetAllResponsePipelines", [
-            { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_pipeline_2.PipelineConfig }
         ]);
     }
     create(value) {
-        const message = { pipelineIds: [] };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -216,8 +217,8 @@ class GetAllResponsePipelines$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated string pipeline_ids */ 1:
-                    message.pipelineIds.push(reader.string());
+                case /* repeated protos.PipelineConfig configs */ 1:
+                    message.configs.push(sp_pipeline_2.PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -231,9 +232,9 @@ class GetAllResponsePipelines$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated string pipeline_ids = 1; */
-        for (let i = 0; i < message.pipelineIds.length; i++)
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.pipelineIds[i]);
+        /* repeated protos.PipelineConfig configs = 1; */
+        for (let i = 0; i < message.configs.length; i++)
+            sp_pipeline_2.PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

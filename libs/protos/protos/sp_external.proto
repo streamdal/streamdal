@@ -120,8 +120,7 @@ message GetAllResponse {
 }
 
 message GetAllResponsePipelines {
-  // List of pipeline IDs that are attached to this audience
-  repeated string pipeline_ids = 1;
+  repeated PipelineConfig configs = 1;
 }
 
 message GetPipelinesRequest {
