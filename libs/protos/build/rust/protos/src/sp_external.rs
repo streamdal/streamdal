@@ -620,8 +620,8 @@ impl ::protobuf::reflect::ProtobufValue for GetPipelinesRequest {
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct GetPipelinesResponse {
     // message fields
-    // @@protoc_insertion_point(field:protos.GetPipelinesResponse.pipelines)
-    pub pipelines: ::std::vec::Vec<super::sp_pipeline::Pipeline>,
+    // @@protoc_insertion_point(field:protos.GetPipelinesResponse.configs)
+    pub configs: ::std::vec::Vec<super::sp_pipeline::PipelineConfig>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.GetPipelinesResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -642,9 +642,9 @@ impl GetPipelinesResponse {
         let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
-            "pipelines",
-            |m: &GetPipelinesResponse| { &m.pipelines },
-            |m: &mut GetPipelinesResponse| { &mut m.pipelines },
+            "configs",
+            |m: &GetPipelinesResponse| { &m.configs },
+            |m: &mut GetPipelinesResponse| { &mut m.configs },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetPipelinesResponse>(
             "GetPipelinesResponse",
@@ -665,7 +665,7 @@ impl ::protobuf::Message for GetPipelinesResponse {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.pipelines.push(is.read_message()?);
+                    self.configs.push(is.read_message()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -679,7 +679,7 @@ impl ::protobuf::Message for GetPipelinesResponse {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        for value in &self.pipelines {
+        for value in &self.configs {
             let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         };
@@ -689,7 +689,7 @@ impl ::protobuf::Message for GetPipelinesResponse {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        for v in &self.pipelines {
+        for v in &self.configs {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
         };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
@@ -709,13 +709,13 @@ impl ::protobuf::Message for GetPipelinesResponse {
     }
 
     fn clear(&mut self) {
-        self.pipelines.clear();
+        self.configs.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static GetPipelinesResponse {
         static instance: GetPipelinesResponse = GetPipelinesResponse {
-            pipelines: ::std::vec::Vec::new(),
+            configs: ::std::vec::Vec::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -5353,60 +5353,60 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x03key\x125\n\x05value\x18\x02\x20\x01(\x0b2\x1f.protos.GetAllResponseP\
     ipelinesR\x05value:\x028\x01B\r\n\x0bX_keepalive\"K\n\x17GetAllResponseP\
     ipelines\x120\n\x07configs\x18\x01\x20\x03(\x0b2\x16.protos.PipelineConf\
-    igR\x07configs\"\x15\n\x13GetPipelinesRequest\"F\n\x14GetPipelinesRespon\
-    se\x12.\n\tpipelines\x18\x01\x20\x03(\x0b2\x10.protos.PipelineR\tpipelin\
-    es\"5\n\x12GetPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\
-    \tR\npipelineId\"C\n\x13GetPipelineResponse\x12,\n\x08pipeline\x18\x01\
-    \x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15CreatePipelineRe\
-    quest\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08p\
-    ipeline\"S\n\x16CreatePipelineResponse\x12\x18\n\x07message\x18\x01\x20\
-    \x01(\tR\x07message\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01(\tR\npipeli\
-    neId\"E\n\x15UpdatePipelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\
-    \x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DeletePipelineRequest\x12\
-    \x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"f\n\x13SetPipelin\
-    esRequest\x12!\n\x0cpipeline_ids\x18\x01\x20\x03(\tR\x0bpipelineIds\x12,\
-    \n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"e\
-    \n\x14PausePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\
-    \npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.Audienc\
-    eR\x08audience\"f\n\x15ResumePipelineRequest\x12\x1f\n\x0bpipeline_id\
-    \x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b\
-    2\x10.protos.AudienceR\x08audience\"[\n\x19CreateNotificationRequest\x12\
-    >\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationConfigR\
-    \x0cnotification\"[\n\x19UpdateNotificationRequest\x12>\n\x0cnotificatio\
-    n\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationConfigR\x0cnotification\"\
-    D\n\x19DeleteNotificationRequest\x12'\n\x0fnotification_id\x18\x01\x20\
-    \x01(\tR\x0enotificationId\"\x19\n\x17GetNotificationsRequest\"\xd3\x01\
-    \n\x18GetNotificationsResponse\x12Y\n\rnotifications\x18\x01\x20\x03(\
-    \x0b23.protos.GetNotificationsResponse.NotificationsEntryR\rnotification\
-    s\x1a\\\n\x12NotificationsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03\
-    key\x120\n\x05value\x18\x02\x20\x01(\x0b2\x1a.protos.NotificationConfigR\
-    \x05value:\x028\x01\"A\n\x16GetNotificationRequest\x12'\n\x0fnotificatio\
-    n_id\x18\x01\x20\x01(\tR\x0enotificationId\"Y\n\x17GetNotificationRespon\
-    se\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationC\
-    onfigR\x0cnotification\"e\n\x19AttachNotificationRequest\x12'\n\x0fnotif\
-    ication_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\n\x0bpipeline_i\
-    d\x18\x02\x20\x01(\tR\npipelineId\"e\n\x19DetachNotificationRequest\x12'\
-    \n\x0fnotification_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\n\
-    \x0bpipeline_id\x18\x02\x20\x01(\tR\npipelineId\"j\n\x15DeleteAudienceRe\
-    quest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08a\
-    udience\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\x05force\x88\x01\x01\
-    B\x08\n\x06_force\"^\n\x14DeleteServiceRequest\x12!\n\x0cservice_name\
-    \x18\x01\x20\x01(\tR\x0bserviceName\x12\x19\n\x05force\x18\x02\x20\x01(\
-    \x08H\0R\x05force\x88\x01\x01B\x08\n\x06_force\"\x13\n\x11GetMetricsRequ\
-    est\"\xd7\x01\n\x12GetMetricsResponse\x12A\n\x07metrics\x18\x01\x20\x03(\
-    \x0b2'.protos.GetMetricsResponse.MetricsEntryR\x07metrics\x12#\n\n_keepa\
-    live\x18\xe8\x07\x20\x01(\x08H\0R\tKeepalive\x88\x01\x01\x1aJ\n\x0cMetri\
-    csEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12$\n\x05value\x18\
-    \x02\x20\x01(\x0b2\x0e.protos.MetricR\x05value:\x028\x01B\r\n\x0bX_keepa\
-    live\"\x19\n\x17GetAudienceRatesRequest\"\xe1\x01\n\x18GetAudienceRatesR\
-    esponse\x12A\n\x05rates\x18\x01\x20\x03(\x0b2+.protos.GetAudienceRatesRe\
-    sponse.RatesEntryR\x05rates\x12#\n\n_keepalive\x18\xe8\x07\x20\x01(\x08H\
-    \0R\tKeepalive\x88\x01\x01\x1aN\n\nRatesEntry\x12\x10\n\x03key\x18\x01\
-    \x20\x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.protos.Aud\
-    ienceRateR\x05value:\x028\x01B\r\n\x0bX_keepalive\"@\n\x10GetSchemaReque\
-    st\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audi\
-    ence\";\n\x11GetSchemaResponse\x12&\n\x06schema\x18\x01\x20\x01(\x0b2\
-    \x0e.protos.SchemaR\x06schema\"4\n\x1cAppRegistrationStatusRequest\x12\
+    igR\x07configs\"\x15\n\x13GetPipelinesRequest\"H\n\x14GetPipelinesRespon\
+    se\x120\n\x07configs\x18\x01\x20\x03(\x0b2\x16.protos.PipelineConfigR\
+    \x07configs\"5\n\x12GetPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\
+    \x20\x01(\tR\npipelineId\"C\n\x13GetPipelineResponse\x12,\n\x08pipeline\
+    \x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"E\n\x15CreatePi\
+    pelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.Pipeli\
+    neR\x08pipeline\"S\n\x16CreatePipelineResponse\x12\x18\n\x07message\x18\
+    \x01\x20\x01(\tR\x07message\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01(\tR\
+    \npipelineId\"E\n\x15UpdatePipelineRequest\x12,\n\x08pipeline\x18\x01\
+    \x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"8\n\x15DeletePipelineRe\
+    quest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"f\n\x13S\
+    etPipelinesRequest\x12!\n\x0cpipeline_ids\x18\x01\x20\x03(\tR\x0bpipelin\
+    eIds\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08au\
+    dience\"e\n\x14PausePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\
+    \x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos\
+    .AudienceR\x08audience\"f\n\x15ResumePipelineRequest\x12\x1f\n\x0bpipeli\
+    ne_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01\
+    (\x0b2\x10.protos.AudienceR\x08audience\"[\n\x19CreateNotificationReques\
+    t\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationCo\
+    nfigR\x0cnotification\"[\n\x19UpdateNotificationRequest\x12>\n\x0cnotifi\
+    cation\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationConfigR\x0cnotificat\
+    ion\"D\n\x19DeleteNotificationRequest\x12'\n\x0fnotification_id\x18\x01\
+    \x20\x01(\tR\x0enotificationId\"\x19\n\x17GetNotificationsRequest\"\xd3\
+    \x01\n\x18GetNotificationsResponse\x12Y\n\rnotifications\x18\x01\x20\x03\
+    (\x0b23.protos.GetNotificationsResponse.NotificationsEntryR\rnotificatio\
+    ns\x1a\\\n\x12NotificationsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\
+    \x03key\x120\n\x05value\x18\x02\x20\x01(\x0b2\x1a.protos.NotificationCon\
+    figR\x05value:\x028\x01\"A\n\x16GetNotificationRequest\x12'\n\x0fnotific\
+    ation_id\x18\x01\x20\x01(\tR\x0enotificationId\"Y\n\x17GetNotificationRe\
+    sponse\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.Notificat\
+    ionConfigR\x0cnotification\"e\n\x19AttachNotificationRequest\x12'\n\x0fn\
+    otification_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\n\x0bpipeli\
+    ne_id\x18\x02\x20\x01(\tR\npipelineId\"e\n\x19DetachNotificationRequest\
+    \x12'\n\x0fnotification_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\
+    \n\x0bpipeline_id\x18\x02\x20\x01(\tR\npipelineId\"j\n\x15DeleteAudience\
+    Request\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\
+    \x08audience\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\x05force\x88\
+    \x01\x01B\x08\n\x06_force\"^\n\x14DeleteServiceRequest\x12!\n\x0cservice\
+    _name\x18\x01\x20\x01(\tR\x0bserviceName\x12\x19\n\x05force\x18\x02\x20\
+    \x01(\x08H\0R\x05force\x88\x01\x01B\x08\n\x06_force\"\x13\n\x11GetMetric\
+    sRequest\"\xd7\x01\n\x12GetMetricsResponse\x12A\n\x07metrics\x18\x01\x20\
+    \x03(\x0b2'.protos.GetMetricsResponse.MetricsEntryR\x07metrics\x12#\n\n_\
+    keepalive\x18\xe8\x07\x20\x01(\x08H\0R\tKeepalive\x88\x01\x01\x1aJ\n\x0c\
+    MetricsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12$\n\x05value\
+    \x18\x02\x20\x01(\x0b2\x0e.protos.MetricR\x05value:\x028\x01B\r\n\x0bX_k\
+    eepalive\"\x19\n\x17GetAudienceRatesRequest\"\xe1\x01\n\x18GetAudienceRa\
+    tesResponse\x12A\n\x05rates\x18\x01\x20\x03(\x0b2+.protos.GetAudienceRat\
+    esResponse.RatesEntryR\x05rates\x12#\n\n_keepalive\x18\xe8\x07\x20\x01(\
+    \x08H\0R\tKeepalive\x88\x01\x01\x1aN\n\nRatesEntry\x12\x10\n\x03key\x18\
+    \x01\x20\x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.protos\
+    .AudienceRateR\x05value:\x028\x01B\r\n\x0bX_keepalive\"@\n\x10GetSchemaR\
+    equest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08\
+    audience\";\n\x11GetSchemaResponse\x12&\n\x06schema\x18\x01\x20\x01(\x0b\
+    2\x0e.protos.SchemaR\x06schema\"4\n\x1cAppRegistrationStatusRequest\x12\
     \x14\n\x05email\x18\x01\x20\x01(\tR\x05email\"\xb8\x01\n\x1dAppRegistrat\
     ionStatusResponse\x12D\n\x06status\x18\x01\x20\x01(\x0e2,.protos.AppRegi\
     strationStatusResponse.StatusR\x06status\"Q\n\x06Status\x12\x10\n\x0cSTA\
@@ -5602,12 +5602,12 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x03\x12\x04}\0\x7f\x01\"#\x20Don't\x20think\x20we\x20need\x20anything\
     \x20here\n\n\n\n\x03\x04\x03\x01\x12\x03}\x08\x1b\n\x0c\n\x02\x04\x04\
     \x12\x06\x81\x01\0\x83\x01\x01\n\x0b\n\x03\x04\x04\x01\x12\x04\x81\x01\
-    \x08\x1c\n\x0c\n\x04\x04\x04\x02\0\x12\x04\x82\x01\x02)\n\r\n\x05\x04\
+    \x08\x1c\n\x0c\n\x04\x04\x04\x02\0\x12\x04\x82\x01\x02-\n\r\n\x05\x04\
     \x04\x02\0\x04\x12\x04\x82\x01\x02\n\n\r\n\x05\x04\x04\x02\0\x06\x12\x04\
-    \x82\x01\x0b\x1a\n\r\n\x05\x04\x04\x02\0\x01\x12\x04\x82\x01\x1b$\n\r\n\
-    \x05\x04\x04\x02\0\x03\x12\x04\x82\x01'(\n\x0c\n\x02\x04\x05\x12\x06\x85\
-    \x01\0\x87\x01\x01\n\x0b\n\x03\x04\x05\x01\x12\x04\x85\x01\x08\x1a\n\x0c\
-    \n\x04\x04\x05\x02\0\x12\x04\x86\x01\x02\x19\n\r\n\x05\x04\x05\x02\0\x05\
+    \x82\x01\x0b\x20\n\r\n\x05\x04\x04\x02\0\x01\x12\x04\x82\x01!(\n\r\n\x05\
+    \x04\x04\x02\0\x03\x12\x04\x82\x01+,\n\x0c\n\x02\x04\x05\x12\x06\x85\x01\
+    \0\x87\x01\x01\n\x0b\n\x03\x04\x05\x01\x12\x04\x85\x01\x08\x1a\n\x0c\n\
+    \x04\x04\x05\x02\0\x12\x04\x86\x01\x02\x19\n\r\n\x05\x04\x05\x02\0\x05\
     \x12\x04\x86\x01\x02\x08\n\r\n\x05\x04\x05\x02\0\x01\x12\x04\x86\x01\t\
     \x14\n\r\n\x05\x04\x05\x02\0\x03\x12\x04\x86\x01\x17\x18\n\x0c\n\x02\x04\
     \x06\x12\x06\x89\x01\0\x8b\x01\x01\n\x0b\n\x03\x04\x06\x01\x12\x04\x89\

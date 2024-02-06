@@ -128,7 +128,7 @@ message GetPipelinesRequest {
 }
 
 message GetPipelinesResponse {
-  repeated protos.Pipeline pipelines = 1;
+  repeated protos.PipelineConfig configs = 1;
 }
 
 message GetPipelineRequest {

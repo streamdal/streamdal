@@ -99,11 +99,16 @@ message PipelineStep {
   optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
+// PipelineConfigs is a "helper" structure used for storing multiple pipeline
+// configurations under redis:streamdal_audience:$audienceStr as *protos.PipelineConfigs.
+message PipelineConfigs {
+  repeated PipelineConfig configs = 1;
+}
+
 // PipelineConfig is the structure used for storing individual pipeline configuration
-// under redis:streamdal_audience:$audienceStr (as JSON); it is also returned as
-// part of external.GetAllResponse.
+// under redis:streamdal_audience:$audienceStr; this type is also returned in external.GetAll().
 message PipelineConfig {
-  string pipeline_id = 1;
+  string id = 1;
   bool paused = 2;
   int64 created_at_unix_ts_ns_utc = 3;
 }

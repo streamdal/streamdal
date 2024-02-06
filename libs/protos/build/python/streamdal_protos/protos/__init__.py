@@ -441,14 +441,25 @@ class PipelineStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class PipelineConfigs(betterproto.Message):
+    """
+    PipelineConfigs is a "helper" structure used for storing multiple pipeline
+    configurations under redis:streamdal_audience:$audienceStr as
+    *protos.PipelineConfigs.
+    """
+
+    configs: List["PipelineConfig"] = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class PipelineConfig(betterproto.Message):
     """
     PipelineConfig is the structure used for storing individual pipeline
-    configuration under redis:streamdal_audience:$audienceStr (as JSON); it is
-    also returned as part of external.GetAllResponse.
+    configuration under redis:streamdal_audience:$audienceStr; this type is
+    also returned in external.GetAll().
     """
 
-    pipeline_id: str = betterproto.string_field(1)
+    id: str = betterproto.string_field(1)
     paused: bool = betterproto.bool_field(2)
     created_at_unix_ts_ns_utc: int = betterproto.int64_field(3)
 
@@ -550,7 +561,7 @@ class GetPipelinesRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesResponse(betterproto.Message):
-    pipelines: List["Pipeline"] = betterproto.message_field(1)
+    configs: List["PipelineConfig"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

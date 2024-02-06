@@ -240,10 +240,10 @@ class GetPipelinesRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetPipelinesResponse(_message.Message):
-    __slots__ = ["pipelines"]
-    PIPELINES_FIELD_NUMBER: _ClassVar[int]
-    pipelines: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
-    def __init__(self, pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ...) -> None: ...
+    __slots__ = ["configs"]
+    CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    configs: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.PipelineConfig]
+    def __init__(self, configs: _Optional[_Iterable[_Union[_sp_pipeline_pb2.PipelineConfig, _Mapping]]] = ...) -> None: ...
 
 class GetSchemaRequest(_message.Message):
     __slots__ = ["audience"]

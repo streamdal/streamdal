@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PipelineConfig = exports.PipelineStep = exports.PipelineStepConditions = exports.Pipeline = exports.AbortCondition = void 0;
+exports.PipelineConfig = exports.PipelineConfigs = exports.PipelineStep = exports.PipelineStepConditions = exports.Pipeline = exports.AbortCondition = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -386,16 +386,14 @@ class PipelineStep$Type extends runtime_5.MessageType {
  */
 exports.PipelineStep = new PipelineStep$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PipelineConfig$Type extends runtime_5.MessageType {
+class PipelineConfigs$Type extends runtime_5.MessageType {
     constructor() {
-        super("protos.PipelineConfig", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "paused", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "created_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+        super("protos.PipelineConfigs", [
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineConfig }
         ]);
     }
     create(value) {
-        const message = { pipelineId: "", paused: false, createdAtUnixTsNsUtc: "0" };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -406,8 +404,57 @@ class PipelineConfig$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string pipeline_id */ 1:
-                    message.pipelineId = reader.string();
+                case /* repeated protos.PipelineConfig configs */ 1:
+                    message.configs.push(exports.PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated protos.PipelineConfig configs = 1; */
+        for (let i = 0; i < message.configs.length; i++)
+            exports.PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineConfigs
+ */
+exports.PipelineConfigs = new PipelineConfigs$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PipelineConfig$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.PipelineConfig", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "paused", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "created_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+        ]);
+    }
+    create(value) {
+        const message = { id: "", paused: false, createdAtUnixTsNsUtc: "0" };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string id */ 1:
+                    message.id = reader.string();
                     break;
                 case /* bool paused */ 2:
                     message.paused = reader.bool();
@@ -427,9 +474,9 @@ class PipelineConfig$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* string pipeline_id = 1; */
-        if (message.pipelineId !== "")
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.pipelineId);
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.id);
         /* bool paused = 2; */
         if (message.paused !== false)
             writer.tag(2, runtime_1.WireType.Varint).bool(message.paused);

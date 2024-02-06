@@ -91,9 +91,9 @@ export interface GetPipelinesRequest {
  */
 export interface GetPipelinesResponse {
     /**
-     * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
      */
-    pipelines: Pipeline[];
+    configs: PipelineConfig[];
 }
 /**
  * @generated from protobuf message protos.GetPipelineRequest

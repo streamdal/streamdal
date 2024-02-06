@@ -101,9 +101,9 @@ export interface GetPipelinesRequest {
  */
 export interface GetPipelinesResponse {
     /**
-     * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
      */
-    pipelines: Pipeline[];
+    configs: PipelineConfig[];
 }
 /**
  * @generated from protobuf message protos.GetPipelineRequest
@@ -736,11 +736,11 @@ export const GetPipelinesRequest = new GetPipelinesRequest$Type();
 class GetPipelinesResponse$Type extends MessageType<GetPipelinesResponse> {
     constructor() {
         super("protos.GetPipelinesResponse", [
-            { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline }
+            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig }
         ]);
     }
     create(value?: PartialMessage<GetPipelinesResponse>): GetPipelinesResponse {
-        const message = { pipelines: [] };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<GetPipelinesResponse>(this, message, value);
@@ -751,8 +751,8 @@ class GetPipelinesResponse$Type extends MessageType<GetPipelinesResponse> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.Pipeline pipelines */ 1:
-                    message.pipelines.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.PipelineConfig configs */ 1:
+                    message.configs.push(PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -766,9 +766,9 @@ class GetPipelinesResponse$Type extends MessageType<GetPipelinesResponse> {
         return message;
     }
     internalBinaryWrite(message: GetPipelinesResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated protos.Pipeline pipelines = 1; */
-        for (let i = 0; i < message.pipelines.length; i++)
-            Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.PipelineConfig configs = 1; */
+        for (let i = 0; i < message.configs.length; i++)
+            PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -207,17 +207,28 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
+ * PipelineConfigs is a "helper" structure used for storing multiple pipeline
+ * configurations under redis:streamdal_audience:$audienceStr as *protos.PipelineConfigs.
+ *
+ * @generated from protobuf message protos.PipelineConfigs
+ */
+export interface PipelineConfigs {
+    /**
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
+     */
+    configs: PipelineConfig[];
+}
+/**
  * PipelineConfig is the structure used for storing individual pipeline configuration
- * under redis:streamdal_audience:$audienceStr (as JSON); it is also returned as
- * part of external.GetAllResponse.
+ * under redis:streamdal_audience:$audienceStr; this type is also returned in external.GetAll().
  *
  * @generated from protobuf message protos.PipelineConfig
  */
 export interface PipelineConfig {
     /**
-     * @generated from protobuf field: string pipeline_id = 1;
+     * @generated from protobuf field: string id = 1;
      */
-    pipelineId: string;
+    id: string;
     /**
      * @generated from protobuf field: bool paused = 2;
      */
@@ -277,6 +288,16 @@ declare class PipelineStep$Type extends MessageType<PipelineStep> {
  * @generated MessageType for protobuf message protos.PipelineStep
  */
 export declare const PipelineStep: PipelineStep$Type;
+declare class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
+    constructor();
+    create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfigs): PipelineConfigs;
+    internalBinaryWrite(message: PipelineConfigs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineConfigs
+ */
+export declare const PipelineConfigs: PipelineConfigs$Type;
 declare class PipelineConfig$Type extends MessageType<PipelineConfig> {
     constructor();
     create(value?: PartialMessage<PipelineConfig>): PipelineConfig;
