@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useState } from "preact/hooks";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { zfd } from "zod-form-data";
 import * as z from "zod/index.ts";
@@ -14,7 +14,6 @@ import {
 } from "streamdal-protos/protos/sp_notify.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
-import { initFlowbite } from "flowbite";
 
 const NotificationTypeEnum = z.nativeEnum(NotificationType);
 const EmailNotificationTypeEnum = z.nativeEnum(NotificationEmail_Type);
@@ -93,11 +92,15 @@ const NotificationDetail = (
   const [data, setData] = useState(notification);
 
   useEffect(() => {
-    initFlowbite();
     setData({
       ...notification,
     });
   }, [notification]);
+
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
+    initFlowbite();
+  });
 
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);

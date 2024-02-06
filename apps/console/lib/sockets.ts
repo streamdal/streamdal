@@ -35,6 +35,7 @@ export const serviceMapSocket = (path: string) => {
         ...parsedData,
         nodesMap: new Map(parsedData.nodesMap),
         edgesMap: new Map(parsedData.edgesMap),
+        browserInitialized: true,
       };
     } catch (e) {
       console.error("error parsing serviceMap socket data", e);

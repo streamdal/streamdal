@@ -1,7 +1,7 @@
 import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
-import { PipelineActionMenu } from "../operation/pipelineActionMenu.tsx";
+import { PipelineActionMenu } from "../../islands/pipelineActionMenu.tsx";
 import { tailEnabledSignal } from "../../islands/drawer/tail.tsx";
 
 export const ManageOpPipelines = (

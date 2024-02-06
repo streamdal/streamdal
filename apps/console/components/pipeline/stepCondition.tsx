@@ -5,8 +5,7 @@ import { RadioGroup } from "../form/radioGroup.tsx";
 import { MetaData } from "./metadata.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
-import { useEffect, useState } from "preact/hooks";
-import { initFlowbite } from "flowbite";
+import { useLayoutEffect, useState } from "preact/hooks";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 
@@ -23,9 +22,10 @@ export const StepCondition = (
 ) => {
   const [expanded, setExpanded] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
     initFlowbite();
-  }, []);
+  });
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useState } from "preact/hooks";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
@@ -29,7 +29,7 @@ import {
   kvModeFromEnum,
   optionsFromEnum,
 } from "../components/form/formSelect.tsx";
-import { isNumeric, logFormData } from "../lib/utils.ts";
+import { isNumeric } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -38,7 +38,6 @@ import {
   StepArgs,
 } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepConditions.tsx";
-import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
@@ -342,7 +341,6 @@ const PipelineDetail = (
   const [data, setData] = useState();
 
   useEffect(() => {
-    initFlowbite();
     setData({
       ...pipeline,
       steps: pipeline.steps.map((s: PipelineStep, i) => ({
@@ -352,6 +350,11 @@ const PipelineDetail = (
       })),
     });
   }, [pipeline]);
+
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
+    initFlowbite();
+  });
 
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);
