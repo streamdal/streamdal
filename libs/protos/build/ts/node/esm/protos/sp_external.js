@@ -272,11 +272,11 @@ export const GetPipelinesRequest = new GetPipelinesRequest$Type();
 class GetPipelinesResponse$Type extends MessageType {
     constructor() {
         super("protos.GetPipelinesResponse", [
-            { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig }
+            { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline }
         ]);
     }
     create(value) {
-        const message = { configs: [] };
+        const message = { pipelines: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -287,8 +287,8 @@ class GetPipelinesResponse$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.PipelineConfig configs */ 1:
-                    message.configs.push(PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.Pipeline pipelines */ 1:
+                    message.pipelines.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -302,9 +302,9 @@ class GetPipelinesResponse$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.PipelineConfig configs = 1; */
-        for (let i = 0; i < message.configs.length; i++)
-            PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Pipeline pipelines = 1; */
+        for (let i = 0; i < message.pipelines.length; i++)
+            Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

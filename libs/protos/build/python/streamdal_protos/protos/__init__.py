@@ -561,7 +561,7 @@ class GetPipelinesRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesResponse(betterproto.Message):
-    configs: List["PipelineConfig"] = betterproto.message_field(1)
+    pipelines: List["Pipeline"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

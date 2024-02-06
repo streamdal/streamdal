@@ -120,7 +120,7 @@ message GetAllResponse {
 }
 
 message GetAllResponsePipelines {
-  repeated PipelineConfig configs = 1;
+  repeated protos.PipelineConfig configs = 1;
 }
 
 message GetPipelinesRequest {
@@ -128,7 +128,7 @@ message GetPipelinesRequest {
 }
 
 message GetPipelinesResponse {
-  repeated protos.PipelineConfig configs = 1;
+  repeated protos.Pipeline pipelines = 1;
 }
 
 message GetPipelineRequest {
