@@ -220,8 +220,7 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 	}
 }
 
-// DEV: PipelineConfigs (DONE)
-// ConvertConfigStrAudience is used for converting a map of *protos.Audience:*protos.PipelineConfigs
+// ConvertPipelineConfigsAudToStr is used for converting a map of *protos.Audience:*protos.PipelineConfigs
 // to map of string:*protos.PipelineConfigs.
 func ConvertPipelineConfigsAudToStr(configs map[*protos.Audience]*protos.PipelineConfigs) map[string]*protos.PipelineConfigs {
 	if configs == nil {

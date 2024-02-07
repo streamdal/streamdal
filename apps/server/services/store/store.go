@@ -497,8 +497,7 @@ func (s *Store) UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) e
 	return nil
 }
 
-// DEV: PipelineConfigs (DONE)
-// Sets pipeline pause status
+// SetPauseResume sets pipeline pause status
 func (s *Store) SetPauseResume(ctx context.Context, audience *protos.Audience, pipelineID string, paused bool) (bool, error) {
 	llog := s.log.WithField("method", "setPause")
 	llog.Debug("received request to set pause")
@@ -658,8 +657,7 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	return nil
 }
 
-// DEV: PipelineConfigs (DONE)
-// GetAllConfig returns all audience -> pipeline configuration mappings
+// GetAllConfig returns all audience -> *protos.PipelineConfigs
 func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error) {
 	cfgs := make(map[*protos.Audience]*protos.PipelineConfigs)
 
@@ -734,8 +732,7 @@ func (s *Store) GetPipelinesByAudience(ctx context.Context, aud *protos.Audience
 	return pipelines, nil
 }
 
-// DEV: PipelineConfigs
-// GetConfigByAudience returns *protos.PipelineConfigs for a given audience
+// GetPipelineConfigsByAudience returns *protos.PipelineConfigs for a given audience
 // TODO: Need tests
 func (s *Store) GetPipelineConfigsByAudience(ctx context.Context, aud *protos.Audience) (*protos.PipelineConfigs, error) {
 	audStr := util.AudienceToStr(aud)
@@ -826,7 +823,6 @@ func (s *Store) GetLive(ctx context.Context) ([]*types.LiveEntry, error) {
 	return live, nil
 }
 
-// DEV: PipelineConfigs (DONE)
 func (s *Store) GetSetPipelinesCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error) {
 	llog := s.log.WithField("method", "GetSetPipelinesCommandsByService")
 	llog.Debug("received request to get set pipelines commands by service")
@@ -1161,7 +1157,6 @@ func (s *Store) GetAudiencesByService(ctx context.Context, serviceName string) (
 	return audiences, nil
 }
 
-// DEV: PipelineConfigs (DONE)
 func (s *Store) IsPipelineAttachedAny(ctx context.Context, pipelineID string) bool {
 	llog := s.log.WithField("method", "IsPipelineAttachedAny")
 

@@ -192,7 +192,6 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 	return nil
 }
 
-// DEV: PipelineConfigs (DONE)
 // Helper for generating pipelines for Pause and Resume pipeline requests.
 // Will skip paused pipelines.
 func (b *Bus) generatePipelinesForPauseResume(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error) {

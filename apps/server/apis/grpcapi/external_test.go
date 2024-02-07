@@ -637,7 +637,6 @@ var _ = Describe("External gRPC API", func() {
 			key := store.RedisAudienceKey(util.AudienceToStr(audience))
 			result, err := redisClient.Get(context.Background(), key).Result()
 			Expect(err).ToNot(HaveOccurred())
-			fmt.Println("result: ", result)
 			Expect(result).ToNot(BeEmpty())
 
 			pipelineConfigs := &protos.PipelineConfigs{}

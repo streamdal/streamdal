@@ -222,7 +222,6 @@ func (s *ExternalServer) getAllLive(ctx context.Context) ([]*protos.LiveInfo, er
 	return liveInfo, nil
 }
 
-// DEV: PipelineConfigs (DONE)
 // getAllPipelineInfo returns a map of pipeline IDs to pipeline info.
 // *protos.PipelineInfo contains the pipeline itself and a list of audiences the
 // pipeline is attached to.
@@ -862,11 +861,9 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}, nil
 }
 
-// DEV: PipelineConfigs (DONE)
 // DeleteService is basically DeleteAudience - the only difference is that
 // DeleteService will (potentially) delete *multiple* audiences (instead of one).
 func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteServiceRequest) (*protos.StandardResponse, error) {
-
 	if err := validate.DeleteServiceRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
 	}
