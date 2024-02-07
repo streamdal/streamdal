@@ -25,8 +25,8 @@ python -m pip install streamdal
 ### Example Usage
 
 ```python
-import pprint
-from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
+import json
+from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig, EXEC_STATUS_TRUE)
 
 client = StreamdalClient(
     cfg=StreamdalConfig(
@@ -41,14 +41,18 @@ res = client.process(
         operation_type=OPERATION_TYPE_CONSUMER,
         operation_name="new-order-topic",
         component_name="kafka",
-        data=b'{"object": {"field": true}}',
+        data=b'{"object": {"email": "user@streamdal.com"}}',
     )
 )
 
-if res.error:
-    print(res.message)
+# Check that process() completed successfully
+if res.status == EXEC_STATUS_TRUE:
+    print("Success processed payload")
+    data = json.loads(res.data)
+    print("Response:", json.dumps(data, indent=2))
 else:
-    pprint.pprint(res.data)
+    print("Failed to process payload")
+    print("Error:", res.status_message)
 ```
 
 ### Metrics
