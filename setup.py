@@ -42,7 +42,7 @@ setup(
         "iniconfig==2.0.0",
         "isort==5.12.0",
         "jaraco.classes==3.3.0",
-        "Jinja2==3.1.2",
+        "Jinja2==3.1.3",
         "keyring==24.3.0",
         "markdown-it-py==3.0.0",
         "MarkupSafe==2.1.3",
