@@ -47,6 +47,10 @@ OPERATION_TYPE_PRODUCER = 2
 CLIENT_TYPE_SDK = 1
 CLIENT_TYPE_SHIM = 2
 
+EXEC_STATUS_TRUE = protos.ExecStatus.EXEC_STATUS_TRUE
+EXEC_STATUS_FALSE = protos.ExecStatus.EXEC_STATUS_FALSE
+EXEC_STATUS_ERROR = protos.ExecStatus.EXEC_STATUS_ERROR
+
 
 @dataclass(frozen=True)
 class ProcessRequest:
@@ -202,13 +206,17 @@ class StreamdalClient:
             )
 
             for cmd in cmds.set_pipeline_commands:
-                for pipeline in cmd.set_pipelines.pipelines:
-                    for step in pipeline.steps:
+                for pipelineIdx, pipeline in enumerate(cmd.set_pipelines.pipelines):
+                    for stepIdx, step in enumerate(pipeline.steps):
                         if step.wasm_id in cmds.wasm_modules:
-                            step.wasm_bytes = cmds.wasm_modules[step.wasm_id]
+                            step.wasm_bytes = cmds.wasm_modules[step.wasm_id].bytes
+                            cmd.set_pipelines.pipelines[pipelineIdx].steps[
+                                stepIdx
+                            ] = step
                         else:
                             self.log.error(f"BUG: missing wasm module {step.wasm_id}")
-                    self._attach_pipeline(cmd)
+
+                self._set_pipelines(cmd)
 
         self.grpc_loop.run_until_complete(call())
 
@@ -374,7 +382,7 @@ class StreamdalClient:
                     cond = step.on_false
                     exec_status = protos.ExecStatus.EXEC_STATUS_FALSE
                 elif wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_ERROR:
-                    cond = step.on_failure
+                    cond = step.on_error
                     exec_status = protos.ExecStatus.EXEC_STATUS_ERROR
                     isr = None  # avoid passing step result on error
 

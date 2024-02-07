@@ -19,7 +19,7 @@ class TestStreamdalRegisterMethods:
 
         self.client = client
 
-    def test_attach_pipeline(self):
+    def test_set_pipelines(self):
         """Test set_pipeline adds a pipeline to the pipelines dict"""
 
         pipeline_id = str(uuid.uuid4())
