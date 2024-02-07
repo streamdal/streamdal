@@ -10,6 +10,7 @@ import { FormBoolean } from "../components/form/formBoolean.tsx";
 import { FormNInput } from "../components/form/formNInput.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { useState } from "preact/hooks";
+import { FormHidden } from "../components/form/formHidden.tsx";
 
 export type PipelineTransformType = {
   stepNumber: number;
@@ -19,9 +20,13 @@ export type PipelineTransformType = {
   errors: ErrorType;
 };
 
-export type PipelineTransformPath =
-  & PipelineTransformType
-  & { optionPath: string };
+export type PipelineTransformPath = {
+  stepNumber: number;
+  data: any;
+  setData: (data: any) => void;
+  errors: ErrorType;
+  optionPath: string;
+};
 
 const TransformPath = (
   { optionPath, stepNumber, data, setData, errors }: PipelineTransformPath,
@@ -68,8 +73,9 @@ const TransformPath = (
 export const TransformOptions = (
   { stepNumber, step, data, setData, errors }: PipelineTransformType,
 ) => {
-  const type = step.step?.transform?.type || TransformType.REPLACE_VALUE;
-
+  const type =
+    (step.step.oneofKind === "transform" && step.step?.transform?.type) ||
+    TransformType.REPLACE_VALUE;
   switch (Number(type)) {
     case TransformType.REPLACE_VALUE:
       return (
@@ -151,8 +157,7 @@ export const TransformOptions = (
     case TransformType.TRUNCATE_VALUE:
       return (
         <>
-          <input
-            type="hidden"
+          <FormHidden
             name={`steps.${stepNumber}.step.transform.options.oneofKind`}
             value="truncateOptions"
           />
@@ -178,7 +183,10 @@ export const TransformOptions = (
             setData={setData}
             label="Value"
             placeHolder={`Truncate after ${
-              (Number(step?.step?.transform?.options?.truncateOptions?.type) ||
+              (step.step.oneofKind === "transform" &&
+                    Number(
+                      step?.step?.transform?.options?.truncateOptions?.type,
+                    ) ||
                   TransformTruncateType.LENGTH) ===
                   TransformTruncateType.LENGTH
                 ? "this many bytes"
@@ -198,6 +206,7 @@ export const TransformOptions = (
           />
           <FormBoolean
             name={`steps.${stepNumber}.step.transform.options.extractOptions.flatten`}
+            data={data}
             display="Flatten result object"
           />
           <FormNInput
@@ -210,6 +219,8 @@ export const TransformOptions = (
           />
         </>
       );
+    default:
+      return null;
   }
 };
 
@@ -229,7 +240,8 @@ export const PipelineTransform = (
           children={optionsFromEnum(TransformType)}
         />
 
-        {Number(step?.step?.transform?.type) === TransformType.EXTRACT
+        {step?.step?.oneofKind === "transform" &&
+            Number(step?.step?.transform?.type) === TransformType.EXTRACT
           ? (
             <div class="h-[47px] mt-3 ml-2 flex flex-row items-center text-stormCloud text-sm">
               <IconInfoCircle class="w-5 h-5 mr-1" />

@@ -13,9 +13,9 @@ export type ToastType = {
 
 export const toastSignal = signal<ToastType | null>(null);
 
-export const Toast = ({ id }: string) => {
+export const Toast = ({ id }: { id: string }) => {
   if (toastSignal.value == null || id !== toastSignal.value.id) {
-    return;
+    return null;
   }
 
   setTimeout(() => {

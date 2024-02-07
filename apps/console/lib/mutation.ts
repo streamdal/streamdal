@@ -34,15 +34,17 @@ export const updatePipelineNotifications = async (
   notificationIds: string[],
   pipeline: Pipeline,
 ) => {
-  if (pipeline.id) {
-    const existing = await getPipeline(pipeline.id);
+  const existing = pipeline.id && await getPipeline(pipeline.id);
 
-    for await (const notification of existing.NotificationConfigs) {
-      client.detachNotification(
-        { notificationId: notification.id, pipelineId: pipeline.id },
-        meta,
-      );
-    }
+  if (!existing) {
+    return;
+  }
+
+  for await (const notification of existing.NotificationConfigs) {
+    notification?.id && client.detachNotification(
+      { notificationId: notification.id, pipelineId: pipeline.id },
+      meta,
+    );
   }
 
   for await (const id of notificationIds) {
@@ -104,8 +106,9 @@ export const attachPipeline = async (
 ) => {
   try {
     const key = audienceKey(audience);
-    const { pipelineIds: existingIds = [] } =
-      serviceSignal?.value?.config[key] ?? [];
+    const existingIds = serviceSignal?.value?.configs[key]?.configs.map((p) =>
+      p.id
+    ) || [];
     const pipelineIds = [...existingIds, ...[pipelineId]];
 
     const request: SetPipelinesRequest = SetPipelinesRequest.create({
@@ -135,8 +138,9 @@ export const detachPipeline = async (
 ) => {
   try {
     const key = audienceKey(audience);
-    const { pipelineIds: existingIds = [] } =
-      serviceSignal?.value?.config[key] ?? [];
+    const existingIds = serviceSignal?.value?.configs[key]?.configs.map((p) =>
+      p.id
+    ) || [];
     const pipelineIds = existingIds?.filter((id: string) => id !== pipelineId);
     const request: SetPipelinesRequest = SetPipelinesRequest.create({
       audience,

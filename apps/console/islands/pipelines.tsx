@@ -25,7 +25,7 @@ const Pipelines = (
     ...pipelines.length === 0 || add ? [newPipeline] : [],
   ];
 
-  const index = id && wrapper?.findIndex((p) => p.id === id);
+  const index = id ? wrapper?.findIndex((p) => p.id === id) : 0;
   const selected = add ? wrapper.length - 1 : index > -1 ? index : 0;
 
   if (success?.message) {

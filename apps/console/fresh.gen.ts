@@ -44,11 +44,13 @@ import * as $$8 from "./islands/nav.tsx";
 import * as $$9 from "./islands/notification.tsx";
 import * as $$10 from "./islands/notifications.tsx";
 import * as $$11 from "./islands/pipeline.tsx";
-import * as $$12 from "./islands/pipelineSchemaValidation.tsx";
-import * as $$13 from "./islands/pipelineTransform.tsx";
-import * as $$14 from "./islands/pipelines.tsx";
-import * as $$15 from "./islands/serviceMap.tsx";
-import * as $$16 from "./islands/sockets.tsx";
+import * as $$12 from "./islands/pipelineActionMenu.tsx";
+import * as $$13 from "./islands/pipelineHTTP.tsx";
+import * as $$14 from "./islands/pipelineSchemaValidation.tsx";
+import * as $$15 from "./islands/pipelineTransform.tsx";
+import * as $$16 from "./islands/pipelines.tsx";
+import * as $$17 from "./islands/serviceMap.tsx";
+import * as $$18 from "./islands/sockets.tsx";
 
 const manifest = {
   routes: {
@@ -102,11 +104,13 @@ const manifest = {
     "./islands/notification.tsx": $$9,
     "./islands/notifications.tsx": $$10,
     "./islands/pipeline.tsx": $$11,
-    "./islands/pipelineSchemaValidation.tsx": $$12,
-    "./islands/pipelineTransform.tsx": $$13,
-    "./islands/pipelines.tsx": $$14,
-    "./islands/serviceMap.tsx": $$15,
-    "./islands/sockets.tsx": $$16,
+    "./islands/pipelineActionMenu.tsx": $$12,
+    "./islands/pipelineHTTP.tsx": $$13,
+    "./islands/pipelineSchemaValidation.tsx": $$14,
+    "./islands/pipelineTransform.tsx": $$15,
+    "./islands/pipelines.tsx": $$16,
+    "./islands/serviceMap.tsx": $$17,
+    "./islands/sockets.tsx": $$18,
   },
   baseUrl: import.meta.url,
 };

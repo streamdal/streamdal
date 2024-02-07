@@ -266,6 +266,49 @@ export interface PipelineStep {
     WasmFunction?: string;
 }
 /**
+ * PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is
+ * also used in external.GetAllResponse:config.
+ *
+ * @generated from protobuf message protos.PipelineConfigs
+ */
+export interface PipelineConfigs {
+    /**
+     * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
+     */
+    configs: PipelineConfig[];
+    /**
+     * !!!!!!!! IMPORTANT !!!!!!!!!!
+     *
+     * For internal use only in server. We need this because marshalling/encoding
+     * an empty protobuf results in nil. If someone does a SetPipelines() with
+     * empty pipeline IDs - we will set this, so that the encoded protobuf gets
+     * written as the actual object and not nil.
+     *
+     *
+     * @generated from protobuf field: optional bool _is_empty = 1000;
+     */
+    IsEmpty?: boolean;
+}
+/**
+ * PipelineConfig is structure used in protos.PipelineConfigs
+ *
+ * @generated from protobuf message protos.PipelineConfig
+ */
+export interface PipelineConfig {
+    /**
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: bool paused = 2;
+     */
+    paused: boolean;
+    /**
+     * @generated from protobuf field: int64 created_at_unix_ts_utc = 3;
+     */
+    createdAtUnixTsUtc: string;
+}
+/**
  * Defines the ways in which a pipeline can be aborted
  *
  * @generated from protobuf enum protos.AbortCondition
@@ -325,4 +368,24 @@ declare class PipelineStep$Type extends MessageType<PipelineStep> {
  * @generated MessageType for protobuf message protos.PipelineStep
  */
 export declare const PipelineStep: PipelineStep$Type;
+declare class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
+    constructor();
+    create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfigs): PipelineConfigs;
+    internalBinaryWrite(message: PipelineConfigs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineConfigs
+ */
+export declare const PipelineConfigs: PipelineConfigs$Type;
+declare class PipelineConfig$Type extends MessageType<PipelineConfig> {
+    constructor();
+    create(value?: PartialMessage<PipelineConfig>): PipelineConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineConfig): PipelineConfig;
+    internalBinaryWrite(message: PipelineConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineConfig
+ */
+export declare const PipelineConfig: PipelineConfig$Type;
 export {};

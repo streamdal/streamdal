@@ -57,7 +57,7 @@ export const BetaTag = (props: any) => {
   );
 };
 
-export const ComingSoonTag = (props) => {
+export const ComingSoonTag = (props: any) => {
   return (
     <svg
       width="69"

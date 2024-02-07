@@ -5,21 +5,21 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 
-export type MetadataType = {
+export type HeadersType = {
   name: string;
   data: any;
   errors: ErrorType;
 };
 
-export const MetaData = (
-  { name, data, errors }: MetadataType,
+export const Headers = (
+  { name, data, errors }: HeadersType,
 ) => {
-  const existingMetadata = resolveValue(data, name);
-  const [metaData, setMetaData] = useState(
+  const existingHeaders = resolveValue(data, name);
+  const [headers, setHeaders] = useState(
     Object.entries(
-      !existingMetadata || Object.keys(existingMetadata)?.length === 0
+      !existingHeaders || Object.keys(existingHeaders)?.length === 0
         ? { "": "" }
-        : existingMetadata,
+        : existingHeaders,
     ),
   );
 
@@ -29,23 +29,23 @@ export const MetaData = (
         <label
           className={`text-xs `}
         >
-          Metadata
+          Headers
         </label>
         <IconInfoCircle
           class="w-4 h-4 ml-1"
-          data-tooltip-target={`${name}-metadata-tooltip`}
+          data-tooltip-target={`${name}-headers-tooltip`}
         />
         <Tooltip
-          targetId={`${name}-metadata-tooltip`}
-          message="Metadata are arbitrary keys and values that will be emitted to calling code"
+          targetId={`${name}-headers-tooltip`}
+          message="Headers are arbitrary keys and values that will be emitted to calling code"
         />
       </div>
       <div className="flex flex-col mb-2 border rounded-sm px-2 w-full">
-        {metaData.map(([k, v], i) => {
+        {headers.map(([k, v], i) => {
           return (
             <div
               className="flex flex-row justify-between items-center w-full"
-              key={`${name}-metadata-key-${i}`}
+              key={`${name}-headers-key-${i}`}
             >
               <div className="flex flex-row justify-start items-start w-[80%]">
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
@@ -57,10 +57,12 @@ export const MetaData = (
                   <input
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight `}
                     value={k}
-                    onChange={(e) =>
-                      setMetaData(
-                        metaData.map(([k, v], ki) =>
-                          ki === i ? [e.target.value, v] : [k, v]
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setHeaders(
+                        headers.map(([k, v], ki) =>
+                          ki === i
+                            ? [(e.target as HTMLInputElement).value, v]
+                            : [k, v]
                         ),
                       )}
                     placeholder="key"
@@ -79,11 +81,13 @@ export const MetaData = (
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight ${
                       errors[`${name}.${k}`] && "border-streamdalRed"
                     } `}
-                    value={v}
-                    onChange={(e) =>
-                      setMetaData(
-                        metaData.map(([k, v], ki) =>
-                          ki === i ? [k, e.target.value] : [k, v]
+                    value={v as string}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setHeaders(
+                        headers.map(([k, v], ki) =>
+                          ki === i
+                            ? [k, (e.target as HTMLInputElement).value]
+                            : [k, v]
                         ),
                       )}
                     disabled={!k}
@@ -100,18 +104,18 @@ export const MetaData = (
               <IconTrash
                 class="w-5 h-5 mt-3 ml-2 text-eyelid cursor-pointer"
                 onClick={() =>
-                  metaData.length === 1
-                    ? setMetaData([["", ""]])
-                    : setMetaData(metaData.filter((_, index) => index !== i))}
+                  headers.length === 1
+                    ? setHeaders([["", ""]])
+                    : setHeaders(headers.filter((_, index) => index !== i))}
               />
               <IconPlus
                 data-tooltip-target={`${name}-metadata-add-${i}`}
                 class="w-5 h-5 mt-3 mx-2 cursor-pointer"
-                onClick={() => setMetaData([...metaData, ["", ""]])}
+                onClick={() => setHeaders([...headers, ["", ""]])}
               />
               <Tooltip
-                targetId={`${name}-metadata-add-${i}`}
-                message={`Add metadata`}
+                targetId={`${name}-headers-add-${i}`}
+                message={`Add headers`}
               />
             </div>
           );

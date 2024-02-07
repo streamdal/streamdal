@@ -8,12 +8,11 @@ import IconX from "tabler-icons/tsx/x.tsx";
 import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { signal, useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { initFlowbite } from "flowbite";
 import { defaultTailSampleRate } from "../../components/modals/tailRateModal.tsx";
 
 export const MAX_TAIL_SIZE = 200;
@@ -142,8 +141,12 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   }, [tailSignal.value]);
 
   useEffect(() => {
-    initFlowbite();
   }, [tailPausedSignal.value, tailDiffSignal.value, fullScreen]);
+
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
+    initFlowbite();
+  });
 
   return (
     <div

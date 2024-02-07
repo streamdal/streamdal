@@ -1,21 +1,21 @@
-import { opModal } from "../serviceMap/opModalSignal.ts";
+import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import IconPlayerPlay from "tabler-icons/tsx/player-play.tsx";
-import { Tooltip } from "../tooltip/tooltip.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { audienceKey } from "../../lib/utils.ts";
-import { useEffect, useState } from "preact/hooks";
-import { initFlowbite } from "flowbite";
-import Pipeline from "../../islands/pipeline.tsx";
-import { serviceSignal } from "../serviceMap/serviceSignal.ts";
+import { audienceKey } from "../lib/utils.ts";
+import { useEffect, useLayoutEffect, useState } from "preact/hooks";
+
+import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 
 const AttachDetach = (
   { pipeline, attached }: { pipeline: Pipeline; attached: boolean },
 ) => {
   const [checked, setChecked] = useState(false);
 
-  const toggle = (e) => {
+  const toggle = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
     opModal.value = {
@@ -106,37 +106,33 @@ export const PipelineActionMenu = (
     pipeline: Pipeline;
   },
 ) => {
-  const attached = serviceSignal.value?.pipelines[pipeline.id].audiences?.some((
-    a: Audience,
-  ) => audienceKey(a) === audienceKey(audience));
+  const key = audienceKey(audience);
+  const p = serviceSignal.value?.configs[key]?.configs?.find((p) =>
+    p.id === pipeline.id
+  );
 
-  const paused = serviceSignal.value?.pipelines[pipeline.id].paused?.some((
-    a: Audience,
-  ) => audienceKey(a) === audienceKey(audience));
-
-  useEffect(() => {
-    //
-    // Flowbite breaks on audience change for some reason
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
     initFlowbite();
-  }, [attached, paused]);
+  });
 
   return (
     <div
       class={`p-2 flex flex-row justify-between items-center ${
-        attached ? "" : "bg-gray-100"
+        p ? "" : "bg-gray-100"
       } hover:bg-purple-100`}
     >
       <div class="flex flex-row justify-start items-center">
-        <AttachDetach pipeline={pipeline} attached={attached} />
+        <AttachDetach pipeline={pipeline} attached={!!p} />
         <PauseResume
           pipeline={pipeline}
-          attached={attached}
-          paused={paused}
+          attached={!!p}
+          paused={!!p?.paused}
         />
 
         <div
           class={`max-w-[${
-            attached ? "150px" : "190px"
+            p ? "150px" : "190px"
           }] flex flex-row justify-start items-center whitespace-nowrap text-ellipsis overflow-hidden`}
         >
           {pipeline.name}

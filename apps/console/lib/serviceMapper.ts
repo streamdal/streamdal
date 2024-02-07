@@ -10,6 +10,7 @@ export type ServiceMapper = GetAllResponse & {
 export type DisplayServiceMap = {
   nodesMap: Map<string, FlowNode>;
   edgesMap: Map<string, FlowEdge>;
+  browserInitialized?: boolean;
 };
 
 export const mapLiveAudiences = (live: LiveInfo[]) => {

@@ -48,31 +48,34 @@ export const Modals = ({ audience }: { audience?: Audience }) => {
   return audience
     ? (
       <>
-        {opModal.value?.pausePipeline && audience && (
+        {opModal.value.pausePipeline && audience && (
           <PausePipelineModal audience={audience} />
         )}
-        {opModal.value?.resumePipeline && (
+        {opModal.value.resumePipeline && (
           <ResumePipelineModal
             audience={audience}
           />
         )}
-        {opModal.value?.detachPipeline && (
+        {opModal.value.detachPipeline && (
           <DetachPipelineModal
             audience={audience}
           />
         )}
-        {opModal.value?.attachPipeline && (
+        {opModal.value.attachPipeline && (
           <AttachPipelineModal
             audience={audience}
+            attachPipeline={opModal.value.attachPipeline}
           />
         )}
-        {opModal.value?.delete && <DeleteOperationModal audience={audience} />}
-        {opModal.value?.schemaModal && <SchemaModal />}
-        {opModal.value?.deleteService && (
+        {opModal.value.deleteOperation && (
+          <DeleteOperationModal audience={audience} />
+        )}
+        {opModal.value.schemaModal && <SchemaModal />}
+        {opModal.value.deleteService && (
           <DeleteServiceModal audience={audience} />
         )}
         {tailEnabledSignal.value && <Tail audience={audience} />}
-        {opModal.value?.tailRateModal && <TailRateModal />}
+        {opModal.value.tailRateModal && <TailRateModal />}
       </>
     )
     : null;

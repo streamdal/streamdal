@@ -5,7 +5,6 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
-import "flowbite";
 import {
   ComponentNode,
   GroupNode,
@@ -17,7 +16,7 @@ import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 import {
@@ -105,10 +104,8 @@ export default function ServiceMapComponent(
     success?: SuccessType;
   },
 ) {
-  const wrapper = useRef(null);
-
+  const wrapper = useRef<HTMLDivElement | null>(null);
   const [rfInstance, setRfInstance] = useState(null);
-
   const [nodes, setNodes, onNodesChange] = useNodesState(initNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges);
 
@@ -126,10 +123,11 @@ export default function ServiceMapComponent(
     };
   }
 
-  const fit = (nodes: FlowNode[], rfInstance) => {
-    const { right } = wrapper?.current?.getBoundingClientRect();
+  const fit = (nodes: FlowNode[], rfInstance: any) => {
+    const rect = wrapper?.current?.getBoundingClientRect();
     if (
-      right && rfInstance && nodes.find((n: FlowNode) => n.position.x > right)
+      rect?.right && rfInstance &&
+      nodes.find((n: FlowNode) => n.position.x > rect.right)
     ) {
       //
       // TODO, use useNodesInitialized instead of a timeout hack,
@@ -155,9 +153,9 @@ export default function ServiceMapComponent(
     }
   });
 
-  const clearModal = (e) => {
+  const clearModal = (e: any) => {
     if (e.target.className === "react-flow__pane react-flow__pane") {
-      opModal.value = null;
+      opModal.value = { clients: 0 };
     }
   };
 
@@ -173,7 +171,8 @@ export default function ServiceMapComponent(
       <Toast id={"global"} />
       <ReactFlow
         onInit={(reactFlowInstance: ReactFlowInstance) => {
-          setRfInstance(reactFlowInstance, fit(nodes, reactFlowInstance));
+          fit(nodes, reactFlowInstance);
+          setRfInstance(reactFlowInstance as any);
         }}
         nodes={nodes}
         edges={edges}
@@ -182,9 +181,14 @@ export default function ServiceMapComponent(
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
         edgeTypes={edgeTypes}
-        onClick={(e) => clearModal(e)}
+        onClick={(e: React.ChangeEvent<HTMLDivElement>) => clearModal(e)}
       >
-        {!serverErrorSignal.value && nodes.length === 0 && <EmptyService />}
+        {serverErrorSignal.value === "" &&
+          (serviceSignal.value.browserInitialized && nodes.length === 0 ||
+            !serviceSignal.value.browserInitialized &&
+              initNodes.length === 0) &&
+          <EmptyService error={serverErrorSignal.value} />}
+
         <Background
           style={{ height: "100vh" }}
         />

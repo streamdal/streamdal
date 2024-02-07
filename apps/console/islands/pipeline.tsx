@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useState } from "preact/hooks";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
@@ -8,7 +8,6 @@ import {
   AbortCondition,
   Pipeline,
   PipelineStep,
-  PipelineStepConditions,
 } from "streamdal-protos/protos/sp_pipeline.ts";
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 import {
@@ -30,7 +29,7 @@ import {
   kvModeFromEnum,
   optionsFromEnum,
 } from "../components/form/formSelect.tsx";
-import { isNumeric, logFormData } from "../lib/utils.ts";
+import { isNumeric } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
   argTypes,
@@ -39,7 +38,6 @@ import {
   StepArgs,
 } from "../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "../components/pipeline/stepConditions.tsx";
-import { initFlowbite } from "flowbite";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
@@ -53,6 +51,8 @@ import {
 } from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
 import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
 import * as uuid from "$std/uuid/mod.ts";
+import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
+import { PipelineHTTP } from "./pipelineHTTP.tsx";
 
 const detective = {
   type: DetectiveType.BOOLEAN_TRUE,
@@ -91,12 +91,14 @@ const SchemaValidationConditionEnum = z.nativeEnum(SchemaValidationCondition);
 const JSONSchemaDraftEnum = z.nativeEnum(JSONSchemaDraft);
 const KVActionTypeEnum = z.nativeEnum(KVAction);
 const KVModeTypeEnum = z.nativeEnum(KVMode);
+const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
 
 const kinds = [
   { label: "Detective", value: "detective" },
   { label: "Transform", value: "transform" },
   { label: "Key/Value", value: "kv" },
   { label: "Schema Validation", value: "schemaValidation" },
+  { label: "HTTP Request", value: "httpRequest" },
 ];
 
 const transformOptions = z.discriminatedUnion("oneofKind", [
@@ -253,6 +255,20 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
     }),
   }),
   z.object({
+    oneofKind: z.literal("httpRequest"),
+    httpRequest: z.object({
+      request: z.object({
+        method: zfd.numeric(HTTPMethodEnum),
+        url: z.string().url(),
+        body: z.string().transform((v) => new TextEncoder().encode(v)),
+        headers: z.record(
+          z.string().min(1, { message: "Required" }),
+          z.string().min(1, { message: "Required" }),
+        ).optional(),
+      }),
+    }),
+  }),
+  z.object({
     oneofKind: z.literal("encode"),
     encode: z.object({
       id: z.string().min(1, { message: "Required" }),
@@ -297,6 +313,8 @@ const stepSchema = z.object({
   // If this is non-dynamic transform step, path is required
   if (
     step?.step?.oneofKind === "transform" && !step.dynamic &&
+    step?.step?.transform
+        ?.options?.oneofKind !== "extractOptions" &&
     !step?.step?.transform
       ?.options[step?.step?.transform?.options?.oneofKind]?.path
   ) {
@@ -341,7 +359,6 @@ const PipelineDetail = (
   const [data, setData] = useState();
 
   useEffect(() => {
-    initFlowbite();
     setData({
       ...pipeline,
       steps: pipeline.steps.map((s: PipelineStep, i) => ({
@@ -351,6 +368,11 @@ const PipelineDetail = (
       })),
     });
   }, [pipeline]);
+
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
+    initFlowbite();
+  });
 
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);
@@ -668,9 +690,18 @@ const PipelineDetail = (
                       />
                     </>
                   )}
+                  {"httpRequest" === step.step.oneofKind && (
+                    <PipelineHTTP
+                      stepNumber={i}
+                      data={data}
+                      setData={setData}
+                      errors={errors}
+                    />
+                  )}
                   <StepConditions
                     stepIndex={i}
                     data={data}
+                    setData={setData}
                     errors={errors}
                   />
                 </div>
