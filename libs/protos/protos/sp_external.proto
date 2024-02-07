@@ -107,8 +107,9 @@ message GetAllResponse {
   // to any audience.
   map <string, protos.PipelineInfo> pipelines = 3;
 
-  // Audience to pipeline mapping config; key == $audience_as_string
-  map <string, protos.PipelineConfigs> configs = 4;
+  // Audience to pipeline ID config/mapping.
+  // key == $audience_as_string, value = $pipeline_id
+  map <string, GetAllResponsePipelines> config = 4;
 
   // When was this response generated. This is useful for determining what is
   // the latest update when using GetAllStream().
@@ -118,11 +119,15 @@ message GetAllResponse {
   optional bool _keepalive = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
+message GetAllResponsePipelines {
+  // List of pipeline IDs that are attached to this audience
+  repeated string pipeline_ids = 1;
+}
+
 message GetPipelinesRequest {
   // Don't think we need anything here
 }
 
-// Array of pipeline definitions
 message GetPipelinesResponse {
   repeated protos.Pipeline pipelines = 1;
 }

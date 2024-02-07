@@ -441,34 +441,6 @@ class PipelineStep(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class PipelineConfigs(betterproto.Message):
-    """
-    PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it
-    is also used in external.GetAllResponse:config.
-    """
-
-    configs: List["PipelineConfig"] = betterproto.message_field(1)
-    is_empty: Optional[bool] = betterproto.bool_field(
-        1000, optional=True, group="X_is_empty"
-    )
-    """
-    !!!!!!!! IMPORTANT !!!!!!!!!! For internal use only in server. We need this
-    because marshalling/encoding an empty protobuf results in nil. If someone
-    does a SetPipelines() with empty pipeline IDs - we will set this, so that
-    the encoded protobuf gets written as the actual object and not nil.
-    """
-
-
-@dataclass(eq=False, repr=False)
-class PipelineConfig(betterproto.Message):
-    """PipelineConfig is structure used in protos.PipelineConfigs"""
-
-    id: str = betterproto.string_field(1)
-    paused: bool = betterproto.bool_field(2)
-    created_at_unix_ts_utc: int = betterproto.int64_field(3)
-
-
-@dataclass(eq=False, repr=False)
 class LiveInfo(betterproto.Message):
     audiences: List["Audience"] = betterproto.message_field(1)
     """If empty, client has not announced any audiences"""
@@ -533,10 +505,13 @@ class GetAllResponse(betterproto.Message):
     attached to any audience.
     """
 
-    configs: Dict[str, "PipelineConfigs"] = betterproto.map_field(
+    config: Dict[str, "GetAllResponsePipelines"] = betterproto.map_field(
         4, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
-    """Audience to pipeline mapping config; key == $audience_as_string"""
+    """
+    Audience to pipeline ID config/mapping. key == $audience_as_string, value =
+    $pipeline_id
+    """
 
     generated_at_unix_ts_ns_utc: int = betterproto.int64_field(100)
     """
@@ -551,14 +526,18 @@ class GetAllResponse(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class GetAllResponsePipelines(betterproto.Message):
+    pipeline_ids: List[str] = betterproto.string_field(1)
+    """List of pipeline IDs that are attached to this audience"""
+
+
+@dataclass(eq=False, repr=False)
 class GetPipelinesRequest(betterproto.Message):
     pass
 
 
 @dataclass(eq=False, repr=False)
 class GetPipelinesResponse(betterproto.Message):
-    """Array of pipeline definitions"""
-
     pipelines: List["Pipeline"] = betterproto.message_field(1)
 
 

@@ -15,7 +15,6 @@ import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
-import { PipelineConfigs } from "./sp_pipeline.js";
 import { PipelineInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
 import { LiveInfo } from "./sp_info.js";
@@ -80,13 +79,13 @@ class GetAllResponse$Type extends MessageType {
             { no: 1, name: "live", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => LiveInfo },
             { no: 2, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 3, name: "pipelines", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineInfo } },
-            { no: 4, name: "configs", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineConfigs } },
+            { no: 4, name: "config", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => GetAllResponsePipelines } },
             { no: 100, name: "generated_at_unix_ts_ns_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
             { no: 1000, name: "_keepalive", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { live: [], audiences: [], pipelines: {}, configs: {}, generatedAtUnixTsNsUtc: "0" };
+        const message = { live: [], audiences: [], pipelines: {}, config: {}, generatedAtUnixTsNsUtc: "0" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -106,8 +105,8 @@ class GetAllResponse$Type extends MessageType {
                 case /* map<string, protos.PipelineInfo> pipelines */ 3:
                     this.binaryReadMap3(message.pipelines, reader, options);
                     break;
-                case /* map<string, protos.PipelineConfigs> configs */ 4:
-                    this.binaryReadMap4(message.configs, reader, options);
+                case /* map<string, protos.GetAllResponsePipelines> config */ 4:
+                    this.binaryReadMap4(message.config, reader, options);
                     break;
                 case /* int64 generated_at_unix_ts_ns_utc */ 100:
                     message.generatedAtUnixTsNsUtc = reader.int64().toString();
@@ -151,12 +150,12 @@ class GetAllResponse$Type extends MessageType {
                     key = reader.string();
                     break;
                 case 2:
-                    val = PipelineConfigs.internalBinaryRead(reader, reader.uint32(), options);
+                    val = GetAllResponsePipelines.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field protos.GetAllResponse.configs");
+                default: throw new globalThis.Error("unknown map entry field for field protos.GetAllResponse.config");
             }
         }
-        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : PipelineConfigs.create();
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : GetAllResponsePipelines.create();
     }
     internalBinaryWrite(message, writer, options) {
         /* repeated protos.LiveInfo live = 1; */
@@ -172,11 +171,11 @@ class GetAllResponse$Type extends MessageType {
             PipelineInfo.internalBinaryWrite(message.pipelines[k], writer, options);
             writer.join().join();
         }
-        /* map<string, protos.PipelineConfigs> configs = 4; */
-        for (let k of Object.keys(message.configs)) {
+        /* map<string, protos.GetAllResponsePipelines> config = 4; */
+        for (let k of Object.keys(message.config)) {
             writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
             writer.tag(2, WireType.LengthDelimited).fork();
-            PipelineConfigs.internalBinaryWrite(message.configs[k], writer, options);
+            GetAllResponsePipelines.internalBinaryWrite(message.config[k], writer, options);
             writer.join().join();
         }
         /* int64 generated_at_unix_ts_ns_utc = 100; */
@@ -195,6 +194,53 @@ class GetAllResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.GetAllResponse
  */
 export const GetAllResponse = new GetAllResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAllResponsePipelines$Type extends MessageType {
+    constructor() {
+        super("protos.GetAllResponsePipelines", [
+            { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value) {
+        const message = { pipelineIds: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated string pipeline_ids */ 1:
+                    message.pipelineIds.push(reader.string());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated string pipeline_ids = 1; */
+        for (let i = 0; i < message.pipelineIds.length; i++)
+            writer.tag(1, WireType.LengthDelimited).string(message.pipelineIds[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllResponsePipelines
+ */
+export const GetAllResponsePipelines = new GetAllResponsePipelines$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GetPipelinesRequest$Type extends MessageType {
     constructor() {
