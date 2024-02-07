@@ -2,23 +2,24 @@ import { ErrorType } from "../form/validate.ts";
 import { AbortCondition } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FormBoolean } from "../form/formBoolean.tsx";
 import { RadioGroup } from "../form/radioGroup.tsx";
-import { MetaData } from "./metadata.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { useLayoutEffect, useState } from "preact/hooks";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
+import { FormStringKV } from "../form/formStringKV.tsx";
 
 export type StepConditionType = {
   name: string;
   label: string;
   toolTip: string;
   data: any;
+  setData: (data: any) => void;
   errors: ErrorType;
 };
 
 export const StepCondition = (
-  { name, label, toolTip, data, errors }: StepConditionType,
+  { name, label, toolTip, data, setData, errors }: StepConditionType,
 ) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -77,9 +78,12 @@ export const StepCondition = (
             [AbortCondition.ABORT_ALL]: "Abort All Pipelines",
           }}
         />
-        <MetaData
+        <FormStringKV
           name={`${name}.metadata`}
           data={data}
+          setData={setData}
+          label={"Metadata"}
+          description="Metadata are arbitrary keys and values that will be emitted to calling code"
           errors={errors}
         />
       </div>

@@ -4,11 +4,12 @@ import { StepCondition } from "./stepCondition.tsx";
 export type StepConditionsType = {
   stepIndex: number;
   data: any;
+  setData: (data: any) => void;
   errors: ErrorType;
 };
 
 export const StepConditions = (
-  { stepIndex, data, errors }: StepConditionsType,
+  { stepIndex, data, setData, errors }: StepConditionsType,
 ) => {
   return (
     <div class="flex flex-col">
@@ -17,6 +18,7 @@ export const StepConditions = (
         label="On True"
         toolTip="Actions to take when the step condition returns true"
         data={data}
+        setData={setData}
         errors={errors}
       />
       <StepCondition
@@ -24,6 +26,7 @@ export const StepConditions = (
         label="On False"
         toolTip="Actions to take when the step condition returns false"
         data={data}
+        setData={setData}
         errors={errors}
       />
       <StepCondition
@@ -31,6 +34,7 @@ export const StepConditions = (
         label="On Error"
         toolTip="Action to take when the step condition did not compelte because of an error"
         data={data}
+        setData={setData}
         errors={errors}
       />
     </div>
