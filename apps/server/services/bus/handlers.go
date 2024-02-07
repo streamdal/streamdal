@@ -39,14 +39,14 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 
 	// Get pipeline config for each audience
 	for _, u := range usage {
-		configs, err := b.options.Store.GetConfigByAudience(ctx, u.Audience)
+		pipelines, err := b.options.Store.GetPipelinesByAudience(ctx, u.Audience)
 		if err != nil {
 			return errors.Wrapf(err, "error getting pipeline config by audience '%s'",
 				util.AudienceToStr(u.Audience))
 		}
 
 		// Send SetPipelines command for session ID
-		if _, err := b.sendSetPipelinesCommand(u.Audience, configs, u.SessionId); err != nil {
+		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
 			llog.Errorf("unable to send SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
@@ -87,14 +87,14 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 
 	// Get pipeline config for each audience that uses this pipeline ID
 	for _, u := range usage {
-		configs, err := b.options.Store.GetConfigByAudience(ctx, u.Audience)
+		pipelines, err := b.options.Store.GetPipelinesByAudience(ctx, u.Audience)
 		if err != nil {
 			return errors.Wrapf(err, "error getting pipeline config by audience '%s'",
 				util.AudienceToStr(u.Audience))
 		}
 
 		// Send SetPipelines command for session ID
-		if _, err := b.sendSetPipelinesCommand(u.Audience, configs, u.SessionId); err != nil {
+		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
 			llog.Debugf("error sending SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
@@ -195,21 +195,24 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 // Helper for generating pipelines for Pause and Resume pipeline requests.
 // Will skip paused pipelines.
 func (b *Bus) generatePipelinesForPauseResume(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error) {
-	configs, err := b.options.Store.GetConfigByAudience(ctx, aud)
+	llog := b.log.WithField("method", "generatePipelinesForPauseResume")
+
+	pipelines, err := b.options.Store.GetPipelinesByAudience(ctx, aud)
 	if err != nil {
-		b.log.Errorf("error getting config by audience '%s' from store: %v", aud, err)
+		llog.Errorf("error getting config by audience '%s' from store: %v", aud, err)
 		return nil, errors.Wrapf(err, "unable to get config for audience '%s'", util.AudienceToStr(aud))
 	}
 
-	pipelines := make([]*protos.Pipeline, 0)
+	activePipelines := make([]*protos.Pipeline, 0)
 
-	for _, pipeline := range configs {
-		if !pipeline.GetXPaused() {
-			pipelines = append(pipelines, pipeline)
+	// Only include non-paused pipelines
+	for _, p := range pipelines {
+		if !p.GetXPaused() {
+			activePipelines = append(activePipelines, p)
 		}
 	}
 
-	return pipelines, nil
+	return activePipelines, nil
 }
 
 // Emits a SetPipelines command that OMITS any paused pipelines.
@@ -377,14 +380,14 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via new audience broadcast handler")
 
 	// Determine pipeline configuration for audience
-	existingPipelines, err := b.options.Store.GetConfigByAudience(ctx, req.Audience)
+	existingPipelines, err := b.options.Store.GetPipelineConfigsByAudience(ctx, req.Audience)
 	if err != nil {
 		llog.Errorf("error getting config by audience: %v", err)
 		return errors.Wrap(err, "error getting config by audience")
 	}
 
 	// If this is NOT a brand new audience, nothing to do
-	if len(existingPipelines) > 0 {
+	if len(existingPipelines.Configs) > 0 {
 		llog.Debugf("audience '%s' already has pipeline configuration - nothing to do", util.AudienceToStr(req.Audience))
 		return nil
 	}

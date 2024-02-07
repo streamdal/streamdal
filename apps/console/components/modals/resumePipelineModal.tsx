@@ -1,26 +1,10 @@
 import IconX from "tabler-icons/tsx/x.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
+import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { toastSignal } from "../toasts/toast.tsx";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
-import { serviceSignal } from "../serviceMap/serviceSignal.ts";
-
-export const resumePipeline = (audience: Audience, pipeline: Pipeline) => {
-  serviceSignal.value = {
-    ...serviceSignal.value,
-    pipelines: {
-      ...serviceSignal.value.pipelines,
-      [pipeline.id]: {
-        ...serviceSignal.value.pipelines[pipeline.id],
-        paused: serviceSignal.value.pipelines[pipeline.id]?.paused?.filter((
-          a: Audience,
-        ) => audienceKey(a) !== audienceKey(audience)),
-      },
-    },
-  };
-};
+import { togglePausePipeline } from "./pausePipelineModal.tsx";
 
 export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
   const pipeline = opModal.value.resumePipeline;
@@ -38,7 +22,7 @@ export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
     const { success } = await response.json();
 
     if (success.message) {
-      resumePipeline(audience, pipeline);
+      togglePausePipeline(false, audience, pipeline);
       toastSignal.value = {
         id: "pipelineCrud",
         type: success.status ? "success" : "error",

@@ -14,7 +14,7 @@ export type ServiceSignal =
 
 export const initServiceSignal: ServiceSignal = {
   audiences: [],
-  config: {},
+  configs: {},
   edgesMap: new Map(),
   generatedAtUnixTsNsUtc: "",
   live: [],
@@ -43,8 +43,8 @@ export const setServiceSignal = (
 
 export const setPipelines = (audienceKey: string, pipelineIds: string[]) => {
   if (serviceSignal.value) {
-    serviceSignal.value.config[audienceKey] = {
-      ...serviceSignal.value.config[audienceKey] || {},
+    serviceSignal.value.configs[audienceKey] = {
+      ...serviceSignal.value.configs[audienceKey] || {},
       pipelineIds,
     };
   }

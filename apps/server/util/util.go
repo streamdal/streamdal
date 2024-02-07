@@ -220,21 +220,17 @@ func StripWASMFields(pipeline *protos.Pipeline) {
 	}
 }
 
-// DEV (DONE): Need to update for ordered pipelines
-func ConvertConfigStrAudience(config map[*protos.Audience][]*protos.Pipeline) map[string]*protos.GetAllResponsePipelines {
-	if config == nil {
+// ConvertPipelineConfigsAudToStr is used for converting a map of *protos.Audience:*protos.PipelineConfigs
+// to map of string:*protos.PipelineConfigs.
+func ConvertPipelineConfigsAudToStr(configs map[*protos.Audience]*protos.PipelineConfigs) map[string]*protos.PipelineConfigs {
+	if configs == nil {
 		return nil
 	}
 
-	m := map[string]*protos.GetAllResponsePipelines{}
+	m := map[string]*protos.PipelineConfigs{}
 
-	for k, pipelines := range config {
-		m[AudienceToStr(k)] = &protos.GetAllResponsePipelines{
-			PipelineIds: make([]string, 0),
-		}
-		for _, p := range pipelines {
-			m[AudienceToStr(k)].PipelineIds = append(m[AudienceToStr(k)].PipelineIds, p.Id)
-		}
+	for k, pipelineConfigs := range configs {
+		m[AudienceToStr(k)] = pipelineConfigs
 	}
 
 	return m

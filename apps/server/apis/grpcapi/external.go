@@ -67,18 +67,19 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	configs, err := s.Options.StoreService.GetAllConfig(ctx)
+	allPipelineConfigs, err := s.Options.StoreService.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get config")
 	}
 
-	configStrAudience := util.ConvertConfigStrAudience(configs)
+	// Convert map of *protos.Audience:*protos.PipelineConfigs to string:*protos.PipelineConfigs
+	convAllPipelineConfigs := util.ConvertPipelineConfigsAudToStr(allPipelineConfigs)
 
 	return &protos.GetAllResponse{
 		Live:                   liveInfo,
 		Audiences:              audiences,
 		Pipelines:              pipelines,
-		Config:                 configStrAudience,
+		Configs:                convAllPipelineConfigs,
 		GeneratedAtUnixTsNsUtc: time.Now().UTC().UnixNano(),
 	}, nil
 }
@@ -243,14 +244,14 @@ func (s *ExternalServer) getAllPipelineInfo(ctx context.Context) (map[string]*pr
 	}
 
 	// Get audience <-> pipeline mappings
-	pipelineConfig, err := s.Options.StoreService.GetAllConfig(ctx)
+	allPipelineConfigs, err := s.Options.StoreService.GetAllConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipeline config")
 	}
 
 	// Update pipeline info with info about attached pipelines
-	for aud, pipelines := range pipelineConfig {
-		for _, p := range pipelines {
+	for aud, pipelineConfigs := range allPipelineConfigs {
+		for _, p := range pipelineConfigs.Configs {
 			if _, ok := gen[p.Id]; ok {
 				gen[p.Id].Audiences = append(gen[p.Id].Audiences, aud)
 			}
@@ -537,7 +538,7 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 	// tools.
 
 	// Get previous pipelines for telemetry
-	existingPipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
+	existingPipelines, err := s.Options.StoreService.GetPipelineConfigsByAudience(ctx, req.Audience)
 	if err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 			fmt.Sprintf("unable to get existing pipelines by audience: %s", err)), nil
@@ -559,7 +560,8 @@ func (s *ExternalServer) SetPipelines(ctx context.Context, req *protos.SetPipeli
 		{"status", "active"},
 	}...)
 
-	delta := len(req.PipelineIds) - len(existingPipelines)
+	// Figure out how many pipelines have been _removed_ so we can decrement "inactive" gauge
+	delta := len(req.PipelineIds) - len(existingPipelines.Configs)
 
 	// Detach metrics are always negative
 	if delta > 0 {
@@ -608,13 +610,13 @@ func (s *ExternalServer) setPausePipeline(ctx context.Context, aud *protos.Audie
 	}
 
 	// Is this pipeline being used?
-	config, err := s.Options.StoreService.GetConfigByAudience(ctx, aud)
+	config, err := s.Options.StoreService.GetPipelineConfigsByAudience(ctx, aud)
 	if err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 			fmt.Sprintf("unable to get config by audience: %s", err)), nil
 	}
 
-	if len(config) == 0 {
+	if len(config.Configs) == 0 {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK,
 			fmt.Sprintf("nothing to do - pipeline '%s' not being used by audience '%s'", pipelineID, util.AudienceToStr(aud))), nil
 	}
@@ -825,19 +827,19 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 	}
 
 	// Determine if the audience is attached to any pipelines
-	pipelines, err := s.Options.StoreService.GetConfigByAudience(ctx, req.Audience)
+	pipelineConfigs, err := s.Options.StoreService.GetPipelineConfigsByAudience(ctx, req.Audience)
 	if err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 			fmt.Sprintf("unable to fetch config by audience: %s", err.Error())), nil
 	}
 
-	if len(pipelines) > 0 && !req.GetForce() {
+	if len(pipelineConfigs.Configs) > 0 && !req.GetForce() {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
 			fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(req.Audience),
-				len(pipelines))), nil
+				len(pipelineConfigs.Configs))), nil
 	}
 
-	// Either there are 0 attached pipelines or force is not set - either way
+	// Either there are 0 attached pipelineConfigs or force is not set - either way
 	// we can delete and broadcast - the broadcast handler will know to send a
 	// SetPipelines cmd set to [] for connected SDKs.
 
@@ -869,7 +871,8 @@ func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteSe
 	// Find all audiences for the service
 	audiences, err := s.Options.StoreService.GetAudiencesByService(ctx, req.ServiceName)
 	if err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			fmt.Sprintf("unable to get pipeline configs by audience: %s", err.Error())), nil
 	}
 
 	if len(audiences) == 0 {
@@ -880,15 +883,15 @@ func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteSe
 
 	// Determine if the audience is attached to any pipelines
 	for _, audience := range audiences {
-		configs, err := s.Options.StoreService.GetConfigByAudience(ctx, audience)
+		pipelineConfigs, err := s.Options.StoreService.GetPipelineConfigsByAudience(ctx, audience)
 		if err != nil {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 				fmt.Sprintf("unable to delete audience '%s' during service delete: %s", util.AudienceToStr(audience), err.Error())), nil
 		}
 
-		if len(configs) > 0 && !req.GetForce() {
+		if len(pipelineConfigs.Configs) > 0 && !req.GetForce() {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
-				fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(audience), len(configs))), nil
+				fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(audience), len(pipelineConfigs.Configs))), nil
 		}
 
 		// Either there are 0 attached pipelines or force is set - either way
