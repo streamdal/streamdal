@@ -56,11 +56,13 @@ service External {
 
   // Attach a notification config to a pipeline
   rpc AttachNotification(AttachNotificationRequest) returns (protos.StandardResponse) {
+    // Deprecated now that we are including notification configs in steps themselves
     option deprecated = true;
   }
 
   // Detach a notification config from a pipeline
   rpc DetachNotification(DetachNotificationRequest) returns (protos.StandardResponse) {
+    // Deprecated now that we are including notification configs in steps themselves
     option deprecated = true;
   }
 
