@@ -1407,6 +1407,15 @@ pub struct PipelineConfigs {
     // message fields
     // @@protoc_insertion_point(field:protos.PipelineConfigs.configs)
     pub configs: ::std::vec::Vec<PipelineConfig>,
+    ///  !!!!!!!! IMPORTANT !!!!!!!!!!
+    ///
+    ///  For internal use only in server. We need this because marshalling/encoding
+    ///  an empty protobuf results in nil. If someone does a SetPipelines() with
+    ///  empty pipeline IDs - we will set this, so that the encoded protobuf gets
+    ///  written as the actual object and not nil.
+    ///
+    // @@protoc_insertion_point(field:protos.PipelineConfigs._is_empty)
+    pub _is_empty: bool,
     // special fields
     // @@protoc_insertion_point(special_field:protos.PipelineConfigs.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -1424,12 +1433,17 @@ impl PipelineConfigs {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "configs",
             |m: &PipelineConfigs| { &m.configs },
             |m: &mut PipelineConfigs| { &mut m.configs },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "_is_empty",
+            |m: &PipelineConfigs| { &m._is_empty },
+            |m: &mut PipelineConfigs| { &mut m._is_empty },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<PipelineConfigs>(
             "PipelineConfigs",
@@ -1452,6 +1466,9 @@ impl ::protobuf::Message for PipelineConfigs {
                 10 => {
                     self.configs.push(is.read_message()?);
                 },
+                8000 => {
+                    self._is_empty = is.read_bool()?;
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -1468,6 +1485,9 @@ impl ::protobuf::Message for PipelineConfigs {
             let len = value.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         };
+        if self._is_empty != false {
+            my_size += 2 + 1;
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -1477,6 +1497,9 @@ impl ::protobuf::Message for PipelineConfigs {
         for v in &self.configs {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
         };
+        if self._is_empty != false {
+            os.write_bool(1000, self._is_empty)?;
+        }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -1495,12 +1518,14 @@ impl ::protobuf::Message for PipelineConfigs {
 
     fn clear(&mut self) {
         self.configs.clear();
+        self._is_empty = false;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static PipelineConfigs {
         static instance: PipelineConfigs = PipelineConfigs {
             configs: ::std::vec::Vec::new(),
+            _is_empty: false,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1791,30 +1816,31 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01\x01\x12$\n\x0b_wasm_bytes\x18\x91N\x20\x01(\x0cH\x02R\tWasmBytes\
     \x88\x01\x01\x12*\n\x0e_wasm_function\x18\x92N\x20\x01(\tH\x03R\x0cWasmF\
     unction\x88\x01\x01B\x06\n\x04stepB\x0b\n\tX_wasm_idB\x0e\n\x0cX_wasm_by\
-    tesB\x11\n\x0fX_wasm_function\"C\n\x0fPipelineConfigs\x120\n\x07configs\
-    \x18\x01\x20\x03(\x0b2\x16.protos.PipelineConfigR\x07configs\"l\n\x0ePip\
-    elineConfig\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x16\n\x06pause\
-    d\x18\x02\x20\x01(\x08R\x06paused\x122\n\x16created_at_unix_ts_utc\x18\
-    \x03\x20\x01(\x03R\x12createdAtUnixTsUtc*m\n\x0eAbortCondition\x12\x19\n\
-    \x15ABORT_CONDITION_UNSET\x10\0\x12!\n\x1dABORT_CONDITION_ABORT_CURRENT\
-    \x10\x01\x12\x1d\n\x19ABORT_CONDITION_ABORT_ALL\x10\x02B<Z:github.com/st\
-    reamdal/streamdal/libs/protos/build/go/protosJ\xc8\x20\n\x06\x12\x04\0\0\
-    q\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\
-    \n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0%\n\t\
-    \n\x02\x03\x02\x12\x03\x06\0%\n\t\n\x02\x03\x03\x12\x03\x07\0(\n\t\n\x02\
-    \x03\x04\x12\x03\x08\0%\n\t\n\x02\x03\x05\x12\x03\t\0*\n\t\n\x02\x03\x06\
-    \x12\x03\n\0*\n\t\n\x02\x03\x07\x12\x03\x0b\0!\n\t\n\x02\x03\x08\x12\x03\
-    \x0c\00\n\t\n\x02\x03\t\x12\x03\r\0(\n\t\n\x02\x03\n\x12\x03\x0e\0)\n\
-    \x08\n\x01\x08\x12\x03\x10\0Q\n\t\n\x02\x08\x0b\x12\x03\x10\0Q\n\xc8\x01\
-    \n\x02\x04\0\x12\x04\x15\0&\x01\x1a\xbb\x01\x20Pipeline\x20is\x20a\x20st\
-    ructure\x20that\x20holds\x20one\x20or\x20more\x20pipeline\x20steps.\x20T\
-    his\x20structure\n\x20is\x20intended\x20to\x20be\x20immutable;\x20client\
-    s\x20are\x20expected\x20to\x20generate\x20WASMRequest's\n\x20that\x20con\
-    tain\x20a\x20pipeline\x20step.\n\n\n\n\x03\x04\0\x01\x12\x03\x15\x08\x10\
-    \n\x9f\x01\n\x04\x04\0\x02\0\x12\x03\x18\x02\x10\x1a\x91\x01\x20ID\x20sh\
-    ould\x20NOT\x20be\x20set\x20by\x20external\x20gRPC\x20client\x20on\x20Cr\
-    eatePipelineRequest\x20-\x20it\n\x20will\x20be\x20ignored;\x20it\x20_doe\
-    s_\x20need\x20to\x20be\x20set\x20on\x20UpdatePipelineRequest.\n\n\x0c\n\
+    tesB\x11\n\x0fX_wasm_function\"`\n\x0fPipelineConfigs\x120\n\x07configs\
+    \x18\x01\x20\x03(\x0b2\x16.protos.PipelineConfigR\x07configs\x12\x1b\n\t\
+    _is_empty\x18\xe8\x07\x20\x01(\x08R\x07IsEmpty\"l\n\x0ePipelineConfig\
+    \x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x16\n\x06paused\x18\x02\
+    \x20\x01(\x08R\x06paused\x122\n\x16created_at_unix_ts_utc\x18\x03\x20\
+    \x01(\x03R\x12createdAtUnixTsUtc*m\n\x0eAbortCondition\x12\x19\n\x15ABOR\
+    T_CONDITION_UNSET\x10\0\x12!\n\x1dABORT_CONDITION_ABORT_CURRENT\x10\x01\
+    \x12\x1d\n\x19ABORT_CONDITION_ABORT_ALL\x10\x02B<Z:github.com/streamdal/\
+    streamdal/libs/protos/build/go/protosJ\xe5#\n\x06\x12\x04\0\0z\x01\n\x08\
+    \n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\
+    \x03\0\x12\x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0%\n\t\n\x02\x03\
+    \x02\x12\x03\x06\0%\n\t\n\x02\x03\x03\x12\x03\x07\0(\n\t\n\x02\x03\x04\
+    \x12\x03\x08\0%\n\t\n\x02\x03\x05\x12\x03\t\0*\n\t\n\x02\x03\x06\x12\x03\
+    \n\0*\n\t\n\x02\x03\x07\x12\x03\x0b\0!\n\t\n\x02\x03\x08\x12\x03\x0c\00\
+    \n\t\n\x02\x03\t\x12\x03\r\0(\n\t\n\x02\x03\n\x12\x03\x0e\0)\n\x08\n\x01\
+    \x08\x12\x03\x10\0Q\n\t\n\x02\x08\x0b\x12\x03\x10\0Q\n\xc8\x01\n\x02\x04\
+    \0\x12\x04\x15\0&\x01\x1a\xbb\x01\x20Pipeline\x20is\x20a\x20structure\
+    \x20that\x20holds\x20one\x20or\x20more\x20pipeline\x20steps.\x20This\x20\
+    structure\n\x20is\x20intended\x20to\x20be\x20immutable;\x20clients\x20ar\
+    e\x20expected\x20to\x20generate\x20WASMRequest's\n\x20that\x20contain\
+    \x20a\x20pipeline\x20step.\n\n\n\n\x03\x04\0\x01\x12\x03\x15\x08\x10\n\
+    \x9f\x01\n\x04\x04\0\x02\0\x12\x03\x18\x02\x10\x1a\x91\x01\x20ID\x20shou\
+    ld\x20NOT\x20be\x20set\x20by\x20external\x20gRPC\x20client\x20on\x20Crea\
+    tePipelineRequest\x20-\x20it\n\x20will\x20be\x20ignored;\x20it\x20_does_\
+    \x20need\x20to\x20be\x20set\x20on\x20UpdatePipelineRequest.\n\n\x0c\n\
     \x05\x04\0\x02\0\x05\x12\x03\x18\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\
     \x03\x18\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x18\x0e\x0f\n-\n\x04\
     \x04\0\x02\x01\x12\x03\x1b\x02\x12\x1a\x20\x20Friendly\x20name\x20for\
@@ -1925,23 +1951,33 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     IELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x02\x02\x11\x04\x12\x03b\
     \x02\n\n\x0c\n\x05\x04\x02\x02\x11\x05\x12\x03b\x0b\x11\n\x0c\n\x05\x04\
     \x02\x02\x11\x01\x12\x03b\x12\x20\n\x0c\n\x05\x04\x02\x02\x11\x03\x12\
-    \x03b#(\n\x88\x01\n\x02\x04\x03\x12\x04g\0i\x01\x1a|\x20PipelineConfigs\
+    \x03b#(\n\x88\x01\n\x02\x04\x03\x12\x04g\0r\x01\x1a|\x20PipelineConfigs\
     \x20is\x20stored\x20encoded\x20in\x20redis:streamdal_audience:$audStr;\
     \x20it\x20is\n\x20also\x20used\x20in\x20external.GetAllResponse:config.\
     \n\n\n\n\x03\x04\x03\x01\x12\x03g\x08\x17\n\x0b\n\x04\x04\x03\x02\0\x12\
     \x03h\x02&\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x03h\x02\n\n\x0c\n\x05\x04\
     \x03\x02\0\x06\x12\x03h\x0b\x19\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03h\
-    \x1a!\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03h$%\nH\n\x02\x04\x04\x12\x04m\
-    \0q\x01\x1a<\x20PipelineConfig\x20is\x20structure\x20used\x20in\x20proto\
-    s.PipelineConfigs\n\n\n\n\x03\x04\x04\x01\x12\x03m\x08\x16\n\x0b\n\x04\
-    \x04\x04\x02\0\x12\x03n\x02\x10\n\x0c\n\x05\x04\x04\x02\0\x05\x12\x03n\
-    \x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03n\t\x0b\n\x0c\n\x05\x04\
-    \x04\x02\0\x03\x12\x03n\x0e\x0f\n\x0b\n\x04\x04\x04\x02\x01\x12\x03o\x02\
-    \x12\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x03o\x02\x06\n\x0c\n\x05\x04\
-    \x04\x02\x01\x01\x12\x03o\x07\r\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x03o\
-    \x10\x11\n\x0b\n\x04\x04\x04\x02\x02\x12\x03p\x02#\n\x0c\n\x05\x04\x04\
-    \x02\x02\x05\x12\x03p\x02\x07\n\x0c\n\x05\x04\x04\x02\x02\x01\x12\x03p\
-    \x08\x1e\n\x0c\n\x05\x04\x04\x02\x02\x03\x12\x03p!\"b\x06proto3\
+    \x1a!\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03h$%\n\xf0\x02\n\x04\x04\x03\
+    \x02\x01\x12\x03q\x02\x18\x1a\xab\x02\x20!!!!!!!!\x20IMPORTANT\x20!!!!!!\
+    !!!!\n\n\x20For\x20internal\x20use\x20only\x20in\x20server.\x20We\x20nee\
+    d\x20this\x20because\x20marshalling/encoding\n\x20an\x20empty\x20protobu\
+    f\x20results\x20in\x20nil.\x20If\x20someone\x20does\x20a\x20SetPipelines\
+    ()\x20with\n\x20empty\x20pipeline\x20IDs\x20-\x20we\x20will\x20set\x20th\
+    is,\x20so\x20that\x20the\x20encoded\x20protobuf\x20gets\n\x20written\x20\
+    as\x20the\x20actual\x20object\x20and\x20not\x20nil.\n\n\"5\x20protolint:\
+    disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x03\x02\
+    \x01\x05\x12\x03q\x02\x06\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x03q\x07\
+    \x10\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x03q\x13\x17\nH\n\x02\x04\x04\
+    \x12\x04v\0z\x01\x1a<\x20PipelineConfig\x20is\x20structure\x20used\x20in\
+    \x20protos.PipelineConfigs\n\n\n\n\x03\x04\x04\x01\x12\x03v\x08\x16\n\
+    \x0b\n\x04\x04\x04\x02\0\x12\x03w\x02\x10\n\x0c\n\x05\x04\x04\x02\0\x05\
+    \x12\x03w\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03w\t\x0b\n\x0c\n\
+    \x05\x04\x04\x02\0\x03\x12\x03w\x0e\x0f\n\x0b\n\x04\x04\x04\x02\x01\x12\
+    \x03x\x02\x12\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x03x\x02\x06\n\x0c\n\
+    \x05\x04\x04\x02\x01\x01\x12\x03x\x07\r\n\x0c\n\x05\x04\x04\x02\x01\x03\
+    \x12\x03x\x10\x11\n\x0b\n\x04\x04\x04\x02\x02\x12\x03y\x02#\n\x0c\n\x05\
+    \x04\x04\x02\x02\x05\x12\x03y\x02\x07\n\x0c\n\x05\x04\x04\x02\x02\x01\
+    \x12\x03y\x08\x1e\n\x0c\n\x05\x04\x04\x02\x02\x03\x12\x03y!\"b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

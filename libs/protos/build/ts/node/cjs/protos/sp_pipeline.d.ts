@@ -217,6 +217,18 @@ export interface PipelineConfigs {
      * @generated from protobuf field: repeated protos.PipelineConfig configs = 1;
      */
     configs: PipelineConfig[];
+    /**
+     * !!!!!!!! IMPORTANT !!!!!!!!!!
+     *
+     * For internal use only in server. We need this because marshalling/encoding
+     * an empty protobuf results in nil. If someone does a SetPipelines() with
+     * empty pipeline IDs - we will set this, so that the encoded protobuf gets
+     * written as the actual object and not nil.
+     *
+     *
+     * @generated from protobuf field: bool _is_empty = 1000;
+     */
+    IsEmpty: boolean;
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs
