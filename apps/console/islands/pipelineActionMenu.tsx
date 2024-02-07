@@ -106,12 +106,10 @@ export const PipelineActionMenu = (
     pipeline: Pipeline;
   },
 ) => {
-  const attached = serviceSignal.value.pipelines[pipeline.id]?.audiences?.some((
-    a: Audience,
-  ) => audienceKey(a) === audienceKey(audience));
-
-  const paused = !!serviceSignal.value?.pipelines[pipeline.id]?.pipeline
-    ?.Paused;
+  const key = audienceKey(audience);
+  const p = serviceSignal.value?.configs[key]?.configs?.find((p) =>
+    p.id === pipeline.id
+  );
 
   useLayoutEffect(async () => {
     const { initFlowbite } = await import("flowbite");
@@ -121,20 +119,20 @@ export const PipelineActionMenu = (
   return (
     <div
       class={`p-2 flex flex-row justify-between items-center ${
-        attached ? "" : "bg-gray-100"
+        p ? "" : "bg-gray-100"
       } hover:bg-purple-100`}
     >
       <div class="flex flex-row justify-start items-center">
-        <AttachDetach pipeline={pipeline} attached={attached} />
+        <AttachDetach pipeline={pipeline} attached={!!p} />
         <PauseResume
           pipeline={pipeline}
-          attached={attached}
-          paused={paused}
+          attached={!!p}
+          paused={!!p?.paused}
         />
 
         <div
           class={`max-w-[${
-            attached ? "150px" : "190px"
+            p ? "150px" : "190px"
           }] flex flex-row justify-start items-center whitespace-nowrap text-ellipsis overflow-hidden`}
         >
           {pipeline.name}
