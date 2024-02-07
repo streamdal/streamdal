@@ -1,3 +1,5 @@
+# github.com/TylerBrock/colorjson v0.0.0-20200706003622-8a50f05110d2
+## explicit
 # github.com/alecthomas/kong v0.8.1
 ## explicit; go 1.18
 github.com/alecthomas/kong

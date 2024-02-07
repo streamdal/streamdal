@@ -3,6 +3,7 @@ module github.com/streamdal/server/test-utils/demo-client
 go 1.20
 
 require (
+	github.com/TylerBrock/colorjson v0.0.0-20200706003622-8a50f05110d2
 	github.com/alecthomas/kong v0.8.1
 	github.com/fatih/color v1.16.0
 	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f
