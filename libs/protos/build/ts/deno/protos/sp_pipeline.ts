@@ -233,9 +233,9 @@ export interface PipelineConfigs {
      * written as the actual object and not nil.
      *
      *
-     * @generated from protobuf field: bool _is_empty = 1000;
+     * @generated from protobuf field: optional bool _is_empty = 1000;
      */
-    IsEmpty: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    IsEmpty?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs
@@ -628,11 +628,11 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
     constructor() {
         super("protos.PipelineConfigs", [
             { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig },
-            { no: 1000, name: "_is_empty", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs {
-        const message = { configs: [], IsEmpty: false };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<PipelineConfigs>(this, message, value);
@@ -646,7 +646,7 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
                 case /* repeated protos.PipelineConfig configs */ 1:
                     message.configs.push(PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* bool _is_empty */ 1000:
+                case /* optional bool _is_empty */ 1000:
                     message.IsEmpty = reader.bool();
                     break;
                 default:
@@ -664,8 +664,8 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
         /* repeated protos.PipelineConfig configs = 1; */
         for (let i = 0; i < message.configs.length; i++)
             PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* bool _is_empty = 1000; */
-        if (message.IsEmpty !== false)
+        /* optional bool _is_empty = 1000; */
+        if (message.IsEmpty !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.IsEmpty);
         let u = options.writeUnknownFields;
         if (u !== false)

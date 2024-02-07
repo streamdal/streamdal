@@ -390,11 +390,11 @@ class PipelineConfigs$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.PipelineConfigs", [
             { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineConfig },
-            { no: 1000, name: "_is_empty", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { configs: [], IsEmpty: false };
+        const message = { configs: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -408,7 +408,7 @@ class PipelineConfigs$Type extends runtime_5.MessageType {
                 case /* repeated protos.PipelineConfig configs */ 1:
                     message.configs.push(exports.PipelineConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* bool _is_empty */ 1000:
+                case /* optional bool _is_empty */ 1000:
                     message.IsEmpty = reader.bool();
                     break;
                 default:
@@ -426,8 +426,8 @@ class PipelineConfigs$Type extends runtime_5.MessageType {
         /* repeated protos.PipelineConfig configs = 1; */
         for (let i = 0; i < message.configs.length; i++)
             exports.PipelineConfig.internalBinaryWrite(message.configs[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* bool _is_empty = 1000; */
-        if (message.IsEmpty !== false)
+        /* optional bool _is_empty = 1000; */
+        if (message.IsEmpty !== undefined)
             writer.tag(1000, runtime_1.WireType.Varint).bool(message.IsEmpty);
         let u = options.writeUnknownFields;
         if (u !== false)

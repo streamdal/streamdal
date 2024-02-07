@@ -448,7 +448,9 @@ class PipelineConfigs(betterproto.Message):
     """
 
     configs: List["PipelineConfig"] = betterproto.message_field(1)
-    is_empty: bool = betterproto.bool_field(1000)
+    is_empty: Optional[bool] = betterproto.bool_field(
+        1000, optional=True, group="X_is_empty"
+    )
     """
     !!!!!!!! IMPORTANT !!!!!!!!!! For internal use only in server. We need this
     because marshalling/encoding an empty protobuf results in nil. If someone

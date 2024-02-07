@@ -226,9 +226,9 @@ export interface PipelineConfigs {
      * written as the actual object and not nil.
      *
      *
-     * @generated from protobuf field: bool _is_empty = 1000;
+     * @generated from protobuf field: optional bool _is_empty = 1000;
      */
-    IsEmpty: boolean;
+    IsEmpty?: boolean;
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs

@@ -111,7 +111,7 @@ message PipelineConfigs {
   // empty pipeline IDs - we will set this, so that the encoded protobuf gets
   // written as the actual object and not nil.
   //
-  bool _is_empty = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  optional bool _is_empty = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 
