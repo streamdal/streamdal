@@ -836,7 +836,7 @@ func (s *ExternalServer) DeleteAudience(ctx context.Context, req *protos.DeleteA
 
 	if len(pipelineConfigs.Configs) > 0 && !req.GetForce() {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
-			fmt.Sprintf("audience '%s' has '%d' attached pipelineConfigs, specify force to remove", util.AudienceToStr(req.Audience),
+			fmt.Sprintf("audience '%s' has '%d' attached pipelines, specify force to remove", util.AudienceToStr(req.Audience),
 				len(pipelineConfigs.Configs))), nil
 	}
 

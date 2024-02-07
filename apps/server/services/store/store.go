@@ -418,6 +418,18 @@ func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesReques
 		pipelineConfigs.Configs = append(pipelineConfigs.Configs, cfg)
 	}
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!! //
+	// 																  //
+	// An empty protobuf var will be marshalled to nil. This is why   //
+	// we set XIsEmpty to true - to ensure that non-nil protobuf is   //
+	//                          saved!		       					  //
+	//																  //
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+
+	if len(pipelineConfigs.Configs) == 0 {
+		pipelineConfigs.XIsEmpty = proto.Bool(true)
+	}
+
 	data, err := proto.Marshal(pipelineConfigs)
 	if err != nil {
 		return errors.Wrap(err, "error encoding pipeline configs")
@@ -582,11 +594,21 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
-	// And add it to more permanent storage (if it doesn't already exist)
+	// Create empty pipeline configs that will be saved to K/V under streamdal_audience:$audStr
+	pipelineConfigs := &protos.PipelineConfigs{
+		Configs:  make([]*protos.PipelineConfig, 0),
+		XIsEmpty: proto.Bool(true),
+	}
+
+	data, err := proto.Marshal(pipelineConfigs)
+	if err != nil {
+		return errors.Wrap(err, "error serializing pipeline configs")
+	}
+
 	if err := s.options.RedisBackend.SetArgs(
 		ctx,
 		RedisAudienceKey(util.AudienceToStr(req.Audience)),
-		[]byte(`[]`),
+		data,
 		redis.SetArgs{
 			Mode: "NX",
 		},
@@ -726,7 +748,7 @@ func (s *Store) GetPipelineConfigsByAudience(ctx context.Context, aud *protos.Au
 	}
 
 	// Fetch all configs, return only single audience
-	setPipelineConfigData, err := s.options.RedisBackend.Get(ctx, fmt.Sprintf(RedisAudienceKeyFormat, audStr)).Result()
+	pipelineConfigsData, err := s.options.RedisBackend.Get(ctx, fmt.Sprintf(RedisAudienceKeyFormat, audStr)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return pipelineConfigs, nil
@@ -736,7 +758,7 @@ func (s *Store) GetPipelineConfigsByAudience(ctx context.Context, aud *protos.Au
 	}
 
 	// Unmarshal config, generate pipeline
-	if err := proto.Unmarshal([]byte(setPipelineConfigData), pipelineConfigs); err != nil {
+	if err := proto.Unmarshal([]byte(pipelineConfigsData), pipelineConfigs); err != nil {
 		return nil, errors.Wrapf(err, "GetPipelineConfigsByAudience: error unmarshaling pipelines config for audience '%s'", audStr)
 	}
 

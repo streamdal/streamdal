@@ -284,7 +284,7 @@ github.com/slack-go/slack/slackutilsx
 ## explicit; go 1.20
 # github.com/streamdal/server v0.0.12
 ## explicit; go 1.18
-# github.com/streamdal/streamdal/libs/protos v0.1.18-0.20240206221141-6a4bd5873e69
+# github.com/streamdal/streamdal/libs/protos v0.1.18-0.20240207005644-812635b028ec
 ## explicit; go 1.20
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
