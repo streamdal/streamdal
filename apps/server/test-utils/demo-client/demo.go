@@ -13,7 +13,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/hokaccha/go-prettyjson"
 	gopretty "github.com/jedib0t/go-pretty/v6/table"
-	jd "github.com/josephburnett/jd/lib"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -300,34 +299,12 @@ func generateDataDiff(tw gopretty.Writer, pre []byte, post *streamdal.ProcessRes
 
 	if string(pre) != string(post.Data) {
 		postTitle = "After " + underline("(changed)")
-		postDiffFormatted, err := generateJSONDiff(pre, post.Data)
-		if err != nil {
-			logrus.Debugf("failed to generate JSON diff: %s", err)
-		} else {
-			postFormatted = postDiffFormatted
-		}
 	}
 
 	tw.AppendSeparator()
 	tw.AppendRow(gopretty.Row{bold("Before"), bold(postTitle)})
 	tw.AppendSeparator()
 	tw.AppendRow(gopretty.Row{string(preFormatted), string(postFormatted)})
-}
-
-func generateJSONDiff(pre, post []byte) ([]byte, error) {
-	a, err := jd.ReadJsonString(string(pre))
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to read pre JSON")
-	}
-
-	b, err := jd.ReadJsonString(string(post))
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to read post JSON")
-	}
-
-	diff := a.Diff(b)
-
-	return []byte(diff.Render(jd.COLOR)), nil
 }
 
 func truncp(s *string) string {
