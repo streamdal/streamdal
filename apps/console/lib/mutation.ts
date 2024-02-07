@@ -106,8 +106,9 @@ export const attachPipeline = async (
 ) => {
   try {
     const key = audienceKey(audience);
-    const { pipelineIds: existingIds = [] } =
-      serviceSignal?.value?.config[key] ?? [];
+    const existingIds = serviceSignal?.value?.configs[key]?.configs.map((p) =>
+      p.id
+    ) || [];
     const pipelineIds = [...existingIds, ...[pipelineId]];
 
     const request: SetPipelinesRequest = SetPipelinesRequest.create({
@@ -137,8 +138,9 @@ export const detachPipeline = async (
 ) => {
   try {
     const key = audienceKey(audience);
-    const { pipelineIds: existingIds = [] } =
-      serviceSignal?.value?.config[key] ?? [];
+    const existingIds = serviceSignal?.value?.configs[key]?.configs.map((p) =>
+      p.id
+    ) || [];
     const pipelineIds = existingIds?.filter((id: string) => id !== pipelineId);
     const request: SetPipelinesRequest = SetPipelinesRequest.create({
       audience,
