@@ -273,30 +273,11 @@ func (n *Notify) handleEmailSES(ctx context.Context, event *protos.NotifyRequest
 	}
 	return nil
 }
-
-func prettyJSON(input []byte) string {
-	if len(input) == 0 {
-		return ""
-	}
-
-	payload := map[string]interface{}{}
-
-	if err := json.Unmarshal(input, &payload); err != nil {
-		return string(input)
-	}
-
-	pretty, err := json.MarshalIndent(payload, "", "  ")
-	if err != nil {
-		return string(input)
-	}
-
-	return string(pretty)
-}
-
 func (n *Notify) handleSlack(ctx context.Context, event *protos.NotifyRequest, cfg *protos.NotificationSlack, pipeline *protos.Pipeline) error {
 	api := slack.New(cfg.BotToken)
 
-	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Alert", false, false))
+	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Alert Triggered", false, false))
+	divBlock := slack.NewDividerBlock()
 
 	infoBlocks := []*slack.TextBlockObject{
 		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline ID*\n"+pipeline.Id, false, false),
@@ -304,21 +285,36 @@ func (n *Notify) handleSlack(ctx context.Context, event *protos.NotifyRequest, c
 		slack.NewTextBlockObject(slack.MarkdownType, "*Step Name*\n"+event.Step.Name, false, false),
 		slack.NewTextBlockObject(slack.MarkdownType, "*Service Name*\n"+event.Audience.ServiceName, false, false),
 		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Name*\n"+event.Audience.OperationName, false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Type*\n"+event.Audience.GetOperationType().String(), false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Payload*", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Type*\n"+operationTypeString(event.Audience.OperationType), false, false),
 	}
 
-	payload := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(prettyJSON(event.Payload), &slack.RichTextSectionTextStyle{}))
-	payload.Type = slack.RTEPreformatted
+	optionBlocks := slack.MsgOptionBlocks(headerBlock, divBlock, slack.NewSectionBlock(nil, infoBlocks, nil), divBlock)
 
-	// Divider before buttons
-	divBlock := slack.NewDividerBlock()
+	// If we have a payload, include it in the alert
+	if len(event.Payload) > 0 {
+		// Add payload to info blocks
+		payloadText := slack.NewTextBlockObject(slack.MarkdownType, "*Payload*", false, false)
+		infoBlocks = append(infoBlocks, payloadText)
+
+		// Payload is preformatted rich text
+		payload := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(prettyJSON(event.Payload), &slack.RichTextSectionTextStyle{}))
+		payload.Type = slack.RTEPreformatted
+
+		// Option blocks needs to include the rich text payload block
+		optionBlocks = slack.MsgOptionBlocks(
+			headerBlock,
+			divBlock,
+			slack.NewSectionBlock(nil, infoBlocks, nil),
+			slack.NewRichTextBlock("payload", payload),
+			divBlock,
+		)
+	}
 
 	_, _, err := api.PostMessageContext(
 		ctx,
 		cfg.Channel,
 		slack.MsgOptionText("Streamdal Alert", false),
-		slack.MsgOptionBlocks(headerBlock, divBlock, slack.NewSectionBlock(nil, infoBlocks, nil), slack.NewRichTextBlock("payload", payload)),
+		optionBlocks,
 		slack.MsgOptionAsUser(true),
 	)
 	if err != nil {
@@ -347,10 +343,14 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *protos.NotifyReques
 		Body: &pagerduty.APIDetails{
 			Type: "incident_body",
 			Details: fmt.Sprintf(
-				"Pipeline ID: %s\nPipeline Name: %s\nStep Name: %s",
+				"Pipeline ID: %s\nPipeline Name: %s\nStep Name: %s\nService Name: %s\nOperation Name: %s\nOperation Type: %s\nPayload: %s\n",
 				pipeline.Id,
 				pipeline.Name,
 				event.Step.Name,
+				event.Audience.ServiceName,
+				event.Audience.OperationName,
+				operationTypeString(event.Audience.OperationType),
+				prettyJSON(event.Payload),
 			),
 		},
 	}
@@ -395,9 +395,13 @@ func (n *Notify) getEmailBody(
 	}
 
 	data := map[string]string{
-		"pipeline_name": pipeline.Name,
-		"step_name":     req.Step.Name,
-		"payload_data":  string(payload),
+		"pipeline_id":    pipeline.Id,
+		"pipeline_name":  pipeline.Name,
+		"step_name":      req.Step.Name,
+		"service_name":   req.Audience.ServiceName,
+		"operation_name": req.Audience.OperationName,
+		"operation_type": operationTypeString(req.Audience.OperationType),
+		"payload_data":   string(payload),
 	}
 
 	if err := tmpl.Execute(&body, data); err != nil {
