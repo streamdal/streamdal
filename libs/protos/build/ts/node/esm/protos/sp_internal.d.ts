@@ -8,7 +8,6 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.js";
 import { Command } from "./sp_command.js";
 import { Metric } from "./sp_common.js";
-import { PipelineStepNotification } from "./sp_pipeline.js";
 import { PipelineStep } from "./sp_pipeline.js";
 import { ClientInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
@@ -67,34 +66,64 @@ export interface HeartbeatRequest {
  */
 export interface NotifyRequest {
     /**
-     * @generated from protobuf field: string pipeline_id = 1;
+     * @generated from protobuf field: protos.NotifyRequest.ConditionType condition_type = 1;
      */
-    pipelineId: string;
+    conditionType: NotifyRequest_ConditionType;
     /**
-     * @deprecated
-     * @generated from protobuf field: string step_name = 2 [deprecated = true];
+     * Used for pulling step name and any other info needed in the future
+     *
+     * @generated from protobuf field: protos.PipelineStep step = 2;
      */
-    stepName: string;
+    step?: PipelineStep;
     /**
+     * Included in notification
+     *
      * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
+     * Included in notification
+     *
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
     occurredAtUnixTsUtc: string;
     /**
-     * @generated from protobuf field: bytes payload = 5;
+     * Included in notification
+     *
+     * @generated from protobuf field: string pipeline_id = 5;
+     */
+    pipelineId: string;
+    /**
+     * Included in notification
+     *
+     * @generated from protobuf field: bytes payload = 6;
      */
     payload: Uint8Array;
+}
+/**
+ * This will be used to pull the condition type (true, false, error) from the pipeline step,
+ * so that we can include metadata, abort condition, etc., in the notification
+ * The condition will contain the notification configuration also.
+ *
+ * @generated from protobuf enum protos.NotifyRequest.ConditionType
+ */
+export declare enum NotifyRequest_ConditionType {
     /**
-     * @generated from protobuf field: protos.PipelineStep step = 6;
+     * @generated from protobuf enum value: CONDITION_TYPE_UNSET = 0;
      */
-    step?: PipelineStep;
+    UNSET = 0,
     /**
-     * @generated from protobuf field: protos.PipelineStepNotification notification = 7;
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_TRUE = 1;
      */
-    notification?: PipelineStepNotification;
+    ON_TRUE = 1,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_FALSE = 2;
+     */
+    ON_FALSE = 2,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_ERROR = 3;
+     */
+    ON_ERROR = 3
 }
 /**
  * @generated from protobuf message protos.MetricsRequest

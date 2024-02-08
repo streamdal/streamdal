@@ -127,6 +127,20 @@ class AppRegistrationStatusResponseStatus(betterproto.Enum):
     """Done means the user is registered and verified"""
 
 
+class NotifyRequestConditionType(betterproto.Enum):
+    """
+    This will be used to pull the condition type (true, false, error) from the
+    pipeline step, so that we can include metadata, abort condition, etc., in
+    the notification The condition will contain the notification configuration
+    also.
+    """
+
+    CONDITION_TYPE_UNSET = 0
+    CONDITION_TYPE_ON_TRUE = 1
+    CONDITION_TYPE_ON_FALSE = 2
+    CONDITION_TYPE_ON_ERROR = 3
+
+
 class ExecStatus(betterproto.Enum):
     EXEC_STATUS_UNSET = 0
     """
@@ -1001,18 +1015,21 @@ class HeartbeatRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class NotifyRequest(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
-    step_name: str = betterproto.string_field(2)
-    audience: "Audience" = betterproto.message_field(3)
-    occurred_at_unix_ts_utc: int = betterproto.int64_field(4)
-    payload: bytes = betterproto.bytes_field(5)
-    step: "PipelineStep" = betterproto.message_field(6)
-    notification: "PipelineStepNotification" = betterproto.message_field(7)
+    condition_type: "NotifyRequestConditionType" = betterproto.enum_field(1)
+    step: "PipelineStep" = betterproto.message_field(2)
+    """Used for pulling step name and any other info needed in the future"""
 
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("step_name"):
-            warnings.warn("NotifyRequest.step_name is deprecated", DeprecationWarning)
+    audience: "Audience" = betterproto.message_field(3)
+    """Included in notification"""
+
+    occurred_at_unix_ts_utc: int = betterproto.int64_field(4)
+    """Included in notification"""
+
+    pipeline_id: str = betterproto.string_field(5)
+    """Included in notification"""
+
+    payload: bytes = betterproto.bytes_field(6)
+    """Included in notification"""
 
 
 @dataclass(eq=False, repr=False)

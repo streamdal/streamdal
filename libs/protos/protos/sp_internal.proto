@@ -69,13 +69,32 @@ message HeartbeatRequest {
 }
 
 message NotifyRequest {
-  string pipeline_id = 1;
-  string step_name = 2 [deprecated=true];
+  // This will be used to pull the condition type (true, false, error) from the pipeline step,
+  // so that we can include metadata, abort condition, etc., in the notification
+  // The condition will contain the notification configuration also.
+  enum ConditionType {
+    CONDITION_TYPE_UNSET = 0;
+    CONDITION_TYPE_ON_TRUE = 1;
+    CONDITION_TYPE_ON_FALSE = 2;
+    CONDITION_TYPE_ON_ERROR = 3;
+  }
+
+  ConditionType condition_type = 1;
+
+  // Used for pulling step name and any other info needed in the future
+  PipelineStep step = 2;
+
+  // Included in notification
   Audience audience = 3;
+
+  // Included in notification
   int64 occurred_at_unix_ts_utc = 4;
-  bytes payload = 5;
-  PipelineStep step = 6;
-  PipelineStepNotification notification = 7;
+
+  // Included in notification
+  string pipeline_id = 5;
+
+  // Included in notification
+  bytes payload = 6;
 }
 
 message MetricsRequest {
