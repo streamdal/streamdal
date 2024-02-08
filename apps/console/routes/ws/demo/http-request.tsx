@@ -1,13 +1,14 @@
 import { Handlers, RouteConfig } from "$fresh/src/server/types.ts";
 import { effect } from "@preact/signals";
-import { serverErrorSignal } from "../../lib/serverError.ts";
+
+import { demoHttpRequestSignal } from "../../demo/http/index.tsx";
 
 export const config: RouteConfig = {
   skipInheritedLayouts: true,
   skipAppWrapper: true,
 };
 
-export const handler: Handlers<{ message: string | null }> = {
+export const handler: Handlers = {
   async GET(req, ctx) {
     if (req.headers.get("upgrade") != "websocket") {
       return new Response(null, { status: 501 });
@@ -17,25 +18,25 @@ export const handler: Handlers<{ message: string | null }> = {
 
     effect(() => {
       try {
-        socket.send(serverErrorSignal.value);
+        demoHttpRequestSignal.value && socket.readyState == WebSocket.OPEN &&
+          socket.send(JSON.stringify(demoHttpRequestSignal.value));
       } catch {
-        console.debug("failed to send server error over socket");
+        console.debug("failed to send demo http request over socket");
       }
     });
 
-    socket.addEventListener("message", (event) => {
+    socket.addEventListener("message", async (event) => {
       if (event.data === "ping") {
         socket.send("pong");
       }
     });
 
     socket.addEventListener("open", () => {
-      console.info("server error socket client connected!");
-      socket.send(serverErrorSignal.value);
+      console.info("demo http request socket client connected!");
     });
 
     socket.addEventListener("close", () => {
-      console.info("server error socket client closed!");
+      console.info("demo http socket client closed!");
     });
 
     return response;

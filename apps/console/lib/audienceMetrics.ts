@@ -61,8 +61,8 @@ export const getAudienceMetrics = async ({ socket }: { socket: WebSocket }) => {
 
 const sendMetrics = (metric: any, socket: WebSocket) => {
   try {
-    socket.send(JSON.stringify(metric));
-  } catch (e) {
-    console.debug("failed to send audience metrics over socket", e);
+    socket.readyState === WebSocket.OPEN && socket.send(JSON.stringify(metric));
+  } catch {
+    console.debug("failed to send audience metrics over socket");
   }
 };
