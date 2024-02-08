@@ -390,22 +390,13 @@ class PipelineStepConditions(betterproto.Message):
     abort: "AbortCondition" = betterproto.enum_field(1)
     """Should we abort execution?"""
 
-    notify: bool = betterproto.bool_field(2)
+    notification: "PipelineStepNotification" = betterproto.message_field(2)
     metadata: Dict[str, str] = betterproto.map_field(
         3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     """
     Should we include additional metadata that SDK should pass back to user?
     """
-
-    notification: "PipelineStepNotification" = betterproto.message_field(4)
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("notify"):
-            warnings.warn(
-                "PipelineStepConditions.notify is deprecated", DeprecationWarning
-            )
 
 
 @dataclass(eq=False, repr=False)
@@ -1001,18 +992,28 @@ class HeartbeatRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class NotifyRequest(betterproto.Message):
-    pipeline_id: str = betterproto.string_field(1)
-    step_name: str = betterproto.string_field(2)
-    audience: "Audience" = betterproto.message_field(3)
-    occurred_at_unix_ts_utc: int = betterproto.int64_field(4)
-    payload: bytes = betterproto.bytes_field(5)
-    step: "PipelineStep" = betterproto.message_field(6)
-    notification: "PipelineStepNotification" = betterproto.message_field(7)
+    condition_type: str = betterproto.string_field(1)
+    """
+    Included in notification This will be used to pull the condition type
+    (true, false, error) from the pipeline step, so that we can include
+    metadata, abort condition, etc., in the notification The condition will
+    contain the notification configuration also.
+    """
 
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("step_name"):
-            warnings.warn("NotifyRequest.step_name is deprecated", DeprecationWarning)
+    step: "PipelineStep" = betterproto.message_field(2)
+    """Used for pulling step name and any other info needed in the future"""
+
+    audience: "Audience" = betterproto.message_field(3)
+    """Included in notification"""
+
+    occurred_at_unix_ts_utc: int = betterproto.int64_field(4)
+    """Included in notification"""
+
+    pipeline_id: str = betterproto.string_field(5)
+    """Included in notification"""
+
+    payload: bytes = betterproto.bytes_field(6)
+    """Included in notification"""
 
 
 @dataclass(eq=False, repr=False)

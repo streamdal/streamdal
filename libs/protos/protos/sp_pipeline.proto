@@ -53,12 +53,10 @@ message PipelineStepConditions {
   // Should we abort execution?
   AbortCondition abort = 1;
 
-  bool notify = 2 [deprecated=true];
+  PipelineStepNotification notification = 2;
 
   // Should we include additional metadata that SDK should pass back to user?
   map<string, string> metadata = 3;
-
-  PipelineStepNotification notification = 4;
 }
 
 

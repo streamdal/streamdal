@@ -8,7 +8,6 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common";
 import { Command } from "./sp_command";
 import { Metric } from "./sp_common";
-import { PipelineStepNotification } from "./sp_pipeline";
 import { PipelineStep } from "./sp_pipeline";
 import { ClientInfo } from "./sp_info";
 import { Audience } from "./sp_common";
@@ -67,34 +66,44 @@ export interface HeartbeatRequest {
  */
 export interface NotifyRequest {
     /**
-     * @generated from protobuf field: string pipeline_id = 1;
+     * Included in notification
+     * This will be used to pull the condition type (true, false, error) from the pipeline step,
+     * so that we can include metadata, abort condition, etc., in the notification
+     * The condition will contain the notification configuration also.
+     *
+     * @generated from protobuf field: string condition_type = 1;
      */
-    pipelineId: string;
+    conditionType: string;
     /**
-     * @deprecated
-     * @generated from protobuf field: string step_name = 2 [deprecated = true];
+     * Used for pulling step name and any other info needed in the future
+     *
+     * @generated from protobuf field: protos.PipelineStep step = 2;
      */
-    stepName: string;
+    step?: PipelineStep;
     /**
+     * Included in notification
+     *
      * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
+     * Included in notification
+     *
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
     occurredAtUnixTsUtc: string;
     /**
-     * @generated from protobuf field: bytes payload = 5;
+     * Included in notification
+     *
+     * @generated from protobuf field: string pipeline_id = 5;
+     */
+    pipelineId: string;
+    /**
+     * Included in notification
+     *
+     * @generated from protobuf field: bytes payload = 6;
      */
     payload: Uint8Array;
-    /**
-     * @generated from protobuf field: protos.PipelineStep step = 6;
-     */
-    step?: PipelineStep;
-    /**
-     * @generated from protobuf field: protos.PipelineStepNotification notification = 7;
-     */
-    notification?: PipelineStepNotification;
 }
 /**
  * @generated from protobuf message protos.MetricsRequest

@@ -160,14 +160,21 @@ type NotifyRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	PipelineId string `protobuf:"bytes,1,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
-	// Deprecated: Marked as deprecated in sp_internal.proto.
-	StepName            string                    `protobuf:"bytes,2,opt,name=step_name,json=stepName,proto3" json:"step_name,omitempty"`
-	Audience            *Audience                 `protobuf:"bytes,3,opt,name=audience,proto3" json:"audience,omitempty"`
-	OccurredAtUnixTsUtc int64                     `protobuf:"varint,4,opt,name=occurred_at_unix_ts_utc,json=occurredAtUnixTsUtc,proto3" json:"occurred_at_unix_ts_utc,omitempty"`
-	Payload             []byte                    `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
-	Step                *PipelineStep             `protobuf:"bytes,6,opt,name=step,proto3" json:"step,omitempty"`
-	Notification        *PipelineStepNotification `protobuf:"bytes,7,opt,name=notification,proto3" json:"notification,omitempty"`
+	// Included in notification
+	// This will be used to pull the condition type (true, false, error) from the pipeline step,
+	// so that we can include metadata, abort condition, etc., in the notification
+	// The condition will contain the notification configuration also.
+	ConditionType string `protobuf:"bytes,1,opt,name=condition_type,json=conditionType,proto3" json:"condition_type,omitempty"` // true, false, error
+	// Used for pulling step name and any other info needed in the future
+	Step *PipelineStep `protobuf:"bytes,2,opt,name=step,proto3" json:"step,omitempty"`
+	// Included in notification
+	Audience *Audience `protobuf:"bytes,3,opt,name=audience,proto3" json:"audience,omitempty"`
+	// Included in notification
+	OccurredAtUnixTsUtc int64 `protobuf:"varint,4,opt,name=occurred_at_unix_ts_utc,json=occurredAtUnixTsUtc,proto3" json:"occurred_at_unix_ts_utc,omitempty"`
+	// Included in notification
+	PipelineId string `protobuf:"bytes,5,opt,name=pipeline_id,json=pipelineId,proto3" json:"pipeline_id,omitempty"`
+	// Included in notification
+	Payload []byte `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
 func (x *NotifyRequest) Reset() {
@@ -202,19 +209,18 @@ func (*NotifyRequest) Descriptor() ([]byte, []int) {
 	return file_sp_internal_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *NotifyRequest) GetPipelineId() string {
+func (x *NotifyRequest) GetConditionType() string {
 	if x != nil {
-		return x.PipelineId
+		return x.ConditionType
 	}
 	return ""
 }
 
-// Deprecated: Marked as deprecated in sp_internal.proto.
-func (x *NotifyRequest) GetStepName() string {
+func (x *NotifyRequest) GetStep() *PipelineStep {
 	if x != nil {
-		return x.StepName
+		return x.Step
 	}
-	return ""
+	return nil
 }
 
 func (x *NotifyRequest) GetAudience() *Audience {
@@ -231,23 +237,16 @@ func (x *NotifyRequest) GetOccurredAtUnixTsUtc() int64 {
 	return 0
 }
 
+func (x *NotifyRequest) GetPipelineId() string {
+	if x != nil {
+		return x.PipelineId
+	}
+	return ""
+}
+
 func (x *NotifyRequest) GetPayload() []byte {
 	if x != nil {
 		return x.Payload
-	}
-	return nil
-}
-
-func (x *NotifyRequest) GetStep() *PipelineStep {
-	if x != nil {
-		return x.Step
-	}
-	return nil
-}
-
-func (x *NotifyRequest) GetNotification() *PipelineStepNotification {
-	if x != nil {
-		return x.Notification
 	}
 	return nil
 }
@@ -706,27 +705,23 @@ var file_sp_internal_proto_rawDesc = []byte{
 	0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x12, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49,
 	0x6e, 0x66, 0x6f, 0x52, 0x0a, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x22,
-	0xbf, 0x02, 0x0a, 0x0d, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65,
-	0x49, 0x64, 0x12, 0x1f, 0x0a, 0x09, 0x73, 0x74, 0x65, 0x70, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x02, 0x18, 0x01, 0x52, 0x08, 0x73, 0x74, 0x65, 0x70, 0x4e,
-	0x61, 0x6d, 0x65, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41,
-	0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63,
-	0x65, 0x12, 0x34, 0x0a, 0x17, 0x6f, 0x63, 0x63, 0x75, 0x72, 0x72, 0x65, 0x64, 0x5f, 0x61, 0x74,
-	0x5f, 0x75, 0x6e, 0x69, 0x78, 0x5f, 0x74, 0x73, 0x5f, 0x75, 0x74, 0x63, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x03, 0x52, 0x13, 0x6f, 0x63, 0x63, 0x75, 0x72, 0x72, 0x65, 0x64, 0x41, 0x74, 0x55, 0x6e,
-	0x69, 0x78, 0x54, 0x73, 0x55, 0x74, 0x63, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f,
-	0x61, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61,
-	0x64, 0x12, 0x28, 0x0a, 0x04, 0x73, 0x74, 0x65, 0x70, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e,
-	0x65, 0x53, 0x74, 0x65, 0x70, 0x52, 0x04, 0x73, 0x74, 0x65, 0x70, 0x12, 0x44, 0x0a, 0x0c, 0x6e,
-	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x07, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x20, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x50, 0x69, 0x70, 0x65, 0x6c,
-	0x69, 0x6e, 0x65, 0x53, 0x74, 0x65, 0x70, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x52, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x22, 0x3a, 0x0a, 0x0e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0xff, 0x01, 0x0a, 0x0d, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x25, 0x0a, 0x0e, 0x63, 0x6f, 0x6e, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x74,
+	0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x63, 0x6f, 0x6e, 0x64, 0x69,
+	0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x12, 0x28, 0x0a, 0x04, 0x73, 0x74, 0x65, 0x70,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e,
+	0x50, 0x69, 0x70, 0x65, 0x6c, 0x69, 0x6e, 0x65, 0x53, 0x74, 0x65, 0x70, 0x52, 0x04, 0x73, 0x74,
+	0x65, 0x70, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x41, 0x75,
+	0x64, 0x69, 0x65, 0x6e, 0x63, 0x65, 0x52, 0x08, 0x61, 0x75, 0x64, 0x69, 0x65, 0x6e, 0x63, 0x65,
+	0x12, 0x34, 0x0a, 0x17, 0x6f, 0x63, 0x63, 0x75, 0x72, 0x72, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x5f,
+	0x75, 0x6e, 0x69, 0x78, 0x5f, 0x74, 0x73, 0x5f, 0x75, 0x74, 0x63, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x03, 0x52, 0x13, 0x6f, 0x63, 0x63, 0x75, 0x72, 0x72, 0x65, 0x64, 0x41, 0x74, 0x55, 0x6e, 0x69,
+	0x78, 0x54, 0x73, 0x55, 0x74, 0x63, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x69, 0x70, 0x65, 0x6c, 0x69,
+	0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x69, 0x70,
+	0x65, 0x6c, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f,
+	0x61, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61,
+	0x64, 0x22, 0x3a, 0x0a, 0x0e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x12, 0x28, 0x0a, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18, 0x01,
 	0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x73, 0x2e, 0x4d, 0x65,
 	0x74, 0x72, 0x69, 0x63, 0x52, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0xd1, 0x01,
@@ -855,49 +850,47 @@ var file_sp_internal_proto_goTypes = []interface{}{
 	(*Audience)(nil),                                 // 11: protos.Audience
 	(*ClientInfo)(nil),                               // 12: protos.ClientInfo
 	(*PipelineStep)(nil),                             // 13: protos.PipelineStep
-	(*PipelineStepNotification)(nil),                 // 14: protos.PipelineStepNotification
-	(*Metric)(nil),                                   // 15: protos.Metric
-	(*Command)(nil),                                  // 16: protos.Command
-	(*Schema)(nil),                                   // 17: protos.Schema
-	(*TailResponse)(nil),                             // 18: protos.TailResponse
-	(*StandardResponse)(nil),                         // 19: protos.StandardResponse
+	(*Metric)(nil),                                   // 14: protos.Metric
+	(*Command)(nil),                                  // 15: protos.Command
+	(*Schema)(nil),                                   // 16: protos.Schema
+	(*TailResponse)(nil),                             // 17: protos.TailResponse
+	(*StandardResponse)(nil),                         // 18: protos.StandardResponse
 }
 var file_sp_internal_proto_depIdxs = []int32{
 	11, // 0: protos.NewAudienceRequest.audience:type_name -> protos.Audience
 	11, // 1: protos.HeartbeatRequest.audiences:type_name -> protos.Audience
 	12, // 2: protos.HeartbeatRequest.client_info:type_name -> protos.ClientInfo
-	11, // 3: protos.NotifyRequest.audience:type_name -> protos.Audience
-	13, // 4: protos.NotifyRequest.step:type_name -> protos.PipelineStep
-	14, // 5: protos.NotifyRequest.notification:type_name -> protos.PipelineStepNotification
-	15, // 6: protos.MetricsRequest.metrics:type_name -> protos.Metric
-	12, // 7: protos.RegisterRequest.client_info:type_name -> protos.ClientInfo
-	11, // 8: protos.RegisterRequest.audiences:type_name -> protos.Audience
-	16, // 9: protos.GetSetPipelinesCommandsByServiceResponse.set_pipeline_commands:type_name -> protos.Command
-	10, // 10: protos.GetSetPipelinesCommandsByServiceResponse.wasm_modules:type_name -> protos.GetSetPipelinesCommandsByServiceResponse.WasmModulesEntry
-	11, // 11: protos.SendSchemaRequest.audience:type_name -> protos.Audience
-	17, // 12: protos.SendSchemaRequest.schema:type_name -> protos.Schema
-	8,  // 13: protos.GetSetPipelinesCommandsByServiceResponse.WasmModulesEntry.value:type_name -> protos.WasmModule
-	4,  // 14: protos.Internal.Register:input_type -> protos.RegisterRequest
-	0,  // 15: protos.Internal.NewAudience:input_type -> protos.NewAudienceRequest
-	1,  // 16: protos.Internal.Heartbeat:input_type -> protos.HeartbeatRequest
-	2,  // 17: protos.Internal.Notify:input_type -> protos.NotifyRequest
-	3,  // 18: protos.Internal.Metrics:input_type -> protos.MetricsRequest
-	6,  // 19: protos.Internal.GetSetPipelinesCommandsByService:input_type -> protos.GetSetPipelinesCommandsByServiceRequest
-	18, // 20: protos.Internal.SendTail:input_type -> protos.TailResponse
-	9,  // 21: protos.Internal.SendSchema:input_type -> protos.SendSchemaRequest
-	16, // 22: protos.Internal.Register:output_type -> protos.Command
-	19, // 23: protos.Internal.NewAudience:output_type -> protos.StandardResponse
-	19, // 24: protos.Internal.Heartbeat:output_type -> protos.StandardResponse
-	19, // 25: protos.Internal.Notify:output_type -> protos.StandardResponse
-	19, // 26: protos.Internal.Metrics:output_type -> protos.StandardResponse
-	7,  // 27: protos.Internal.GetSetPipelinesCommandsByService:output_type -> protos.GetSetPipelinesCommandsByServiceResponse
-	19, // 28: protos.Internal.SendTail:output_type -> protos.StandardResponse
-	19, // 29: protos.Internal.SendSchema:output_type -> protos.StandardResponse
-	22, // [22:30] is the sub-list for method output_type
-	14, // [14:22] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	13, // 3: protos.NotifyRequest.step:type_name -> protos.PipelineStep
+	11, // 4: protos.NotifyRequest.audience:type_name -> protos.Audience
+	14, // 5: protos.MetricsRequest.metrics:type_name -> protos.Metric
+	12, // 6: protos.RegisterRequest.client_info:type_name -> protos.ClientInfo
+	11, // 7: protos.RegisterRequest.audiences:type_name -> protos.Audience
+	15, // 8: protos.GetSetPipelinesCommandsByServiceResponse.set_pipeline_commands:type_name -> protos.Command
+	10, // 9: protos.GetSetPipelinesCommandsByServiceResponse.wasm_modules:type_name -> protos.GetSetPipelinesCommandsByServiceResponse.WasmModulesEntry
+	11, // 10: protos.SendSchemaRequest.audience:type_name -> protos.Audience
+	16, // 11: protos.SendSchemaRequest.schema:type_name -> protos.Schema
+	8,  // 12: protos.GetSetPipelinesCommandsByServiceResponse.WasmModulesEntry.value:type_name -> protos.WasmModule
+	4,  // 13: protos.Internal.Register:input_type -> protos.RegisterRequest
+	0,  // 14: protos.Internal.NewAudience:input_type -> protos.NewAudienceRequest
+	1,  // 15: protos.Internal.Heartbeat:input_type -> protos.HeartbeatRequest
+	2,  // 16: protos.Internal.Notify:input_type -> protos.NotifyRequest
+	3,  // 17: protos.Internal.Metrics:input_type -> protos.MetricsRequest
+	6,  // 18: protos.Internal.GetSetPipelinesCommandsByService:input_type -> protos.GetSetPipelinesCommandsByServiceRequest
+	17, // 19: protos.Internal.SendTail:input_type -> protos.TailResponse
+	9,  // 20: protos.Internal.SendSchema:input_type -> protos.SendSchemaRequest
+	15, // 21: protos.Internal.Register:output_type -> protos.Command
+	18, // 22: protos.Internal.NewAudience:output_type -> protos.StandardResponse
+	18, // 23: protos.Internal.Heartbeat:output_type -> protos.StandardResponse
+	18, // 24: protos.Internal.Notify:output_type -> protos.StandardResponse
+	18, // 25: protos.Internal.Metrics:output_type -> protos.StandardResponse
+	7,  // 26: protos.Internal.GetSetPipelinesCommandsByService:output_type -> protos.GetSetPipelinesCommandsByServiceResponse
+	18, // 27: protos.Internal.SendTail:output_type -> protos.StandardResponse
+	18, // 28: protos.Internal.SendSchema:output_type -> protos.StandardResponse
+	21, // [21:29] is the sub-list for method output_type
+	13, // [13:21] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_sp_internal_proto_init() }

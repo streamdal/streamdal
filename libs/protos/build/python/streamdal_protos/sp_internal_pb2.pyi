@@ -65,22 +65,20 @@ class NewAudienceRequest(_message.Message):
     def __init__(self, session_id: _Optional[str] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class NotifyRequest(_message.Message):
-    __slots__ = ["audience", "notification", "occurred_at_unix_ts_utc", "payload", "pipeline_id", "step", "step_name"]
+    __slots__ = ["audience", "condition_type", "occurred_at_unix_ts_utc", "payload", "pipeline_id", "step"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
+    CONDITION_TYPE_FIELD_NUMBER: _ClassVar[int]
     OCCURRED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
     STEP_FIELD_NUMBER: _ClassVar[int]
-    STEP_NAME_FIELD_NUMBER: _ClassVar[int]
     audience: _sp_common_pb2.Audience
-    notification: _sp_pipeline_pb2.PipelineStepNotification
+    condition_type: str
     occurred_at_unix_ts_utc: int
     payload: bytes
     pipeline_id: str
     step: _sp_pipeline_pb2.PipelineStep
-    step_name: str
-    def __init__(self, pipeline_id: _Optional[str] = ..., step_name: _Optional[str] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ..., payload: _Optional[bytes] = ..., step: _Optional[_Union[_sp_pipeline_pb2.PipelineStep, _Mapping]] = ..., notification: _Optional[_Union[_sp_pipeline_pb2.PipelineStepNotification, _Mapping]] = ...) -> None: ...
+    def __init__(self, condition_type: _Optional[str] = ..., step: _Optional[_Union[_sp_pipeline_pb2.PipelineStep, _Mapping]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ..., pipeline_id: _Optional[str] = ..., payload: _Optional[bytes] = ...) -> None: ...
 
 class RegisterRequest(_message.Message):
     __slots__ = ["audiences", "client_info", "dry_run", "service_name", "session_id"]
