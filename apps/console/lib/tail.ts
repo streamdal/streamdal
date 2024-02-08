@@ -49,15 +49,19 @@ export const tail = async (
   },
 ) => {
   const sendResponse = (response: TailResponse) => {
-    socket.send(
-      JSON.stringify({
-        timestamp: parseDate(response.timestampNs),
-        data: formatData(new TextDecoder().decode(response.newData)),
-        originalData: formatData(
-          new TextDecoder().decode(response.originalData),
-        ),
-      }),
-    );
+    try {
+      socket.send(
+        JSON.stringify({
+          timestamp: parseDate(response.timestampNs),
+          data: formatData(new TextDecoder().decode(response.newData)),
+          originalData: formatData(
+            new TextDecoder().decode(response.originalData),
+          ),
+        }),
+      );
+    } catch {
+      console.debug("failed to send tail over socket");
+    }
   };
 
   const abortController = new AbortController();

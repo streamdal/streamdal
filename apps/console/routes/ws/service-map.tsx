@@ -23,13 +23,14 @@ export const handler: Handlers<DisplayServiceMap> = {
 
     effect(() => {
       try {
-        serviceSignal.value && socket.send(bigIntStringify({
-          ...serviceSignal.value,
-          nodesMap: Array.from(serviceSignal.value.nodesMap.entries()),
-          edgesMap: Array.from(serviceSignal.value.edgesMap.entries()),
-        }));
-      } catch (e) {
-        console.debug("failed to send service map over socket", e);
+        serviceSignal.value && socket.readyState == WebSocket.OPEN &&
+          socket.send(bigIntStringify({
+            ...serviceSignal.value,
+            nodesMap: Array.from(serviceSignal.value.nodesMap.entries()),
+            edgesMap: Array.from(serviceSignal.value.edgesMap.entries()),
+          }));
+      } catch {
+        console.debug("failed to send service map over socket");
       }
     });
 
