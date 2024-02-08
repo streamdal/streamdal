@@ -1,4 +1,4 @@
-PROTOC_IMAGE = rvolosatovs/protoc:development
+PROTOC_IMAGE = streamdal/protoc:4.1.1-streamdal
 NODE_IMAGE = node:lts-alpine
 
 # Pattern #1 example: "example : description = Description for example target"
@@ -45,7 +45,7 @@ generate/go:
 	mkdir -p build/go/protos/steps && \
 	mkdir -p build/go/protos/shared
 
-	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
+	docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--go_out=./build/go/protos \
  		--go-grpc_out=./build/go/protos \
@@ -74,7 +74,7 @@ generate/rust: clean/rust
 generate/rust:
 	mkdir -p build/rust/protos/src
 
-	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
+	docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--rust_out=./build/rust/protos/src \
 		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
@@ -102,7 +102,7 @@ generate/protoset: description = Generate protoset for services
 generate/protoset: clean/protoset
 generate/protoset:
 	mkdir -p build
-	docker run --platform linux/amd64 --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
+	docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--include_imports \
  		-o build/protos.protoset \
  		--proto_path=protos \

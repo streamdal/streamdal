@@ -43,10 +43,11 @@ export interface Pipeline {
      */
     steps: PipelineStep[];
     /**
-     * Notification configs for this pipeline. Only filled out
-     * in external API responses
+     * Notification configs for this pipeline. Only filled out in external API responses
+     * This is deprecated and the data has moved to PipelineStep
      *
-     * @generated from protobuf field: repeated protos.NotificationConfig _notification_configs = 4;
+     * @deprecated
+     * @generated from protobuf field: repeated protos.NotificationConfig _notification_configs = 4 [deprecated = true];
      */
     NotificationConfigs: NotificationConfig[];
     /**
@@ -60,6 +61,7 @@ export interface Pipeline {
  * Conditions define how the SDK should handle a Wasm response in a step.
  * Should it continue executing the pipeline, should it abort, should it notify
  * and on_error.
+ * TODO: de-pluralize this name
  *
  * @generated from protobuf message protos.PipelineStepConditions
  */
@@ -71,9 +73,8 @@ export interface PipelineStepConditions {
      */
     abort: AbortCondition;
     /**
-     * Should we trigger a notification?
-     *
-     * @generated from protobuf field: bool notify = 2;
+     * @deprecated
+     * @generated from protobuf field: bool notify = 2 [deprecated = true];
      */
     notify: boolean;
     /**
@@ -84,6 +85,64 @@ export interface PipelineStepConditions {
     metadata: {
         [key: string]: string;
     };
+    /**
+     * @generated from protobuf field: protos.PipelineStepNotification notification = 4;
+     */
+    notification?: PipelineStepNotification;
+}
+/**
+ * @generated from protobuf message protos.PipelineStepNotification
+ */
+export interface PipelineStepNotification {
+    /**
+     * The UUIDs of the notification config to use
+     * This is kept separate to avoid having to configure slack/email settings
+     * every time and also because that config info is sensitive and is encrypted
+     *
+     * @generated from protobuf field: repeated string notification_config_ids = 1;
+     */
+    notificationConfigIds: string[];
+    /**
+     * @generated from protobuf field: protos.PipelineStepNotification.PayloadType payload_type = 2;
+     */
+    payloadType: PipelineStepNotification_PayloadType;
+    /**
+     * If type == paths, then we will look here for a list of json paths to include
+     * in the notification payload.
+     *
+     * @generated from protobuf field: repeated string paths = 3;
+     */
+    paths: string[];
+}
+/**
+ * @generated from protobuf enum protos.PipelineStepNotification.PayloadType
+ */
+export declare enum PipelineStepNotification_PayloadType {
+    /**
+     * Same functionality as PAYLOAD_TYPE_EXCLUDE
+     *
+     * @generated from protobuf enum value: PAYLOAD_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * Default. No payload data included in notification
+     *
+     * @generated from protobuf enum value: PAYLOAD_TYPE_EXCLUDE = 1;
+     */
+    EXCLUDE = 1,
+    /**
+     * Entire payload content included in notification
+     *
+     * @generated from protobuf enum value: PAYLOAD_TYPE_FULL_PAYLOAD = 2;
+     */
+    FULL_PAYLOAD = 2,
+    /**
+     * Only specified paths of payload content included in notification
+     * Only works on JSON. Plaintext payloads will be ignored.
+     *
+     * @generated from protobuf enum value: PAYLOAD_TYPE_SELECT_PATHS = 3;
+     */
+    SELECT_PATHS = 3
 }
 /**
  * A pipeline step is a single step in a pipeline.
@@ -289,6 +348,16 @@ declare class PipelineStepConditions$Type extends MessageType<PipelineStepCondit
  * @generated MessageType for protobuf message protos.PipelineStepConditions
  */
 export declare const PipelineStepConditions: PipelineStepConditions$Type;
+declare class PipelineStepNotification$Type extends MessageType<PipelineStepNotification> {
+    constructor();
+    create(value?: PartialMessage<PipelineStepNotification>): PipelineStepNotification;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PipelineStepNotification): PipelineStepNotification;
+    internalBinaryWrite(message: PipelineStepNotification, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.PipelineStepNotification
+ */
+export declare const PipelineStepNotification: PipelineStepNotification$Type;
 declare class PipelineStep$Type extends MessageType<PipelineStep> {
     constructor();
     create(value?: PartialMessage<PipelineStep>): PipelineStep;

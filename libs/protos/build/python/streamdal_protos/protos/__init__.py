@@ -92,6 +92,23 @@ class AbortCondition(betterproto.Enum):
     ABORT_CONDITION_ABORT_ALL = 2
 
 
+class PipelineStepNotificationPayloadType(betterproto.Enum):
+    PAYLOAD_TYPE_UNSET = 0
+    """Same functionality as PAYLOAD_TYPE_EXCLUDE"""
+
+    PAYLOAD_TYPE_EXCLUDE = 1
+    """Default. No payload data included in notification"""
+
+    PAYLOAD_TYPE_FULL_PAYLOAD = 2
+    """Entire payload content included in notification"""
+
+    PAYLOAD_TYPE_SELECT_PATHS = 3
+    """
+    Only specified paths of payload content included in notification Only works
+    on JSON. Plaintext payloads will be ignored.
+    """
+
+
 class ClientType(betterproto.Enum):
     CLIENT_TYPE_UNSET = 0
     CLIENT_TYPE_SDK = 1
@@ -344,7 +361,7 @@ class Pipeline(betterproto.Message):
     notification_configs: List["NotificationConfig"] = betterproto.message_field(4)
     """
     Notification configs for this pipeline. Only filled out in external API
-    responses
+    responses This is deprecated and the data has moved to PipelineStep
     """
 
     paused: Optional[bool] = betterproto.bool_field(
@@ -354,26 +371,57 @@ class Pipeline(betterproto.Message):
     Indicates whether the pipeline is paused or not. Used internally by server.
     """
 
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("notification_configs"):
+            warnings.warn(
+                "Pipeline.notification_configs is deprecated", DeprecationWarning
+            )
+
 
 @dataclass(eq=False, repr=False)
 class PipelineStepConditions(betterproto.Message):
     """
     Conditions define how the SDK should handle a Wasm response in a step.
     Should it continue executing the pipeline, should it abort, should it
-    notify and on_error.
+    notify and on_error. TODO: de-pluralize this name
     """
 
     abort: "AbortCondition" = betterproto.enum_field(1)
     """Should we abort execution?"""
 
     notify: bool = betterproto.bool_field(2)
-    """Should we trigger a notification?"""
-
     metadata: Dict[str, str] = betterproto.map_field(
         3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     """
     Should we include additional metadata that SDK should pass back to user?
+    """
+
+    notification: "PipelineStepNotification" = betterproto.message_field(4)
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("notify"):
+            warnings.warn(
+                "PipelineStepConditions.notify is deprecated", DeprecationWarning
+            )
+
+
+@dataclass(eq=False, repr=False)
+class PipelineStepNotification(betterproto.Message):
+    notification_config_ids: List[str] = betterproto.string_field(1)
+    """
+    The UUIDs of the notification config to use This is kept separate to avoid
+    having to configure slack/email settings every time and also because that
+    config info is sensitive and is encrypted
+    """
+
+    payload_type: "PipelineStepNotificationPayloadType" = betterproto.enum_field(2)
+    paths: List[str] = betterproto.string_field(3)
+    """
+    If type == paths, then we will look here for a list of json paths to
+    include in the notification payload.
     """
 
 
@@ -656,11 +704,19 @@ class AttachNotificationRequest(betterproto.Message):
     notification_id: str = betterproto.string_field(1)
     pipeline_id: str = betterproto.string_field(2)
 
+    def __post_init__(self) -> None:
+        warnings.warn("AttachNotificationRequest is deprecated", DeprecationWarning)
+        super().__post_init__()
+
 
 @dataclass(eq=False, repr=False)
 class DetachNotificationRequest(betterproto.Message):
     notification_id: str = betterproto.string_field(1)
     pipeline_id: str = betterproto.string_field(2)
+
+    def __post_init__(self) -> None:
+        warnings.warn("DetachNotificationRequest is deprecated", DeprecationWarning)
+        super().__post_init__()
 
 
 @dataclass(eq=False, repr=False)
@@ -949,6 +1005,14 @@ class NotifyRequest(betterproto.Message):
     step_name: str = betterproto.string_field(2)
     audience: "Audience" = betterproto.message_field(3)
     occurred_at_unix_ts_utc: int = betterproto.int64_field(4)
+    payload: bytes = betterproto.bytes_field(5)
+    step: "PipelineStep" = betterproto.message_field(6)
+    notification: "PipelineStepNotification" = betterproto.message_field(7)
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("step_name"):
+            warnings.warn("NotifyRequest.step_name is deprecated", DeprecationWarning)
 
 
 @dataclass(eq=False, repr=False)

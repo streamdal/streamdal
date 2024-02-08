@@ -252,6 +252,7 @@ export interface GetNotificationResponse {
     notification?: NotificationConfig;
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.AttachNotificationRequest
  */
 export interface AttachNotificationRequest {
@@ -265,6 +266,7 @@ export interface AttachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @deprecated
  * @generated from protobuf message protos.DetachNotificationRequest
  */
 export interface DetachNotificationRequest {
@@ -703,6 +705,7 @@ declare class AttachNotificationRequest$Type extends MessageType<AttachNotificat
     internalBinaryWrite(message: AttachNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.AttachNotificationRequest
  */
 export declare const AttachNotificationRequest: AttachNotificationRequest$Type;
@@ -713,6 +716,7 @@ declare class DetachNotificationRequest$Type extends MessageType<DetachNotificat
     internalBinaryWrite(message: DetachNotificationRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
+ * @deprecated
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
  */
 export declare const DetachNotificationRequest: DetachNotificationRequest$Type;

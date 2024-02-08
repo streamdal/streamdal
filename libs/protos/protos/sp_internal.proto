@@ -5,6 +5,7 @@ package protos;
 import "sp_command.proto";
 import "sp_common.proto";
 import "sp_info.proto";
+import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
@@ -69,9 +70,12 @@ message HeartbeatRequest {
 
 message NotifyRequest {
   string pipeline_id = 1;
-  string step_name = 2;
+  string step_name = 2 [deprecated=true];
   Audience audience = 3;
   int64 occurred_at_unix_ts_utc = 4;
+  bytes payload = 5;
+  PipelineStep step = 6;
+  PipelineStepNotification notification = 7;
 }
 
 message MetricsRequest {

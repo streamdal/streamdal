@@ -17,6 +17,8 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.ts";
 import { Command } from "./sp_command.ts";
 import { Metric } from "./sp_common.ts";
+import { PipelineStepNotification } from "./sp_pipeline.ts";
+import { PipelineStep } from "./sp_pipeline.ts";
 import { ClientInfo } from "./sp_info.ts";
 import { Audience } from "./sp_common.ts";
 /**
@@ -78,7 +80,8 @@ export interface NotifyRequest {
      */
     pipelineId: string;
     /**
-     * @generated from protobuf field: string step_name = 2;
+     * @deprecated
+     * @generated from protobuf field: string step_name = 2 [deprecated = true];
      */
     stepName: string;
     /**
@@ -89,6 +92,18 @@ export interface NotifyRequest {
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
     occurredAtUnixTsUtc: string;
+    /**
+     * @generated from protobuf field: bytes payload = 5;
+     */
+    payload: Uint8Array;
+    /**
+     * @generated from protobuf field: protos.PipelineStep step = 6;
+     */
+    step?: PipelineStep;
+    /**
+     * @generated from protobuf field: protos.PipelineStepNotification notification = 7;
+     */
+    notification?: PipelineStepNotification;
 }
 /**
  * @generated from protobuf message protos.MetricsRequest
@@ -359,11 +374,14 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
             { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "step_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
-            { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ }
+            { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
+            { no: 5, name: "payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 6, name: "step", kind: "message", T: () => PipelineStep },
+            { no: 7, name: "notification", kind: "message", T: () => PipelineStepNotification }
         ]);
     }
     create(value?: PartialMessage<NotifyRequest>): NotifyRequest {
-        const message = { pipelineId: "", stepName: "", occurredAtUnixTsUtc: "0" };
+        const message = { pipelineId: "", stepName: "", occurredAtUnixTsUtc: "0", payload: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<NotifyRequest>(this, message, value);
@@ -377,7 +395,7 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
                 case /* string pipeline_id */ 1:
                     message.pipelineId = reader.string();
                     break;
-                case /* string step_name */ 2:
+                case /* string step_name = 2 [deprecated = true];*/ 2:
                     message.stepName = reader.string();
                     break;
                 case /* protos.Audience audience */ 3:
@@ -385,6 +403,15 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
                     break;
                 case /* int64 occurred_at_unix_ts_utc */ 4:
                     message.occurredAtUnixTsUtc = reader.int64().toString();
+                    break;
+                case /* bytes payload */ 5:
+                    message.payload = reader.bytes();
+                    break;
+                case /* protos.PipelineStep step */ 6:
+                    message.step = PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
+                    break;
+                case /* protos.PipelineStepNotification notification */ 7:
+                    message.notification = PipelineStepNotification.internalBinaryRead(reader, reader.uint32(), options, message.notification);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -401,7 +428,7 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         /* string pipeline_id = 1; */
         if (message.pipelineId !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.pipelineId);
-        /* string step_name = 2; */
+        /* string step_name = 2 [deprecated = true]; */
         if (message.stepName !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.stepName);
         /* protos.Audience audience = 3; */
@@ -410,6 +437,15 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         /* int64 occurred_at_unix_ts_utc = 4; */
         if (message.occurredAtUnixTsUtc !== "0")
             writer.tag(4, WireType.Varint).int64(message.occurredAtUnixTsUtc);
+        /* bytes payload = 5; */
+        if (message.payload.length)
+            writer.tag(5, WireType.LengthDelimited).bytes(message.payload);
+        /* protos.PipelineStep step = 6; */
+        if (message.step)
+            PipelineStep.internalBinaryWrite(message.step, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineStepNotification notification = 7; */
+        if (message.notification)
+            PipelineStepNotification.internalBinaryWrite(message.notification, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

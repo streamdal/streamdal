@@ -30,9 +30,9 @@ message Pipeline {
   // One or more steps to execute
   repeated PipelineStep steps = 3;
 
-  // Notification configs for this pipeline. Only filled out
-  // in external API responses
-  repeated protos.NotificationConfig _notification_configs = 4; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  // Notification configs for this pipeline. Only filled out in external API responses
+  // This is deprecated and the data has moved to PipelineStep
+  repeated protos.NotificationConfig _notification_configs = 4 [deprecated=true]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   // Indicates whether the pipeline is paused or not. Used internally by server.
   optional bool _paused = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
@@ -48,15 +48,51 @@ enum AbortCondition {
 // Conditions define how the SDK should handle a Wasm response in a step.
 // Should it continue executing the pipeline, should it abort, should it notify
 // and on_error.
+// TODO: de-pluralize this name
 message PipelineStepConditions {
   // Should we abort execution?
   AbortCondition abort = 1;
 
-  // Should we trigger a notification?
-  bool notify = 2;
+  bool notify = 2 [deprecated=true];
 
   // Should we include additional metadata that SDK should pass back to user?
   map<string, string> metadata = 3;
+
+  PipelineStepNotification notification = 4;
+}
+
+
+message PipelineStepNotification {
+  enum PayloadType {
+    // Same functionality as PAYLOAD_TYPE_EXCLUDE
+    PAYLOAD_TYPE_UNSET = 0;
+
+    // Default. No payload data included in notification
+    PAYLOAD_TYPE_EXCLUDE = 1;
+
+    // Entire payload content included in notification
+    PAYLOAD_TYPE_FULL_PAYLOAD = 2;
+
+    // Only specified paths of payload content included in notification
+    // Only works on JSON. Plaintext payloads will be ignored.
+    PAYLOAD_TYPE_SELECT_PATHS = 3;
+  }
+
+  // The UUIDs of the notification config to use
+  // This is kept separate to avoid having to configure slack/email settings
+  // every time and also because that config info is sensitive and is encrypted
+  repeated string notification_config_ids = 1;
+
+  PayloadType payload_type = 2;
+
+  // If type == paths, then we will look here for a list of json paths to include
+  // in the notification payload.
+  repeated string paths = 3;
+
+  // Notification configs for this pipeline. Only filled out in external API responses
+  // TODO: needed? We might be able to exclude since NotificationConfigID is present
+  // TODO: and the console can pull all notification configs via `external.GetNotifications()`
+  //repeated protos.NotificationConfig _notification_configs = 4 [deprecated=true]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // A pipeline step is a single step in a pipeline.
