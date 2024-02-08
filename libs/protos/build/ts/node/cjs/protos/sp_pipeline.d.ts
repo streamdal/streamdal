@@ -73,9 +73,10 @@ export interface PipelineStepConditions {
      */
     abort: AbortCondition;
     /**
-     * @generated from protobuf field: protos.PipelineStepNotification notification = 2;
+     * @deprecated
+     * @generated from protobuf field: bool notify = 2 [deprecated = true];
      */
-    notification?: PipelineStepNotification;
+    notify: boolean;
     /**
      * Should we include additional metadata that SDK should pass back to user?
      *
@@ -84,6 +85,10 @@ export interface PipelineStepConditions {
     metadata: {
         [key: string]: string;
     };
+    /**
+     * @generated from protobuf field: protos.PipelineStepNotification notification = 4;
+     */
+    notification?: PipelineStepNotification;
 }
 /**
  * @generated from protobuf message protos.PipelineStepNotification

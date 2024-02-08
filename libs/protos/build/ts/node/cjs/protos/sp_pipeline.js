@@ -148,12 +148,13 @@ class PipelineStepConditions$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.PipelineStepConditions", [
             { no: 1, name: "abort", kind: "enum", T: () => ["protos.AbortCondition", AbortCondition, "ABORT_CONDITION_"] },
-            { no: 2, name: "notification", kind: "message", T: () => exports.PipelineStepNotification },
-            { no: 3, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 2, name: "notify", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 4, name: "notification", kind: "message", T: () => exports.PipelineStepNotification }
         ]);
     }
     create(value) {
-        const message = { abort: 0, metadata: {} };
+        const message = { abort: 0, notify: false, metadata: {} };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -167,11 +168,14 @@ class PipelineStepConditions$Type extends runtime_5.MessageType {
                 case /* protos.AbortCondition abort */ 1:
                     message.abort = reader.int32();
                     break;
-                case /* protos.PipelineStepNotification notification */ 2:
-                    message.notification = exports.PipelineStepNotification.internalBinaryRead(reader, reader.uint32(), options, message.notification);
+                case /* bool notify = 2 [deprecated = true];*/ 2:
+                    message.notify = reader.bool();
                     break;
                 case /* map<string, string> metadata */ 3:
                     this.binaryReadMap3(message.metadata, reader, options);
+                    break;
+                case /* protos.PipelineStepNotification notification */ 4:
+                    message.notification = exports.PipelineStepNotification.internalBinaryRead(reader, reader.uint32(), options, message.notification);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -204,12 +208,15 @@ class PipelineStepConditions$Type extends runtime_5.MessageType {
         /* protos.AbortCondition abort = 1; */
         if (message.abort !== 0)
             writer.tag(1, runtime_1.WireType.Varint).int32(message.abort);
-        /* protos.PipelineStepNotification notification = 2; */
-        if (message.notification)
-            exports.PipelineStepNotification.internalBinaryWrite(message.notification, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* bool notify = 2 [deprecated = true]; */
+        if (message.notify !== false)
+            writer.tag(2, runtime_1.WireType.Varint).bool(message.notify);
         /* map<string, string> metadata = 3; */
         for (let k of Object.keys(message.metadata))
             writer.tag(3, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k).tag(2, runtime_1.WireType.LengthDelimited).string(message.metadata[k]).join();
+        /* protos.PipelineStepNotification notification = 4; */
+        if (message.notification)
+            exports.PipelineStepNotification.internalBinaryWrite(message.notification, writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

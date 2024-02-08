@@ -93,7 +93,7 @@ class PipelineStep(_message.Message):
     def __init__(self, name: _Optional[str] = ..., on_true: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., on_false: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., dynamic: bool = ..., on_error: _Optional[_Union[PipelineStepConditions, _Mapping]] = ..., detective: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStep, _Mapping]] = ..., transform: _Optional[_Union[_sp_steps_transform_pb2.TransformStep, _Mapping]] = ..., encode: _Optional[_Union[_sp_steps_encode_pb2.EncodeStep, _Mapping]] = ..., decode: _Optional[_Union[_sp_steps_decode_pb2.DecodeStep, _Mapping]] = ..., custom: _Optional[_Union[_sp_steps_custom_pb2.CustomStep, _Mapping]] = ..., http_request: _Optional[_Union[_sp_steps_httprequest_pb2.HttpRequestStep, _Mapping]] = ..., kv: _Optional[_Union[_sp_steps_kv_pb2.KVStep, _Mapping]] = ..., infer_schema: _Optional[_Union[_sp_steps_inferschema_pb2.InferSchemaStep, _Mapping]] = ..., valid_json: _Optional[_Union[_sp_steps_valid_json_pb2.ValidJSONStep, _Mapping]] = ..., schema_validation: _Optional[_Union[_sp_steps_schema_validation_pb2.SchemaValidationStep, _Mapping]] = ..., _wasm_id: _Optional[str] = ..., _wasm_bytes: _Optional[bytes] = ..., _wasm_function: _Optional[str] = ...) -> None: ...
 
 class PipelineStepConditions(_message.Message):
-    __slots__ = ["abort", "metadata", "notification"]
+    __slots__ = ["abort", "metadata", "notification", "notify"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -104,10 +104,12 @@ class PipelineStepConditions(_message.Message):
     ABORT_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
+    NOTIFY_FIELD_NUMBER: _ClassVar[int]
     abort: AbortCondition
     metadata: _containers.ScalarMap[str, str]
     notification: PipelineStepNotification
-    def __init__(self, abort: _Optional[_Union[AbortCondition, str]] = ..., notification: _Optional[_Union[PipelineStepNotification, _Mapping]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    notify: bool
+    def __init__(self, abort: _Optional[_Union[AbortCondition, str]] = ..., notify: bool = ..., metadata: _Optional[_Mapping[str, str]] = ..., notification: _Optional[_Union[PipelineStepNotification, _Mapping]] = ...) -> None: ...
 
 class PipelineStepNotification(_message.Message):
     __slots__ = ["notification_config_ids", "paths", "payload_type"]

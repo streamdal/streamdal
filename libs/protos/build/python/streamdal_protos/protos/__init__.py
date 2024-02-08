@@ -390,13 +390,22 @@ class PipelineStepConditions(betterproto.Message):
     abort: "AbortCondition" = betterproto.enum_field(1)
     """Should we abort execution?"""
 
-    notification: "PipelineStepNotification" = betterproto.message_field(2)
+    notify: bool = betterproto.bool_field(2)
     metadata: Dict[str, str] = betterproto.map_field(
         3, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
     """
     Should we include additional metadata that SDK should pass back to user?
     """
+
+    notification: "PipelineStepNotification" = betterproto.message_field(4)
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("notify"):
+            warnings.warn(
+                "PipelineStepConditions.notify is deprecated", DeprecationWarning
+            )
 
 
 @dataclass(eq=False, repr=False)
