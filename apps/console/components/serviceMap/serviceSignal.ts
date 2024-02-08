@@ -40,12 +40,3 @@ export const setServiceSignal = (
     ...mapServiceDisplay(serviceMap),
   };
 };
-
-export const setPipelines = (audienceKey: string, pipelineIds: string[]) => {
-  if (serviceSignal.value) {
-    serviceSignal.value.configs[audienceKey] = {
-      ...serviceSignal.value.configs[audienceKey] || {},
-      pipelineIds,
-    };
-  }
-};

@@ -14,21 +14,24 @@ export const handler: Handlers<any | null> = {
   async POST(req, _ctx) {
     const method = req.method;
     const headers = Object.fromEntries(req.headers);
-    const data = await req.json();
+    let data = "";
+    try {
+      data = await req.json();
+    } catch {
+      console.debug("cannot parse demo http request body");
+    }
 
     demoHttpRequestSignal.value = [
       ...demoHttpRequestSignal.value ? demoHttpRequestSignal.value : [],
-      ...data
-        ? [{
-          time: new Date().toLocaleDateString(
-            "en-us",
-            longDateFormat,
-          ),
-          method,
-          headers,
-          data,
-        }]
-        : [],
+      ...[{
+        time: new Date().toLocaleDateString(
+          "en-us",
+          longDateFormat,
+        ),
+        method,
+        headers,
+        data,
+      }],
     ];
     return new Response(null, { status: 200 });
   },

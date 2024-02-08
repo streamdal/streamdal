@@ -90,11 +90,14 @@ export const DemoHttpRequest = () => {
             ? "Received Test Http Requests"
             : "No demo http requests found"}
         </div>
-        <div class="cursor-pointer" onClick={() => setPaused(!paused)}>
-          {paused
-            ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
-            : <IconPlayerPauseFilled class="w-6 h-6 text-white" />}
-        </div>
+        {demoHttpRequestSignal.value &&
+          (
+            <div class="cursor-pointer" onClick={() => setPaused(!paused)}>
+              {paused
+                ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
+                : <IconPlayerPauseFilled class="w-6 h-6 text-white" />}
+            </div>
+          )}
       </div>
       <div
         class={`flex flex-col pt-[60px] h-screen w-full overflow-y-scroll`}
