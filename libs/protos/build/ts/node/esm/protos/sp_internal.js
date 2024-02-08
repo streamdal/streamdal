@@ -15,6 +15,32 @@ import { Metric } from "./sp_common.js";
 import { PipelineStep } from "./sp_pipeline.js";
 import { ClientInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
+/**
+ * This will be used to pull the condition type (true, false, error) from the pipeline step,
+ * so that we can include metadata, abort condition, etc., in the notification
+ * The condition will contain the notification configuration also.
+ *
+ * @generated from protobuf enum protos.NotifyRequest.ConditionType
+ */
+export var NotifyRequest_ConditionType;
+(function (NotifyRequest_ConditionType) {
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_UNSET = 0;
+     */
+    NotifyRequest_ConditionType[NotifyRequest_ConditionType["UNSET"] = 0] = "UNSET";
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_TRUE = 1;
+     */
+    NotifyRequest_ConditionType[NotifyRequest_ConditionType["ON_TRUE"] = 1] = "ON_TRUE";
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_FALSE = 2;
+     */
+    NotifyRequest_ConditionType[NotifyRequest_ConditionType["ON_FALSE"] = 2] = "ON_FALSE";
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_ERROR = 3;
+     */
+    NotifyRequest_ConditionType[NotifyRequest_ConditionType["ON_ERROR"] = 3] = "ON_ERROR";
+})(NotifyRequest_ConditionType || (NotifyRequest_ConditionType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class NewAudienceRequest$Type extends MessageType {
     constructor() {
@@ -141,7 +167,7 @@ export const HeartbeatRequest = new HeartbeatRequest$Type();
 class NotifyRequest$Type extends MessageType {
     constructor() {
         super("protos.NotifyRequest", [
-            { no: 1, name: "condition_type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "condition_type", kind: "enum", T: () => ["protos.NotifyRequest.ConditionType", NotifyRequest_ConditionType, "CONDITION_TYPE_"] },
             { no: 2, name: "step", kind: "message", T: () => PipelineStep },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
             { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
@@ -150,7 +176,7 @@ class NotifyRequest$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { conditionType: "", occurredAtUnixTsUtc: "0", pipelineId: "", payload: new Uint8Array(0) };
+        const message = { conditionType: 0, occurredAtUnixTsUtc: "0", pipelineId: "", payload: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -161,8 +187,8 @@ class NotifyRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string condition_type */ 1:
-                    message.conditionType = reader.string();
+                case /* protos.NotifyRequest.ConditionType condition_type */ 1:
+                    message.conditionType = reader.int32();
                     break;
                 case /* protos.PipelineStep step */ 2:
                     message.step = PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
@@ -191,9 +217,9 @@ class NotifyRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* string condition_type = 1; */
-        if (message.conditionType !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.conditionType);
+        /* protos.NotifyRequest.ConditionType condition_type = 1; */
+        if (message.conditionType !== 0)
+            writer.tag(1, WireType.Varint).int32(message.conditionType);
         /* protos.PipelineStep step = 2; */
         if (message.step)
             PipelineStep.internalBinaryWrite(message.step, writer.tag(2, WireType.LengthDelimited).fork(), options).join();

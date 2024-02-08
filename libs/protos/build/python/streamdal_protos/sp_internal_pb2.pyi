@@ -3,6 +3,7 @@ import sp_common_pb2 as _sp_common_pb2
 import sp_info_pb2 as _sp_info_pb2
 import sp_pipeline_pb2 as _sp_pipeline_pb2
 from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
@@ -66,19 +67,25 @@ class NewAudienceRequest(_message.Message):
 
 class NotifyRequest(_message.Message):
     __slots__ = ["audience", "condition_type", "occurred_at_unix_ts_utc", "payload", "pipeline_id", "step"]
+    class ConditionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     CONDITION_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CONDITION_TYPE_ON_ERROR: NotifyRequest.ConditionType
+    CONDITION_TYPE_ON_FALSE: NotifyRequest.ConditionType
+    CONDITION_TYPE_ON_TRUE: NotifyRequest.ConditionType
+    CONDITION_TYPE_UNSET: NotifyRequest.ConditionType
     OCCURRED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
     PAYLOAD_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
     STEP_FIELD_NUMBER: _ClassVar[int]
     audience: _sp_common_pb2.Audience
-    condition_type: str
+    condition_type: NotifyRequest.ConditionType
     occurred_at_unix_ts_utc: int
     payload: bytes
     pipeline_id: str
     step: _sp_pipeline_pb2.PipelineStep
-    def __init__(self, condition_type: _Optional[str] = ..., step: _Optional[_Union[_sp_pipeline_pb2.PipelineStep, _Mapping]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ..., pipeline_id: _Optional[str] = ..., payload: _Optional[bytes] = ...) -> None: ...
+    def __init__(self, condition_type: _Optional[_Union[NotifyRequest.ConditionType, str]] = ..., step: _Optional[_Union[_sp_pipeline_pb2.PipelineStep, _Mapping]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., occurred_at_unix_ts_utc: _Optional[int] = ..., pipeline_id: _Optional[str] = ..., payload: _Optional[bytes] = ...) -> None: ...
 
 class RegisterRequest(_message.Message):
     __slots__ = ["audiences", "client_info", "dry_run", "service_name", "session_id"]

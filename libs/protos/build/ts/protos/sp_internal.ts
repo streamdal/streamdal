@@ -75,14 +75,9 @@ export interface HeartbeatRequest {
  */
 export interface NotifyRequest {
     /**
-     * Included in notification
-     * This will be used to pull the condition type (true, false, error) from the pipeline step,
-     * so that we can include metadata, abort condition, etc., in the notification
-     * The condition will contain the notification configuration also.
-     *
-     * @generated from protobuf field: string condition_type = 1;
+     * @generated from protobuf field: protos.NotifyRequest.ConditionType condition_type = 1;
      */
-    conditionType: string; // true, false, error
+    conditionType: NotifyRequest_ConditionType;
     /**
      * Used for pulling step name and any other info needed in the future
      *
@@ -113,6 +108,31 @@ export interface NotifyRequest {
      * @generated from protobuf field: bytes payload = 6;
      */
     payload: Uint8Array;
+}
+/**
+ * This will be used to pull the condition type (true, false, error) from the pipeline step,
+ * so that we can include metadata, abort condition, etc., in the notification
+ * The condition will contain the notification configuration also.
+ *
+ * @generated from protobuf enum protos.NotifyRequest.ConditionType
+ */
+export enum NotifyRequest_ConditionType {
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_TRUE = 1;
+     */
+    ON_TRUE = 1,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_FALSE = 2;
+     */
+    ON_FALSE = 2,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_ERROR = 3;
+     */
+    ON_ERROR = 3
 }
 /**
  * @generated from protobuf message protos.MetricsRequest
@@ -380,7 +400,7 @@ export const HeartbeatRequest = new HeartbeatRequest$Type();
 class NotifyRequest$Type extends MessageType<NotifyRequest> {
     constructor() {
         super("protos.NotifyRequest", [
-            { no: 1, name: "condition_type", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "condition_type", kind: "enum", T: () => ["protos.NotifyRequest.ConditionType", NotifyRequest_ConditionType, "CONDITION_TYPE_"] },
             { no: 2, name: "step", kind: "message", T: () => PipelineStep },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
             { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
@@ -389,7 +409,7 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         ]);
     }
     create(value?: PartialMessage<NotifyRequest>): NotifyRequest {
-        const message = { conditionType: "", occurredAtUnixTsUtc: "0", pipelineId: "", payload: new Uint8Array(0) };
+        const message = { conditionType: 0, occurredAtUnixTsUtc: "0", pipelineId: "", payload: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<NotifyRequest>(this, message, value);
@@ -400,8 +420,8 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string condition_type */ 1:
-                    message.conditionType = reader.string();
+                case /* protos.NotifyRequest.ConditionType condition_type */ 1:
+                    message.conditionType = reader.int32();
                     break;
                 case /* protos.PipelineStep step */ 2:
                     message.step = PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
@@ -430,9 +450,9 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         return message;
     }
     internalBinaryWrite(message: NotifyRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string condition_type = 1; */
-        if (message.conditionType !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.conditionType);
+        /* protos.NotifyRequest.ConditionType condition_type = 1; */
+        if (message.conditionType !== 0)
+            writer.tag(1, WireType.Varint).int32(message.conditionType);
         /* protos.PipelineStep step = 2; */
         if (message.step)
             PipelineStep.internalBinaryWrite(message.step, writer.tag(2, WireType.LengthDelimited).fork(), options).join();

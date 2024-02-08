@@ -127,6 +127,20 @@ class AppRegistrationStatusResponseStatus(betterproto.Enum):
     """Done means the user is registered and verified"""
 
 
+class NotifyRequestConditionType(betterproto.Enum):
+    """
+    This will be used to pull the condition type (true, false, error) from the
+    pipeline step, so that we can include metadata, abort condition, etc., in
+    the notification The condition will contain the notification configuration
+    also.
+    """
+
+    CONDITION_TYPE_UNSET = 0
+    CONDITION_TYPE_ON_TRUE = 1
+    CONDITION_TYPE_ON_FALSE = 2
+    CONDITION_TYPE_ON_ERROR = 3
+
+
 class ExecStatus(betterproto.Enum):
     EXEC_STATUS_UNSET = 0
     """
@@ -1001,14 +1015,7 @@ class HeartbeatRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class NotifyRequest(betterproto.Message):
-    condition_type: str = betterproto.string_field(1)
-    """
-    Included in notification This will be used to pull the condition type
-    (true, false, error) from the pipeline step, so that we can include
-    metadata, abort condition, etc., in the notification The condition will
-    contain the notification configuration also.
-    """
-
+    condition_type: "NotifyRequestConditionType" = betterproto.enum_field(1)
     step: "PipelineStep" = betterproto.message_field(2)
     """Used for pulling step name and any other info needed in the future"""
 

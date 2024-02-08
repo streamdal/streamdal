@@ -66,14 +66,9 @@ export interface HeartbeatRequest {
  */
 export interface NotifyRequest {
     /**
-     * Included in notification
-     * This will be used to pull the condition type (true, false, error) from the pipeline step,
-     * so that we can include metadata, abort condition, etc., in the notification
-     * The condition will contain the notification configuration also.
-     *
-     * @generated from protobuf field: string condition_type = 1;
+     * @generated from protobuf field: protos.NotifyRequest.ConditionType condition_type = 1;
      */
-    conditionType: string;
+    conditionType: NotifyRequest_ConditionType;
     /**
      * Used for pulling step name and any other info needed in the future
      *
@@ -104,6 +99,31 @@ export interface NotifyRequest {
      * @generated from protobuf field: bytes payload = 6;
      */
     payload: Uint8Array;
+}
+/**
+ * This will be used to pull the condition type (true, false, error) from the pipeline step,
+ * so that we can include metadata, abort condition, etc., in the notification
+ * The condition will contain the notification configuration also.
+ *
+ * @generated from protobuf enum protos.NotifyRequest.ConditionType
+ */
+export declare enum NotifyRequest_ConditionType {
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_TRUE = 1;
+     */
+    ON_TRUE = 1,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_FALSE = 2;
+     */
+    ON_FALSE = 2,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_ERROR = 3;
+     */
+    ON_ERROR = 3
 }
 /**
  * @generated from protobuf message protos.MetricsRequest
