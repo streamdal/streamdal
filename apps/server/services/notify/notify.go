@@ -112,13 +112,31 @@ func (n *Notify) Queue(_ context.Context, req *protos.NotifyRequest) {
 	n.eventChan <- req
 }
 
+func getConditionFromRequest(req *protos.NotifyRequest) *protos.PipelineStepConditions {
+	switch req.ConditionType {
+	case protos.NotifyRequest_CONDITION_TYPE_ON_TRUE:
+		return req.Step.OnTrue
+	case protos.NotifyRequest_CONDITION_TYPE_ON_FALSE:
+		return req.Step.OnFalse
+	case protos.NotifyRequest_CONDITION_TYPE_ON_ERROR:
+		return req.Step.OnError
+	default:
+		return nil
+	}
+}
+
 func (n *Notify) handle(ctx context.Context, event *protos.NotifyRequest) error {
 	pipeline, err := n.Store.GetPipeline(ctx, event.PipelineId)
 	if err != nil {
 		return errors.Wrap(err, "pipeline not found")
 	}
 
-	for _, cfgID := range event.Notification.NotificationConfigIds {
+	cond := getConditionFromRequest(event)
+	if cond == nil {
+		return errors.New("Unknown condition type")
+	}
+
+	for _, cfgID := range cond.Notification.NotificationConfigIds {
 		cfg, err := n.Store.GetNotificationConfig(ctx, &protos.GetNotificationRequest{NotificationId: cfgID})
 		if err != nil {
 			return errors.Wrapf(err, "unknown notification config ID '%s'", cfgID)
@@ -280,41 +298,56 @@ func (n *Notify) handleSlack(ctx context.Context, event *protos.NotifyRequest, c
 	divBlock := slack.NewDividerBlock()
 
 	infoBlocks := []*slack.TextBlockObject{
-		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline ID*\n"+pipeline.Id, false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline Name*\n"+pipeline.Name, false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Step Name*\n"+event.Step.Name, false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Service Name*\n"+event.Audience.ServiceName, false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Name*\n"+event.Audience.OperationName, false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Type*\n"+operationTypeString(event.Audience.OperationType), false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline ID*\n`"+pipeline.Id+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline Name*\n`"+pipeline.Name+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Step Type*\n`"+stepToString(event.Step)+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Step Name*\n`"+event.Step.Name+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Condition Met*\n`"+conditionToString(event)+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Service Name*\n`"+event.Audience.ServiceName+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Name*\n`"+event.Audience.OperationName+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Type*\n`"+operationTypeString(event.Audience.OperationType)+"`", false, false),
 	}
 
-	optionBlocks := slack.MsgOptionBlocks(headerBlock, divBlock, slack.NewSectionBlock(nil, infoBlocks, nil), divBlock)
+	blocks := []slack.Block{
+		headerBlock,
+		divBlock,
+		slack.NewSectionBlock(nil, infoBlocks, nil),
+	}
+
+	cond := getConditionFromRequest(event)
+
+	// If metadata is an empty string, slack will fail validation on PostMessage() call
+	// so we only include it if any metadata is actually present
+	if len(cond.Metadata) > 0 {
+		metadataBlock := slack.NewTextBlockObject(slack.MarkdownType, "*Metadata*", false, false)
+		metadata := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(metadataToString(cond.Metadata), &slack.RichTextSectionTextStyle{}))
+		metadata.Type = slack.RTEPreformatted
+		blocks = append(blocks, slack.NewSectionBlock(nil, []*slack.TextBlockObject{metadataBlock}, nil))
+		blocks = append(blocks, slack.NewRichTextBlock("metadata", metadata))
+	}
 
 	// If we have a payload, include it in the alert
 	if len(event.Payload) > 0 {
 		// Add payload to info blocks
 		payloadText := slack.NewTextBlockObject(slack.MarkdownType, "*Payload*", false, false)
-		infoBlocks = append(infoBlocks, payloadText)
 
 		// Payload is preformatted rich text
 		payload := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(prettyJSON(event.Payload), &slack.RichTextSectionTextStyle{}))
 		payload.Type = slack.RTEPreformatted
 
-		// Option blocks needs to include the rich text payload block
-		optionBlocks = slack.MsgOptionBlocks(
-			headerBlock,
-			divBlock,
-			slack.NewSectionBlock(nil, infoBlocks, nil),
-			slack.NewRichTextBlock("payload", payload),
-			divBlock,
-		)
+		blocks = append(blocks, divBlock)
+		blocks = append(blocks, slack.NewSectionBlock(nil, []*slack.TextBlockObject{payloadText}, nil))
+		blocks = append(blocks, slack.NewRichTextBlock("payload", payload))
+
 	}
+
+	blocks = append(blocks, divBlock)
 
 	_, _, err := api.PostMessageContext(
 		ctx,
 		cfg.Channel,
 		slack.MsgOptionText("Streamdal Alert", false),
-		optionBlocks,
+		slack.MsgOptionBlocks(blocks...),
 		slack.MsgOptionAsUser(true),
 	)
 	if err != nil {
@@ -389,7 +422,12 @@ func (n *Notify) getEmailBody(
 
 	var body bytes.Buffer
 
-	payload, err := getPayload(req.Payload, req.Notification)
+	cond := getConditionFromRequest(req)
+	if cond == nil {
+		return "", errors.New("Unknown condition type")
+	}
+
+	payload, err := getPayload(req.Payload, cond.Notification)
 	if err != nil {
 		return "", errors.Wrap(err, "unable to get payload")
 	}
@@ -398,10 +436,13 @@ func (n *Notify) getEmailBody(
 		"pipeline_id":    pipeline.Id,
 		"pipeline_name":  pipeline.Name,
 		"step_name":      req.Step.Name,
+		"step_type":      stepToString(req.Step),
 		"service_name":   req.Audience.ServiceName,
 		"operation_name": req.Audience.OperationName,
 		"operation_type": operationTypeString(req.Audience.OperationType),
 		"payload_data":   string(payload),
+		"metadata":       metadataToString(cond.Metadata),
+		"condition":      conditionToString(req),
 	}
 
 	if err := tmpl.Execute(&body, data); err != nil {
