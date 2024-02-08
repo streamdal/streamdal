@@ -15,6 +15,7 @@ import { InterStepResult, WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
 import { Configs, StreamdalRequest } from "../streamdal.js";
 import { addAudience } from "./audience.js";
+import { httpRequest } from "./httpRequest.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
 import { initPipelines } from "./pipeline.js";
 import { audienceKey, internal, Tail } from "./register.js";
@@ -110,7 +111,7 @@ export const retryProcessPipelines = async ({
   });
 };
 
-export const processPipeline = ({
+export const processPipeline = async ({
   originalData,
   audience,
   configs,
@@ -120,7 +121,7 @@ export const processPipeline = ({
   audience: Audience;
   configs: Configs;
   pipeline: Pipeline;
-}): { pipelineStatus: EnchancedPipelineStatus; data: Uint8Array } => {
+}): Promise<{ pipelineStatus: EnchancedPipelineStatus; data: Uint8Array }> => {
   const pipelineStatus: EnchancedPipelineStatus = {
     id: pipeline.id,
     name: pipeline.name,
@@ -144,7 +145,7 @@ export const processPipeline = ({
       data: newData,
       stepStatus,
       interStepResult,
-    } = runStep({
+    } = await runStep({
       originalData,
       audience,
       configs,
@@ -216,7 +217,7 @@ export const processPipelines = async ({
   };
 
   for (const pipeline of pipelines.values()) {
-    const { data, pipelineStatus } = processPipeline({
+    const { data, pipelineStatus } = await processPipeline({
       originalData: response.data,
       audience,
       configs,
@@ -310,7 +311,7 @@ export const resultCondition = ({
     conditions && conditions.abort ? conditions.abort : AbortCondition.UNSET;
 };
 
-export const runStep = ({
+export const runStep = async ({
   originalData,
   audience,
   configs,
@@ -324,11 +325,11 @@ export const runStep = ({
   step: PipelineStep;
   pipeline: Pipeline;
   lastStepResult?: InterStepResult;
-}): {
+}): Promise<{
   stepStatus: EnhancedStepStatus;
   data: Uint8Array;
   interStepResult?: InterStepResult;
-} => {
+}> => {
   const stepStatus: EnhancedStepStatus = {
     name: step.name,
     status: ExecStatus.TRUE,
@@ -342,11 +343,13 @@ export const runStep = ({
 
   try {
     const { outputPayload, outputStep, exitCode, exitMsg, interStepResult } =
-      runWasm({
-        step,
-        originalData,
-        interStepResult: lastStepResult,
-      });
+      step.step.oneofKind === "httpRequest"
+        ? await httpRequest({ step })
+        : runWasm({
+            step,
+            originalData,
+            interStepResult: lastStepResult,
+          });
 
     //
     // output gets passed back as data for the next function

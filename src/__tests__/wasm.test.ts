@@ -117,7 +117,7 @@ describe("wasm tests", async () => {
 
   it("attached pipeline detective step should execute wasm", async () => {
     internal.pipelines.set(key, new Map([[testPipeline.id, testPipeline]]));
-    const result = processPipeline({
+    const result = await processPipeline({
       originalData: new TextEncoder().encode(JSON.stringify(testData)),
       audience: testAudience,
       configs: testConfigs,

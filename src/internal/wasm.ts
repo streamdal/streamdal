@@ -21,6 +21,14 @@ const wasi = new WASI({
   },
 } as any);
 
+//
+// We bypass wasm for some things in node (async) but we still
+// need to have a host function mapped so wasm instantiation
+// doesn't blow up.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const hostFunctionNOOP = (_: any, __: number, ____: number): bigint =>
+  BigInt(0);
+
 export const instantiateWasm = async (
   wasmId?: string,
   wasmBytes?: Uint8Array
@@ -41,6 +49,8 @@ export const instantiateWasm = async (
     env: {
       kvExists: (pointer: number, length: number): bigint =>
         kvExists(instantiated.exports, pointer, length),
+      httpRequest: (pointer: number, length: number): bigint =>
+        hostFunctionNOOP(instantiated.exports, pointer, length),
     },
   });
   internal.wasmModules.set(wasmId, instantiated);

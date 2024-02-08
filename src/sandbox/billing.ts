@@ -132,3 +132,9 @@ export const billingExample = () => {
   randomPipelineAndData(welcome, welcomeConsumer, sData);
   randomPipelineAndData(welcome, welcomeProducer, wpData);
 };
+
+export const singleWelcomeExample = () => {
+  const welcome = new Streamdal(serviceWelcomeConfig);
+  const wpData = loadData("./src/sandbox/assets/sample-welcome-producer.json");
+  randomPipelineAndData(welcome, welcomeProducer, wpData);
+};
