@@ -38,6 +38,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
+          tag_prefix: "sdks/node/v"
 
       - name: Update npm package version
         run: |
