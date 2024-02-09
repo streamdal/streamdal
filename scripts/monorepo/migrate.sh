@@ -17,7 +17,7 @@
 # │   └── ...
 # ├── apps
 # │   ├── cli
-# │   ├── console                
+# │   ├── console
 # │   ├── docs
 # │   ├── server
 # │   └── ...
@@ -43,20 +43,20 @@
 # └── README.md
 
 # Dirs we should pre-create and add a .gitkeep (to allow empty dirs to be added to git)
-BASE_DIRS="assets/img apps docs/install docs/instrument libs scripts"
+BASE_DIRS=""
 
 # What files to pre-create/touch -- this is purely for aesthetics :)
-FILES="LICENSE README.md Makefile"
+FILES=""
 
 # Repos we will migrate during this run; you'll want to change these between
 # runs as diff repos will need to go into a diff monorepo subdir.
-REPOS="server"
+REPOS="python-sdk"
 
 # Name of the target mono repo dir
-MONO_DIR="mono"
+MONO_DIR="streamdal"
 
 # Which subdir will we migrate $REPOS into
-SUB_DIR="apps"
+SUB_DIR="sdks"
 
 info() {
     printf "\x1b[48;5;%sm» ${1}\e[0m\n" "99"
@@ -80,11 +80,11 @@ initialize_monorepo() {
     # Pre-create dirs & .gitkeep files
     for DIR in $(echo $BASE_DIRS); do
         mkdir -p $DIR || fatal "Could not create dir ${MONO_DIR}/${DIR}"
-#        touch $DIR/.gitkeep || fatal "Could not create ${MONO_DIR}/${DIR}.gitkeep"
+        touch $DIR/.gitkeep || fatal "Could not create ${MONO_DIR}/${DIR}.gitkeep"
     done
 
     for FILE in $(echo $FILES); do
-#        touch $FILE || fatal "Could not create ${MONO_DIR}/${FILE}"
+        touch $FILE || fatal "Could not create ${MONO_DIR}/${FILE}"
     done
 
     # You'll have to manually `git add .` and `git commit -m "Initial commit"` the pre-created dirs & files

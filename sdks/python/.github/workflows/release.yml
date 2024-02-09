@@ -12,26 +12,34 @@ jobs:
     steps:
       - name: Get tag name
         run: echo "TAG_NAME=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+
       - name: Get version
         run: echo "TAG_VERSION=$(echo ${GITHUB_REF#refs/tags/v})" >> $GITHUB_ENV
+
       - uses: actions/checkout@v2
+
       - name: Delete tag
         uses: prompt/actions-delete-tag@v1
+
       - name: Delete tag local
         run: git tag -d ${{ env.TAG_NAME }}
+
       - name: Inject version into setup.py
         run: |
           sed -i "s/version=\".*\"/version=\"${{ env.TAG_VERSION }}\"/" streamdal/__init__.py
           sed -i "s/version=.*/version='${{ env.TAG_VERSION }}',/" setup.py
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bumped version in setup.py to ${{ env.TAG_VERSION }}
           branch: main
           tagging_message: ${{ env.TAG_NAME }}
           push_options: '--force'
+
       - name: Generate updated distribution
         run: |
           python3 setup.py sdist
+
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
