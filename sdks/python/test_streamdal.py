@@ -75,7 +75,7 @@ class TestStreamdalClient:
         )
         aud = protos.Audience()
 
-        self.client._notify_condition(pipeline, step, aud, step.on_true, b"")
+        self.client._notify_condition(pipeline, step, aud, step.on_true, b"", protos.NotifyRequestConditionType.CONDITION_TYPE_ON_TRUE)
         fake_stub.notify.assert_called_once()
         fake_metrics.incr.assert_called_once()
 
