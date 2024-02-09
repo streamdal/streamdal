@@ -1,0 +1,26 @@
+name: SDK Go - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'sdks/go/**'
+      - '.github/workflows/sdks-go-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./sdks/go
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '~1.19' # The Go version to download (if necessary) and use.
+
+      - name: Test
+        run: |
+          make test
