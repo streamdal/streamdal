@@ -60,7 +60,7 @@ jobs:
         run: npm run build
 
       - name: Release to npm
-        working-directory: ./build
+        working-directory: ./sdks/node/build
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
