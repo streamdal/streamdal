@@ -9,23 +9,17 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
-	"github.com/streamdal/go-sdk/validate"
-)
-
-var (
-	ErrPipelineNotPaused = errors.New("pipeline not paused")
-	ErrPipelineNotActive = errors.New("pipeline not active or does not exist")
+	"github.com/streamdal/streamdal/sdks/go/validate"
 )
 
 func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "v0.0.85",
+		LibraryVersion: "v0.0.86",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,

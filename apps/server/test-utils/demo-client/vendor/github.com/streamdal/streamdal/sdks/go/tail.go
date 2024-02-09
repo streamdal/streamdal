@@ -12,11 +12,11 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/go-sdk/logger"
-	"github.com/streamdal/go-sdk/metrics"
-	"github.com/streamdal/go-sdk/server"
-	"github.com/streamdal/go-sdk/types"
-	"github.com/streamdal/go-sdk/validate"
+	"github.com/streamdal/streamdal/sdks/go/logger"
+	"github.com/streamdal/streamdal/sdks/go/metrics"
+	"github.com/streamdal/streamdal/sdks/go/server"
+	"github.com/streamdal/streamdal/sdks/go/types"
+	"github.com/streamdal/streamdal/sdks/go/validate"
 )
 
 const (

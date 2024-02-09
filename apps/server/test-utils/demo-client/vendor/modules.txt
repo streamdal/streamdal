@@ -46,22 +46,22 @@ github.com/rivo/uniseg
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/streamdal/go-sdk v0.0.85
-## explicit; go 1.19
-github.com/streamdal/go-sdk
-github.com/streamdal/go-sdk/helper
-github.com/streamdal/go-sdk/hostfunc
-github.com/streamdal/go-sdk/kv
-github.com/streamdal/go-sdk/logger
-github.com/streamdal/go-sdk/metrics
-github.com/streamdal/go-sdk/server
-github.com/streamdal/go-sdk/types
-github.com/streamdal/go-sdk/validate
-# github.com/streamdal/streamdal/libs/protos v0.1.17
+# github.com/streamdal/streamdal/libs/protos v0.1.18
 ## explicit; go 1.20
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
 github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
+# github.com/streamdal/streamdal/sdks/go v0.0.2
+## explicit; go 1.19
+github.com/streamdal/streamdal/sdks/go
+github.com/streamdal/streamdal/sdks/go/helper
+github.com/streamdal/streamdal/sdks/go/hostfunc
+github.com/streamdal/streamdal/sdks/go/kv
+github.com/streamdal/streamdal/sdks/go/logger
+github.com/streamdal/streamdal/sdks/go/metrics
+github.com/streamdal/streamdal/sdks/go/server
+github.com/streamdal/streamdal/sdks/go/types
+github.com/streamdal/streamdal/sdks/go/validate
 # github.com/tetratelabs/wazero v1.6.0
 ## explicit; go 1.19
 github.com/tetratelabs/wazero

@@ -29,12 +29,12 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
-	"github.com/streamdal/go-sdk/hostfunc"
-	"github.com/streamdal/go-sdk/kv"
-	"github.com/streamdal/go-sdk/logger"
-	"github.com/streamdal/go-sdk/metrics"
-	"github.com/streamdal/go-sdk/server"
-	"github.com/streamdal/go-sdk/types"
+	"github.com/streamdal/streamdal/sdks/go/hostfunc"
+	"github.com/streamdal/streamdal/sdks/go/kv"
+	"github.com/streamdal/streamdal/sdks/go/logger"
+	"github.com/streamdal/streamdal/sdks/go/metrics"
+	"github.com/streamdal/streamdal/sdks/go/server"
+	"github.com/streamdal/streamdal/sdks/go/types"
 )
 
 // OperationType is used to indicate if the operation is a consumer or a producer

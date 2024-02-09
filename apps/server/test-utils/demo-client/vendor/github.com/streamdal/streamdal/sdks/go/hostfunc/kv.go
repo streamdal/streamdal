@@ -9,7 +9,7 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
-	"github.com/streamdal/go-sdk/helper"
+	"github.com/streamdal/streamdal/sdks/go/helper"
 )
 
 // KVExists is function that is exported to and called from a Rust WASM module

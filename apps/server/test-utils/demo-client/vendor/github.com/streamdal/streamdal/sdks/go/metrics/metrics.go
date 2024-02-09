@@ -11,9 +11,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
 
-	"github.com/streamdal/go-sdk/logger"
-	"github.com/streamdal/go-sdk/server"
-	"github.com/streamdal/go-sdk/types"
+	"github.com/streamdal/streamdal/sdks/go/logger"
+	"github.com/streamdal/streamdal/sdks/go/server"
+	"github.com/streamdal/streamdal/sdks/go/types"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . IMetrics
