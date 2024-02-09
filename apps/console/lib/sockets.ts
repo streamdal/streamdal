@@ -8,12 +8,35 @@ import {
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
+import { demoHttpRequestSignal } from "../routes/demo/http/index.tsx";
 
 export const getSocket = (path: string) => {
   const url = new URL(path, location.href);
   url.protocol = url.protocol.replace("http", "ws");
   url.pathname = path;
   return new WebSocket(url);
+};
+
+export const demoHttpRequestSocket = (path: string) => {
+  const webSocket = getSocket(path);
+
+  webSocket.addEventListener("open", () => {
+    webSocket.send("ping");
+  });
+
+  webSocket.addEventListener("message", (event) => {
+    if (event.data === "pong") {
+      console.debug("got server pong");
+      return;
+    }
+
+    try {
+      demoHttpRequestSignal.value = JSON.parse(event.data);
+    } catch (e) {
+      console.error("error parsing demo http request data", e);
+    }
+  });
+  return webSocket;
 };
 
 export const serviceMapSocket = (path: string) => {

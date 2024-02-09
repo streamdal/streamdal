@@ -18,8 +18,8 @@ export const handler: Handlers<{ message: string | null }> = {
     effect(() => {
       try {
         socket.send(serverErrorSignal.value);
-      } catch (e) {
-        console.debug("failed to send server error over socket", e);
+      } catch {
+        console.debug("failed to send server error over socket");
       }
     });
 

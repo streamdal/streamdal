@@ -1,7 +1,6 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
 SERVICE = demo-client
 ARCH ?= $(shell uname -m)
-GOOS=linux GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -o ./build/$(SERVICE)-linux-arm64
 GO=go
 # Pattern #1 example: "example : description = Description for example target"
 # Pattern #2 example: "### Example separator text

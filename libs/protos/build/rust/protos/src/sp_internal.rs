@@ -357,20 +357,23 @@ impl ::protobuf::reflect::ProtobufValue for HeartbeatRequest {
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct NotifyRequest {
     // message fields
-    // @@protoc_insertion_point(field:protos.NotifyRequest.pipeline_id)
-    pub pipeline_id: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.NotifyRequest.step_name)
-    pub step_name: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.NotifyRequest.audience)
-    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
-    // @@protoc_insertion_point(field:protos.NotifyRequest.occurred_at_unix_ts_utc)
-    pub occurred_at_unix_ts_utc: i64,
-    // @@protoc_insertion_point(field:protos.NotifyRequest.payload)
-    pub payload: ::std::vec::Vec<u8>,
+    // @@protoc_insertion_point(field:protos.NotifyRequest.condition_type)
+    pub condition_type: ::protobuf::EnumOrUnknown<notify_request::ConditionType>,
+    ///  Used for pulling step name and any other info needed in the future
     // @@protoc_insertion_point(field:protos.NotifyRequest.step)
     pub step: ::protobuf::MessageField<super::sp_pipeline::PipelineStep>,
-    // @@protoc_insertion_point(field:protos.NotifyRequest.notification)
-    pub notification: ::protobuf::MessageField<super::sp_pipeline::PipelineStepNotification>,
+    ///  Included in notification
+    // @@protoc_insertion_point(field:protos.NotifyRequest.audience)
+    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
+    ///  Included in notification
+    // @@protoc_insertion_point(field:protos.NotifyRequest.occurred_at_unix_ts_utc)
+    pub occurred_at_unix_ts_utc: i64,
+    ///  Included in notification
+    // @@protoc_insertion_point(field:protos.NotifyRequest.pipeline_id)
+    pub pipeline_id: ::std::string::String,
+    ///  Included in notification
+    // @@protoc_insertion_point(field:protos.NotifyRequest.payload)
+    pub payload: ::std::vec::Vec<u8>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.NotifyRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -388,17 +391,17 @@ impl NotifyRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(7);
+        let mut fields = ::std::vec::Vec::with_capacity(6);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "pipeline_id",
-            |m: &NotifyRequest| { &m.pipeline_id },
-            |m: &mut NotifyRequest| { &mut m.pipeline_id },
+            "condition_type",
+            |m: &NotifyRequest| { &m.condition_type },
+            |m: &mut NotifyRequest| { &mut m.condition_type },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "step_name",
-            |m: &NotifyRequest| { &m.step_name },
-            |m: &mut NotifyRequest| { &mut m.step_name },
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::PipelineStep>(
+            "step",
+            |m: &NotifyRequest| { &m.step },
+            |m: &mut NotifyRequest| { &mut m.step },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
             "audience",
@@ -411,19 +414,14 @@ impl NotifyRequest {
             |m: &mut NotifyRequest| { &mut m.occurred_at_unix_ts_utc },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_id",
+            |m: &NotifyRequest| { &m.pipeline_id },
+            |m: &mut NotifyRequest| { &mut m.pipeline_id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "payload",
             |m: &NotifyRequest| { &m.payload },
             |m: &mut NotifyRequest| { &mut m.payload },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::PipelineStep>(
-            "step",
-            |m: &NotifyRequest| { &m.step },
-            |m: &mut NotifyRequest| { &mut m.step },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::PipelineStepNotification>(
-            "notification",
-            |m: &NotifyRequest| { &m.notification },
-            |m: &mut NotifyRequest| { &mut m.notification },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<NotifyRequest>(
             "NotifyRequest",
@@ -443,11 +441,11 @@ impl ::protobuf::Message for NotifyRequest {
     fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
-                10 => {
-                    self.pipeline_id = is.read_string()?;
+                8 => {
+                    self.condition_type = is.read_enum_or_unknown()?;
                 },
                 18 => {
-                    self.step_name = is.read_string()?;
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.step)?;
                 },
                 26 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
@@ -456,13 +454,10 @@ impl ::protobuf::Message for NotifyRequest {
                     self.occurred_at_unix_ts_utc = is.read_int64()?;
                 },
                 42 => {
-                    self.payload = is.read_bytes()?;
+                    self.pipeline_id = is.read_string()?;
                 },
                 50 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.step)?;
-                },
-                58 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.notification)?;
+                    self.payload = is.read_bytes()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -476,11 +471,12 @@ impl ::protobuf::Message for NotifyRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.pipeline_id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.pipeline_id);
+        if self.condition_type != ::protobuf::EnumOrUnknown::new(notify_request::ConditionType::CONDITION_TYPE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(1, self.condition_type.value());
         }
-        if !self.step_name.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.step_name);
+        if let Some(v) = self.step.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
         if let Some(v) = self.audience.as_ref() {
             let len = v.compute_size();
@@ -489,16 +485,11 @@ impl ::protobuf::Message for NotifyRequest {
         if self.occurred_at_unix_ts_utc != 0 {
             my_size += ::protobuf::rt::int64_size(4, self.occurred_at_unix_ts_utc);
         }
+        if !self.pipeline_id.is_empty() {
+            my_size += ::protobuf::rt::string_size(5, &self.pipeline_id);
+        }
         if !self.payload.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(5, &self.payload);
-        }
-        if let Some(v) = self.step.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        if let Some(v) = self.notification.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+            my_size += ::protobuf::rt::bytes_size(6, &self.payload);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -506,11 +497,11 @@ impl ::protobuf::Message for NotifyRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.pipeline_id.is_empty() {
-            os.write_string(1, &self.pipeline_id)?;
+        if self.condition_type != ::protobuf::EnumOrUnknown::new(notify_request::ConditionType::CONDITION_TYPE_UNSET) {
+            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&self.condition_type))?;
         }
-        if !self.step_name.is_empty() {
-            os.write_string(2, &self.step_name)?;
+        if let Some(v) = self.step.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
         }
         if let Some(v) = self.audience.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(3, v, os)?;
@@ -518,14 +509,11 @@ impl ::protobuf::Message for NotifyRequest {
         if self.occurred_at_unix_ts_utc != 0 {
             os.write_int64(4, self.occurred_at_unix_ts_utc)?;
         }
+        if !self.pipeline_id.is_empty() {
+            os.write_string(5, &self.pipeline_id)?;
+        }
         if !self.payload.is_empty() {
-            os.write_bytes(5, &self.payload)?;
-        }
-        if let Some(v) = self.step.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(6, v, os)?;
-        }
-        if let Some(v) = self.notification.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(7, v, os)?;
+            os.write_bytes(6, &self.payload)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -544,25 +532,23 @@ impl ::protobuf::Message for NotifyRequest {
     }
 
     fn clear(&mut self) {
-        self.pipeline_id.clear();
-        self.step_name.clear();
+        self.condition_type = ::protobuf::EnumOrUnknown::new(notify_request::ConditionType::CONDITION_TYPE_UNSET);
+        self.step.clear();
         self.audience.clear();
         self.occurred_at_unix_ts_utc = 0;
+        self.pipeline_id.clear();
         self.payload.clear();
-        self.step.clear();
-        self.notification.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static NotifyRequest {
         static instance: NotifyRequest = NotifyRequest {
-            pipeline_id: ::std::string::String::new(),
-            step_name: ::std::string::String::new(),
+            condition_type: ::protobuf::EnumOrUnknown::from_i32(0),
+            step: ::protobuf::MessageField::none(),
             audience: ::protobuf::MessageField::none(),
             occurred_at_unix_ts_utc: 0,
+            pipeline_id: ::std::string::String::new(),
             payload: ::std::vec::Vec::new(),
-            step: ::protobuf::MessageField::none(),
-            notification: ::protobuf::MessageField::none(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -584,6 +570,84 @@ impl ::std::fmt::Display for NotifyRequest {
 
 impl ::protobuf::reflect::ProtobufValue for NotifyRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+/// Nested message and enums of message `NotifyRequest`
+pub mod notify_request {
+    ///  This will be used to pull the condition type (true, false, error) from the pipeline step,
+    ///  so that we can include metadata, abort condition, etc., in the notification
+    ///  The condition will contain the notification configuration also.
+    #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+    // @@protoc_insertion_point(enum:protos.NotifyRequest.ConditionType)
+    pub enum ConditionType {
+        // @@protoc_insertion_point(enum_value:protos.NotifyRequest.ConditionType.CONDITION_TYPE_UNSET)
+        CONDITION_TYPE_UNSET = 0,
+        // @@protoc_insertion_point(enum_value:protos.NotifyRequest.ConditionType.CONDITION_TYPE_ON_TRUE)
+        CONDITION_TYPE_ON_TRUE = 1,
+        // @@protoc_insertion_point(enum_value:protos.NotifyRequest.ConditionType.CONDITION_TYPE_ON_FALSE)
+        CONDITION_TYPE_ON_FALSE = 2,
+        // @@protoc_insertion_point(enum_value:protos.NotifyRequest.ConditionType.CONDITION_TYPE_ON_ERROR)
+        CONDITION_TYPE_ON_ERROR = 3,
+    }
+
+    impl ::protobuf::Enum for ConditionType {
+        const NAME: &'static str = "ConditionType";
+
+        fn value(&self) -> i32 {
+            *self as i32
+        }
+
+        fn from_i32(value: i32) -> ::std::option::Option<ConditionType> {
+            match value {
+                0 => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_UNSET),
+                1 => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_ON_TRUE),
+                2 => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_ON_FALSE),
+                3 => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_ON_ERROR),
+                _ => ::std::option::Option::None
+            }
+        }
+
+        fn from_str(str: &str) -> ::std::option::Option<ConditionType> {
+            match str {
+                "CONDITION_TYPE_UNSET" => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_UNSET),
+                "CONDITION_TYPE_ON_TRUE" => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_ON_TRUE),
+                "CONDITION_TYPE_ON_FALSE" => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_ON_FALSE),
+                "CONDITION_TYPE_ON_ERROR" => ::std::option::Option::Some(ConditionType::CONDITION_TYPE_ON_ERROR),
+                _ => ::std::option::Option::None
+            }
+        }
+
+        const VALUES: &'static [ConditionType] = &[
+            ConditionType::CONDITION_TYPE_UNSET,
+            ConditionType::CONDITION_TYPE_ON_TRUE,
+            ConditionType::CONDITION_TYPE_ON_FALSE,
+            ConditionType::CONDITION_TYPE_ON_ERROR,
+        ];
+    }
+
+    impl ::protobuf::EnumFull for ConditionType {
+        fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+            static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+            descriptor.get(|| super::file_descriptor().enum_by_package_relative_name("NotifyRequest.ConditionType").unwrap()).clone()
+        }
+
+        fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+            let index = *self as usize;
+            Self::enum_descriptor().value_by_index(index)
+        }
+    }
+
+    impl ::std::default::Default for ConditionType {
+        fn default() -> Self {
+            ConditionType::CONDITION_TYPE_UNSET
+        }
+    }
+
+    impl ConditionType {
+        pub(in super) fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+            ::protobuf::reflect::GeneratedEnumDescriptorData::new::<ConditionType>("NotifyRequest.ConditionType")
+        }
+    }
 }
 
 // @@protoc_insertion_point(message:protos.MetricsRequest)
@@ -1662,32 +1726,34 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \tsessionId\x12!\n\x0cservice_name\x18\x02\x20\x01(\tR\x0bserviceName\
     \x12.\n\taudiences\x18\x03\x20\x03(\x0b2\x10.protos.AudienceR\taudiences\
     \x123\n\x0bclient_info\x18\x04\x20\x01(\x0b2\x12.protos.ClientInfoR\ncli\
-    entInfo\"\xbf\x02\n\rNotifyRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\
-    \x01(\tR\npipelineId\x12\x1f\n\tstep_name\x18\x02\x20\x01(\tR\x08stepNam\
-    eB\x02\x18\x01\x12,\n\x08audience\x18\x03\x20\x01(\x0b2\x10.protos.Audie\
-    nceR\x08audience\x124\n\x17occurred_at_unix_ts_utc\x18\x04\x20\x01(\x03R\
-    \x13occurredAtUnixTsUtc\x12\x18\n\x07payload\x18\x05\x20\x01(\x0cR\x07pa\
-    yload\x12(\n\x04step\x18\x06\x20\x01(\x0b2\x14.protos.PipelineStepR\x04s\
-    tep\x12D\n\x0cnotification\x18\x07\x20\x01(\x0b2\x20.protos.PipelineStep\
-    NotificationR\x0cnotification\":\n\x0eMetricsRequest\x12(\n\x07metrics\
-    \x18\x01\x20\x03(\x0b2\x0e.protos.MetricR\x07metrics\"\xd1\x01\n\x0fRegi\
-    sterRequest\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\
-    \x12\x1d\n\nsession_id\x18\x02\x20\x01(\tR\tsessionId\x123\n\x0bclient_i\
-    nfo\x18\x03\x20\x01(\x0b2\x12.protos.ClientInfoR\nclientInfo\x12.\n\taud\
-    iences\x18\x04\x20\x03(\x0b2\x10.protos.AudienceR\taudiences\x12\x17\n\
-    \x07dry_run\x18\x05\x20\x01(\x08R\x06dryRun\"U\n\x11DeregisterRequest\
-    \x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\x12\x1d\n\nse\
-    ssion_id\x18\x02\x20\x01(\tR\tsessionId\"L\n'GetSetPipelinesCommandsBySe\
-    rviceRequest\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\"\
-    \xa9\x02\n(GetSetPipelinesCommandsByServiceResponse\x12C\n\x15set_pipeli\
-    ne_commands\x18\x01\x20\x03(\x0b2\x0f.protos.CommandR\x13setPipelineComm\
-    ands\x12d\n\x0cwasm_modules\x18\x03\x20\x03(\x0b2A.protos.GetSetPipeline\
-    sCommandsByServiceResponse.WasmModulesEntryR\x0bwasmModules\x1aR\n\x10Wa\
-    smModulesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12(\n\x05val\
-    ue\x18\x02\x20\x01(\x0b2\x12.protos.WasmModuleR\x05value:\x028\x01\"N\n\
-    \nWasmModule\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x14\n\x05byte\
-    s\x18\x02\x20\x01(\x0cR\x05bytes\x12\x1a\n\x08function\x18\x03\x20\x01(\
-    \tR\x08function\"i\n\x11SendSchemaRequest\x12,\n\x08audience\x18\x01\x20\
+    entInfo\"\xa5\x03\n\rNotifyRequest\x12J\n\x0econdition_type\x18\x01\x20\
+    \x01(\x0e2#.protos.NotifyRequest.ConditionTypeR\rconditionType\x12(\n\
+    \x04step\x18\x02\x20\x01(\x0b2\x14.protos.PipelineStepR\x04step\x12,\n\
+    \x08audience\x18\x03\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\x124\
+    \n\x17occurred_at_unix_ts_utc\x18\x04\x20\x01(\x03R\x13occurredAtUnixTsU\
+    tc\x12\x1f\n\x0bpipeline_id\x18\x05\x20\x01(\tR\npipelineId\x12\x18\n\
+    \x07payload\x18\x06\x20\x01(\x0cR\x07payload\"\x7f\n\rConditionType\x12\
+    \x18\n\x14CONDITION_TYPE_UNSET\x10\0\x12\x1a\n\x16CONDITION_TYPE_ON_TRUE\
+    \x10\x01\x12\x1b\n\x17CONDITION_TYPE_ON_FALSE\x10\x02\x12\x1b\n\x17CONDI\
+    TION_TYPE_ON_ERROR\x10\x03\":\n\x0eMetricsRequest\x12(\n\x07metrics\x18\
+    \x01\x20\x03(\x0b2\x0e.protos.MetricR\x07metrics\"\xd1\x01\n\x0fRegister\
+    Request\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\x12\
+    \x1d\n\nsession_id\x18\x02\x20\x01(\tR\tsessionId\x123\n\x0bclient_info\
+    \x18\x03\x20\x01(\x0b2\x12.protos.ClientInfoR\nclientInfo\x12.\n\taudien\
+    ces\x18\x04\x20\x03(\x0b2\x10.protos.AudienceR\taudiences\x12\x17\n\x07d\
+    ry_run\x18\x05\x20\x01(\x08R\x06dryRun\"U\n\x11DeregisterRequest\x12!\n\
+    \x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\x12\x1d\n\nsession_i\
+    d\x18\x02\x20\x01(\tR\tsessionId\"L\n'GetSetPipelinesCommandsByServiceRe\
+    quest\x12!\n\x0cservice_name\x18\x01\x20\x01(\tR\x0bserviceName\"\xa9\
+    \x02\n(GetSetPipelinesCommandsByServiceResponse\x12C\n\x15set_pipeline_c\
+    ommands\x18\x01\x20\x03(\x0b2\x0f.protos.CommandR\x13setPipelineCommands\
+    \x12d\n\x0cwasm_modules\x18\x03\x20\x03(\x0b2A.protos.GetSetPipelinesCom\
+    mandsByServiceResponse.WasmModulesEntryR\x0bwasmModules\x1aR\n\x10WasmMo\
+    dulesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12(\n\x05value\
+    \x18\x02\x20\x01(\x0b2\x12.protos.WasmModuleR\x05value:\x028\x01\"N\n\nW\
+    asmModule\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x14\n\x05bytes\
+    \x18\x02\x20\x01(\x0cR\x05bytes\x12\x1a\n\x08function\x18\x03\x20\x01(\t\
+    R\x08function\"i\n\x11SendSchemaRequest\x12,\n\x08audience\x18\x01\x20\
     \x01(\x0b2\x10.protos.AudienceR\x08audience\x12&\n\x06schema\x18\x02\x20\
     \x01(\x0b2\x0e.protos.SchemaR\x06schema2\xc9\x04\n\x08Internal\x126\n\
     \x08Register\x12\x17.protos.RegisterRequest\x1a\x0f.protos.Command0\x01\
@@ -1700,8 +1766,8 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x1a0.protos.GetSetPipelinesCommandsByServiceResponse\x12<\n\x08SendTail\
     \x12\x14.protos.TailResponse\x1a\x18.protos.StandardResponse(\x01\x12A\n\
     \nSendSchema\x12\x19.protos.SendSchemaRequest\x1a\x18.protos.StandardRes\
-    ponseB<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xec\
-    *\n\x07\x12\x05\0\0\x94\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    ponseB<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xaa\
+    /\n\x07\x12\x05\0\0\xa7\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
     \x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1a\n\t\n\x02\
     \x03\x01\x12\x03\x05\0\x19\n\t\n\x02\x03\x02\x12\x03\x06\0\x17\n\t\n\x02\
     \x03\x03\x12\x03\x07\0\x1b\n\x08\n\x01\x08\x12\x03\t\0Q\n\t\n\x02\x08\
@@ -1777,113 +1843,130 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x03C\x02$\x1a\"\x20Used\x20for\x20refreshing\x20registration\n\n\x0c\n\
     \x05\x04\x01\x02\x03\x06\x12\x03C\x02\x13\n\x0c\n\x05\x04\x01\x02\x03\
     \x01\x12\x03C\x14\x1f\n\x0c\n\x05\x04\x01\x02\x03\x03\x12\x03C\"#\n\n\n\
-    \x02\x04\x02\x12\x04F\0N\x01\n\n\n\x03\x04\x02\x01\x12\x03F\x08\x15\n\
-    \x0b\n\x04\x04\x02\x02\0\x12\x03G\x02\x19\n\x0c\n\x05\x04\x02\x02\0\x05\
-    \x12\x03G\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03G\t\x14\n\x0c\n\
-    \x05\x04\x02\x02\0\x03\x12\x03G\x17\x18\n\x0b\n\x04\x04\x02\x02\x01\x12\
-    \x03H\x02)\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x03H\x02\x08\n\x0c\n\x05\
-    \x04\x02\x02\x01\x01\x12\x03H\t\x12\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\
-    \x03H\x15\x16\n\x0c\n\x05\x04\x02\x02\x01\x08\x12\x03H\x17(\n\r\n\x06\
-    \x04\x02\x02\x01\x08\x03\x12\x03H\x18'\n\x0b\n\x04\x04\x02\x02\x02\x12\
-    \x03I\x02\x18\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\x03I\x02\n\n\x0c\n\x05\
-    \x04\x02\x02\x02\x01\x12\x03I\x0b\x13\n\x0c\n\x05\x04\x02\x02\x02\x03\
-    \x12\x03I\x16\x17\n\x0b\n\x04\x04\x02\x02\x03\x12\x03J\x02$\n\x0c\n\x05\
-    \x04\x02\x02\x03\x05\x12\x03J\x02\x07\n\x0c\n\x05\x04\x02\x02\x03\x01\
-    \x12\x03J\x08\x1f\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\x03J\"#\n\x0b\n\
-    \x04\x04\x02\x02\x04\x12\x03K\x02\x14\n\x0c\n\x05\x04\x02\x02\x04\x05\
-    \x12\x03K\x02\x07\n\x0c\n\x05\x04\x02\x02\x04\x01\x12\x03K\x08\x0f\n\x0c\
-    \n\x05\x04\x02\x02\x04\x03\x12\x03K\x12\x13\n\x0b\n\x04\x04\x02\x02\x05\
-    \x12\x03L\x02\x18\n\x0c\n\x05\x04\x02\x02\x05\x06\x12\x03L\x02\x0e\n\x0c\
-    \n\x05\x04\x02\x02\x05\x01\x12\x03L\x0f\x13\n\x0c\n\x05\x04\x02\x02\x05\
-    \x03\x12\x03L\x16\x17\n\x0b\n\x04\x04\x02\x02\x06\x12\x03M\x02,\n\x0c\n\
-    \x05\x04\x02\x02\x06\x06\x12\x03M\x02\x1a\n\x0c\n\x05\x04\x02\x02\x06\
-    \x01\x12\x03M\x1b'\n\x0c\n\x05\x04\x02\x02\x06\x03\x12\x03M*+\n\n\n\x02\
-    \x04\x03\x12\x04P\0R\x01\n\n\n\x03\x04\x03\x01\x12\x03P\x08\x16\n\x0b\n\
-    \x04\x04\x03\x02\0\x12\x03Q\x02%\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x03Q\
-    \x02\n\n\x0c\n\x05\x04\x03\x02\0\x06\x12\x03Q\x0b\x18\n\x0c\n\x05\x04\
-    \x03\x02\0\x01\x12\x03Q\x19\x20\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03Q#$\
-    \n\n\n\x02\x04\x04\x12\x04T\0i\x01\n\n\n\x03\x04\x04\x01\x12\x03T\x08\
-    \x17\nC\n\x04\x04\x04\x02\0\x12\x03V\x02\x1a\x1a6\x20REQUIRED\x20--\x20N\
-    ame\x20of\x20the\x20service\x20that\x20is\x20registering.\n\n\x0c\n\x05\
-    \x04\x04\x02\0\x05\x12\x03V\x02\x08\n\x0c\n\x05\x04\x04\x02\0\x01\x12\
-    \x03V\t\x15\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03V\x18\x19\n\xad\x01\n\
-    \x04\x04\x04\x02\x01\x12\x03\\\x02\x18\x1a\x9f\x01\x20REQUIRED\x20--\x20\
-    Unique\x20ID\x20for\x20this\x20SDK\x20instance.\n\n\x20This\x20should\
-    \x20be\x20generated\x20every\x20time\x20the\x20SDK\x20is\x20instantiated\
-    \x20(oe.\x20every\n\x20time\x20a\x20NEW\x20registration\x20is\x20perform\
-    ed).\n\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x03\\\x02\x08\n\x0c\n\x05\x04\
-    \x04\x02\x01\x01\x12\x03\\\t\x13\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\x03\
-    \\\x16\x17\nQ\n\x04\x04\x04\x02\x02\x12\x03_\x02$\x1aD\x20REQUIRED\x20--\
-    \x20Info\x20about\x20the\x20client\x20(lib\x20name,\x20lang,\x20os,\x20a\
-    rch,\x20etc.)\n\n\x0c\n\x05\x04\x04\x02\x02\x06\x12\x03_\x02\x13\n\x0c\n\
-    \x05\x04\x04\x02\x02\x01\x12\x03_\x14\x1f\n\x0c\n\x05\x04\x04\x02\x02\
-    \x03\x12\x03_\"#\n\x87\x01\n\x04\x04\x04\x02\x03\x12\x03c\x02)\x1az\x20O\
-    PTIONAL\x20--\x20if\x20these\x20are\x20defined,\x20these\x20will\x20show\
-    \x20up\x20in\x20the\x20UI\x20even\x20if\n\x20there\x20is\x20no\x20active\
-    \x20.Process()\x20call\x20from\x20the\x20SDK.\n\n\x0c\n\x05\x04\x04\x02\
-    \x03\x04\x12\x03c\x02\n\n\x0c\n\x05\x04\x04\x02\x03\x06\x12\x03c\x0b\x1a\
-    \n\x0c\n\x05\x04\x04\x02\x03\x01\x12\x03c\x1b$\n\x0c\n\x05\x04\x04\x02\
-    \x03\x03\x12\x03c'(\n\xd9\x01\n\x04\x04\x04\x02\x04\x12\x03h\x02\x13\x1a\
-    \xcb\x01\x20OPTIONAL\x20--\x20If\x20set,\x20we\x20know\x20that\x20any\
-    \x20pipelines\x20or\x20steps\x20executed\x20in\x20this\n\x20SDK\x20will\
-    \x20NOT\x20modify\x20the\x20input/output\x20data.\x20As\x20in,\x20the\
-    \x20SDK\x20will\x20log\x20what\x20it\n\x20_would_\x20do\x20and\x20always\
-    \x20return\x20the\x20original\x20data\x20set.\n\n\x0c\n\x05\x04\x04\x02\
-    \x04\x05\x12\x03h\x02\x06\n\x0c\n\x05\x04\x04\x02\x04\x01\x12\x03h\x07\
-    \x0e\n\x0c\n\x05\x04\x04\x02\x04\x03\x12\x03h\x11\x12\nT\n\x02\x04\x05\
-    \x12\x04l\0o\x01\x1aH\x20Same\x20as\x20RegisterRequest\x20-\x20used\x20f\
-    or\x20broadcasting\x20a\x20deregistration\x20event\n\n\n\n\x03\x04\x05\
-    \x01\x12\x03l\x08\x19\n\x0b\n\x04\x04\x05\x02\0\x12\x03m\x02\x1a\n\x0c\n\
-    \x05\x04\x05\x02\0\x05\x12\x03m\x02\x08\n\x0c\n\x05\x04\x05\x02\0\x01\
-    \x12\x03m\t\x15\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03m\x18\x19\n\x0b\n\
-    \x04\x04\x05\x02\x01\x12\x03n\x02\x18\n\x0c\n\x05\x04\x05\x02\x01\x05\
-    \x12\x03n\x02\x08\n\x0c\n\x05\x04\x05\x02\x01\x01\x12\x03n\t\x13\n\x0c\n\
-    \x05\x04\x05\x02\x01\x03\x12\x03n\x16\x17\n\xa4\x03\n\x02\x04\x06\x12\
-    \x04w\0y\x01\x1a\x97\x03\x20Method\x20used\x20by\x20SDKs\x20to\x20fetch\
-    \x20all\x20SetPipelinesCommands\x20for\x20a\x20given\x20service\x20name.\
-    \n\x20The\x20SDK\x20may\x20not\x20know\x20of\x20all\x20audiences\x20yet\
+    \x02\x04\x02\x12\x04F\0a\x01\n\n\n\x03\x04\x02\x01\x12\x03F\x08\x15\n\
+    \xf8\x01\n\x04\x04\x02\x04\0\x12\x04J\x02O\x03\x1a\xe9\x01\x20This\x20wi\
+    ll\x20be\x20used\x20to\x20pull\x20the\x20condition\x20type\x20(true,\x20\
+    false,\x20error)\x20from\x20the\x20pipeline\x20step,\n\x20so\x20that\x20\
+    we\x20can\x20include\x20metadata,\x20abort\x20condition,\x20etc.,\x20in\
+    \x20the\x20notification\n\x20The\x20condition\x20will\x20contain\x20the\
+    \x20notification\x20configuration\x20also.\n\n\x0c\n\x05\x04\x02\x04\0\
+    \x01\x12\x03J\x07\x14\n\r\n\x06\x04\x02\x04\0\x02\0\x12\x03K\x04\x1d\n\
+    \x0e\n\x07\x04\x02\x04\0\x02\0\x01\x12\x03K\x04\x18\n\x0e\n\x07\x04\x02\
+    \x04\0\x02\0\x02\x12\x03K\x1b\x1c\n\r\n\x06\x04\x02\x04\0\x02\x01\x12\
+    \x03L\x04\x1f\n\x0e\n\x07\x04\x02\x04\0\x02\x01\x01\x12\x03L\x04\x1a\n\
+    \x0e\n\x07\x04\x02\x04\0\x02\x01\x02\x12\x03L\x1d\x1e\n\r\n\x06\x04\x02\
+    \x04\0\x02\x02\x12\x03M\x04\x20\n\x0e\n\x07\x04\x02\x04\0\x02\x02\x01\
+    \x12\x03M\x04\x1b\n\x0e\n\x07\x04\x02\x04\0\x02\x02\x02\x12\x03M\x1e\x1f\
+    \n\r\n\x06\x04\x02\x04\0\x02\x03\x12\x03N\x04\x20\n\x0e\n\x07\x04\x02\
+    \x04\0\x02\x03\x01\x12\x03N\x04\x1b\n\x0e\n\x07\x04\x02\x04\0\x02\x03\
+    \x02\x12\x03N\x1e\x1f\n\x0b\n\x04\x04\x02\x02\0\x12\x03Q\x02#\n\x0c\n\
+    \x05\x04\x02\x02\0\x06\x12\x03Q\x02\x0f\n\x0c\n\x05\x04\x02\x02\0\x01\
+    \x12\x03Q\x10\x1e\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03Q!\"\nQ\n\x04\x04\
+    \x02\x02\x01\x12\x03T\x02\x18\x1aD\x20Used\x20for\x20pulling\x20step\x20\
+    name\x20and\x20any\x20other\x20info\x20needed\x20in\x20the\x20future\n\n\
+    \x0c\n\x05\x04\x02\x02\x01\x06\x12\x03T\x02\x0e\n\x0c\n\x05\x04\x02\x02\
+    \x01\x01\x12\x03T\x0f\x13\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03T\x16\
+    \x17\n'\n\x04\x04\x02\x02\x02\x12\x03W\x02\x18\x1a\x1a\x20Included\x20in\
+    \x20notification\n\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\x03W\x02\n\n\x0c\
+    \n\x05\x04\x02\x02\x02\x01\x12\x03W\x0b\x13\n\x0c\n\x05\x04\x02\x02\x02\
+    \x03\x12\x03W\x16\x17\n'\n\x04\x04\x02\x02\x03\x12\x03Z\x02$\x1a\x1a\x20\
+    Included\x20in\x20notification\n\n\x0c\n\x05\x04\x02\x02\x03\x05\x12\x03\
+    Z\x02\x07\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\x03Z\x08\x1f\n\x0c\n\x05\
+    \x04\x02\x02\x03\x03\x12\x03Z\"#\n'\n\x04\x04\x02\x02\x04\x12\x03]\x02\
+    \x19\x1a\x1a\x20Included\x20in\x20notification\n\n\x0c\n\x05\x04\x02\x02\
+    \x04\x05\x12\x03]\x02\x08\n\x0c\n\x05\x04\x02\x02\x04\x01\x12\x03]\t\x14\
+    \n\x0c\n\x05\x04\x02\x02\x04\x03\x12\x03]\x17\x18\n'\n\x04\x04\x02\x02\
+    \x05\x12\x03`\x02\x14\x1a\x1a\x20Included\x20in\x20notification\n\n\x0c\
+    \n\x05\x04\x02\x02\x05\x05\x12\x03`\x02\x07\n\x0c\n\x05\x04\x02\x02\x05\
+    \x01\x12\x03`\x08\x0f\n\x0c\n\x05\x04\x02\x02\x05\x03\x12\x03`\x12\x13\n\
+    \n\n\x02\x04\x03\x12\x04c\0e\x01\n\n\n\x03\x04\x03\x01\x12\x03c\x08\x16\
+    \n\x0b\n\x04\x04\x03\x02\0\x12\x03d\x02%\n\x0c\n\x05\x04\x03\x02\0\x04\
+    \x12\x03d\x02\n\n\x0c\n\x05\x04\x03\x02\0\x06\x12\x03d\x0b\x18\n\x0c\n\
+    \x05\x04\x03\x02\0\x01\x12\x03d\x19\x20\n\x0c\n\x05\x04\x03\x02\0\x03\
+    \x12\x03d#$\n\n\n\x02\x04\x04\x12\x04g\0|\x01\n\n\n\x03\x04\x04\x01\x12\
+    \x03g\x08\x17\nC\n\x04\x04\x04\x02\0\x12\x03i\x02\x1a\x1a6\x20REQUIRED\
+    \x20--\x20Name\x20of\x20the\x20service\x20that\x20is\x20registering.\n\n\
+    \x0c\n\x05\x04\x04\x02\0\x05\x12\x03i\x02\x08\n\x0c\n\x05\x04\x04\x02\0\
+    \x01\x12\x03i\t\x15\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03i\x18\x19\n\xad\
+    \x01\n\x04\x04\x04\x02\x01\x12\x03o\x02\x18\x1a\x9f\x01\x20REQUIRED\x20-\
+    -\x20Unique\x20ID\x20for\x20this\x20SDK\x20instance.\n\n\x20This\x20shou\
+    ld\x20be\x20generated\x20every\x20time\x20the\x20SDK\x20is\x20instantiat\
+    ed\x20(oe.\x20every\n\x20time\x20a\x20NEW\x20registration\x20is\x20perfo\
+    rmed).\n\n\x0c\n\x05\x04\x04\x02\x01\x05\x12\x03o\x02\x08\n\x0c\n\x05\
+    \x04\x04\x02\x01\x01\x12\x03o\t\x13\n\x0c\n\x05\x04\x04\x02\x01\x03\x12\
+    \x03o\x16\x17\nQ\n\x04\x04\x04\x02\x02\x12\x03r\x02$\x1aD\x20REQUIRED\
+    \x20--\x20Info\x20about\x20the\x20client\x20(lib\x20name,\x20lang,\x20os\
+    ,\x20arch,\x20etc.)\n\n\x0c\n\x05\x04\x04\x02\x02\x06\x12\x03r\x02\x13\n\
+    \x0c\n\x05\x04\x04\x02\x02\x01\x12\x03r\x14\x1f\n\x0c\n\x05\x04\x04\x02\
+    \x02\x03\x12\x03r\"#\n\x87\x01\n\x04\x04\x04\x02\x03\x12\x03v\x02)\x1az\
+    \x20OPTIONAL\x20--\x20if\x20these\x20are\x20defined,\x20these\x20will\
+    \x20show\x20up\x20in\x20the\x20UI\x20even\x20if\n\x20there\x20is\x20no\
+    \x20active\x20.Process()\x20call\x20from\x20the\x20SDK.\n\n\x0c\n\x05\
+    \x04\x04\x02\x03\x04\x12\x03v\x02\n\n\x0c\n\x05\x04\x04\x02\x03\x06\x12\
+    \x03v\x0b\x1a\n\x0c\n\x05\x04\x04\x02\x03\x01\x12\x03v\x1b$\n\x0c\n\x05\
+    \x04\x04\x02\x03\x03\x12\x03v'(\n\xd9\x01\n\x04\x04\x04\x02\x04\x12\x03{\
+    \x02\x13\x1a\xcb\x01\x20OPTIONAL\x20--\x20If\x20set,\x20we\x20know\x20th\
+    at\x20any\x20pipelines\x20or\x20steps\x20executed\x20in\x20this\n\x20SDK\
+    \x20will\x20NOT\x20modify\x20the\x20input/output\x20data.\x20As\x20in,\
+    \x20the\x20SDK\x20will\x20log\x20what\x20it\n\x20_would_\x20do\x20and\
+    \x20always\x20return\x20the\x20original\x20data\x20set.\n\n\x0c\n\x05\
+    \x04\x04\x02\x04\x05\x12\x03{\x02\x06\n\x0c\n\x05\x04\x04\x02\x04\x01\
+    \x12\x03{\x07\x0e\n\x0c\n\x05\x04\x04\x02\x04\x03\x12\x03{\x11\x12\nU\n\
+    \x02\x04\x05\x12\x05\x7f\0\x82\x01\x01\x1aH\x20Same\x20as\x20RegisterReq\
+    uest\x20-\x20used\x20for\x20broadcasting\x20a\x20deregistration\x20event\
+    \n\n\n\n\x03\x04\x05\x01\x12\x03\x7f\x08\x19\n\x0c\n\x04\x04\x05\x02\0\
+    \x12\x04\x80\x01\x02\x1a\n\r\n\x05\x04\x05\x02\0\x05\x12\x04\x80\x01\x02\
+    \x08\n\r\n\x05\x04\x05\x02\0\x01\x12\x04\x80\x01\t\x15\n\r\n\x05\x04\x05\
+    \x02\0\x03\x12\x04\x80\x01\x18\x19\n\x0c\n\x04\x04\x05\x02\x01\x12\x04\
+    \x81\x01\x02\x18\n\r\n\x05\x04\x05\x02\x01\x05\x12\x04\x81\x01\x02\x08\n\
+    \r\n\x05\x04\x05\x02\x01\x01\x12\x04\x81\x01\t\x13\n\r\n\x05\x04\x05\x02\
+    \x01\x03\x12\x04\x81\x01\x16\x17\n\xa6\x03\n\x02\x04\x06\x12\x06\x8a\x01\
+    \0\x8c\x01\x01\x1a\x97\x03\x20Method\x20used\x20by\x20SDKs\x20to\x20fetc\
+    h\x20all\x20SetPipelinesCommands\x20for\x20a\x20given\x20service\x20name\
+    .\n\x20The\x20SDK\x20may\x20not\x20know\x20of\x20all\x20audiences\x20yet\
     \x20so\x20this\x20method\x20returns\x20ALL\n\x20SetPipelinesCommands\x20\
     that\x20use\x20the\x20same\x20same\x20service\x20name.\x20SDKs\x20should\
     \x20store\n\x20the\x20commands\x20(or\x20pipelines)\x20in\x20memory\x20t\
     ied\x20to\x20an\x20audience,\x20so\x20that\x20if/when\x20a\n\x20.Process\
     ()\x20call\x20occurs\x20with\x20an\x20audience\x20-\x20the\x20SDK\x20wil\
     l\x20already\x20have\x20the\n\x20pipeline\x20config\x20in\x20memory.\n\n\
-    \n\n\x03\x04\x06\x01\x12\x03w\x08/\n\x0b\n\x04\x04\x06\x02\0\x12\x03x\
-    \x02\x1a\n\x0c\n\x05\x04\x06\x02\0\x05\x12\x03x\x02\x08\n\x0c\n\x05\x04\
-    \x06\x02\0\x01\x12\x03x\t\x15\n\x0c\n\x05\x04\x06\x02\0\x03\x12\x03x\x18\
-    \x19\n\x0b\n\x02\x04\x07\x12\x05{\0\x81\x01\x01\n\n\n\x03\x04\x07\x01\
-    \x12\x03{\x080\n<\n\x04\x04\x07\x02\0\x12\x03}\x024\x1a/\x20SetPipelines\
-    Commands\x20for\x20all\x20active\x20pipelines\n\n\x0c\n\x05\x04\x07\x02\
-    \0\x04\x12\x03}\x02\n\n\x0c\n\x05\x04\x07\x02\0\x06\x12\x03}\x0b\x19\n\
-    \x0c\n\x05\x04\x07\x02\0\x01\x12\x03}\x1a/\n\x0c\n\x05\x04\x07\x02\0\x03\
-    \x12\x03}23\n\x1c\n\x04\x04\x07\x02\x01\x12\x04\x80\x01\x02*\x1a\x0e\x20\
-    ID\x20=\x20wasm\x20ID\n\n\r\n\x05\x04\x07\x02\x01\x06\x12\x04\x80\x01\
-    \x02\x18\n\r\n\x05\x04\x07\x02\x01\x01\x12\x04\x80\x01\x19%\n\r\n\x05\
-    \x04\x07\x02\x01\x03\x12\x04\x80\x01()\n\xc8\x01\n\x02\x04\x08\x12\x06\
-    \x86\x01\0\x8f\x01\x01\x1a\xb9\x01\x20WasmModule\x20is\x20used\x20to\x20\
-    ensure\x20we\x20only\x20send\x20the\x20wasm\x20module\x20once\x20per\x20\
-    request\n\x20instead\x20of\x20duplicated\x20in\x20every\x20pipeline\x20w\
-    here\x20it\x20is\x20used.\x20This\x20prevents\n\x20over-sized\x20payload\
-    s\x20on\x20SDK\x20startup\n\n\x0b\n\x03\x04\x08\x01\x12\x04\x86\x01\x08\
-    \x12\nQ\n\x04\x04\x08\x02\0\x12\x04\x88\x01\x02\x10\x1aC\x20ID\x20is\x20\
+    \x0b\n\x03\x04\x06\x01\x12\x04\x8a\x01\x08/\n\x0c\n\x04\x04\x06\x02\0\
+    \x12\x04\x8b\x01\x02\x1a\n\r\n\x05\x04\x06\x02\0\x05\x12\x04\x8b\x01\x02\
+    \x08\n\r\n\x05\x04\x06\x02\0\x01\x12\x04\x8b\x01\t\x15\n\r\n\x05\x04\x06\
+    \x02\0\x03\x12\x04\x8b\x01\x18\x19\n\x0c\n\x02\x04\x07\x12\x06\x8e\x01\0\
+    \x94\x01\x01\n\x0b\n\x03\x04\x07\x01\x12\x04\x8e\x01\x080\n=\n\x04\x04\
+    \x07\x02\0\x12\x04\x90\x01\x024\x1a/\x20SetPipelinesCommands\x20for\x20a\
+    ll\x20active\x20pipelines\n\n\r\n\x05\x04\x07\x02\0\x04\x12\x04\x90\x01\
+    \x02\n\n\r\n\x05\x04\x07\x02\0\x06\x12\x04\x90\x01\x0b\x19\n\r\n\x05\x04\
+    \x07\x02\0\x01\x12\x04\x90\x01\x1a/\n\r\n\x05\x04\x07\x02\0\x03\x12\x04\
+    \x90\x0123\n\x1c\n\x04\x04\x07\x02\x01\x12\x04\x93\x01\x02*\x1a\x0e\x20I\
+    D\x20=\x20wasm\x20ID\n\n\r\n\x05\x04\x07\x02\x01\x06\x12\x04\x93\x01\x02\
+    \x18\n\r\n\x05\x04\x07\x02\x01\x01\x12\x04\x93\x01\x19%\n\r\n\x05\x04\
+    \x07\x02\x01\x03\x12\x04\x93\x01()\n\xc8\x01\n\x02\x04\x08\x12\x06\x99\
+    \x01\0\xa2\x01\x01\x1a\xb9\x01\x20WasmModule\x20is\x20used\x20to\x20ensu\
+    re\x20we\x20only\x20send\x20the\x20wasm\x20module\x20once\x20per\x20requ\
+    est\n\x20instead\x20of\x20duplicated\x20in\x20every\x20pipeline\x20where\
+    \x20it\x20is\x20used.\x20This\x20prevents\n\x20over-sized\x20payloads\
+    \x20on\x20SDK\x20startup\n\n\x0b\n\x03\x04\x08\x01\x12\x04\x99\x01\x08\
+    \x12\nQ\n\x04\x04\x08\x02\0\x12\x04\x9b\x01\x02\x10\x1aC\x20ID\x20is\x20\
     a\x20uuid(sha256(_wasm_bytes))\x20that\x20is\x20set\x20by\x20streamdal\
-    \x20server\n\n\r\n\x05\x04\x08\x02\0\x05\x12\x04\x88\x01\x02\x08\n\r\n\
-    \x05\x04\x08\x02\0\x01\x12\x04\x88\x01\t\x0b\n\r\n\x05\x04\x08\x02\0\x03\
-    \x12\x04\x88\x01\x0e\x0f\n1\n\x04\x04\x08\x02\x01\x12\x04\x8b\x01\x02\
+    \x20server\n\n\r\n\x05\x04\x08\x02\0\x05\x12\x04\x9b\x01\x02\x08\n\r\n\
+    \x05\x04\x08\x02\0\x01\x12\x04\x9b\x01\t\x0b\n\r\n\x05\x04\x08\x02\0\x03\
+    \x12\x04\x9b\x01\x0e\x0f\n1\n\x04\x04\x08\x02\x01\x12\x04\x9e\x01\x02\
     \x12\x1a#\x20WASM\x20module\x20bytes\x20(set\x20by\x20server)\n\n\r\n\
-    \x05\x04\x08\x02\x01\x05\x12\x04\x8b\x01\x02\x07\n\r\n\x05\x04\x08\x02\
-    \x01\x01\x12\x04\x8b\x01\x08\r\n\r\n\x05\x04\x08\x02\x01\x03\x12\x04\x8b\
-    \x01\x10\x11\n=\n\x04\x04\x08\x02\x02\x12\x04\x8e\x01\x02\x16\x1a/\x20WA\
+    \x05\x04\x08\x02\x01\x05\x12\x04\x9e\x01\x02\x07\n\r\n\x05\x04\x08\x02\
+    \x01\x01\x12\x04\x9e\x01\x08\r\n\r\n\x05\x04\x08\x02\x01\x03\x12\x04\x9e\
+    \x01\x10\x11\n=\n\x04\x04\x08\x02\x02\x12\x04\xa1\x01\x02\x16\x1a/\x20WA\
     SM\x20function\x20name\x20to\x20execute\x20(set\x20by\x20server)\n\n\r\n\
-    \x05\x04\x08\x02\x02\x05\x12\x04\x8e\x01\x02\x08\n\r\n\x05\x04\x08\x02\
-    \x02\x01\x12\x04\x8e\x01\t\x11\n\r\n\x05\x04\x08\x02\x02\x03\x12\x04\x8e\
-    \x01\x14\x15\n\x0c\n\x02\x04\t\x12\x06\x91\x01\0\x94\x01\x01\n\x0b\n\x03\
-    \x04\t\x01\x12\x04\x91\x01\x08\x19\n\x0c\n\x04\x04\t\x02\0\x12\x04\x92\
-    \x01\x02\x18\n\r\n\x05\x04\t\x02\0\x06\x12\x04\x92\x01\x02\n\n\r\n\x05\
-    \x04\t\x02\0\x01\x12\x04\x92\x01\x0b\x13\n\r\n\x05\x04\t\x02\0\x03\x12\
-    \x04\x92\x01\x16\x17\n\x0c\n\x04\x04\t\x02\x01\x12\x04\x93\x01\x02\x14\n\
-    \r\n\x05\x04\t\x02\x01\x06\x12\x04\x93\x01\x02\x08\n\r\n\x05\x04\t\x02\
-    \x01\x01\x12\x04\x93\x01\t\x0f\n\r\n\x05\x04\t\x02\x01\x03\x12\x04\x93\
+    \x05\x04\x08\x02\x02\x05\x12\x04\xa1\x01\x02\x08\n\r\n\x05\x04\x08\x02\
+    \x02\x01\x12\x04\xa1\x01\t\x11\n\r\n\x05\x04\x08\x02\x02\x03\x12\x04\xa1\
+    \x01\x14\x15\n\x0c\n\x02\x04\t\x12\x06\xa4\x01\0\xa7\x01\x01\n\x0b\n\x03\
+    \x04\t\x01\x12\x04\xa4\x01\x08\x19\n\x0c\n\x04\x04\t\x02\0\x12\x04\xa5\
+    \x01\x02\x18\n\r\n\x05\x04\t\x02\0\x06\x12\x04\xa5\x01\x02\n\n\r\n\x05\
+    \x04\t\x02\0\x01\x12\x04\xa5\x01\x0b\x13\n\r\n\x05\x04\t\x02\0\x03\x12\
+    \x04\xa5\x01\x16\x17\n\x0c\n\x04\x04\t\x02\x01\x12\x04\xa6\x01\x02\x14\n\
+    \r\n\x05\x04\t\x02\x01\x06\x12\x04\xa6\x01\x02\x08\n\r\n\x05\x04\t\x02\
+    \x01\x01\x12\x04\xa6\x01\t\x0f\n\r\n\x05\x04\t\x02\x01\x03\x12\x04\xa6\
     \x01\x12\x13b\x06proto3\
 ";
 
@@ -1917,7 +2000,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(GetSetPipelinesCommandsByServiceResponse::generated_message_descriptor_data());
             messages.push(WasmModule::generated_message_descriptor_data());
             messages.push(SendSchemaRequest::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(0);
+            let mut enums = ::std::vec::Vec::with_capacity(1);
+            enums.push(notify_request::ConditionType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

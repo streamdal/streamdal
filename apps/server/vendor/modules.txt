@@ -129,6 +129,8 @@ github.com/ebitengine/purego/internal/strings
 # github.com/fsnotify/fsnotify v1.6.0
 ## explicit; go 1.16
 github.com/fsnotify/fsnotify
+# github.com/go-logr/logr v1.4.0
+## explicit; go 1.18
 # github.com/gofrs/uuid v4.4.0+incompatible
 ## explicit
 github.com/gofrs/uuid
@@ -150,6 +152,8 @@ github.com/google/go-cmp/cmp/internal/value
 # github.com/google/go-querystring v1.1.0
 ## explicit; go 1.10
 github.com/google/go-querystring/query
+# github.com/google/pprof v0.0.0-20231212022811-ec68065c825e
+## explicit; go 1.19
 # github.com/google/uuid v1.5.0
 ## explicit
 github.com/google/uuid
@@ -200,9 +204,9 @@ github.com/onsi/ginkgo/reporters/stenographer
 github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
 github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/ginkgo/v2 v2.12.1
+# github.com/onsi/ginkgo/v2 v2.13.2
 ## explicit; go 1.18
-# github.com/onsi/gomega v1.28.0
+# github.com/onsi/gomega v1.30.0
 ## explicit; go 1.18
 github.com/onsi/gomega
 github.com/onsi/gomega/format

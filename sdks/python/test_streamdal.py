@@ -1,0 +1,519 @@
+import asyncio
+import streamdal.common as common
+import threading
+import pytest
+import streamdal_protos.protos as protos
+import uuid
+import unittest.mock as mock
+import streamdal
+from streamdal import StreamdalClient, StreamdalConfig
+from streamdal.tail import Tail
+
+
+class TestStreamdalClient:
+    client: StreamdalClient
+
+    @pytest.fixture(autouse=True)
+    def before_each(self):
+        client = object.__new__(StreamdalClient)
+        client.cfg = StreamdalConfig(service_name="testing")
+        client.grpc_loop = asyncio.get_event_loop()
+        client.log = mock.Mock()
+        client.metrics = mock.Mock()
+        client.grpc_stub = mock.AsyncMock()
+        client.register_stub = mock.AsyncMock()
+        client.grpc_loop = asyncio.get_event_loop()
+        client.register_loop = asyncio.get_event_loop()
+        client.grpc_timeout = 5
+        client.auth_token = "test"
+        client.exit = threading.Event()
+        client.session_id = uuid.uuid4().__str__()
+        client.pipelines = {}
+        client.paused_pipelines = {}
+        client.audiences = {}
+        client.tails = {}
+        client.paused_tails = {}
+        client.schemas = {}
+
+        self.client = client
+
+    def test_process_validation(self):
+        with pytest.raises(ValueError, match="req is required"):
+            self.client.process(None)
+
+    def test_process_max_size(self):
+        fake_metrics = mock.Mock()
+
+        self.client.cfg = StreamdalConfig(service_name="testing")
+        self.client.metrics = fake_metrics
+        payload = bytearray(streamdal.MAX_PAYLOAD_SIZE + 1)
+        payload_bytes = bytes(payload)
+
+        req = streamdal.ProcessRequest(
+            data=payload_bytes,
+            operation_type=1,
+            component_name="kafka",
+            operation_name="test-topic",
+        )
+        res = self.client.process(req)
+
+        assert res is not None
+        assert res.data == payload_bytes
+        fake_metrics.incr.assert_called_once()
+
+    def test_notify_condition(self):
+        fake_stub = mock.AsyncMock()
+        fake_metrics = mock.Mock()
+
+        self.client.metrics = fake_metrics
+        self.client.grpc_stub = fake_stub
+
+        pipeline = protos.Pipeline(id=uuid.uuid4().__str__())
+        step = protos.PipelineStep(name="test")
+        step.on_true = protos.PipelineStepConditions(
+            notify=True,
+        )
+        aud = protos.Audience()
+
+        self.client._notify_condition(pipeline, step, aud, step.on_true, b"")
+        fake_stub.notify.assert_called_once()
+        fake_metrics.incr.assert_called_once()
+
+    def test_process_success(self):
+        wasm_resp = protos.WasmResponse(
+            output_payload=b'{"object": {"type": "streamdal"}}',
+            exit_code=protos.WasmExitCode.WASM_EXIT_CODE_TRUE,
+            exit_msg="",
+        )
+        self.client._call_wasm = mock.MagicMock()
+        self.client._call_wasm.return_value = wasm_resp
+
+        pipeline = protos.Pipeline(
+            id=uuid.uuid4().__str__(),
+            steps=[
+                protos.PipelineStep(
+                    name="test",
+                    on_false=protos.PipelineStepConditions(
+                        abort=protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT
+                    ),
+                    detective=protos.steps.DetectiveStep(
+                        path="object.type",
+                        args=["streamdal"],
+                        type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                    ),
+                )
+            ],
+        )
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline]),
+        )
+
+        self.client._set_pipelines(cmd)
+
+        resp = self.client.process(
+            streamdal.ProcessRequest(
+                data=b'{"object": {"type": "streamdal"}}',
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
+                component_name="kafka",
+                operation_name="test-topic",
+            )
+        )
+
+        assert resp is not None
+        assert resp.status == protos.ExecStatus.EXEC_STATUS_TRUE
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
+
+    def test_process_failure_and_abort(self):
+        fake_stub = mock.AsyncMock()
+
+        client = self.client
+        client.grpc_stub = fake_stub
+
+        wasm_resp = protos.WasmResponse(
+            output_payload=b"{}",
+            exit_code=protos.WasmExitCode.WASM_EXIT_CODE_FALSE,
+            exit_msg="field not found",
+        )
+        client._call_wasm = mock.MagicMock()
+        client._call_wasm.return_value = wasm_resp
+
+        pipeline = protos.Pipeline(
+            id=uuid.uuid4().__str__(),
+            steps=[
+                protos.PipelineStep(
+                    name="test",
+                    on_false=protos.PipelineStepConditions(
+                        abort=protos.AbortCondition.ABORT_CONDITION_ABORT_ALL,
+                        notify=True,
+                    ),
+                    detective=protos.steps.DetectiveStep(
+                        path="object.type",
+                        args=["batch"],
+                        type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                    ),
+                ),
+                protos.PipelineStep(
+                    name="test",
+                    on_false=protos.PipelineStepConditions(
+                        abort=protos.AbortCondition.ABORT_CONDITION_ABORT_ALL,
+                        notify=True,
+                    ),
+                    detective=protos.steps.DetectiveStep(
+                        path="object.type",
+                        args=["should not execute"],
+                        type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                    ),
+                ),
+            ],
+        )
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="kafka",
+                operation_name="test-topic",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline]),
+        )
+
+        client._set_pipelines(cmd)
+
+        resp = client.process(
+            streamdal.ProcessRequest(
+                data=b'{"object": {"type": "streamdal"}}',
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
+                component_name="kafka",
+                operation_name="test-topic",
+            )
+        )
+
+        assert resp is not None
+        fake_stub.notify.assert_called_once()
+        assert resp.status == protos.ExecStatus.EXEC_STATUS_FALSE
+        assert resp.status_message == "Step returned: field not found"
+        assert resp.data == b"{}"
+        assert len(resp.pipeline_status) == 1
+        assert len(resp.pipeline_status[0].step_status) == 1
+        assert (
+            resp.pipeline_status[0].step_status[0].status
+            == protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
+        )
+        assert (
+            resp.pipeline_status[0].step_status[0].status
+            == protos.ExecStatus.EXEC_STATUS_FALSE
+        )
+        assert (
+            resp.pipeline_status[0].step_status[0].status_message
+            == "Step returned: field not found"
+        )
+
+    def test_process_failure_dry_run(self):
+        client = self.client
+        client.cfg = StreamdalConfig(dry_run=True)
+
+        wasm_resp = protos.WasmResponse(
+            output_payload=b'{"object": {"type": "should be replaced by original data on dry run"}}',
+            exit_code=protos.WasmExitCode.WASM_EXIT_CODE_FALSE,
+            exit_msg="field not found",
+        )
+        client._call_wasm = mock.MagicMock()
+        client._call_wasm.return_value = wasm_resp
+
+        pipeline = protos.Pipeline(
+            id=uuid.uuid4().__str__(),
+            steps=[
+                protos.PipelineStep(
+                    name="test",
+                    on_false=protos.PipelineStepConditions(
+                        abort=protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT
+                    ),
+                    detective=protos.steps.DetectiveStep(
+                        path="object.type",
+                        args=["batch"],
+                        type=protos.steps.DetectiveType.DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+                    ),
+                )
+            ],
+        )
+
+        cmd = protos.Command(
+            audience=protos.Audience(
+                component_name="test-topic",
+                service_name="testing",
+                operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+            ),
+            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline]),
+        )
+
+        client._set_pipelines(cmd)
+
+        resp = client.process(
+            streamdal.ProcessRequest(
+                data=b'{"object": {"type": "streamdal"}}',
+                operation_type=streamdal.OPERATION_TYPE_PRODUCER,
+                component_name="kafka",
+                operation_name="test-topic",
+            )
+        )
+
+        assert resp is not None
+        assert resp.status == protos.ExecStatus.EXEC_STATUS_TRUE
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
+
+    def test_tail_request_start(self, mocker):
+        m = mock.Mock()
+        mocker.patch("streamdal.StreamdalClient._start_tail", m)
+
+        cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=protos.Audience(),
+                    id=uuid.uuid4().__str__(),
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+                )
+            ),
+        )
+
+        self.client._tail_request(cmd)
+        m.assert_called_once()
+
+    def test_tail_request_stop(self, mocker):
+        m = mock.Mock()
+        mocker.patch("streamdal.StreamdalClient._stop_tail", m)
+
+        cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=protos.Audience(),
+                    id=uuid.uuid4().__str__(),
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_STOP,
+                )
+            ),
+        )
+
+        self.client._tail_request(cmd)
+        m.assert_called_once()
+
+    def test_tail_request_pause(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        t = Tail.__new__(Tail)
+        t.request = protos.TailRequest(
+            audience=aud,
+            id=tail_id,
+            type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+        )
+
+        self.client.tails[common.aud_to_str(aud)] = {}
+        self.client.tails[common.aud_to_str(aud)][tail_id] = t
+
+        pause_cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=aud,
+                    id=tail_id,
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_PAUSE,
+                )
+            ),
+        )
+
+        self.client._tail_request(pause_cmd)
+        assert len(self.client.paused_tails) == 1
+        assert len(self.client.tails) == 0
+
+    def test_tail_request_resume(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        t = Tail.__new__(Tail)
+        t.request = protos.TailRequest(
+            audience=aud,
+            id=tail_id,
+            type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+        )
+
+        self.client.paused_tails[common.aud_to_str(aud)] = {}
+        self.client.paused_tails[common.aud_to_str(aud)][tail_id] = t
+
+        resume_cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=aud,
+                    id=tail_id,
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_RESUME,
+                )
+            ),
+        )
+
+        self.client._tail_request(resume_cmd)
+        assert len(self.client.paused_tails) == 0
+        assert len(self.client.tails) == 1
+
+    def test_set_tail(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        tail = object.__new__(streamdal.Tail)
+        tail.request = protos.TailRequest(
+            audience=aud,
+            id=tail_id,
+        )
+
+        assert len(self.client.tails) == 0
+
+        self.client._set_active_tail(tail)
+
+        assert len(self.client.tails) == 1
+
+    def test_start_tail(self, mocker):
+        tail_id = uuid.uuid4().__str__()
+        pipeline_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        cmd = protos.Command(
+            tail=protos.TailCommand(
+                request=protos.TailRequest(
+                    audience=aud,
+                    id=tail_id,
+                    type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+                    pipeline_id=pipeline_id,
+                )
+            ),
+        )
+
+        tail_mock = mock.Mock()
+        tail_mock.start_tail_workers = mock.Mock()
+
+        mocker.patch("streamdal.Tail.__new__", return_value=tail_mock)
+
+        tail = object.__new__(streamdal.Tail)
+        tail.start_tail_workers = mock.Mock()
+
+        self.client._start_tail(cmd)
+        assert len(self.client.tails) == 1
+        assert tail_mock.start_tail_workers.called_once()
+
+    def test_stop_tail(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        req = protos.TailRequest(
+            audience=aud,
+            id=tail_id,
+            type=protos.TailRequestType.TAIL_REQUEST_TYPE_START,
+        )
+
+        tail = object.__new__(streamdal.Tail)
+        tail.request = req
+        tail.exit = threading.Event()
+
+        cmd = protos.Command(
+            tail=protos.TailCommand(request=req),
+        )
+
+        self.client._set_active_tail(tail)
+        assert len(self.client.tails) == 1
+
+        cmd.tail.request.type = (protos.TailRequestType.TAIL_REQUEST_TYPE_STOP,)
+        self.client._stop_tail(cmd)
+        assert len(self.client.tails) == 0
+
+    def test_remove_tail(self):
+        tail_id = uuid.uuid4().__str__()
+
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        aud_str = common.aud_to_str(aud)
+
+        self.client.tails = {aud_str: {tail_id: mock.Mock()}}
+        self.client._remove_active_tail(aud, tail_id)
+        assert len(self.client.tails) == 0
+
+    def test_set_schema(self):
+        aud = protos.Audience(
+            component_name="kafka",
+            service_name="testing",
+            operation_name="test-topic",
+            operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+        )
+
+        assert len(self.client.schemas) == 0
+        self.client._set_schema(aud, b"")
+        assert len(self.client.schemas) == 1
+
+    # def test_handle_schema(self):
+    #     aud = protos.Audience(
+    #         component_name="kafka",
+    #         service_name="testing",
+    #         operation_name="test-topic",
+    #         operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
+    #     )
+    #
+    #     resp = protos.WasmResponse(
+    #         exit_code=protos.WasmExitCode.WASM_EXIT_CODE_SUCCESS,
+    #         output_step=b'{"object": {"type": "streamdal"}}',
+    #     )
+    #
+    #     # Inferschema pipeline step
+    #     step = protos.PipelineStep(
+    #         infer_schema=protos.steps.InferSchemaStep(),
+    #     )
+    #
+    #     event_loop = asyncio.get_event_loop()
+    #     grpc_channel = object.__new__(grpclib.client.Channel)
+    #     grpc_channel._loop = event_loop
+    #     grpc_stub = protos.InternalStub(channel=grpc_channel)
+    #     grpc_stub.send_schema = mock.AsyncMock()
+    #
+    #     self.client.grpc_loop = event_loop
+    #
+    #     self.client._handle_schema(aud, step, resp)
+    #     self.client.grpc_loop.run_until_complete(
+    #         asyncio.gather(*asyncio.all_tasks(self.client.grpc_loop))
+    #     )
+    #     time.sleep(1)
+    #     assert len(self.client.schemas) == 1
+    #     assert grpc_stub.send_schema.called_once()

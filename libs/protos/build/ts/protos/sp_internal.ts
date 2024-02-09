@@ -17,7 +17,6 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.js";
 import { Command } from "./sp_command.js";
 import { Metric } from "./sp_common.js";
-import { PipelineStepNotification } from "./sp_pipeline.js";
 import { PipelineStep } from "./sp_pipeline.js";
 import { ClientInfo } from "./sp_info.js";
 import { Audience } from "./sp_common.js";
@@ -76,34 +75,64 @@ export interface HeartbeatRequest {
  */
 export interface NotifyRequest {
     /**
-     * @generated from protobuf field: string pipeline_id = 1;
+     * @generated from protobuf field: protos.NotifyRequest.ConditionType condition_type = 1;
      */
-    pipelineId: string;
+    conditionType: NotifyRequest_ConditionType;
     /**
-     * @deprecated
-     * @generated from protobuf field: string step_name = 2 [deprecated = true];
+     * Used for pulling step name and any other info needed in the future
+     *
+     * @generated from protobuf field: protos.PipelineStep step = 2;
      */
-    stepName: string;
+    step?: PipelineStep;
     /**
+     * Included in notification
+     *
      * @generated from protobuf field: protos.Audience audience = 3;
      */
     audience?: Audience;
     /**
+     * Included in notification
+     *
      * @generated from protobuf field: int64 occurred_at_unix_ts_utc = 4;
      */
     occurredAtUnixTsUtc: string;
     /**
-     * @generated from protobuf field: bytes payload = 5;
+     * Included in notification
+     *
+     * @generated from protobuf field: string pipeline_id = 5;
+     */
+    pipelineId: string;
+    /**
+     * Included in notification
+     *
+     * @generated from protobuf field: bytes payload = 6;
      */
     payload: Uint8Array;
+}
+/**
+ * This will be used to pull the condition type (true, false, error) from the pipeline step,
+ * so that we can include metadata, abort condition, etc., in the notification
+ * The condition will contain the notification configuration also.
+ *
+ * @generated from protobuf enum protos.NotifyRequest.ConditionType
+ */
+export enum NotifyRequest_ConditionType {
     /**
-     * @generated from protobuf field: protos.PipelineStep step = 6;
+     * @generated from protobuf enum value: CONDITION_TYPE_UNSET = 0;
      */
-    step?: PipelineStep;
+    UNSET = 0,
     /**
-     * @generated from protobuf field: protos.PipelineStepNotification notification = 7;
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_TRUE = 1;
      */
-    notification?: PipelineStepNotification;
+    ON_TRUE = 1,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_FALSE = 2;
+     */
+    ON_FALSE = 2,
+    /**
+     * @generated from protobuf enum value: CONDITION_TYPE_ON_ERROR = 3;
+     */
+    ON_ERROR = 3
 }
 /**
  * @generated from protobuf message protos.MetricsRequest
@@ -371,17 +400,16 @@ export const HeartbeatRequest = new HeartbeatRequest$Type();
 class NotifyRequest$Type extends MessageType<NotifyRequest> {
     constructor() {
         super("protos.NotifyRequest", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "step_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1, name: "condition_type", kind: "enum", T: () => ["protos.NotifyRequest.ConditionType", NotifyRequest_ConditionType, "CONDITION_TYPE_"] },
+            { no: 2, name: "step", kind: "message", T: () => PipelineStep },
             { no: 3, name: "audience", kind: "message", T: () => Audience },
             { no: 4, name: "occurred_at_unix_ts_utc", kind: "scalar", T: 3 /*ScalarType.INT64*/ },
-            { no: 5, name: "payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 6, name: "step", kind: "message", T: () => PipelineStep },
-            { no: 7, name: "notification", kind: "message", T: () => PipelineStepNotification }
+            { no: 5, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value?: PartialMessage<NotifyRequest>): NotifyRequest {
-        const message = { pipelineId: "", stepName: "", occurredAtUnixTsUtc: "0", payload: new Uint8Array(0) };
+        const message = { conditionType: 0, occurredAtUnixTsUtc: "0", pipelineId: "", payload: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<NotifyRequest>(this, message, value);
@@ -392,11 +420,11 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string pipeline_id */ 1:
-                    message.pipelineId = reader.string();
+                case /* protos.NotifyRequest.ConditionType condition_type */ 1:
+                    message.conditionType = reader.int32();
                     break;
-                case /* string step_name = 2 [deprecated = true];*/ 2:
-                    message.stepName = reader.string();
+                case /* protos.PipelineStep step */ 2:
+                    message.step = PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
                     break;
                 case /* protos.Audience audience */ 3:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
@@ -404,14 +432,11 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
                 case /* int64 occurred_at_unix_ts_utc */ 4:
                     message.occurredAtUnixTsUtc = reader.int64().toString();
                     break;
-                case /* bytes payload */ 5:
+                case /* string pipeline_id */ 5:
+                    message.pipelineId = reader.string();
+                    break;
+                case /* bytes payload */ 6:
                     message.payload = reader.bytes();
-                    break;
-                case /* protos.PipelineStep step */ 6:
-                    message.step = PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
-                    break;
-                case /* protos.PipelineStepNotification notification */ 7:
-                    message.notification = PipelineStepNotification.internalBinaryRead(reader, reader.uint32(), options, message.notification);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -425,27 +450,24 @@ class NotifyRequest$Type extends MessageType<NotifyRequest> {
         return message;
     }
     internalBinaryWrite(message: NotifyRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string pipeline_id = 1; */
-        if (message.pipelineId !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.pipelineId);
-        /* string step_name = 2 [deprecated = true]; */
-        if (message.stepName !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.stepName);
+        /* protos.NotifyRequest.ConditionType condition_type = 1; */
+        if (message.conditionType !== 0)
+            writer.tag(1, WireType.Varint).int32(message.conditionType);
+        /* protos.PipelineStep step = 2; */
+        if (message.step)
+            PipelineStep.internalBinaryWrite(message.step, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         /* protos.Audience audience = 3; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* int64 occurred_at_unix_ts_utc = 4; */
         if (message.occurredAtUnixTsUtc !== "0")
             writer.tag(4, WireType.Varint).int64(message.occurredAtUnixTsUtc);
-        /* bytes payload = 5; */
+        /* string pipeline_id = 5; */
+        if (message.pipelineId !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.pipelineId);
+        /* bytes payload = 6; */
         if (message.payload.length)
-            writer.tag(5, WireType.LengthDelimited).bytes(message.payload);
-        /* protos.PipelineStep step = 6; */
-        if (message.step)
-            PipelineStep.internalBinaryWrite(message.step, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* protos.PipelineStepNotification notification = 7; */
-        if (message.notification)
-            PipelineStepNotification.internalBinaryWrite(message.notification, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+            writer.tag(6, WireType.LengthDelimited).bytes(message.payload);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

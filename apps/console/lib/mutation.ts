@@ -20,10 +20,7 @@ import {
 } from "streamdal-protos/protos/sp_external.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { getPipeline } from "./fetch.ts";
-import {
-  serviceSignal,
-  setPipelines,
-} from "../components/serviceMap/serviceSignal.ts";
+import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { audienceKey } from "./utils.ts";
 
 export type PatchedPipelineResponse = StandardResponse & {
@@ -120,8 +117,6 @@ export const attachPipeline = async (
       meta,
     );
 
-    setPipelines(key, pipelineIds);
-
     return response;
   } catch (error) {
     return {
@@ -150,8 +145,6 @@ export const detachPipeline = async (
       request,
       meta,
     );
-
-    setPipelines(key, pipelineIds);
 
     return response;
   } catch (error) {
