@@ -40,6 +40,7 @@ func operationTypeString(ot protos.OperationType) string {
 	}
 }
 
+// metadataToString converts a metadata map to a human-readable string
 func metadataToString(metadata map[string]string) string {
 	if len(metadata) == 0 {
 		return ""
@@ -52,7 +53,7 @@ func metadataToString(metadata map[string]string) string {
 	return sb.String()
 }
 
-// conditionToString converts a step condition to a human readable string
+// conditionToString converts a step condition to a human-readable string
 func conditionToString(req *protos.NotifyRequest) string {
 	switch req.ConditionType {
 	case protos.NotifyRequest_CONDITION_TYPE_ON_TRUE:

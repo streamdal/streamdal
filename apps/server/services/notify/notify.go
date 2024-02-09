@@ -328,17 +328,21 @@ func (n *Notify) handleSlack(ctx context.Context, event *protos.NotifyRequest, c
 
 	// If we have a payload, include it in the alert
 	if len(event.Payload) > 0 {
+		payloadData, err := getPayload(event.Payload, cond.Notification)
+		if err != nil {
+			return errors.Wrap(err, "unable to get payload")
+		}
+
 		// Add payload to info blocks
 		payloadText := slack.NewTextBlockObject(slack.MarkdownType, "*Payload*", false, false)
 
 		// Payload is preformatted rich text
-		payload := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(prettyJSON(event.Payload), &slack.RichTextSectionTextStyle{}))
+		payload := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(prettyJSON(payloadData), &slack.RichTextSectionTextStyle{}))
 		payload.Type = slack.RTEPreformatted
 
 		blocks = append(blocks, divBlock)
 		blocks = append(blocks, slack.NewSectionBlock(nil, []*slack.TextBlockObject{payloadText}, nil))
 		blocks = append(blocks, slack.NewRichTextBlock("payload", payload))
-
 	}
 
 	blocks = append(blocks, divBlock)
@@ -365,6 +369,16 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *protos.NotifyReques
 
 	pdClient := pagerduty.NewClient(cfg.Token)
 
+	cond := getConditionFromRequest(event)
+	if cond == nil {
+		return errors.New("Unknown condition type")
+	}
+
+	payload, err := getPayload(event.Payload, cond.Notification)
+	if err != nil {
+		return errors.Wrap(err, "unable to get payload")
+	}
+
 	incidentOptions := &pagerduty.CreateIncidentOptions{
 		Service: &pagerduty.APIReference{
 			ID:   cfg.ServiceId,
@@ -376,14 +390,24 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *protos.NotifyReques
 		Body: &pagerduty.APIDetails{
 			Type: "incident_body",
 			Details: fmt.Sprintf(
-				"Pipeline ID: %s\nPipeline Name: %s\nStep Name: %s\nService Name: %s\nOperation Name: %s\nOperation Type: %s\nPayload: %s\n",
+				"Pipeline ID: %s\n"+
+					"Pipeline Name: %s\n"+
+					"Step Name: %s\n"+
+					"Condition: %s\n"+
+					"Service Name: %s\n"+
+					"Operation Name: %s\n"+
+					"Operation Type: %s\n"+
+					"Metadata:\n%s\n\n"+
+					"Payload:\n%s\n",
 				pipeline.Id,
 				pipeline.Name,
 				event.Step.Name,
+				conditionToString(event),
 				event.Audience.ServiceName,
 				event.Audience.OperationName,
 				operationTypeString(event.Audience.OperationType),
-				prettyJSON(event.Payload),
+				metadataToString(cond.Metadata),
+				prettyJSON(payload),
 			),
 		},
 	}
