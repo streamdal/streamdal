@@ -1,0 +1,11 @@
+.idea
+.DS_Store
+*.pyc
+*.wasm
+.coverage
+*.egg-info
+dist/*
+htmlcov/*
+coverage.xml
+coverage/*
+test-assets/wasm/*

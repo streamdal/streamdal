@@ -1,0 +1,38 @@
+name: SDK Python - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'sdks/python/**'
+      - '.github/workflows/sdks-python-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./sdks/python
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # If you have any specific requirements for your project
+
+      - name: Run Pytest
+        run: |
+          make test/wasm
+          pytest
