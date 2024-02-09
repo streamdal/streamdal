@@ -34,7 +34,7 @@ type IServerClient interface {
 	NewAudience(ctx context.Context, aud *protos.Audience, sessionID string) error
 
 	// Notify calls to streamdal server to trigger the configured notification rules for the specified step
-	Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error
+	Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience, payload []byte, conditionType protos.NotifyRequest_ConditionType) error
 
 	// Reconnect closes any open gRPC connection to the streamdal server and re-establishes a new connection
 	// This method won't perform retries as that should be determined by the caller
@@ -124,14 +124,23 @@ func (c *Client) Reconnect() error {
 	return nil
 }
 
-func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *protos.PipelineStep, aud *protos.Audience) error {
+func (c *Client) Notify(
+	ctx context.Context,
+	pipeline *protos.Pipeline,
+	step *protos.PipelineStep,
+	aud *protos.Audience,
+	payload []byte,
+	conditionType protos.NotifyRequest_ConditionType,
+) error {
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("auth-token", c.Token))
 
 	req := &protos.NotifyRequest{
 		PipelineId:          pipeline.Id,
 		Audience:            aud,
-		StepName:            step.Name,
 		OccurredAtUnixTsUtc: time.Now().UTC().Unix(),
+		ConditionType:       conditionType,
+		Step:                step,
+		Payload:             payload,
 	}
 
 	if _, err := c.Server.Notify(ctx, req); err != nil {

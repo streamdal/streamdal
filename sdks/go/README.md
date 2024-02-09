@@ -25,23 +25,31 @@ package main
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc/connectivity"
 
 	"github.com/streamdal/go-sdk"
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	sc, _ := streamdal.New(&streamdal.Config{
 		// Address of the streamdal server
-		ServerURL:       "streamdal-server.svc.cluster.local:8082",
-		
+		ServerURL: "streamdal-server.svc.cluster.local:8082",
+
 		// Token used for authenticating with the streamdal server
-		ServerToken:     "1234",
-		
+		ServerToken: "1234",
+
 		// Identify _this_ application/service (
-		ServiceName:     "billing-svc",
+		ServiceName: "billing-svc",
+
+		// Used for shutting down processing and goroutines
+		// Your application should call `cancel()` when it's time to shut down
+		ShutdownCtx: ctx,
 	})
-	
-	resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
+
+	resp := sc.Process(ctx, &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
@@ -49,18 +57,18 @@ func main() {
 	})
 	
 	// Check if the .Process() call completed
-	if resp.Status != streamdal.StatusError {
+	if resp.Status != streamdal.ExecStatusError {
 		fmt.Println("Successfully processed payload")
-    }
-	
+	}
+
 	// Or you can inspect each individual pipeline & step result
-	for _, pipeline := resp.PipelineStatus {
+	for _, pipeline := range resp.PipelineStatus {
 		fmt.Printf("Inspecting '%d' steps in pipeline '%s'...\n", len(resp.PipelineStatus), pipeline.Name)
-		
+
 		for _, step := range pipeline.StepStatus {
 			fmt.Printf("Step '%s' status: '%s'\n", step.Name, step.Status)
 		}
-    }
+	}
 }
 
 ```
