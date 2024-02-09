@@ -72,4 +72,3 @@ and release a new version to npm. The package.json file will
 will also be bumped to reflect the new version. If you'd like 
 to skip release on the push/merge to main, include "norelease" 
 anywhere in the commit message.
-
