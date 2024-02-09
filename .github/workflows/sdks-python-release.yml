@@ -46,7 +46,8 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ steps.get_new_version.outputs.new_tag }}
+          custom_tag: ${{ steps.get_new_version.outputs.new_version }}
+          tag_prefix: "sdks/python/v"
 
       - name: Generate updated distribution
         run: |
