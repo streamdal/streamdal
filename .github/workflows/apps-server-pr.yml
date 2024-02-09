@@ -36,4 +36,5 @@ jobs:
     - name: Try building demo
       run: |
         cd test-utils/demo-client
+        go get ./...
         make build
