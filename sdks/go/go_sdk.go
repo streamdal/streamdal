@@ -158,7 +158,7 @@ type Config struct {
 	DryRun bool
 
 	// ShutdownCtx is a context that the library will listen to for cancellation
-	// notices. Optional; default: nil
+	// notices. Required
 	ShutdownCtx context.Context
 
 	// Logger is a logger you can inject (such as logrus) to allow this library
@@ -660,7 +660,7 @@ PIPELINE:
 				stepStatus.StatusMessage = proto.String("Pipeline error: " + ErrPipelineTimeout.Error())
 
 				// Maybe notify, maybe include metadata
-				cond := s.handleCondition(ctx, req, resp, step.OnError, step, pipeline, aud)
+				cond := s.handleCondition(ctx, req, resp, step.OnError, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_ERROR)
 
 				// Update the abort condition before we populate statuses in resp
 				stepStatus.AbortCondition = cond.abortCondition
@@ -703,7 +703,7 @@ PIPELINE:
 				stepStatus.StatusMessage = proto.String("Wasm Error: " + err.Error())
 
 				// Maybe notify, maybe include metadata
-				cond := s.handleCondition(ctx, req, resp, step.OnError, step, pipeline, aud)
+				cond := s.handleCondition(ctx, req, resp, step.OnError, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_ERROR)
 
 				// Update the abort condition before we populate statuses in resp
 				stepStatus.AbortCondition = cond.abortCondition
@@ -756,6 +756,7 @@ PIPELINE:
 				stepCondStr    string
 				stepConds      *protos.PipelineStepConditions
 				stepExecStatus protos.ExecStatus
+				condType       protos.NotifyRequest_ConditionType
 			)
 
 			// Execution worked - check wasm exit code
@@ -767,6 +768,7 @@ PIPELINE:
 				stepCondStr = "true"
 				stepConds = step.OnTrue
 				stepExecStatus = protos.ExecStatus_EXEC_STATUS_TRUE
+				condType = protos.NotifyRequest_CONDITION_TYPE_ON_TRUE
 			case protos.WASMExitCode_WASM_EXIT_CODE_FALSE:
 				// Data was potentially modified
 				resp.Data = wasmResp.OutputPayload
@@ -774,6 +776,7 @@ PIPELINE:
 				stepCondStr = "false"
 				stepConds = step.OnFalse
 				stepExecStatus = protos.ExecStatus_EXEC_STATUS_FALSE
+				condType = protos.NotifyRequest_CONDITION_TYPE_ON_FALSE
 			case protos.WASMExitCode_WASM_EXIT_CODE_ERROR:
 				// Ran into an error - return original data
 				resp.Data = req.Data
@@ -781,6 +784,7 @@ PIPELINE:
 				stepCondStr = "error"
 				stepConds = step.OnError
 				stepExecStatus = protos.ExecStatus_EXEC_STATUS_ERROR
+				condType = protos.NotifyRequest_CONDITION_TYPE_ON_ERROR
 			default:
 				_ = s.metrics.Incr(ctx, &types.CounterEntry{Name: counterError, Labels: s.getCounterLabels(req, pipeline), Value: 1, Audience: aud})
 				s.config.Logger.Debugf("Step '%s:%s' returned unknown exit code %d", pipeline.Name, step.Name, wasmResp.ExitCode)
@@ -793,7 +797,7 @@ PIPELINE:
 			statusMsg := fmt.Sprintf("step '%s:%s' returned %s: %s", pipeline.Name, step.Name, stepCondStr, wasmResp.ExitMsg)
 
 			// Maybe notify, maybe include metadata
-			cond := s.handleCondition(ctx, req, resp, stepConds, step, pipeline, aud)
+			cond := s.handleCondition(ctx, req, resp, stepConds, step, pipeline, aud, condType)
 
 			// Update step status bits
 			stepStatus.Status = stepExecStatus
@@ -873,6 +877,7 @@ type condition struct {
 
 // handleCondition is a wrapper for inspecting the step condition and potentially
 // performing a notification and injecting metadata back into the response.
+// TODO: simplify these params
 func (s *Streamdal) handleCondition(
 	ctx context.Context,
 	req *ProcessRequest,
@@ -881,6 +886,7 @@ func (s *Streamdal) handleCondition(
 	step *protos.PipelineStep,
 	pipeline *protos.Pipeline,
 	aud *protos.Audience,
+	condType protos.NotifyRequest_ConditionType,
 ) condition {
 	// If no condition is set, we don't need to do anything
 	if stepCond == nil {
@@ -888,10 +894,10 @@ func (s *Streamdal) handleCondition(
 	}
 
 	// Should we notify?
-	if stepCond.Notify && !s.config.DryRun {
+	if stepCond.Notification != nil && !s.config.DryRun {
 		s.config.Logger.Debugf("Performing 'notify' condition for step '%s'", step.Name)
 
-		if err := s.serverClient.Notify(ctx, pipeline, step, aud); err != nil {
+		if err := s.serverClient.Notify(ctx, pipeline, step, aud, resp.Data, condType); err != nil {
 			s.config.Logger.Errorf("failed to notify condition: %s", err)
 		}
 

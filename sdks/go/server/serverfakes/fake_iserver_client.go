@@ -63,13 +63,15 @@ type FakeIServerClient struct {
 	newAudienceReturnsOnCall map[int]struct {
 		result1 error
 	}
-	NotifyStub        func(context.Context, *protos.Pipeline, *protos.PipelineStep, *protos.Audience) error
+	NotifyStub        func(context.Context, *protos.Pipeline, *protos.PipelineStep, *protos.Audience, []byte, protos.NotifyRequest_ConditionType) error
 	notifyMutex       sync.RWMutex
 	notifyArgsForCall []struct {
 		arg1 context.Context
 		arg2 *protos.Pipeline
 		arg3 *protos.PipelineStep
 		arg4 *protos.Audience
+		arg5 []byte
+		arg6 protos.NotifyRequest_ConditionType
 	}
 	notifyReturns struct {
 		result1 error
@@ -384,7 +386,12 @@ func (fake *FakeIServerClient) NewAudienceReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakeIServerClient) Notify(arg1 context.Context, arg2 *protos.Pipeline, arg3 *protos.PipelineStep, arg4 *protos.Audience) error {
+func (fake *FakeIServerClient) Notify(arg1 context.Context, arg2 *protos.Pipeline, arg3 *protos.PipelineStep, arg4 *protos.Audience, arg5 []byte, arg6 protos.NotifyRequest_ConditionType) error {
+	var arg5Copy []byte
+	if arg5 != nil {
+		arg5Copy = make([]byte, len(arg5))
+		copy(arg5Copy, arg5)
+	}
 	fake.notifyMutex.Lock()
 	ret, specificReturn := fake.notifyReturnsOnCall[len(fake.notifyArgsForCall)]
 	fake.notifyArgsForCall = append(fake.notifyArgsForCall, struct {
@@ -392,13 +399,15 @@ func (fake *FakeIServerClient) Notify(arg1 context.Context, arg2 *protos.Pipelin
 		arg2 *protos.Pipeline
 		arg3 *protos.PipelineStep
 		arg4 *protos.Audience
-	}{arg1, arg2, arg3, arg4})
+		arg5 []byte
+		arg6 protos.NotifyRequest_ConditionType
+	}{arg1, arg2, arg3, arg4, arg5Copy, arg6})
 	stub := fake.NotifyStub
 	fakeReturns := fake.notifyReturns
-	fake.recordInvocation("Notify", []interface{}{arg1, arg2, arg3, arg4})
+	fake.recordInvocation("Notify", []interface{}{arg1, arg2, arg3, arg4, arg5Copy, arg6})
 	fake.notifyMutex.Unlock()
 	if stub != nil {
-		return stub(arg1, arg2, arg3, arg4)
+		return stub(arg1, arg2, arg3, arg4, arg5, arg6)
 	}
 	if specificReturn {
 		return ret.result1
@@ -412,17 +421,17 @@ func (fake *FakeIServerClient) NotifyCallCount() int {
 	return len(fake.notifyArgsForCall)
 }
 
-func (fake *FakeIServerClient) NotifyCalls(stub func(context.Context, *protos.Pipeline, *protos.PipelineStep, *protos.Audience) error) {
+func (fake *FakeIServerClient) NotifyCalls(stub func(context.Context, *protos.Pipeline, *protos.PipelineStep, *protos.Audience, []byte, protos.NotifyRequest_ConditionType) error) {
 	fake.notifyMutex.Lock()
 	defer fake.notifyMutex.Unlock()
 	fake.NotifyStub = stub
 }
 
-func (fake *FakeIServerClient) NotifyArgsForCall(i int) (context.Context, *protos.Pipeline, *protos.PipelineStep, *protos.Audience) {
+func (fake *FakeIServerClient) NotifyArgsForCall(i int) (context.Context, *protos.Pipeline, *protos.PipelineStep, *protos.Audience, []byte, protos.NotifyRequest_ConditionType) {
 	fake.notifyMutex.RLock()
 	defer fake.notifyMutex.RUnlock()
 	argsForCall := fake.notifyArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakeIServerClient) NotifyReturns(result1 error) {
