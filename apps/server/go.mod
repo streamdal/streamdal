@@ -14,7 +14,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.28.0
+	github.com/onsi/gomega v1.30.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible // TODO: Switch this to bigcache
 	github.com/paulbellamy/ratecounter v0.2.0
 	github.com/pkg/errors v0.9.1
@@ -33,8 +33,6 @@ require (
 	gopkg.in/relistan/rubberneck.v1 v1.1.0
 )
 
-require github.com/streamdal/server v0.0.12
-
 require (
 	github.com/DataDog/appsec-internal-go v1.4.0 // indirect
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.50.2 // indirect
@@ -51,15 +49,17 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.5.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/go-logr/logr v1.4.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/pprof v0.0.0-20231212022811-ec68065c825e // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/onsi/ginkgo/v2 v2.12.1 // indirect
+	github.com/onsi/ginkgo/v2 v2.13.2 // indirect
 	github.com/outcaste-io/ristretto v0.2.3 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
@@ -68,7 +68,6 @@ require (
 	github.com/relistan/rubberneck v1.3.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
-	github.com/streamdal/protos v0.0.124 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tinylib/msgp v1.1.9 // indirect
