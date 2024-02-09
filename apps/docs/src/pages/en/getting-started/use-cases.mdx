@@ -1,0 +1,345 @@
+---
+title: Streamdal Use Cases
+metaTitle: Streamdal Use Cases
+description: Understand the different ways you can utilize Streamdal for handling PII
+layout: ../../../layouts/MainLayout.astro
+---
+
+import cliTail from "@images/guides/CliTail.png";
+import consoleDashboard from '@images/core-components/console-dashboard.png';
+import RichImg from "@components/Misc/RichImg.astro";
+import Changes from "@components/Misc/Changes.astro";
+
+<Changes />
+
+Streamdal gives you the ability to embed data-handling pipelines directly into 
+your application code. This means that once an application has the Streamdal 
+`.process()` wrapped around the code where data reads or writes, data will go 
+through any checks (rules and [pipelines](/en/guides/pipelines/)) you define 
+and attach to this code. 
+
+So, there are wide varieties of use cases for Streamdal!
+
+Below is a curated list of use cases based on current implementations we have 
+seen, and battle-testing we've done with our design partners and contributors.
+
+## Data Privacy
+
+<span class="pkeyword" style="padding-left: 0px;"><span style="background-color: #956CFF; border-radius: 3px 0px 0px 3px; padding-right: 2px;">Code-Native</span> Data Privacy</span>
+
+There are a lot of tools for data privacy, and they generally fall into two 
+buckets: 
+1. Tools that scan/monitor your databases/data warehouses in batches for 
+discovery, cataloging, and/or anomalies
+2. Tools like SIEMs and log ingestors
+
+Streamdal isn't a replacement for those tools. Streamdal introduces a 
+simplified method to handle data privacy from where data originates: **your 
+application code**. By embedding the data pipeline engine into your code (via 
+[SDK](/en/core-components/sdk/)), you'll be solving for the capability gaps in 
+contemporary data privacy tooling, or mitigating some of the drawbacks that 
+those tools introduce, like how they:
+
+- Add more complexity to an organization's infrastructure
+- Are generating more tickets than they are solving
+- Are reactive and **prevent nothing**
+- Are incredibly expensive, and are starting to introduce unforeseen costs
+- Aren't helping your mechanisms of action, or hampering application 
+performance and/or the development process
+
+See [how Streamdal lines up vs. contemporary Data Privacy Tools](#streamdal-vs-contemporary-solutions).
+
+## PII Handling
+
+<span class="pkeyword" style="padding-left: 0px;"><span style="background-color: #956CFF; border-radius: 3px 0px 0px 3px; padding-right: 2px;">Code-Native</span> PII Handling</span>
+
+Similar to the [Data Privacy](#data-privacy) use case, there are many methods, 
+tools, and platforms that can be used to handle PII. Those usually fall into 
+the same buckets of functionality, but might also offer capabilities like:
+
+1. Data Loss Prevention (DLP), by integrating into all of your organization's 
+data-handling environments (E-mail, Google Docs, etc)
+2. Multi-tenant data segregation and/or encryption/tokenization
+
+Streamdal isn't a replacement for those tools either. However, Streamdal is 
+scoped to work _within_ your bespoke applications or services (via 
+[SDK](/en/core-components/sdk/)), and can govern how they handle PII data at 
+runtime. 
+
+You would use Streamdal to cover the gaps in handling PII, such as 
+
+- Ensuring authorized applications never handle PII incorrectly, or 
+inadvertently expose PII to unauthorized applications or storage after read
+- Detecting PII explicitly or dynamically in a payload, and applying rules 
+(like transformations, obfuscations, notifications, etc)
+- Detecting for tokenization or encryption usage, and non-compliant data from 
+flowing
+
+The the data [pipelines](/en/guides/pipelines/) you can embed into your code 
+with Streamdal allows a wide range of PII checks you can enforce at runtime.
+
+See [how Streamdal lines up vs. contemporary PII Handling Tools](#streamdal-vs-contemporary-solutions).
+
+## Reducing Costs
+
+<span class="pkeyword" style="padding-left: 0px;"><span style="background-color: #956CFF; border-radius: 3px 0px 0px 3px; padding-right: 2px;">Code-Native</span> Cost Savings</span>
+
+A lot of monitoring, tracing, data analytics, or data tools in general revolve 
+around logs or connecting to and scanning at-rest data. If your costs are 
+ballooning around processing data or logging, streamdal can help reduce these 
+costs.
+
+Streamdal is embedded into your application code (via 
+[SDK](/en/core-components/sdk/)), and supplies data pipelines to where your 
+application logs, creates, reads, writes, or transmits data. Because of this 
+method, and Streamdal's utilization of <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> 
+to execute your rules/pipelines at near-native speeds, you can greatly reduce 
+costs without any extra infrastructure, network hops, or performance overhead.
+
+You could use Streamdal to reduce costs by:
+
+1. Reducing log size
+    - You can attach [pipelines](/en/guides/pipelines/) with rules to 
+    `TRUNCATE_VALUE` anywhere in your payloads, and explicitly by length or 
+    percentage
+2. Extracting values
+    - You can extract values anywhere in the payload (e.x. object.field) and 
+    drop all others. `EXTRACT` also gives you the option to flatten the 
+    resulting object as well
+3. Replacing, obfuscating, masking, or deleting values
+    - A lot of costs can be saved by executing data transformations on the 
+    application side, which gives you the option to greatly simplify (or 
+    eliminate entirely) your usage of extraneous data handling tools.
+
+With Streamdal embedded into your code, you can ensure to keep data costs as 
+low as possible by handling these transformations before data leaves your 
+applications. 
+
+Check out all of the different 
+[transformation and detective types](/en/guides/pipelines/#step-types) available for data 
+rules and pipelines.
+
+
+## Simplifying Data Infrastructure
+
+<span class="pkeyword" style="padding-left: 0px;"><span style="background-color: #956CFF; border-radius: 3px 0px 0px 3px; padding-right: 2px;">Code-Native</span> Infrastructure Simplification</span>
+
+Streamdal helps keep the technology and data landscape less complex and spread 
+out. 
+
+You can use Streamdal to reduce the amount of data infrastructure used for 
+handling data, whether it's for [Data Privacy](#data-privacy), 
+[PII handling](#pii-handling), [Data Quality](#data-quality), or by simply 
+having a single place to handle rules and govern all of these processes (i.e. 
+[Data Operations](#real-time-data-operations)).
+
+The [Console UI](/en/core-components/console-ui/) provides a single visualization for the flow of data across your 
+systems, along with providing a place to define and attach rules/pipelines to 
+execute wherever data is being handled.
+
+You can reduce the infrastructure data runs through, such as:
+
+1. Airflow
+2. dbt
+3. Flink
+
+And much more. 
+
+There is potential to replace or bypass the need for an enumerating number of 
+contemporary monitoring, ETL/ELT, data pipeline, and dashboard-esque tools 
+commonly stood up for data infrastructure.
+
+Take a closer look at the various Streamdal [pipelines](/en/guides/pipelines/) you can apply to data for a better idea of where you can simplify your data infrastructure.
+
+## Real-time Data Operations
+
+<span class="pkeyword" style="padding-left: 0px;"><span style="background-color: #956CFF; border-radius: 3px 0px 0px 3px; padding-right: 2px;">Code-Native</span> Data Operations</span>
+
+Coupled closely with the use case for 
+[simplifying data infrastructure](#simplifying-data-infrastructure), Streamdal 
+can act as your single source of truth for your real-time data operations. 
+
+From the [Console UI](/en/core-components/console-ui/), you can get answers to 
+all of the following questions and much more:
+
+1. What data is flowing through my applications _right now?_
+1. How is PII flowing through my systems?
+1. How are we governing our data, and ensuring data privacy?
+1. How can I get alerted any time an application would potentially violate data privacy, or cause downstream data issues?
+1. What is causing sudden spikes in log activity?
+1. Where can we begin reducing costs around data?
+1. What is producing the most amount of data?
+1. Where is broken data coming from, and how can I ensure it is always valid?
+
+While Streamdal doesn't operate on data at rest, it can ensure whenever data 
+moves (i.e. a read or write occurs), it runs through the pipelines of checks, 
+rules, or validations you put in place. Most issues can be solved without 
+leaving the [Console UI](/en/core-components/console-ui/). You can define and 
+apply data rules and apply them indefinitely, exponentially, or hot-swap as 
+needed.
+
+The [live Streamdal demo](https://demo.streamdal.com/) is a simple example of 
+what handling data operations on real-time data might look like.
+
+## Streamdal vs. Contemporary Solutions
+
+<div style="text-align: left;">
+| Features & Functionality | Contemporary Solutions | Streamdal |
+|-|-|-|
+| Free | ❌ | ✅ |
+| Fully Open Source | ❌ | ✅ |
+| Adds preventative measures for handling data | ❌ | ✅ |
+| User control over the real-time movement of data | ❌ | ✅ |
+| Creates and enforces geographical barriers for real-time data | ❌ | ✅ |
+| Run functions and checks within data handling applications | ❌ | ✅ |
+| Requires network hops | ✅ | ❌ |
+| Adds extra infrastructure or data sprawl | ✅ | ❌ |
+| Vendor ingests or reads your data | ✅ | ❌ |
+</div>
+
+## Other Useful Aspects
+
+<span class="pkeyword" style="padding-left: 0px;"><span style="background-color: #956CFF; border-radius: 3px 0px 0px 3px; padding-right: 2px;">Code-Native</span> Everything</span>
+
+Streamdal is a tool designed to give you a performant, unintrusive mechanism to 
+prevent data issues and simplify the processes around handling or moving data. 
+This is accomplished through two cornerstone functionalities:
+
+1. Embedding the mechanism directly into application code (via [SDK](/en/core-components/sdk/))
+2. Adding mechanisms for viewing real-time data (Tail 
+[CLI](/en/what-is-streamdal/#cli) and [UI](/en/core-components/console-ui/)), 
+and applying continuous, reusable remedies for real-time data 
+([Pipelines](/en/guides/pipelines/))
+
+The first of those functionalities is what allows users to apply preventative 
+rules to the earliest stage of data handling in applications: **at runtime**. 
+This is why it is so popular for 
+[Data Privacy](/en/getting-started/use-cases/#data-privacy) and 
+[PII Handling](/en/getting-started/use-cases/#pii-handling).
+
+However, there are more benefits you can derive from Streamdal outside of this. 
+You can:
+- Detect, alert, notify, or transform any field in data
+- Validate schemas
+- Validate data
+- Detect for empty values and transform or fill them as necessary
+
+Or, you could do something more specific, such as:
+
+### Performance Improvements
+
+Streamdal provides real-time [metrics](/en/engineering/metrics/), so you can 
+monitor the effectiveness and test throughput capabilities of your 
+applications. You can also view real-time data with [Tail](/en/guides/tail/). 
+It's like a `tail -f`, but for data flowing through your services or 
+applications.
+
+Tail is also accessible via [CLI](/en/what-is-streamdal/#cli).
+
+In the future, we plan to add auto-encoding and decoding of JSON -> Protobuf. 
+This means you can get the benefits of protobuf, without the time-consuming 
+process of everyone having to become a protobuf expert.
+
+Check back on our [roadmap](https://github.com/orgs/streamdal/projects/1) for 
+updates on performance improvement features.
+
+### Data Flow Visualization
+
+Streamdal can be used to generate a visual flow of data throughout your 
+systems. This visualization provides a variety of relevant, real-time 
+information to maximize insights. You can also view:
+
+- Real-time data being processed
+- Metrics and throughput information
+- Schemas
+- Data privacy and governance enforcement, along with any validation, rulesets, 
+or processing you're applying to data
+- Where alerts and notifications are sent
+- Scale of attached clients (horizontal and vertical scaling of your 
+applications)
+- Trends in data flow over time (this is coming soon!)
+
+The Figma-like visualization that sits in the Console UI is what we call the 
+<span class="pkeyword">Data Graph</span>: 
+
+<RichImg src={consoleDashboard} alt="Streamdal Console Dashboard" />
+
+While the Console and Data Graph is an actionable dashboard, you don't have to 
+do anything to maintain it's freshness or accuracy. It's real-time, and 
+dynamically updated as you embed Streamdal into your applications.
+
+Take a look at the [deployment](/en/guides/deployment/) and 
+[instrumentation](/en/guides/instrumentation/) to understand more about how 
+the Data Graph is rendered.
+
+### Data Observability
+
+Sometimes you just need to see data or the structure of the data you're 
+working with. Streamdal is an ideal choice for data observability because you 
+can view:
+
+- Your data in real-time as it is processed in your applications. Before it 
+writes or as it reads data
+- Schemas
+- Side-by-side view of before and after data transformations
+
+If you simply want to view data without going through the 
+[UI](/en/core-components/console-ui/), you can use the 
+[CLI](https://github.com/streamdal/streamdal/tree/main/apps/cli):
+
+<RichImg src={cliTail} alt="Streamdal Tail CLI" />
+
+Read more on the [Tail](/en/guides/tail/) feature for details on how to tap 
+into real-time data.
+
+### Data Quality
+
+Streamdal provides a simple way to collaborate on, define, and enforce data 
+quality needs in a way that doesn't hamstring the development or CI/CD process. 
+
+For example, let's say you have a field in data that must never be `null` or 
+empty. You might define a pipeline that:
+
+1. Uses detective types like `IS_EMPTY`, `HAS_FIELD`, or `IS_TYPE` to watch for 
+`null` or empty fields
+    - _Optionally, you can select "notify" for alerts_
+1. Once this is detected, it moves to the next step you might want with a 
+transform type like `REPLACE_VALUE`, and add a placeholder value
+
+The above pipeline example is somewhat rudimentary, as you could also simply 
+have `SCHEMA_VALIDATION` steps. But, the high-level ideas are:
+
+1. With Streamdal, you're applying continuous checks on real-time data via 
+data pipelines shipped directly into your application code. The pipelines are 
+reusable, and there are no limits to the amount of pipelines you can apply to 
+data-handling applications
+1. You're applying preventive mechanisms that ensure no data issues are caused 
+to downstream systems by upstream producers.
+
+Read more on about [Pipelines](/en/guides/pipelines/) and the enumerating ways 
+they can be constructed for data quality.
+
+### Data Enrichment and Data Categorization
+
+This is commonly associated with [Data Privacy](/en/getting-started/use-cases/#data-privacy), 
+[PII handling](/en/getting-started/use-cases/#data-privacy), or 
+general [Data Operations](/en/getting-started/use-cases/#real-time-data-operations) needs, 
+but you can enrich and categorize real-time data with Streamdal.
+
+On any step in the pipeline process, you can optionally enrich or categorize 
+your data by adding `key/value` metadata, which is embedded into data at the 
+earliest possible state of data. 
+
+Read more about 
+[Pipeline Flow Control](/en/guides/pipelines/#pipeline-flow-control) to 
+understand how you can enrich and categorize data, and pass metadata.
+
+---
+
+<div style="justify-content: center; display: flex;">
+  <div style="background: linear-gradient(250deg, #956CFF, #FFD260); border-radius: 17px; padding: 2px; @media ">
+    <div style="background-color: var(--color-purple-1000); display: inline-flex; padding: 20px; font-size: 22px; border-radius: 15px;">
+      Ready to get started? Take a look at the [Quickstart Guide ⮕](/en/getting-started/quickstart/)
+    </div>
+  </div>
+</div>
