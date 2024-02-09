@@ -25,7 +25,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc/connectivity"
 
 	"github.com/streamdal/go-sdk"
 )
