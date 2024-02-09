@@ -36,9 +36,6 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Bumped version in setup.py to ${{ steps.get_new_version.outputs.new_version }}
-          branch: main
-          tagging_message: ${{ steps.get_new_version.outputs.new_version }}
-          push_options: '--force'
 
       # .. and now create the actual tag (will be the same as the dry run)
       - name: Create tag
