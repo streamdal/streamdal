@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/streamdal/go-sdk/types"
+	"github.com/streamdal/streamdal/sdks/go/types"
 )
 
 type counter struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/go-sdk/logger"
+	"github.com/streamdal/streamdal/sdks/go/logger"
 )
 
 var (

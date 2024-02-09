@@ -5,8 +5,8 @@ package hostfunc
 import (
 	"github.com/pkg/errors"
 
-	"github.com/streamdal/go-sdk/kv"
-	"github.com/streamdal/go-sdk/logger"
+	"github.com/streamdal/streamdal/sdks/go/kv"
+	"github.com/streamdal/streamdal/sdks/go/logger"
 )
 
 type HostFunc struct {
