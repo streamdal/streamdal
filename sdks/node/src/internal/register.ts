@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ClientType } from "@streamdal/protos/protos/sp_info";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
-
-import { Pipeline } from "../../../streamdal/libs/protos/build/ts/node/cjs/protos/sp_pipeline.js";
+// DS: Can this be just @streamdal/protos/...?
+import { Pipeline } from "../../../../../streamdal/libs/protos/build/ts/node/cjs/protos/sp_pipeline.js";
 import { Configs } from "../streamdal.js";
 import { processResponse } from "./pipeline.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
