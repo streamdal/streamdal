@@ -1,0 +1,33 @@
+name: SDK Node - Pull Request
+
+on:
+  pull_request:
+    paths:
+      - 'sdks/node/**'
+      - '.github/workflows/sdks-node-pr.yml'
+
+defaults:
+  run:
+    # NOTE: This is going to ONLY work for "run" steps; non-run steps may need
+    # to have their own "working-directory" set.
+    working-directory: ./sdks/node
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --force
+
+      - name: Test
+        run: npm run test

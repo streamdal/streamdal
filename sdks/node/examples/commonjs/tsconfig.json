@@ -1,0 +1,16 @@
+{
+  "include": [
+     "./src/**/*.ts"
+  ],
+  "compilerOptions": {
+    "outDir": "./build",
+    "declaration": true,
+    "strict": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "composite": true
+  }
+}
