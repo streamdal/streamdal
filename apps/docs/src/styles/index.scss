@@ -378,7 +378,13 @@ a.pkeyword:hover {
   padding-left: 3px;
   padding-right: 3px;
   font-weight: bold;
-  border-radius: 5px;
+}
+.rhighlight {
+  background-color: var(--color-red-500);
+  color: var(--color-purple-900);
+  padding-left: 3px;
+  padding-right: 3px;
+  font-weight: bold;
 }
 .phighlight {
   background-color: var(--color-purple-600);
