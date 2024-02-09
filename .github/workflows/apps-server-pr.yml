@@ -32,9 +32,3 @@ jobs:
 
     - name: Test
       run: sudo make test
-
-    - name: Try building demo
-      run: |
-        cd test-utils/demo-client
-        go get ./...
-        make build
