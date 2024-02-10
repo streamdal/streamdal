@@ -43,6 +43,7 @@ jobs:
           echo ${{ steps.get_new_version.outputs.new_version }} > VERSION
 
       - uses: stefanzweifel/git-auto-commit-action@v4
+        id: auto_commit
         with:
           commit_message: Bumped Console VERSION file to ${{ steps.get_new_version.outputs.new_version }}
 
@@ -50,6 +51,7 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         id: create_tag
         with:
+          commit_sha: ${{ steps.auto_commit.outputs.commit_hash }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ steps.get_new_version.outputs.new_version }}
           tag_prefix: "apps/console/v"
