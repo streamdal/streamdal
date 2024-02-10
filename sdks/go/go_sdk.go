@@ -73,8 +73,8 @@ const (
 	AbortCurrentStr = "aborted current pipeline"
 	AbortNoneStr    = "no abort condition"
 
-	// ExecStatusTrue & ExecStatusFalse & ExecStatusError are used to indicate
-	// the execution status of a step.
+	// ExecStatusTrue ExecStatusFalse ExecStatusError are used to indicate
+	// the execution status of the _last_ step in the _last_ pipeline.
 	ExecStatusTrue  = protos.ExecStatus_EXEC_STATUS_TRUE
 	ExecStatusFalse = protos.ExecStatus_EXEC_STATUS_FALSE
 	ExecStatusError = protos.ExecStatus_EXEC_STATUS_ERROR
@@ -86,7 +86,6 @@ var (
 	ErrEmptyOperationName   = errors.New("operation name cannot be empty")
 	ErrInvalidOperationType = errors.New("operation type must be set to either OperationTypeConsumer or OperationTypeProducer")
 	ErrEmptyComponentName   = errors.New("component name cannot be empty")
-	ErrMissingShutdownCtx   = errors.New("shutdown context cannot be nil")
 	ErrEmptyCommand         = errors.New("command cannot be empty")
 	ErrEmptyProcessRequest  = errors.New("process request cannot be empty")
 
@@ -291,7 +290,7 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.ShutdownCtx == nil {
-		return ErrMissingShutdownCtx
+		cfg.ShutdownCtx = context.Background()
 	}
 
 	if cfg.ServiceName == "" {
