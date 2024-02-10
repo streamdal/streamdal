@@ -25,44 +25,49 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
-	"github.com/streamdal/go-sdk"
+	streamdal "github.com/streamdal/streamdal/sdks/go"
 )
 
 func main() {
 	sc, _ := streamdal.New(&streamdal.Config{
-		// Address of the streamdal server
-		ServerURL:       "streamdal-server.svc.cluster.local:8082",
-		
+		// Address of the streamdal server + gRPC API port
+		ServerURL: "streamdal-server-address:8082",
+
 		// Token used for authenticating with the streamdal server
-		ServerToken:     "1234",
-		
+		ServerToken: "1234",
+
 		// Identify _this_ application/service (
-		ServiceName:     "billing-svc",
+		ServiceName: "billing-svc",
 	})
-	
+
 	resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
 		Data:          []byte(`{"object": {"field": true}}`),
 	})
-	
+
 	// Check if the .Process() call completed
-	if resp.Status != streamdal.StatusError {
+	if resp.Status != streamdal.ExecStatusError {
 		fmt.Println("Successfully processed payload")
-    }
-	
+	}
+
 	// Or you can inspect each individual pipeline & step result
-	for _, pipeline := resp.PipelineStatus {
+	for _, pipeline := range resp.PipelineStatus {
 		fmt.Printf("Inspecting '%d' steps in pipeline '%s'...\n", len(resp.PipelineStatus), pipeline.Name)
-		
+
 		for _, step := range pipeline.StepStatus {
 			fmt.Printf("Step '%s' status: '%s'\n", step.Name, step.Status)
 		}
-    }
-}
+	}
 
+	// The SDK needs ~3 seconds to start up which will perform initial registration
+	// with server + pull pipelines. Since this is not a long running app, we
+	// want to prevent a fast exit.
+	time.Sleep(5 * time.Second)
+}
 ```
 
 ### Configuration
