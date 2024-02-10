@@ -20,8 +20,8 @@ traditional data pipelines.
 
 <div align="center">
 
-[Overview](#streamdal) •
-[Benefits](#why-streamdal) •
+[Manifesto](#manifesto) •
+[Benefits](#benefits) •
 [Demo](#live-demo) •
 [Getting Started](#getting-started) •
 [How Does It Work?](#how-does-it-work) •
@@ -44,11 +44,11 @@ There are major benefits to running pipelines directly within your app:
 * Is **actually** real-time
    * Not "near real-time" or "max-30-seconds-real-time" - but _actually_
      real-time - data is processed as soon as your app reads or writes data
-* [And **many** other reasons]()
+* [And **many** other reasons](https://docs.streamdal.com/en/getting-started/use-cases/)
 
 # Live Demo
 
-You don't have to install the [server](https://github.com/streamdal/server), the [console](https://github.com/streamdal/console) or [instrument](https://docs.streamdal.com/en/guides/instrumentation/)
+You don't have to install the [server](https://github.com/streamdal/streamdal/tree/main/apps/server), the [console](https://github.com/streamdal/streamdal/tree/main/apps/console) or [instrument](https://docs.streamdal.com/en/guides/instrumentation/)
 any of your apps to see Streamdal in action. We've got a live demo :)
 
 ### [DEMO.STREAMDAL.COM](https://demo.streamdal.com)
@@ -109,13 +109,17 @@ we will need to instrument some code. _Onto the next section!_
 ### Instrument
 
 Once you've installed the server and console, you can instrument your code using
-one of our [SDKs](#sdks).
+one of our SDKs:
+
+- [Go](https://github.com/streamdal/streamdal/tree/main/sdks/go) ━ [ꜜExample](#go)
+- [Python](https://github.com/streamdal/streamdal/tree/main/sdks/python) ━ [ꜜExample](#python)
+- [Node](https://github.com/streamdal/streamdal/tree/main/sdks/node) ━ [ꜜExample](#nodejs)
 
 > To see an example of a _complete_ instrumentation, take a look at the
 [Go demo client](./apps/server/test-utils/demo-client/) 
 > that is bundled with the [./apps/server](./apps/server/test-utils/demo-client/).
 
-**[Go](https://github.com/streamdal/go-sdk)**
+#### [Go](https://github.com/streamdal/streamdal/tree/main/sdks/go)
 ```go
 package main
 
@@ -142,7 +146,7 @@ func main() {
 }
 ```
 
-**[Python](https://github.com/streamdal/python-sdk)**
+#### [Python](https://github.com/streamdal/streamdal/tree/main/sdks/python)
 ```python
 from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
 
@@ -164,7 +168,7 @@ res = client.process(
 )
 ```
 
-**[Node.js](https://github.com/streamdal/node-sdk)**
+#### [Node.js](https://github.com/streamdal/streamdal/tree/main/sdks/node)
 ```typescript
 import { OperationType, Streamdal } from "@streamdal/node-sdk";
 
@@ -194,14 +198,14 @@ export const example = async () => {
 > [!IMPORTANT]
 > **These are _basic, minimal_ examples and should NOT be used in production code.**
 > 
-> Refer to the [instrumentation docs]([https://docs.streamdal.com/en/core-components/sdk/](https://docs.streamdal.com/en/guides/instrumentation/)) for more thorough directions.
+> Refer to the [instrumentation docs](https://docs.streamdal.com/en/guides/instrumentation/) for more thorough directions.
 
 # How Does It Work?
 
 Streamdal consists of **three** main components:
 
-- **[Server](https://github.com/streamdal/server)**
-- **[Console](https://github.com/streamdal/console)**
+- **[Server](https://github.com/streamdal/streamdal/tree/main/apps/server)**
+- **[Console](https://github.com/streamdal/streamdal/tree/main/apps/console)**
 - **[SDKs](https://docs.streamdal.com/en/core-components/sdk/)**
 
 The basic flow is that you [install](#getting-started) the server and console and wrap any 

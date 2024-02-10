@@ -7,11 +7,9 @@
 
 </div>  
 
-**This is the documentation repo for the [Streamdal](https://streamdal.com) project.**
+**This app contains the documentation found at https://docs.streamdal.com**
 
-https://docs.streamdal.com
-
-Streamdal is a combination of open-source services and SDKs that enable 
+Streamdal is a suite of open-source applications and SDKs that enable 
 real-time:
 
 - Data observability _(think_ `tail -f`_, but for your app’s runtime data)_
@@ -38,7 +36,7 @@ principles, and really, our state of mind - check out our
 If you experience any issues with the documentation, whether it be poor 
 readability/experience, missing/incorrect info, typos, or anything, please feel 
 free to [reach out](#community) or simply open an 
-<a href="https://github.com/streamdal/docs/issues">issue</a>.
+<a href="https://github.com/streamdal/streamdal/issues">issue</a>.
 
 
 ## Overview
@@ -58,6 +56,7 @@ helpful for getting started with Streamdal:
 
 - [What is Streamdal?](https://docs.streamdal.com/en/what-is-streamdal/)
 - [How Streamdal Works](https://docs.streamdal.com/en/getting-started/how-streamdal-works/)
+- [Use Cases](https://docs.streamdal.com/en/getting-started/use-cases/)
 - [Quickstart](https://docs.streamdal.com/en/getting-started/quickstart/)
 - [Core Components Overview](https://docs.streamdal.com/en/core-components/overview/)
 
@@ -65,6 +64,7 @@ helpful for getting started with Streamdal:
 - [Instrumentation](https://docs.streamdal.com/en/guides/instrumentation/)
 - [Deployment](https://docs.streamdal.com/en/guides/deployment/)
 - [Tail](https://docs.streamdal.com/en/guides/tail/)
+- [Pipelines](https://docs.streamdal.com/en/guides/pipelines/)
 
 ### Resources
 
@@ -119,7 +119,7 @@ To contribute to this repo:
     
 That's it!
 
-We may modify your additions/subtractions over time for clarity and readability. Feel free to make design requests for anything you submit (or feel is needed), and we are happy to make it happen!
+We may modify your additions/subtractions over time for clarity and readability. Feel free to make design requests for anything you submit and we'll be happy to make it happen!
 
 <div align="right">
 [<a href="#to-top">Back to top</a>]

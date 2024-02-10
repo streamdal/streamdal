@@ -1,11 +1,13 @@
 # Streamdal Go SDK
 
 
-[![Master build status](https://github.com/streamdal/go-sdk/workflows/main/badge.svg)](https://github.com/streamdal/go-sdk/actions/workflows/main-test.yml)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/test_coverage)](https://codeclimate.com/github/streamdal/go-sdk/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/018c12aaebba74deb05e/maintainability)](https://codeclimate.com/github/streamdal/go-sdk/maintainability)
-[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/go-sdk)](https://goreportcard.com/report/github.com/streamdal/go-sdk)
-[![GitHub](https://img.shields.io/github/license/streamdal/go-sdk)](https://github.com/streamdal/go-sdk)
+[![Master build status](https://github.com/streamdal/streamdal/actions/workflows/sdks-go-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/sdks-go-release.yml)
+[![Github](https://img.shields.io/github/license/streamdal/streamdal)](LICENSE)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+<!-- TODO: UPDATE CODECLIMATE, GOREPORTCARD LINKS -->
+<!-- [![Test Coverage](https://api.codeclimate.com/v1/badges/7202de86dc937056673b/test_coverage)](https://codeclimate.com/github/streamdal/go-sdk/test_coverage) -->
+<!-- [![Maintainability](https://api.codeclimate.com/v1/badges/018c12aaebba74deb05e/maintainability)](https://codeclimate.com/github/streamdal/go-sdk/maintainability) -->
+<!-- [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/go-sdk)](https://goreportcard.com/report/github.com/streamdal/go-sdk) -->
 
 ### Documentation
 
