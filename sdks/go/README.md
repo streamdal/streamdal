@@ -14,7 +14,7 @@ See https://docs.streamdal.com
 ### Installation
 
 ```bash
-go get github.com/streamdal/go-sdk
+go get github.com/streamdal/streamdal/sdks/go
 ```
 
 ### Example Usage
@@ -31,10 +31,13 @@ import (
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	sc, _ := streamdal.New(&streamdal.Config{
 		// Address of the streamdal server + gRPC API port
 		ServerURL: "streamdal-server-address:8082",
-
+		
 		// Token used for authenticating with the streamdal server
 		ServerToken: "1234",
 
@@ -42,7 +45,9 @@ func main() {
 		ServiceName: "billing-svc",
 	})
 
-	resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
+	})
+
+    resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
