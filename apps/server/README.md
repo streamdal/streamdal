@@ -1,9 +1,10 @@
 streamdal-server
 ================
-[![Test](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server)
-[![Pull Request](https://github.com/streamdal/server/actions/workflows/pr-test.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/pr-test.yml)
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-server-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+<!-- TODO: NEED TO UPDATE GOREPORTCARD -->
+<!-- [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server) -->
 
 The server component in the Streamdal ecosystem.
 
@@ -29,7 +30,7 @@ To develop the server itself, you'll want to only run the `redis` and
 
 ## gRPC API Usage
 
-You can view the available methods by looking at [protos](https://github.com/streamdal/protos)
+You can view the available methods by looking at [protos](https://github.com/streamdal/streamdal/tree/main/libs/protos)
 or doing it via `grpcurl`:
 
 ```bash

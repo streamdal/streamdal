@@ -1,7 +1,7 @@
 CLI
 ===
-[![Pull Request](https://github.com/streamdal/cli/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/pr.yaml)
-[![Release](https://github.com/streamdal/cli/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/release.yaml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml)
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 CLI tool for [Streamdal](https://streamdal.com)!
@@ -28,7 +28,7 @@ _**OR**_
 
 Install manually:
 
-1. Download latest release [here](https://github.com/streamdal/cli/releases)
+1. Download latest release [here](https://github.com/streamdal/streamdal/releases)
 2. `chmod +x streamdal-darwin-arm64`
 3. `mv streamdal-darwin-arm64 /usr/local/bin/streamdal-cli`
 4. Verify that it works: `streamdal-cli --version`
@@ -71,7 +71,7 @@ you launch the CLI from.
 ## Release
 The process of releasing is semi-automated. You will have to push a new version
 tag which will kick off a release Github action and publish a new release on
-the [releases](https://github.com/streamdal/cli/releases) page.
+the [releases](https://github.com/streamdal/streamdal/releases) page.
 
 You will also need to perform a manual update to the 
 [homebrew formula](https://github.com/streamdal/homebrew-tap).

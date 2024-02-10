@@ -1,10 +1,12 @@
 # Streamdal Python SDK
 
 
-[![Master build status](https://github.com/streamdal/python-sdk/actions/workflows/main.yml/badge.svg)](https://github.com/streamdal/python-sdk/actions/workflows/main.yml)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/test_coverage)](https://codeclimate.com/github/streamdal/python-sdk/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability)
-[![GitHub](https://img.shields.io/github/license/streamdal/python-sdk)](https://github.com/streamdal/python-sdk)
+[![Master build status](https://github.com/streamdal/streamdal/actions/workflows/sdks-python-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/sdks-python-release.yml)
+[![Github](https://img.shields.io/github/license/streamdal/streamdal)](LICENSE)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+<!-- TODO: UPDATE CODECLIMATE LINKS -->
+<!-- [![Test Coverage](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/test_coverage)](https://codeclimate.com/github/streamdal/python-sdk/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability) -->
 
 python-sdk is the python client SDK for Streamdal's open source observability server https://github.com/streamdal/streamdal
 

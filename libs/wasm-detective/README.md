@@ -1,9 +1,10 @@
 wasm-detective
 ================
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-release.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/libs-wasm-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-detective-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/libs-wasm-detective-pr.yml)
 <a href="https://crates.io/crates/streamdal-wasm-detective/"><img src="https://img.shields.io/crates/v/streamdal-wasm-detective.svg"></a>
 <a href="https://docs.rs/streamdal-wasm-detective/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
-[![Release](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml)
-[![Test](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 > [!CAUTION]
 > There are no longer releases for this library. It is now included directly into wasm modules via Cargo.toml path
@@ -12,7 +13,7 @@ wasm-detective
 Rust helper lib for performing value matching in `streamdal/wasm` Wasm functions.
 
 For available matchers, look at the enums listed in
-[streamdal/protos](https://github.com/streamdal/protos/blob/main/protos/steps/detective.proto).
+[/libs/protos/protos](https://github.com/streamdal/streamdal/blob/main/libs/protos/protos/steps/sp_steps_detective.proto).
 
 # Install
 ```

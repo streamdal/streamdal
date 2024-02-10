@@ -1,7 +1,8 @@
 Wasm
 ====
-[![Release WASM files](https://github.com/streamdal/wasm/actions/workflows/release.yml/badge.svg)](https://github.com/streamdal/wasm/actions/workflows/release.yml)
-[![Pull Request](https://github.com/streamdal/wasm/actions/workflows/pr.yml/badge.svg)](https://github.com/streamdal/wasm/actions/workflows/pr.yml)
+[![Release WASM files](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-release.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/libs-wasm-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-pr.yml)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 This repository contains all of the Wasm funcs used by various 
 [Streamdal](https://github.com/streamdal/streamdal) components.

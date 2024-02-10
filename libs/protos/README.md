@@ -1,6 +1,7 @@
 # protos
 [![Build Status](https://github.com/streamdal/streamdal/actions/workflows/libs-protos-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/libs-protos-release.yml)
 <a href="https://crates.io/crates/streamdal-protos/"><img src="https://img.shields.io/crates/v/streamdal-protos.svg"></a>
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 This repo contains the common protobuf definitions for all streamdal components.
 

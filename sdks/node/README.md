@@ -1,4 +1,9 @@
+
 # Streamdal's Node SDK
+
+[![Master build status](https://github.com/streamdal/streamdal/actions/workflows/sdks-node-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/sdks-node-release.yml)
+[![Github](https://img.shields.io/github/license/streamdal/streamdal)](LICENSE)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 ## Getting started
 
@@ -63,7 +68,7 @@ To do development on the `node-sdk`, you can run it locally:
 
 See `./src/sandbox/index.ts` for an entry point for local dev.
 
-Optionally install and run the Streamdal [server](https://github.com/streamdal/server)
+Optionally install and run the Streamdal [server](https://github.com/streamdal/streamdal/tree/main/apps/server)
 
 ### Releasing
 
