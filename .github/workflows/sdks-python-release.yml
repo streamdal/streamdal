@@ -34,6 +34,7 @@ jobs:
           sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
 
       - uses: stefanzweifel/git-auto-commit-action@v4
+        id: auto_commit
         with:
           commit_message: Bumped version in setup.py to ${{ steps.get_new_version.outputs.new_version }}
 
@@ -42,6 +43,7 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         id: create_tag
         with:
+          commit_sha: ${{ steps.auto_commit.outputs.commit_hash }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ steps.get_new_version.outputs.new_version }}
           tag_prefix: "sdks/python/v"
