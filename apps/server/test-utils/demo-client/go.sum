@@ -56,6 +56,8 @@ github.com/streamdal/streamdal/libs/protos v0.1.18 h1:aUY614JVKfJsAEPMsLgOGDYtld
 github.com/streamdal/streamdal/libs/protos v0.1.18/go.mod h1:WZ6qCqzJu/9Vn+P5EUMN1hcOWlxN2EHgcsxehylhgJQ=
 github.com/streamdal/streamdal/sdks/go v0.0.2 h1:ZJuRezuR/cSOSwCi6vzRHavG9RUVa5/1lzV/t9FKl4Q=
 github.com/streamdal/streamdal/sdks/go v0.0.2/go.mod h1:HuRyfRERNAeVEPmhsrEBZP9BcqCL1ZKZYF9mdsCbIck=
+github.com/streamdal/streamdal/sdks/go v0.1.7 h1:mgDEvcNJ4R5lNSHFQKejeDWc9bt65jp69CdrKqAIDGk=
+github.com/streamdal/streamdal/sdks/go v0.1.7/go.mod h1:HuRyfRERNAeVEPmhsrEBZP9BcqCL1ZKZYF9mdsCbIck=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
