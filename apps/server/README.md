@@ -8,6 +8,9 @@ streamdal-server
 
 _**Go server used for facilitating communications between SDKs and Console.**_
 
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
 ---
 
 The server exposes 3 APIs:
