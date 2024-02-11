@@ -6,7 +6,7 @@ streamdal-server
 <!-- TODO: NEED TO UPDATE GOREPORTCARD -->
 <!-- [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server) -->
 
-_**The server component in the Streamdal ecosystem.**_
+_**Go server used for facilitating communications between SDKs and Console.**_
 
 ---
 
