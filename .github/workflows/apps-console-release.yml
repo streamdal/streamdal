@@ -79,3 +79,4 @@ jobs:
           tags: |
             streamdal/console:latest
             streamdal/console:${{ steps.get_new_version.outputs.new_version }}
+
