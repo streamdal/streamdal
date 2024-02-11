@@ -54,6 +54,10 @@ export const example = async () => {
 ```
 *See [./examples](./examples) for runnable examples that can be used as a starters.*
 
+## Documentation
+
+See https://docs.streamdal.com
+
 ## Wasm
 In order to run pipelines with a minimal amount of overhead, the Streamdal node sdk ships 
 and executes pipeline rules as WASM. If you are using Node version < 20.* you'll need to enable 
