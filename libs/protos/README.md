@@ -6,6 +6,9 @@
 
 _**This repo contains the common protobuf definitions used by various Streamdal components.**_
 
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
 ---
 
 ## Development
