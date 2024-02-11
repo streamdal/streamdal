@@ -41,11 +41,14 @@ jobs:
           sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
           grep version build/rust/protos/Cargo.toml
 
+      # We do this because other jobs might have written to the repo while this
+      # job was running and making local changes; without this pull step, we
+      # might run into an error when performing the auto-commit.
       - name: Pull latest changes
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git pull
+          git pull --depth=10
 
       # Commit the updated Cargo.toml
       - uses: stefanzweifel/git-auto-commit-action@v4
