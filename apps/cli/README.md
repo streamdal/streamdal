@@ -1,12 +1,12 @@
 CLI
 ===
-[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml)
 [![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 CLI tool for [Streamdal](https://streamdal.com)!
 
-> It's like a `tail -f` for your data!
+> It's like a `tail -f` for watching the I/O in your app!
 
 NOTE: This app looks best if you use it in a _modern_ terminal that has TrueColor
 support such as iTerm2, Alacrity, Konsole, PowerShell and many, many more.
@@ -69,15 +69,12 @@ file. Alternatively, you can set them in a `.env` file in whichever directory
 you launch the CLI from.
 
 ## Release
-The process of releasing is semi-automated. You will have to push a new version
-tag which will kick off a release Github action and publish a new release on
-the [releases](https://github.com/streamdal/streamdal/releases) page.
+Merging to `main` will trigger a release that will bump the version and create
+a new tag with the format `apps/cli/vX.Y.Z`.
 
-You will also need to perform a manual update to the 
-[homebrew formula](https://github.com/streamdal/homebrew-tap).
-For that, edit `cli.rb`, update `url` and `sha256` for each release and get the
-change merged. Verify that new version is available by running 
-`brew upgrade streamdal/tap/cli`.
+<sub>NOTE: Updating homebrew is manual and requires running the `/scripts/helper/install-tags.sh` script.</sub>
+
+<sub>NOTE: The installer script will automatically fetch and install the latest CLI release.</sub>
 
 ## Community
 
