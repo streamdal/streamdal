@@ -4,12 +4,17 @@ CLI
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-CLI tool for [Streamdal](https://streamdal.com)!
+_**CLI tool for [Streamdal](https://streamdal.com).**_
 
 > It's like a `tail -f` for watching the I/O in your app!
 
 NOTE: This app looks best if you use it in a _modern_ terminal that has TrueColor
 support such as iTerm2, Alacrity, Konsole, PowerShell and many, many more.
+
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
 
 ## Demo
 <img src="./assets/demo.gif">
@@ -69,12 +74,16 @@ file. Alternatively, you can set them in a `.env` file in whichever directory
 you launch the CLI from.
 
 ## Release
-Merging to `main` will trigger a release that will bump the version and create
-a new tag with the format `apps/cli/vX.Y.Z`.
 
-<sub>NOTE: Updating homebrew is manual and requires running the `/scripts/helper/install-tags.sh` script.</sub>
+Any push or merge to the `main` branch with any changes in `/apps/cli/*`
+will automatically tag and release a new console version with `apps/cli/vX.Y.Z`.
 
-<sub>NOTE: The installer script will automatically fetch and install the latest CLI release.</sub>
+<sub>(1) If you'd like to skip running the release action on push/merge to `main`,
+include `norelease` anywhere in the commit message.</sub>
+
+<sub>(2) Updating homebrew is manual and requires running the `/scripts/helper/install-tags.sh` script.</sub>
+
+<sub>(3) The installer script will automatically fetch and install the latest CLI release.</sub>
 
 ## Community
 

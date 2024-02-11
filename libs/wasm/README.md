@@ -4,8 +4,15 @@ Wasm
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-This repository contains all of the Wasm funcs used by various 
-[Streamdal](https://github.com/streamdal/streamdal) components.
+_**This repository contains all of the Wasm funcs used by various 
+[Streamdal](https://github.com/streamdal/streamdal) components.**_
+
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
+
+## Usage
 
 To build: `make build`
 
@@ -37,18 +44,15 @@ Without any of the size optimizations, the initial binary size is ~4.2MB.
 
 Compile + optimization time is ~45s on an M2.
 
-## Developing
+## Development
 
 To update protobuf definitions across all modules, run `bash update_protos.sh 1.2.3`. This will replace the 
 version of `streamdal-protos` across all `Cargo.toml` files and run a `cargo update` to pull in the new version.
 
 ## Release
 
-Releasing is semi-automatic - you have to manually create and push a new `v0.0.0`
-tag and Github Actions will pick up the commit and create a new release.
+Any push or merge to the `main` branch with any changes in `/libs/wasm/*`
+will automatically tag and release a new console version with `libs/wasm/vX.Y.Z`.
 
-```
-git tag v0.0.4
-git push --tags
-```
-
+<sub>If you'd like to skip running the release action on push/merge to `main`,
+include `norelease` anywhere in the commit message.</sub>
