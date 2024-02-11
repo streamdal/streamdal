@@ -6,7 +6,9 @@ streamdal-server
 <!-- TODO: NEED TO UPDATE GOREPORTCARD -->
 <!-- [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server) -->
 
-The server component in the Streamdal ecosystem.
+_**The server component in the Streamdal ecosystem.**_
+
+---
 
 The server exposes 3 APIs:
 
@@ -80,6 +82,14 @@ To generate a key, you can use the following command:
 ```bash
 openssl enc -aes-256-cbc -k secret -P -md sha1 -pbkdf2
 ```
+
+## Release
+
+Any push or merge to the `main` branch with any changes in `/apps/server/*` 
+will automatically tag and release a new console version with `apps/server/vX.Y.Z`.
+
+<sub>If you'd like to skip running the release action on push/merge to `main`,
+include "norelease" anywhere in the commit message.</sub>
 
 # Testing
 Make sure to run tests via `make test`. This is necessary as we have to set

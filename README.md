@@ -8,7 +8,7 @@
 </div>  
 
 Streamdal is an open-source _**'Code Native Data Pipeline'**_ solution for 
-running data pipelines _directly_ in your application code.
+running data tasks _directly_ in your application code.
 
 It is at least _10x faster_, _10x cheaper_ and _10x easier_ to operate than
 traditional data pipelines.
