@@ -5,7 +5,7 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "../lib/utils.ts";
-import { useEffect, useLayoutEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
@@ -110,11 +110,6 @@ export const PipelineActionMenu = (
   const p = serviceSignal.value?.configs[key]?.configs?.find((p) =>
     p.id === pipeline.id
   );
-
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
 
   return (
     <div

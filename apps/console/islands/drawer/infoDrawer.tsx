@@ -15,6 +15,7 @@ import { ResumePipelineModal } from "../../components/modals/resumePipelineModal
 import { AttachPipelineModal } from "../../components/modals/attachPipelineModal.tsx";
 import { Audience } from "https://deno.land/x/streamdal_protos@v0.0.126/protos/sp_common.ts";
 import { TailRateModal } from "../../components/modals/tailRateModal.tsx";
+import { useLayoutEffect } from "preact/hooks";
 
 export const OP_MODAL_WIDTH = "308px";
 
@@ -85,6 +86,11 @@ export const InfoDrawer = (
   { serviceMap }: { serviceMap: ServiceSignal | null },
 ) => {
   const audience = opModal.value?.audience;
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
+    initFlowbite();
+  });
+
   return (
     <>
       <Toast id="pipelineCrud" />
