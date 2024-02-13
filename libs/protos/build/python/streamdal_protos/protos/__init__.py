@@ -653,6 +653,12 @@ class UpdatePipelineRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class DeletePipelineRequest(betterproto.Message):
     pipeline_id: str = betterproto.string_field(1)
+    audiences: List["Audience"] = betterproto.message_field(1000)
+    """
+    This field is for internal usage only by the server. It is used to indicate
+    to the bus handler who this pipeline was used by so the handler can decide
+    who we need to emit a SetPipelines cmd to.
+    """
 
 
 @dataclass(eq=False, repr=False)
