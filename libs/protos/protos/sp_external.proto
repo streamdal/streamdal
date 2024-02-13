@@ -156,6 +156,11 @@ message UpdatePipelineRequest {
 
 message DeletePipelineRequest {
   string pipeline_id = 1;
+
+  // This field is for internal usage only by the server. It is used to indicate
+  // to the bus handler who this pipeline was used by so the handler can decide
+  // who we need to emit a SetPipelines cmd to.
+  repeated protos.Audience _audiences = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message SetPipelinesRequest {
