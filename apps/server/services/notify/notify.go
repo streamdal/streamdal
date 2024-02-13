@@ -276,7 +276,7 @@ func (n *Notify) handleSlack(ctx context.Context, event *Notification, cfg *prot
 	sectionBlock := slack.NewSectionBlock(nil, []*slack.TextBlockObject{
 		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline ID*: %s\n", event.Pipeline.Id), false, false),
 		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline Name*: %s\n", event.Pipeline.Name), false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Step Name*: %s\n", event.Req.StepName), false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Step Name*: %s\n", event.Req.Step.Name), false, false),
 	}, nil)
 
 	// Divider before buttons
@@ -316,7 +316,7 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *Notification, cfg *
 				"Pipeline ID: %s\nPipeline Name: %s\nStep Name: %s",
 				event.Pipeline.Id,
 				event.Pipeline.Name,
-				event.Req.StepName,
+				event.Req.Step.Name,
 			),
 		},
 	}
@@ -352,7 +352,7 @@ func (n *Notify) getEmailBody(_ context.Context, event *Notification, templateNa
 
 	data := map[string]string{
 		"pipeline_name": event.Pipeline.Name,
-		"step_name":     event.Req.StepName,
+		"step_name":     event.Req.Step.Name,
 		"payload_data":  "", // TODO: implement
 	}
 

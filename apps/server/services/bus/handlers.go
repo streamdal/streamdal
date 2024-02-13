@@ -9,6 +9,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
+	types2 "github.com/streamdal/streamdal/apps/server/services/store/types"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/apps/server/validate"
@@ -61,6 +62,36 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 	return nil
 }
 
+// Filter out audiences that are not live AND are not on this node
+func (b *Bus) filterLiveAudiences(ctx context.Context, audiences []*protos.Audience) ([]*types2.LiveEntry, error) {
+	llog := b.log.WithField("method", "filterLiveAudiences")
+
+	llog.Debugf("filtering live audiences")
+
+	// Get all live audiences
+	liveEntries, err := b.options.Store.GetLive(ctx)
+	if err != nil {
+		llog.Errorf("error getting live audiences: %v", err)
+		return nil, errors.Wrap(err, "error getting live audiences")
+	}
+
+	// Go through live entries and remove audiences that are not on this node
+	// and are not part of the req audiences
+	filtered := make([]*types2.LiveEntry, 0)
+
+	for _, le := range liveEntries {
+		if le.NodeName != b.options.NodeName {
+			continue
+		}
+
+		if util.AudienceInList(le.Audience, audiences) {
+			filtered = append(filtered, le)
+		}
+	}
+
+	return filtered, nil
+}
+
 // This is mostly a copy of handleUpdatePipelineRequest (just with diff validation)
 func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.DeletePipelineRequest) error {
 	llog := b.log.WithField("method", "handleDeletePipelineRequest")
@@ -73,38 +104,41 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 		return errors.Wrap(err, "validation error")
 	}
 
-	// Get all ACTIVE/LIVE audiences that use this pipeline ID
-	usage, err := b.options.Store.GetActivePipelineUsage(ctx, req.PipelineId)
-	if err != nil {
-		return errors.Wrap(err, "error getting active pipeline usage")
-	}
-
-	if len(usage) == 0 {
-		llog.Debugf("pipeline id '%s' is not in use on node '%s'- skipping",
-			req.PipelineId, b.options.NodeName)
+	if len(req.XAudiences) == 0 {
+		llog.Debugf("no audiences found for pipeline id '%s' - skipping", req.PipelineId)
 		return nil
 	}
 
-	// Get pipeline config for each audience that uses this pipeline ID
-	for _, u := range usage {
-		pipelines, err := b.options.Store.GetPipelinesByAudience(ctx, u.Audience)
+	liveEntries, err := b.filterLiveAudiences(ctx, req.XAudiences)
+	if err != nil {
+		llog.Errorf("error filtering live audiences: %v", err)
+		return errors.Wrap(err, "error filtering live audiences")
+	}
+
+	if len(liveEntries) == 0 {
+		llog.Debugf("no active audiences found for pipeline id '%s' - skipping", req.PipelineId)
+		return nil
+	}
+
+	for _, le := range liveEntries {
+		pipelines, err := b.options.Store.GetPipelinesByAudience(ctx, le.Audience)
 		if err != nil {
 			return errors.Wrapf(err, "error getting pipeline config by audience '%s'",
-				util.AudienceToStr(u.Audience))
+				util.AudienceToStr(le.Audience))
 		}
 
 		// Send SetPipelines command for session ID
-		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
+		if _, err := b.sendSetPipelinesCommand(le.Audience, pipelines, le.SessionID); err != nil {
 			llog.Debugf("error sending SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
 
 		llog.Debugf("sent SetPipeline command to session '%s' for audience '%s'",
-			u.SessionId, util.AudienceToStr(u.Audience))
+			le.SessionID, util.AudienceToStr(le.Audience))
 	}
 
 	llog.Debugf("sent SetPipelines commands to '%d' active session(s) for pipeline id '%s'",
-		len(usage), req.PipelineId)
+		len(liveEntries), req.PipelineId)
 
 	return nil
 }

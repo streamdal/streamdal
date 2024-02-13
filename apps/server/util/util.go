@@ -424,3 +424,13 @@ func GetStepSubType(step *protos.PipelineStep) string {
 
 	return strings.ToLower(st)
 }
+
+func AudienceInList(audience *protos.Audience, list []*protos.Audience) bool {
+	for _, a := range list {
+		if AudienceEquals(a, audience) {
+			return true
+		}
+	}
+
+	return false
+}

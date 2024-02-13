@@ -479,6 +479,15 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 			"unable to fetch existing pipeline: "+err.Error()), nil
 	}
 
+	audiences, err := s.Options.StoreService.GetAudiencesByPipelineID(ctx, req.PipelineId)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get audiences by pipeline: "+err.Error()), nil
+	}
+
+	// Inject audiences into req so bus handler doesn't have to perform config lookup
+	req.XAudiences = audiences
+
 	// Pipeline exists, delete it
 	if err := s.Options.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,

@@ -84,8 +84,10 @@ type ExternalClient interface {
 	GetNotifications(ctx context.Context, in *GetNotificationsRequest, opts ...grpc.CallOption) (*GetNotificationsResponse, error)
 	// Returns a single notification config
 	GetNotification(ctx context.Context, in *GetNotificationRequest, opts ...grpc.CallOption) (*GetNotificationResponse, error)
+	// Deprecated: Do not use.
 	// Attach a notification config to a pipeline
 	AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Deprecated: Do not use.
 	// Detach a notification config from a pipeline
 	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete an audience
@@ -273,6 +275,7 @@ func (c *externalClient) GetNotification(ctx context.Context, in *GetNotificatio
 	return out, nil
 }
 
+// Deprecated: Do not use.
 func (c *externalClient) AttachNotification(ctx context.Context, in *AttachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, External_AttachNotification_FullMethodName, in, out, opts...)
@@ -282,6 +285,7 @@ func (c *externalClient) AttachNotification(ctx context.Context, in *AttachNotif
 	return out, nil
 }
 
+// Deprecated: Do not use.
 func (c *externalClient) DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, External_DetachNotification_FullMethodName, in, out, opts...)
@@ -510,8 +514,10 @@ type ExternalServer interface {
 	GetNotifications(context.Context, *GetNotificationsRequest) (*GetNotificationsResponse, error)
 	// Returns a single notification config
 	GetNotification(context.Context, *GetNotificationRequest) (*GetNotificationResponse, error)
+	// Deprecated: Do not use.
 	// Attach a notification config to a pipeline
 	AttachNotification(context.Context, *AttachNotificationRequest) (*StandardResponse, error)
+	// Deprecated: Do not use.
 	// Detach a notification config from a pipeline
 	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
 	// Delete an audience
