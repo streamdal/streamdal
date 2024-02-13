@@ -9,7 +9,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
-	types2 "github.com/streamdal/streamdal/apps/server/services/store/types"
+	stypes "github.com/streamdal/streamdal/apps/server/services/store/types"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/apps/server/validate"
@@ -63,7 +63,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 }
 
 // Filter out audiences that are not live AND are not on this node
-func (b *Bus) filterLiveAudiences(ctx context.Context, audiences []*protos.Audience) ([]*types2.LiveEntry, error) {
+func (b *Bus) filterLiveAudiences(ctx context.Context, audiences []*protos.Audience) ([]*stypes.LiveEntry, error) {
 	llog := b.log.WithField("method", "filterLiveAudiences")
 
 	llog.Debugf("filtering live audiences")
@@ -77,7 +77,7 @@ func (b *Bus) filterLiveAudiences(ctx context.Context, audiences []*protos.Audie
 
 	// Go through live entries and remove audiences that are not on this node
 	// and are not part of the req audiences
-	filtered := make([]*types2.LiveEntry, 0)
+	filtered := make([]*stypes.LiveEntry, 0)
 
 	for _, le := range liveEntries {
 		if le.NodeName != b.options.NodeName {
