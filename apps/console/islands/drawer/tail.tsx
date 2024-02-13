@@ -96,16 +96,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   useEffect(() => {
     tailSignal.value = [];
     tailPausedSignal.value = false;
-    const togglePause = () => {
-      tailPausedSignal.value = document.visibilityState !== "visible";
-    };
-    document.addEventListener("visibilitychange", togglePause);
-
-    return () => {
-      stop();
-      tailSignal.value = [];
-      document.removeEventListener("visibilitychange", togglePause);
-    };
   }, []);
 
   useSignalEffect(() => {
@@ -166,11 +156,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
               data-tooltip-target="tail-pause-play"
               onClick={() => (tailPausedSignal.value = !tailPausedSignal.value)}
             >
-              {tailPausedSignal.value ? (
-                <IconPlayerPlayFilled class="h-6 w-6 text-white" />
-              ) : (
-                <IconPlayerPauseFilled class="h-6 w-6 text-white" />
-              )}
+              {tailPausedSignal.value
+                ? <IconPlayerPlayFilled class="h-6 w-6 text-white" />
+                : <IconPlayerPauseFilled class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-pause-play"
                 message={tailPausedSignal.value ? "Resume Tail" : "Pause Tail"}
@@ -183,11 +171,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
                 tailDiffSignal.value = !tailDiffSignal.value;
               }}
             >
-              {tailDiffSignal.value ? (
-                <IconColumns1 class="h-6 w-6 text-white" />
-              ) : (
-                <IconColumns2 class="h-6 w-6 text-white" />
-              )}
+              {tailDiffSignal.value
+                ? <IconColumns1 class="h-6 w-6 text-white" />
+                : <IconColumns2 class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-diff"
                 message={`${
@@ -200,11 +186,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
               data-tooltip-target="tail-fullscreen"
               onClick={() => setFullScreen(!fullScreen)}
             >
-              {fullScreen ? (
-                <IconWindowMinimize class="h-6 w-6 text-white" />
-              ) : (
-                <IconWindowMaximize class="h-6 w-6 text-white" />
-              )}
+              {fullScreen
+                ? <IconWindowMinimize class="h-6 w-6 text-white" />
+                : <IconWindowMaximize class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-fullscreen"
                 message={fullScreen ? "Smaller" : "Fullscreen"}

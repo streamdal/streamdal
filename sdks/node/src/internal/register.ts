@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ClientType } from "@streamdal/protos/protos/sp_info";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
-// DS: Can this be just @streamdal/protos/...?
-import { Pipeline } from "../../../../../streamdal/libs/protos/build/ts/node/cjs/protos/sp_pipeline.js";
+import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
+
 import { Configs } from "../streamdal.js";
 import { processResponse } from "./pipeline.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
@@ -20,7 +20,7 @@ export interface RegisterConfigs {
 }
 
 export interface Tail {
-  tail?: boolean;
+  tailStatus?: boolean;
   tailRequestId?: string;
   sampleBucket: TokenBucket;
 }
