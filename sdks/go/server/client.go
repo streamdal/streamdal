@@ -130,7 +130,7 @@ func (c *Client) Notify(ctx context.Context, pipeline *protos.Pipeline, step *pr
 	req := &protos.NotifyRequest{
 		PipelineId:          pipeline.Id,
 		Audience:            aud,
-		StepName:            step.Name,
+		Step:                step,
 		OccurredAtUnixTsUtc: time.Now().UTC().Unix(),
 	}
 
