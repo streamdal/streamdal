@@ -20,7 +20,11 @@ import * as z from "zod/index.ts";
 import { PipelineMenu } from "../components/pipeline/pipelineMenu.tsx";
 import { StepMenu } from "../components/pipeline/stepMenu.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { ErrorType, validate } from "../components/form/validate.ts";
+import {
+  ErrorType,
+  resolveValue,
+  validate,
+} from "../components/form/validate.ts";
 import { FormInput } from "../components/form/formInput.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import {
@@ -460,6 +464,7 @@ const PipelineDetail = ({
                 data={data}
                 setData={setData}
                 errors={errors}
+                defaultValue={resolveValue(data, "name")}
               />
             </div>
             <PipelineMenu id={pipeline?.id} />
