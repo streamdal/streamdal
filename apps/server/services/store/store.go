@@ -161,7 +161,63 @@ type IStore interface {
 }
 
 func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
-	return nil, nil
+	llog := s.log.WithField("method", "DeletePipelineConfigsByPipelineID")
+	llog.Debug("received request to delete pipeline configs by pipeline ID")
+
+	// Fetch all pipeline configs
+	pipelineConfigs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error fetching pipeline configs")
+	}
+
+	newPipelineConfigs := make(map[*protos.Audience]*protos.PipelineConfigs)
+	audiences := make([]*protos.Audience, 0)
+
+	// Build a new pipeline config for each audience that uses the pipeline ID,
+	// skipping over pipeline ID that we want to delete
+	for aud, configs := range pipelineConfigs {
+		for _, cfg := range configs.Configs {
+			if cfg.Id == pipelineID {
+				continue
+			}
+
+			if _, ok := newPipelineConfigs[aud]; !ok {
+				newPipelineConfigs[aud] = &protos.PipelineConfigs{
+					Configs: make([]*protos.PipelineConfig, 0),
+				}
+			}
+
+			newPipelineConfigs[aud].Configs = append(newPipelineConfigs[aud].Configs, cfg)
+			audiences = append(audiences, aud)
+		}
+	}
+
+	// Save the new pipeline configs
+	if err := s.savePipelineConfigs(ctx, newPipelineConfigs); err != nil {
+		llog.Errorf("unable to save new pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error saving new pipeline configs")
+	}
+
+	return audiences, nil
+}
+
+func (s *Store) savePipelineConfigs(ctx context.Context, pipelineConfigs map[*protos.Audience]*protos.PipelineConfigs) error {
+	llog := s.log.WithField("method", "savePipelineConfigs")
+	llog.Debug("received request to save pipeline configs")
+
+	for aud, cfgs := range pipelineConfigs {
+		data, err := proto.Marshal(cfgs)
+		if err != nil {
+			return errors.Wrap(err, "error encoding pipeline configs")
+		}
+
+		if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(aud)), data, 0).Err(); err != nil {
+			return errors.Wrapf(err, "error saving pipeline to store in key '%s'", RedisAudienceKey(util.AudienceToStr(aud)))
+		}
+	}
+
+	return nil
 }
 
 func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
