@@ -150,6 +150,15 @@ type IStore interface {
 	// GetPipelinesByAudience will fetch pipeline configs and then use the ID to
 	// fetch the actual pipeline from store + update the paused state.
 	GetPipelinesByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error)
+
+	// DeletePipelineConfig deletes a pipeline config for all audiences that use
+	// given pipeline ID; it will return a list of audiences that the pipeline id
+	// was used by.
+	DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+}
+
+func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
+	return nil, nil
 }
 
 func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
