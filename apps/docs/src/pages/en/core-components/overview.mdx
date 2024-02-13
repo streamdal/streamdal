@@ -12,17 +12,17 @@ import Changes from "@components/Misc/Changes.astro";
 
 ## 1. Streamdal SDK
 
-The SDK, designed for efficiency, tackles metrics reporting, pipeline processing, and validations using **WebAssembly (Wasm)**. This approach assures sub-millisecond overhead, immense scalability, and cross-language compatibility.
+The SDK, designed for efficiency, tackles metrics reporting, [pipeline](/en/guides/pipelines/) processing, and validations using **WebAssembly (Wasm)**. This approach assures sub-millisecond overhead, immense scalability, and cross-language compatibility.
 
 ### Key Features:
 
 <ul>
 <li style="padding: 5px 0px 5px 0px;">**Lightweight Design**: Tailored for efficiency, avoiding unnecessary bulk.</li>
-<li style="padding: 5px 0px 5px 0px;">**Real-time Rule Processing**: Employs <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>, achieving [remarkable overheads](https://github.com/streamdal/go-sdk/blob/main/BENCHMARKS.md).</li>
+<li style="padding: 5px 0px 5px 0px;">**Real-time Rule Processing**: Employs <a href="/en/resources-support/glossary#wasm" class="pkeyword">Wasm</a>, achieving [remarkable overheads](https://github.com/streamdal/streamdal/blob/main/sdks/go/BENCHMARKS.md).</li>
 <li style="padding: 5px 0px 5px 0px;">**Console UI-Defined Rules**: <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">Rules</a> are directly defined via the [Console UI](/en/core-components/console-ui/) and fetched by the [SDK](/en/core-components/sdk/) for processing.</li>
 </ul>
 
-For detailed insights, explore the [Streamdal SDK documentation](/en/core-components/sdk/).
+For more details, explore the [Streamdal SDK documentation](/en/core-components/sdk/).
 
 ## 2. Streamdal Server
 
@@ -34,7 +34,7 @@ Acting as the pivotal hub in Streamdal's framework, the Server ensures fluent tr
 - **High Availability**: Crafted for uninterrupted and consistent data operations.
 - **Multi-Component Communication**: Vital in interfacing between different components for smooth data operations.
 
-For a deep dive, refer to the [Streamdal Server documentation](/en/core-components/server/).
+For more details, explore the [Streamdal Server documentation](/en/core-components/server/).
 
 ## 3. Streamdal Console UI 
 
@@ -51,11 +51,11 @@ The Console UI stands as the orchestrator, steering the intricate nuances of dat
 
 ### <img src={beta} alt="Beta" style="display: inline" /> Pipeline View
 
-- **Detective (PII) <a href="/en/resources-support/glossary#rule-or-step" class="pkeyword">Rules</a>**: Define guidelines for handling Personal Identifiable Information (PII).
+- **[Detective](/en/guides/pipelines/#detective) Rules**: Define guidelines for handling Personal Identifiable Information (PII).
 - **Encode & Decode Rules**: Manage data encoding and decoding.
-- **Transformation Rules**: Set dynamic data transformation parameters.
+- **[Transformation](/en/guides/pipelines/#transform) Rules**: Set dynamic data transformation parameters.
 
-For an in-depth tour, navigate to the [Streamdal Console UI documentation](../console-ui).
+For more details, explore the [Streamdal Console UI documentation](/en/core-components/console-ui/).
 
 ---
 

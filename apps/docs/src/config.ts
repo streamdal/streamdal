@@ -141,7 +141,7 @@ export const SIDEBAR: Sidebar = {
             link: "en/core-components/console-ui",
           },
           {
-            text: "Libraries/Shims (TBA)",
+            text: "Libraries/Shims",
             slug: "libraries-shiums",
             link: "en/core-components/libraries-shims",
           },
