@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { zfd } from "zod-form-data";
 import * as z from "zod/index.ts";
@@ -83,11 +83,11 @@ export const NotificationSchema = zfd.formData({
   config: NotificationKindSchema,
 });
 
-const NotificationDetail = (
-  { notification }: {
-    notification: NotificationConfig;
-  },
-) => {
+const NotificationDetail = ({
+  notification,
+}: {
+  notification: NotificationConfig;
+}) => {
   const [errors, setErrors] = useState({});
   const [data, setData] = useState(notification);
 
@@ -96,11 +96,6 @@ const NotificationDetail = (
       ...notification,
     });
   }, [notification]);
-
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
 
   const onSubmit = async (e: any) => {
     const notificationFormData = new FormData(e.target);
@@ -132,7 +127,7 @@ const NotificationDetail = (
         ...data.config,
         email: {
           ...data.config.email,
-          recipients: [...data.config.email?.recipients || [], ""],
+          recipients: [...(data.config.email?.recipients || []), ""],
         },
       },
     });
@@ -140,14 +135,10 @@ const NotificationDetail = (
 
   return (
     <>
-      <form
-        onSubmit={onSubmit}
-        action="/notifications/save"
-        method="post"
-      >
-        <div class="flex justify-between rounded-t items-center px-[18px] pt-[18px] pb-[8px]">
+      <form onSubmit={onSubmit} action="/notifications/save" method="post">
+        <div class="flex items-center justify-between rounded-t px-[18px] pb-[8px] pt-[18px]">
           <div class="flex flex-row items-center">
-            <div class="text-[30px] font-medium mr-2 h-[54px]">
+            <div class="mr-2 h-[54px] text-[30px] font-medium">
               <FormHidden name="id" value={data?.id} />
               <InlineInput
                 placeHolder="Name your notification"
@@ -165,9 +156,9 @@ const NotificationDetail = (
             </a>
           </div>
         </div>
-        <div class="flex justify-between rounded-t items-center w-full px-[18px] pt-[18px] pb-[8px]">
-          <div class="flex flex-row items-center w-full justify-between">
-            <div class="text-[16px] flex flex-col justify-between font-medium mr-2 h-[54px] w-full">
+        <div class="flex w-full items-center justify-between rounded-t px-[18px] pb-[8px] pt-[18px]">
+          <div class="flex w-full flex-row items-center justify-between">
+            <div class="mr-2 flex h-[54px] w-full flex-col justify-between text-[16px] font-medium">
               <FormSelect
                 name={"type"}
                 data={data}
@@ -181,42 +172,40 @@ const NotificationDetail = (
                 value={data.config.oneofKind}
               />
 
-              {data?.type == NotificationType.SLACK &&
-                (
-                  <>
-                    <h2 className="mb-2 mt-4 w-full text-sm">
-                      In order to get Slack Alerts, you'll need to provide a
-                      Slack API token. To generate a token, follow the
-                      instructions{" "}
-                      <a
-                        href="https://api.slack.com/tutorials/tracks/getting-a-token"
-                        target="_new"
-                        className="underline underline-offset-2"
-                      >
-                        here
-                      </a>
-                      .
-                    </h2>
-                    <FormInput
-                      name={`config.slack.botToken`}
-                      data={data}
-                      setData={setData}
-                      label="Slack token"
-                      placeHolder=""
-                      errors={errors}
-                      wrapperClass={"w-full"}
-                    />
-                    <FormInput
-                      name={`config.slack.channel`}
-                      data={data}
-                      setData={setData}
-                      label="Slack Channel"
-                      placeHolder=""
-                      errors={errors}
-                      wrapperClass={"w-full"}
-                    />
-                  </>
-                )}
+              {data?.type == NotificationType.SLACK && (
+                <>
+                  <h2 className="mb-2 mt-4 w-full text-sm">
+                    In order to get Slack Alerts, you'll need to provide a Slack
+                    API token. To generate a token, follow the instructions{" "}
+                    <a
+                      href="https://api.slack.com/tutorials/tracks/getting-a-token"
+                      target="_new"
+                      className="underline underline-offset-2"
+                    >
+                      here
+                    </a>
+                    .
+                  </h2>
+                  <FormInput
+                    name={`config.slack.botToken`}
+                    data={data}
+                    setData={setData}
+                    label="Slack token"
+                    placeHolder=""
+                    errors={errors}
+                    wrapperClass={"w-full"}
+                  />
+                  <FormInput
+                    name={`config.slack.channel`}
+                    data={data}
+                    setData={setData}
+                    label="Slack Channel"
+                    placeHolder=""
+                    errors={errors}
+                    wrapperClass={"w-full"}
+                  />
+                </>
+              )}
               {data?.type == NotificationType.EMAIL && (
                 <div>
                   <FormSelect
@@ -231,28 +220,29 @@ const NotificationDetail = (
                     name={`config.email.config.oneofKind`}
                     value={NotificationEmail_Type[
                       data?.config?.email?.type || 1
-                    ]
-                      ?.toLowerCase()}
+                    ]?.toLowerCase()}
                   />
                   <div
-                    class={"flex items-center justify-evenly btn-secondary w-[175px] border border-web cursor-pointer"}
+                    class={"btn-secondary border-web flex w-[175px] cursor-pointer items-center justify-evenly border"}
                     onClick={addRecipient}
                   >
                     Add a new recipient
-                    <IconPlus class="w-5 h-5 cursor-pointer" />
+                    <IconPlus class="h-5 w-5 cursor-pointer" />
                   </div>
 
                   {data?.config?.email?.recipients?.length
-                    ? data?.config?.email?.recipients?.map((r, i) => (
-                      <FormInput
-                        name={`config.email.recipients.${i}`}
-                        data={data}
-                        label={`Recipient ${i + 1}.`}
-                        setData={setData}
-                        placeHolder={""}
-                        errors={errors}
-                      />
-                    ))
+                    ? (
+                      data?.config?.email?.recipients?.map((r, i) => (
+                        <FormInput
+                          name={`config.email.recipients.${i}`}
+                          data={data}
+                          label={`Recipient ${i + 1}.`}
+                          setData={setData}
+                          placeHolder={""}
+                          errors={errors}
+                        />
+                      ))
+                    )
                     : (
                       <FormInput
                         name={`config.email.recipients.0`}
@@ -270,105 +260,97 @@ const NotificationDetail = (
                     setData={setData}
                     errors={errors}
                   />
-                  {data?.config.email?.type !=
-                      NotificationEmail_Type.SES &&
-                    (
-                      <>
-                        <div
-                          class={"flex flex-row justify-between items-center"}
-                        >
-                          <FormInput
-                            name={"config.email.config.smtp.host"}
-                            data={data}
-                            setData={setData}
-                            label="Host name"
-                            placeHolder=""
-                            errors={errors}
-                            wrapperClass="w-[49%]"
-                          />
-                          <FormInput
-                            name={"config.email.config.smtp.port"}
-                            data={data}
-                            setData={setData}
-                            label="Port"
-                            errors={errors}
-                            isNumber={true}
-                            wrapperClass="w-[49%]"
-                          />
-                        </div>
-                        <div
-                          class={"flex flex-row justify-between items-center"}
-                        >
-                          <FormInput
-                            name={"config.email.config.smtp.user"}
-                            data={data}
-                            setData={setData}
-                            label="User"
-                            placeHolder=""
-                            errors={errors}
-                            wrapperClass="w-[49%]"
-                          />
-                          <FormInput
-                            name={"config.email.config.smtp.password"}
-                            data={data}
-                            setData={setData}
-                            label="Password"
-                            placeHolder=""
-                            errors={errors}
-                            wrapperClass="w-[49%]"
-                          />
-                        </div>
-                        <FormSelect
-                          name={"config.email.config.smtp.useTls"}
-                          data={data}
-                          setData={setData}
-                          label="Use TLS?"
-                          errors={errors}
-                          children={[
-                            <option
-                              key={`option-type-key-true`}
-                              value={true}
-                              label={"true"}
-                            />,
-                            <option
-                              key={`option-type-key-false`}
-                              value={false}
-                              label={"false"}
-                            />,
-                          ]}
-                        />
-                      </>
-                    )}
-                  {data?.config.email?.type ==
-                      NotificationEmail_Type.SES &&
-                    (
-                      <>
-                        <div class={"flex-col"}>
-                          <FormInput
-                            name={"config.email.config.ses.sesRegion"}
-                            data={data}
-                            label="Region"
-                            setData={setData}
-                            errors={errors}
-                          />
-                          <FormInput
-                            name={"config.email.config.ses.sesAccessKeyId"}
-                            data={data}
-                            label="Access Key Id"
-                            setData={setData}
-                            errors={errors}
-                          />
-                        </div>
-
+                  {data?.config.email?.type != NotificationEmail_Type.SES && (
+                    <>
+                      <div class={"flex flex-row items-center justify-between"}>
                         <FormInput
-                          name={"config.email.config.ses.sesSecretAccessKey"}
+                          name={"config.email.config.smtp.host"}
                           data={data}
-                          label="Secret Access Key"
+                          setData={setData}
+                          label="Host name"
+                          placeHolder=""
+                          errors={errors}
+                          wrapperClass="w-[49%]"
+                        />
+                        <FormInput
+                          name={"config.email.config.smtp.port"}
+                          data={data}
+                          setData={setData}
+                          label="Port"
+                          errors={errors}
+                          isNumber={true}
+                          wrapperClass="w-[49%]"
+                        />
+                      </div>
+                      <div class={"flex flex-row items-center justify-between"}>
+                        <FormInput
+                          name={"config.email.config.smtp.user"}
+                          data={data}
+                          setData={setData}
+                          label="User"
+                          placeHolder=""
+                          errors={errors}
+                          wrapperClass="w-[49%]"
+                        />
+                        <FormInput
+                          name={"config.email.config.smtp.password"}
+                          data={data}
+                          setData={setData}
+                          label="Password"
+                          placeHolder=""
+                          errors={errors}
+                          wrapperClass="w-[49%]"
+                        />
+                      </div>
+                      <FormSelect
+                        name={"config.email.config.smtp.useTls"}
+                        data={data}
+                        setData={setData}
+                        label="Use TLS?"
+                        errors={errors}
+                        children={[
+                          <option
+                            key={`option-type-key-true`}
+                            value={true}
+                            label={"true"}
+                          />,
+                          <option
+                            key={`option-type-key-false`}
+                            value={false}
+                            label={"false"}
+                          />,
+                        ]}
+                      />
+                    </>
+                  )}
+                  {data?.config.email?.type == NotificationEmail_Type.SES && (
+                    <>
+                      <div class={"flex-col"}>
+                        <FormInput
+                          name={"config.email.config.ses.sesRegion"}
+                          data={data}
+                          label="Region"
                           setData={setData}
                           errors={errors}
                         />
-                      </>
-                    )}
+                        <FormInput
+                          name={"config.email.config.ses.sesAccessKeyId"}
+                          data={data}
+                          label="Access Key Id"
+                          setData={setData}
+                          errors={errors}
+                        />
+                      </div>
+
+                      <FormInput
+                        name={"config.email.config.ses.sesSecretAccessKey"}
+                        data={data}
+                        label="Secret Access Key"
+                        setData={setData}
+                        errors={errors}
+                      />
+                    </>
+                  )}
                 </div>
               )}
               {data?.type == NotificationType.PAGERDUTY && (
@@ -405,11 +387,8 @@ const NotificationDetail = (
                   />
                 </>
               )}
-              <div class="flex flex-row justify-end mb-4">
-                <button
-                  className="btn-heimdal"
-                  type="submit"
-                >
+              <div class="mb-4 flex flex-row justify-end">
+                <button className="btn-heimdal" type="submit">
                   Save
                 </button>
               </div>
