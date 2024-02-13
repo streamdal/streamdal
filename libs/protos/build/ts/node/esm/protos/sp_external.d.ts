@@ -144,6 +144,14 @@ export interface DeletePipelineRequest {
      * @generated from protobuf field: string pipeline_id = 1;
      */
     pipelineId: string;
+    /**
+     * This field is for internal usage only by the server. It is used to indicate
+     * to the bus handler who this pipeline was used by so the handler can decide
+     * who we need to emit a SetPipelines cmd to.
+     *
+     * @generated from protobuf field: repeated protos.Audience _audiences = 1000;
+     */
+    Audiences: Audience[];
 }
 /**
  * @generated from protobuf message protos.SetPipelinesRequest
