@@ -4,7 +4,7 @@ import { FormBoolean } from "../form/formBoolean.tsx";
 import { RadioGroup } from "../form/radioGroup.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
-import { useLayoutEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import { FormStringKV } from "../form/formStringKV.tsx";
@@ -22,11 +22,6 @@ export const StepCondition = (
   { name, label, toolTip, data, setData, errors }: StepConditionType,
 ) => {
   const [expanded, setExpanded] = useState(false);
-
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
 
   return (
     <div
@@ -81,7 +76,6 @@ export const StepCondition = (
         <FormStringKV
           name={`${name}.metadata`}
           data={data}
-          setData={setData}
           label={"Metadata"}
           description="Metadata are arbitrary keys and values that will be emitted to calling code"
           errors={errors}

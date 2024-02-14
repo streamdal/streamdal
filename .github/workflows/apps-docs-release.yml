@@ -26,6 +26,9 @@ jobs:
 
       - name: Build
         run: npm install && npm run build
+        env:
+          PUBLIC_ALGOLIA_APP_ID: OWD3D04SOS
+          PUBLIC_ALGOLIA_API_KEY: ${{secrets.ALGOLIA_API_KEY}}
 
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1

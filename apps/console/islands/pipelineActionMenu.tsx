@@ -5,7 +5,7 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "../lib/utils.ts";
-import { useEffect, useLayoutEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
@@ -111,11 +111,6 @@ export const PipelineActionMenu = (
     p.id === pipeline.id
   );
 
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
-
   return (
     <div
       class={`p-2 flex flex-row justify-between items-center ${
@@ -131,12 +126,19 @@ export const PipelineActionMenu = (
         />
 
         <div
-          class={`max-w-[${
-            p ? "150px" : "190px"
-          }] flex flex-row justify-start items-center whitespace-nowrap text-ellipsis overflow-hidden`}
+          data-tooltip-target={`pipeline-name-${pipeline.id}`}
+          class={"flex flex-row justify-start items-center"}
         >
-          {pipeline.name}
+          <div
+            class={`w-[${p ? "195px" : "200px"}] truncate`}
+          >
+            {pipeline.name}
+          </div>
         </div>
+        <Tooltip
+          targetId={`pipeline-name-${pipeline.id}`}
+          message={pipeline.name}
+        />
       </div>
       <div class="flex flex-row justify-end items-center ">
         <a

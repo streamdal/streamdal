@@ -11,6 +11,7 @@ import note from "@images/icons/note.png";
 import cliTail from "@images/guides/CliTail.png";
 import consoleUi from "@images/core-components/console-dashboard.png";
 import Changes from "@components/Misc/Changes.astro";
+import Footer from "@components/Callouts/pFooter.astro"
 
 <Changes />
 
@@ -18,59 +19,68 @@ import Changes from "@components/Misc/Changes.astro";
 <br />
 
 <div style="justify-content: center; display: flex;">
-  <div style="background: linear-gradient(250deg, #956CFF, #FFD260); border-radius: 17px; padding: 2px; @media ">
+  <div style="background: linear-gradient(250deg, #956CFF, #FFD260); border-radius: 17px; padding: 2px;">
     <div style="background-color: var(--color-purple-1000); display: inline-flex; padding-left: 20px; padding-right: 20px; border-radius: 15px;">
       Want a quick peek at what it looks like? Check the live [demo](https://demo.streamdal.com)
     </div>
   </div>
 </div>
 
-Streamdal is an open-source data observability graph and rule-based management
-tool that helps you take action. It's built on a collection of several
-open-source components - a server, an SDK, and a console UI - designed to
-integrate seamlessly into your code. We call this method of handling data 
-Code-Native Data Pipelines.
+Streamdal is a free and open-source tool that allows you to embed privacy 
+controls into application code. These controls can be used to detect PII, or an 
+enumerating variety of [data types](/en/guides/pipelines/#detective), as it 
+enters and leaves your systems, preventing it from reaching unintended 
+databases, data streams, or pipelines.
 
-# <center>_Why_ Streamdal?</center>
+We call this method of adding privacy controls, and unique 
+performance-retaining, near-native speed of handling data with Wasm: 
+**Code-Native.**
 
-Streamdal is not just another <a class="pkeyword" href="/en/resources-support/glossary/#observability">observability</a>
-or data management tool. It's a philosophy for a way of thinking and working
-with data that prioritizes a few concepts:
+# <center>Why Code-Native?</center>
 
-- Real-time insights... that are _truly_ **real-time** and not _"real-time"_
-- Flexibility
-- Ease of use
-- Preventing issues
+It's not just another gimmick for a privacy or data management tool. It's a 
+philosophy for a way of thinking and working with data that prioritizes 
+a few concepts:
 
-Read more about this philosophy and design choice in our brief
+1. Preventing issues vs reacting to issues
+2. Flexibility and ease of use
+3. Minimalism (i.e. the reduction of complex data infrastructure)
+4. Real-time insights... that are _truly_ **real-time** and not _"real-time"_
+
+By having a method that embeds your data privacy controls, data 
+transformations, and PII or other data handling operations into code, you will 
+ensure compliance happens at runtime in a _preventive way_ vs. traditional 
+tooling that relies on a database, log ingestion, or other extra infrastructure 
+with network hops in a _reactive way_. 
+
+Read more about this philosophy and design choice in our brief 
 [manifesto](https://streamdal.com/manifesto/).
 
+## Walkthrough Video
 
-{/* TODO: Add demo section once we have a good video */}
-{/* ## Demo Video
-Explore Streamdal in action! Our demo video offers a comprehensive walkthrough
-of the platform's capabilities and how it can be integrated into your workflows.
+Explore Streamdal in action! The walkthrough video below shows the platform's 
+capabilities and conveys what Code-Native does for handling data. It also shows 
+how you can get started with Streamdal along with some examples 
+[pipelines](/en/guides/pipelines/).
 
-[Watch the Demo Video](https://demo.streamdal.com/video) */}
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/gjHpSMWoWPs?si=v5dgSxzVDmZBBJKi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 
 ## Features
 
-- Data Observability _(think_ `tail -f`_, but for your app's runtime data)_
-- Data Quality Monitoring
+- Data Privacy Controls
 - Data Obfuscation, Masking, and Stripping
+- Data Observability _(think_ `tail -f`_, but for your app's runtime data)_
 - Data Transformation
+- Data Quality Monitoring
 - (Beta) Data Governance & Enforcement
-
-
----
 
 ## Deployment
 - **Quick Setup**: Check out our
 [quickstart guide](/en/getting-started/quickstart/) to get Streamdal up in no
 time.
 - **Streamdal in Production**: For more robust requirements, refer to our
-[deployment guide](/en/guides/instrumentation/).
+[deployment guide](/en/guides/deployment/).
 
 ## Console UI
 Dive into the [Console UI](/en/core-components/console-ui) to explore metrics,
@@ -121,5 +131,11 @@ Need help? Have questions? Want to contribute or chat with like-minded developer
 [Join our Community!](/en/resources-support/community/)
 
 ## Contributing
-We ️**love** contributions! We'll even send you some swag for being a contributor 😘 
+We ️**love** contributions! We'll even send you some swag for being a contributor 😘 
 But before you craft that amazing PR, make sure to read the [contributing guidelines](/en/resources-support/contributing).
+
+<Footer>
+<div slot="start">
+[How Streamdal Works →](/en/getting-started/how-streamdal-works/)
+</div>
+</Footer>

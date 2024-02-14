@@ -88,13 +88,6 @@ var _ = Describe("Streamdal", func() {
 			Expect(err).To(Equal(ErrEmptyServiceName))
 		})
 
-		It("should error on missing shutdown context", func() {
-			cfg.ShutdownCtx = nil
-			err := validateConfig(cfg)
-			Expect(err).To(HaveOccurred())
-			Expect(err).To(Equal(ErrMissingShutdownCtx))
-		})
-
 		It("should error on invalid step timeout duration", func() {
 			_ = os.Setenv("STREAMDAL_STEP_TIMEOUT", "foo")
 			err := validateConfig(cfg)

@@ -11,6 +11,7 @@ import producer_icon from "@images/icons/producer_icon.png";
 import consumer_icon from "@images/icons/consumer_icon.png";
 import datagraph from "@images/core-components/data-graph.png";
 import Changes from "@components/Misc/Changes.astro";
+import RichImg from "@components/Misc/RichImg.astro";
 
 <Changes />
 
@@ -86,7 +87,7 @@ and topics in each <a href="/en/resources-support/glossary#pipeline" class="pkey
 
 It's the pretty figma-like portion of the [Console UI](/en/core-components/console-ui/):
 
-<img src={datagraph} alt="Streamdal Data Graph" style="border-radius: 5px;" />
+<RichImg src={datagraph} alt="Streamdal Data Graph" style="border-radius: 5px;" />
 
 It will show the direction of the flow of data (whether it is a read or a 
 write), and will always have:
@@ -144,7 +145,10 @@ features we consider as "observability" features:
 
 A `pipeline` is a set of `steps` and conditions. A user would configure one or 
 more steps for a specific producer or consumer - the result would be a pipeline 
-(that is sent to the [SDK](/en/core-components/sdk/) client via [gRPC](/en/engineering/grpc/)).
+(that is sent to the [SDK](/en/core-components/sdk/) client via 
+[gRPC](/en/engineering/grpc/)).
+
+Check out the [Pipeline guide](/en/guides/pipelines/) for more information.
 
 
 ### <span class="pkeyword">Producer</span> 

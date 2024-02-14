@@ -1,18 +1,25 @@
-<a href="https://crates.io/crates/streamdal-wasm-transform/"><img src="https://img.shields.io/crates/v/streamdal-wasm-transform.svg"></a>
-<a href="https://docs.rs/streamdal-wasm-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
-[![Release](https://github.com/streamdal/wasm-transform/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm-transform/actions/workflows/release.yaml)
-[![Test](https://github.com/streamdal/wasm-transform/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm-transform/actions/workflows/pr.yaml)
-
-
 streamdal-transform
 ==================
 
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-transform-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-transform-pr.yml)
+<a href="https://crates.io/crates/streamdal-wasm-transform/"><img src="https://img.shields.io/crates/v/streamdal-wasm-transform.svg"></a>
+<a href="https://docs.rs/streamdal-wasm-transform/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+
 > [!CAUTION]
-> There are no longer releases for this library. It is now included directly into wasm modules via Cargo.toml path
+> Releases for this library are no longer published on crates.io. Wasm modules
+> include this library by using "path" in `Cargo.toml`.
+
+_**Rust library used by [/libs/wasm](https://github.com/streamdal/streamdal/tree/main/libs/wasm) to 
+perform transformations on JSON payloads.**_
+
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
 
 
-Library used by [streamdal/wasm](https://github.com/streamdal/wasm) to 
-perform transformations on JSON payloads.
 ## Usage
 
 ```rust

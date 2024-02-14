@@ -1,0 +1,36 @@
+---
+interface Props {
+  type?: 'default' | '2'
+}
+
+const { type = 'default' } = Astro.props;
+---
+
+<div style="display: flex; justify-content: center;">
+    <div class={`pFooterInner${type === '2' ? ' pFooterInner-2' : ''}`} style="background: linear-gradient(250deg, #956CFF, #FFD260); border-radius: 17px; padding: 2px;">
+        <div class="pFooterFont" style="background-color: var(--color-purple-1000); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between;">
+            <div style="text-align: left;">
+                <slot name="start"></slot>
+            </div>
+            <div style="text-align: right;">
+                <slot name="end"></slot>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .pFooterFont {
+        font-size: 22px;
+    }
+
+    @media screen and (max-width: 800px) {
+        .pFooterFont {
+            font-size: 14px;
+        }
+    }
+    .pFooterInner-2 {
+        width: 100%;
+    }
+</style>
+

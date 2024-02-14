@@ -6,10 +6,20 @@ layout: ../../../layouts/MainLayout.astro
 ---
 
 import Changes from "@components/Misc/Changes.astro";
+import Notification  from "@components/Callouts/Notification.astro";
+import tip from "@images/icons/tip.png";
 
 <Changes />
 
-[Wrappers/shims](/en/resources-support/glossary/#shims) are currently TBA.
+Libraries, shims, wrappers, or extensions are libraries that incorporate the 
+usage of our SDKs to simplify the integration and adoption of Streamdal.
+
+## Master List
+
+- Go - [streamdal/confluent-kafka-go](https://github.com/streamdal/confluent-kafka-go/)
+- Node - [prisma-extension-streamdal](https://github.com/streamdal/prisma-extension-streamdal)
+
+# More to come!
 
 Check out the *Libraries* section of the SDK pages to see what we are 
 considering forking based on feedback from our users and design partners:
@@ -24,5 +34,11 @@ considering forking based on feedback from our users and design partners:
 - [Scala](/en/sdks/scala)
 
 
-For more information on the progress of forking libraries / creating shims, 
-check out our [roadmap](/en/resources-support/roadmap).
+<Notification type="note">
+  <img src={tip} alt="Note" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    Have a request for a library/wrapper/extension we should add?
+
+    Open up an [issue on GitHub](https://github.com/streamdal/streamdal/issues), or let us know on [Discord](https://discord)!
+  </div>
+</Notification>

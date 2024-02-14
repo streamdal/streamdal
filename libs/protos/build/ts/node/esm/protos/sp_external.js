@@ -514,11 +514,12 @@ export const UpdatePipelineRequest = new UpdatePipelineRequest$Type();
 class DeletePipelineRequest$Type extends MessageType {
     constructor() {
         super("protos.DeletePipelineRequest", [
-            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "pipeline_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
         ]);
     }
     create(value) {
-        const message = { pipelineId: "" };
+        const message = { pipelineId: "", Audiences: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -531,6 +532,9 @@ class DeletePipelineRequest$Type extends MessageType {
             switch (fieldNo) {
                 case /* string pipeline_id */ 1:
                     message.pipelineId = reader.string();
+                    break;
+                case /* repeated protos.Audience _audiences */ 1000:
+                    message.Audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -547,6 +551,9 @@ class DeletePipelineRequest$Type extends MessageType {
         /* string pipeline_id = 1; */
         if (message.pipelineId !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.pipelineId);
+        /* repeated protos.Audience _audiences = 1000; */
+        for (let i = 0; i < message.Audiences.length; i++)
+            Audience.internalBinaryWrite(message.Audiences[i], writer.tag(1000, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
