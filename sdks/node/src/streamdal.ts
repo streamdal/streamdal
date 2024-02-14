@@ -44,9 +44,7 @@ export interface Streamdal {
   process: (arg: StreamdalRequest) => Promise<SDKResponse>;
 }
 
-export const registerStreamdal = async (
-  configs: StreamdalConfigs
-): Promise<Streamdal> => {
+const initConfigs = (configs: StreamdalConfigs) => {
   if (configs.quiet || process.env.NODE_ENV === "production") {
     console.debug = () => null;
   }
@@ -88,8 +86,42 @@ export const registerStreamdal = async (
     sendMetrics(internalConfigs);
   }, METRIC_INTERVAL);
 
+  return internalConfigs;
+};
+
+export const registerStreamdal = async (
+  configs: StreamdalConfigs
+): Promise<Streamdal> => {
+  const internalConfigs = initConfigs(configs);
+
   await addAudiences(internalConfigs);
   await internalRegister(internalConfigs);
+
+  return {
+    process: async ({
+      audience,
+      data,
+    }: StreamdalRequest): Promise<SDKResponse> => {
+      return retryProcessPipelines({
+        configs: internalConfigs,
+        audience,
+        data,
+      });
+    },
+  };
+};
+
+/**
+ * For use in envs that don't support top level await.
+ * Subsequent process pipeline requests will retry until
+ * registration is done.
+ */
+export const legacyRegisterStreamdal = (
+  configs: StreamdalConfigs
+): Streamdal => {
+  const internalConfigs = initConfigs(configs);
+  void addAudiences(internalConfigs);
+  void internalRegister(internalConfigs);
 
   return {
     process: async ({
