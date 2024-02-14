@@ -13,14 +13,12 @@
   ],
   "type": "module",
   "exports": {
-    "require": "./cjs/streamdal.js",
-    "import": "./esm/streamdal.js"
+    "require": "./cjs/streamdal.cjs",
+    "import": "./streamdal.js"
   },
   "main": "esm/streamdal.js",
   "scripts": {
-    "build": "npm run clean && npm run build:esm && npm run build:commonjs && ./generatePackages.sh",
-    "build:commonjs": "npx tsc --module commonjs --outDir build/cjs/",
-    "build:esm": "npx tsc --module es2022 --outDir build/esm/",
+    "build": "npm run clean && duel && ./copyBuild.sh",
     "clean": "rimraf build",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
@@ -52,6 +50,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@knighted/duel": "^1.0.6",
     "@types/node": "20.7.1",
     "@types/prompts": "^2.4.4",
     "@types/uuid": "^9.0.2",
