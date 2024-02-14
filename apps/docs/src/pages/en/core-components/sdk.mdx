@@ -13,33 +13,26 @@ import RichImg from "@components/Misc/RichImg.astro";
 
 <br />
 <br />
-Designed with efficiency in mind, the SDK handles metrics reporting, pipeline processing, and validations using WebAssembly (Wasm). This approach guarantees sub-millisecond overhead, high scalability, and compatibility across various languages.
+Designed with efficiency in mind, the SDK handles metrics reporting, [pipeline](/en/guides/pipelines/) processing, and validations using WebAssembly (Wasm). This approach guarantees sub-millisecond overhead, high scalability, and compatibility across various languages.
 
 ## Key Features
 
 - **Lightweight Design**: The SDK is crafted to be lean, ensuring efficient runtime without adding bulk.
-- **Real-time Rule Processing**: Utilizing WebAssembly (Wasm), the [SDK boasts sub-millisecond overheads](https://github.com/streamdal/go-sdk/blob/main/BENCHMARKS.md) for rule application.
-- **Console UI-Defined Rules**: Rules are defined directly through the console UI, and pulled down via the SDK for processing .
+- **Real-time Rule Processing**: Utilizing WebAssembly (Wasm), the [SDK boasts sub-millisecond overheads](https://github.com/streamdal/streamdal/blob/main/sdks/go/BENCHMARKS.md) for rule application.
+- **Console UI-Defined Rules**: Rules are defined directly through the console UI, and pulled down via the SDK for processing.
 
 ## Integrating the SDK into your Application
 
-The SDK is designed to be integraterd into your application as a library. Please see our [instrumentation guide](../../guides/instrumentation).  
+The SDK is designed to be integrated into your application as a library. Please see our [instrumentation guide](/en/guides/instrumentation/).  
 
 ## Multi-Language Support
 
 The SDK is currently available in the following languages:
 
-- **[Go](https://github.com/streamdal/go-sdk)**
-- **[Node](https://github.com/streamdal/node-sdk)**
-- **[Python](https://github.com/streamdal/python-sdk)**
+- **[Go](https://github.com/streamdal/streamdal/tree/main/sdks/go)**
+- **[Node](https://github.com/streamdal/streamdal/tree/main/sdks/node)**
+- **[Python](https://github.com/streamdal/streamdal/tree/main/sdks/python)**
 
-
-## SDK High Level Architecture
-
-The SDK 
+## SDK High-Level Architecture
 
 <RichImg src={sdkDiagram} alt="Streamdal SDK Arch" />
-
-
-
-

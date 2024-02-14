@@ -7,6 +7,7 @@ import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import NotificationDetail from "./notification.tsx";
+import { useLayoutEffect } from "preact/hooks";
 
 const slack = {
   botToken: "",
@@ -47,6 +48,11 @@ export const Notifications = (
       message: success.message,
     };
   }
+
+  useLayoutEffect(async () => {
+    const { initFlowbite } = await import("flowbite");
+    initFlowbite();
+  });
 
   return (
     <>

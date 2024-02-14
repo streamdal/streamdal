@@ -111,7 +111,7 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
       // Add entry (@JH, OK if overwritten?)
       request.id &&
         internal.audiences.get(audienceKey(audience))?.tails.set(request.id, {
-          tail: request.type === TailRequestType.START,
+          tailStatus: request.type === TailRequestType.START,
           tailRequestId: request.id,
           sampleBucket: new TokenBucket(
             request.sampleOptions?.sampleRate,

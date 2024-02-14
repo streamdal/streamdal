@@ -569,6 +569,11 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	payloadSize := int64(len(resp.Data))
 	aud := newAudience(req, s.config)
 
+	// Always send tail output
+	defer func() {
+		s.sendTail(aud, "", req.Data, resp.Data)
+	}()
+
 	// TODO: DRY this up
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
@@ -599,9 +604,6 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	// survive for the first few messages - after that, StatusMessage might get
 	// updated by the infer schema pipeline step.
 	if len(pipelines) == 0 {
-		// Send tail if there is any. Tails do not require a pipeline to operate
-		s.sendTail(aud, "", resp.Data, resp.Data)
-
 		// No pipelines for this mode, nothing to do
 		resp.Status = protos.ExecStatus_EXEC_STATUS_TRUE
 
@@ -854,9 +856,6 @@ PIPELINE:
 
 		// END pipeline loop
 	}
-
-	// Perform tail if necessary
-	s.sendTail(aud, "", req.Data, resp.Data)
 
 	// Dry run should not modify anything, but we must allow pipeline to
 	// mutate internal state in order to function properly

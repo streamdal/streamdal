@@ -9,6 +9,7 @@ import cliTail from "@images/guides/CliTail.png";
 import consoleDashboard from '@images/core-components/console-dashboard.png';
 import RichImg from "@components/Misc/RichImg.astro";
 import Changes from "@components/Misc/Changes.astro";
+import Footer from "@components/Callouts/pFooter.astro"
 
 <Changes />
 
@@ -334,12 +335,11 @@ Read more about
 [Pipeline Flow Control](/en/guides/pipelines/#pipeline-flow-control) to 
 understand how you can enrich and categorize data, and pass metadata.
 
----
-
-<div style="justify-content: center; display: flex;">
-  <div style="background: linear-gradient(250deg, #956CFF, #FFD260); border-radius: 17px; padding: 2px; @media ">
-    <div style="background-color: var(--color-purple-1000); display: inline-flex; padding: 20px; font-size: 22px; border-radius: 15px;">
-      Ready to get started? Take a look at the [Quickstart Guide ⮕](/en/getting-started/quickstart/)
+<Footer type="2">
+    <div slot="start">
+        [← How Streamdal Works](/en/getting-started/how-streamdal-works/)
     </div>
-  </div>
-</div>
+    <div slot="end">
+        [Quickstart →](/en/getting-started/quickstart/)
+    </div>
+</Footer>

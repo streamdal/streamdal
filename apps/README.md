@@ -1,6 +1,6 @@
 Apps
 ====
-This directory contains apps that are used in the St reamdal ecosystem.
+This directory contains apps that are used in the Streamdal ecosystem.
  
 * [cli](./cli)
   * CLI/terminal UI 
@@ -13,7 +13,7 @@ This directory contains apps that are used in the St reamdal ecosystem.
 
 ## Usage - For Users
 You do not need to use these directly - you can install all of the components
-via curl-bash `curl -Ssl https://get.streamdal.com | bash` or run the stack
+via curl-bash `curl -sSL https://sh.streamdal.com | bash` or run the stack
 manually via `docker-compose` (see [../docs/install/docker](../docs/install/docker)).
 
 ## Usage - For Developers

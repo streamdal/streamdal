@@ -1,12 +1,31 @@
 import IconCopy from "tabler-icons/tsx/copy.tsx";
 import IconDots from "tabler-icons/tsx/dots.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { showNav } from "../../islands/nav.tsx";
 
 export const PipelineMenu = ({ id }: { id?: string }) => {
   const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const clickAway = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", clickAway);
+    return () => {
+      document.removeEventListener("mousedown", clickAway);
+    };
+  }, [menuRef]);
+
   return (
     <div
+      ref={menuRef}
       type="button"
       className="cursor-pointer"
       onClick={() => setOpen(!open)}

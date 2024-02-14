@@ -95,10 +95,12 @@ class DeleteNotificationRequest(_message.Message):
     def __init__(self, notification_id: _Optional[str] = ...) -> None: ...
 
 class DeletePipelineRequest(_message.Message):
-    __slots__ = ["pipeline_id"]
+    __slots__ = ["_audiences", "pipeline_id"]
     PIPELINE_ID_FIELD_NUMBER: _ClassVar[int]
+    _AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    _audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
     pipeline_id: str
-    def __init__(self, pipeline_id: _Optional[str] = ...) -> None: ...
+    def __init__(self, pipeline_id: _Optional[str] = ..., _audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
 
 class DeleteServiceRequest(_message.Message):
     __slots__ = ["force", "service_name"]

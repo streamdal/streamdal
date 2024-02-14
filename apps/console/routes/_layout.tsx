@@ -9,7 +9,6 @@ import { CustomError } from "../components/error/custom.tsx";
 import { Partial } from "$fresh/runtime.ts";
 import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
 import { Sockets } from "../islands/sockets.tsx";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
 
 const tokenError = () => (
   <CustomError

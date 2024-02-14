@@ -1,18 +1,24 @@
 wasm-detective
 ================
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-release.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/libs-wasm-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/libs-wasm-detective-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/libs-wasm-detective-pr.yml)
 <a href="https://crates.io/crates/streamdal-wasm-detective/"><img src="https://img.shields.io/crates/v/streamdal-wasm-detective.svg"></a>
 <a href="https://docs.rs/streamdal-wasm-detective/"><img src="https://img.shields.io/badge/docs-rustdoc-369"></a>
-[![Release](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/release.yaml)
-[![Test](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/wasm-detective/actions/workflows/pr.yaml)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 > [!CAUTION]
-> There are no longer releases for this library. It is now included directly into wasm modules via Cargo.toml path
+> Releases for this library are no longer published on crates.io. Wasm modules
+> include this library by using "path" in `Cargo.toml`.
 
+_**Rust helper lib for performing value matching in `streamdal/wasm` Wasm functions.**_
 
-Rust helper lib for performing value matching in `streamdal/wasm` Wasm functions.
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
 
 For available matchers, look at the enums listed in
-[streamdal/protos](https://github.com/streamdal/protos/blob/main/protos/steps/detective.proto).
+[/libs/protos/protos](https://github.com/streamdal/streamdal/blob/main/libs/protos/protos/steps/sp_steps_detective.proto).
 
 # Install
 ```
@@ -47,15 +53,9 @@ fn main() {
 ```
 
 ## Note on regex
-Regex-based matchers are currently slow because we have to compile the pattern on every call.
-
-This will improve when we implement K/V functionality in SDK's.
-
-The idea is that WASM funcs will be given the ability to GET/PUT items in cache, so `detective` would be wired up to accept a param that is a trait that allows working with the cache funcs.
-
-If K/V trait is provided to `detective` - before compiling a regex pattern, it would first check if the cache already contains it. If yes, it'll use that, if not, it'll compile and put it in the cache.
-
-~DS 06-29-2023
+Due to regex being extremely slow, majority of the matchers do not use them. If
+a matcher relies on regex, it will be noted in the matcher's documentation and
+in the [console](../../apps/console).
 
 ## Development
 The library must be tested using Rust nightly (because we use `#![feature(test)]` to enable the ability to bench).
@@ -67,10 +67,6 @@ To run tests using nightly: `cargo +nightly test`
 To run benches using nightly: `cargo +nightly bench`
 
 <sub>You can also set nightly as default using `rustup default nightly`.</sub>
-
-## Releasing
-
-Any changes made under libs/wasm-detective will be automatically released to crates.io with a version bump
 
 ## Benchmarks
 
@@ -92,3 +88,11 @@ test test_bench::bench_string_contains_all ... bench:         218 ns/iter (+/- 4
 test test_bench::bench_string_contains_any ... bench:         221 ns/iter (+/- 1)
 test test_bench::bench_uuid                ... bench:         402 ns/iter (+/- 6)
 ```
+
+## Release
+
+Any push or merge to the `main` branch with any changes in `/libs/wasm-detective/*`
+will automatically tag and release a new console version with `libs/wasm-detective/vX.Y.Z`.
+
+<sub>(1) If you'd like to skip running the release action on push/merge to `main`,
+include `norelease` anywhere in the commit message.</sub>

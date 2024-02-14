@@ -1,4 +1,15 @@
-# Streamdal's Node SDK
+Streamdal Node SDK
+==================
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/sdks-node-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/sdks-node-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/sdks-node-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/sdks-node-pr.yml)
+[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+
+_**Node SDK for [Streamdal](https://streamdal.com).**_
+
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
 
 ## Getting started
 
@@ -43,6 +54,10 @@ export const example = async () => {
 ```
 *See [./examples](./examples) for runnable examples that can be used as a starters.*
 
+## Documentation
+
+See https://docs.streamdal.com
+
 ## Wasm
 In order to run pipelines with a minimal amount of overhead, the Streamdal node sdk ships 
 and executes pipeline rules as WASM. If you are using Node version < 20.* you'll need to enable 
@@ -63,13 +78,15 @@ To do development on the `node-sdk`, you can run it locally:
 
 See `./src/sandbox/index.ts` for an entry point for local dev.
 
-Optionally install and run the Streamdal [server](https://github.com/streamdal/server)
+Optionally install and run the Streamdal [server](https://github.com/streamdal/streamdal/tree/main/apps/server)
 
-### Releasing
+## Release
 
-Any push or merge to main will automatically tag
-and release a new version to npm. The package.json file will
-will also be bumped to reflect the new version. If you'd like 
-to skip release on the push/merge to main, include "norelease" 
-anywhere in the commit message.
+Any push or merge to the `main` branch with any changes in `/sdks/node/*`
+will automatically tag and release a new console version with `sdks/node/vX.Y.Z`.
 
+<sub>(1) If you'd like to skip running the release action on push/merge to `main`,
+include `norelease` anywhere in the commit message.</sub>
+
+<sub>(2) The `package.json` file will will also be bumped as part of the release
+to reflect the new version.</sub>
