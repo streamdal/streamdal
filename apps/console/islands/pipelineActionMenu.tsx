@@ -126,12 +126,19 @@ export const PipelineActionMenu = (
         />
 
         <div
-          class={`max-w-[${
-            p ? "150px" : "190px"
-          }] flex flex-row justify-start items-center whitespace-nowrap text-ellipsis overflow-hidden`}
+          data-tooltip-target={`pipeline-name-${pipeline.id}`}
+          class={"flex flex-row justify-start items-center"}
         >
-          {pipeline.name}
+          <div
+            class={`w-[${p ? "195px" : "200px"}] truncate`}
+          >
+            {pipeline.name}
+          </div>
         </div>
+        <Tooltip
+          targetId={`pipeline-name-${pipeline.id}`}
+          message={pipeline.name}
+        />
       </div>
       <div class="flex flex-row justify-end items-center ">
         <a

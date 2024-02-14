@@ -32,12 +32,12 @@ export const sendTail = ({
   const tails = internal.audiences.get(key)?.tails;
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  tails?.forEach(async (tailStatus, tailRequestId) => {
-    if (!tailStatus.tail) {
+  tails?.forEach(async ({ tailStatus, tailRequestId, sampleBucket }) => {
+    if (!tailStatus) {
       return;
     }
     try {
-      if (!tailStatus.sampleBucket.consume()) {
+      if (!sampleBucket.consume()) {
         console.debug("sample rate exceeded, discarding tail");
         return;
       }
