@@ -151,13 +151,49 @@
                                                     <p style="mso-line-height-rule:exactly; line-height:175%">
                                                         The following pipeline step has triggered:
                                                     </p>
-
+                                                    <br />
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Pipeline ID:</b> {{ .pipeline_id  }}
+                                                    </p>
                                                     <p style="mso-line-height-rule:exactly; line-height:175%">
                                                         <b>Pipeline Name:</b> {{ .pipeline_name  }}
                                                     </p>
                                                     <p style="mso-line-height-rule:exactly; line-height:175%">
                                                         <b>Step Name:</b> {{ .step_name  }}
                                                     </p>
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Step Type:</b> {{ .step_type  }}
+                                                    </p>
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Service Name:</b> {{ .condition  }}
+                                                    </p>
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Service Name:</b> {{ .service_name  }}
+                                                    </p>
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Operation Name:</b> {{ .operation_name  }}
+                                                    </p>
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Operation Type:</b> {{ .operation_type  }}
+                                                    </p>
+                                                    <br />
+                                                    <p style="mso-line-height-rule:exactly; line-height:175%">
+                                                        <b>Metadata:</b>
+                                                        <br />
+                                                    </p>
+                                                    <code style="display: block;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: scroll;
+  max-width: 530px;
+  min-width: 530px;
+  background: #0D1110;
+  color: #C9D1D9;
+  font-size: 14px;
+
+  padding: 10px;">{{ .metadata }}</code>
+                                                </div>
+                                                <br />
                                                     <p style="mso-line-height-rule:exactly; line-height:175%">
                                                         <b>Payload Data:</b>
                                                         <br />

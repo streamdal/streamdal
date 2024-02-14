@@ -42,7 +42,7 @@ const (
 var templates embed.FS
 
 type INotifier interface {
-	Queue(ctx context.Context, event *protos.NotifyRequest) error
+	Queue(ctx context.Context, event *protos.NotifyRequest)
 }
 
 type Config struct {
@@ -53,14 +53,7 @@ type Config struct {
 type Notify struct {
 	*Config
 	log       *logrus.Entry
-	eventChan chan *Notification
-}
-
-type Notification struct {
-	Req      *protos.NotifyRequest
-	Pipeline *protos.Pipeline
-	Aud      *protos.Audience
-	Configs  []*protos.NotificationConfig
+	eventChan chan *protos.NotifyRequest
 }
 
 func New(cfg *Config) (*Notify, error) {
@@ -71,7 +64,7 @@ func New(cfg *Config) (*Notify, error) {
 	n := &Notify{
 		Config:    cfg,
 		log:       logrus.WithField("pkg", "notify"),
-		eventChan: make(chan *Notification, 1000),
+		eventChan: make(chan *protos.NotifyRequest, 1000),
 	}
 
 	go n.runWorker(director.NewFreeLooper(director.FOREVER, make(chan error, 1)))
@@ -106,10 +99,8 @@ func (n *Notify) runWorker(looper director.Looper) {
 			quit = true
 			return nil
 		case event := <-n.eventChan:
-			for _, cfg := range event.Configs {
-				if err := n.handle(context.Background(), event, cfg); err != nil {
-					n.log.WithError(err).Error("unable to handle notification")
-				}
+			if err := n.handle(context.Background(), event); err != nil {
+				n.log.WithError(err).Error("unable to handle notification")
 			}
 		}
 
@@ -117,56 +108,89 @@ func (n *Notify) runWorker(looper director.Looper) {
 	})
 }
 
-func (n *Notify) Queue(ctx context.Context, req *protos.NotifyRequest) error {
-	// Look up pipeline
-	pipeline, err := n.Store.GetPipeline(ctx, req.PipelineId)
+func (n *Notify) Queue(_ context.Context, req *protos.NotifyRequest) {
+	n.eventChan <- req
+}
+
+func getConditionFromRequest(req *protos.NotifyRequest) *protos.PipelineStepConditions {
+	switch req.ConditionType {
+	case protos.NotifyRequest_CONDITION_TYPE_ON_TRUE:
+		return req.Step.OnTrue
+	case protos.NotifyRequest_CONDITION_TYPE_ON_FALSE:
+		return req.Step.OnFalse
+	case protos.NotifyRequest_CONDITION_TYPE_ON_ERROR:
+		return req.Step.OnError
+	default:
+		return nil
+	}
+}
+
+func (n *Notify) handle(ctx context.Context, event *protos.NotifyRequest) error {
+	pipeline, err := n.Store.GetPipeline(ctx, event.PipelineId)
 	if err != nil {
 		return errors.Wrap(err, "pipeline not found")
 	}
 
-	configs, err := n.Store.GetNotificationConfigsByPipeline(ctx, req.PipelineId)
-	if err != nil {
-		return errors.Wrap(err, "notify config not found")
+	cond := getConditionFromRequest(event)
+	if cond == nil {
+		return errors.New("Unknown condition type")
 	}
 
-	n.log.Debugf("notify got configs for pipeline %s: %+v", req.PipelineId, configs)
+	for _, cfgID := range cond.Notification.NotificationConfigIds {
+		cfg, err := n.Store.GetNotificationConfig(ctx, &protos.GetNotificationRequest{NotificationId: cfgID})
+		if err != nil {
+			return errors.Wrapf(err, "unknown notification config ID '%s'", cfgID)
+		}
 
-	n.eventChan <- &Notification{
-		Req:      req,
-		Pipeline: pipeline,
-		Aud:      req.Audience,
-		Configs:  configs,
+		if err := n.handleNotificationConfig(ctx, event, cfg, pipeline); err != nil {
+			return errors.Wrapf(err, "unable to handle notification config ID '%s'", cfgID)
+		}
 	}
 
 	return nil
 }
 
-func (n *Notify) handle(ctx context.Context, event *Notification, cfg *protos.NotificationConfig) error {
+func (n *Notify) handleNotificationConfig(
+	ctx context.Context,
+	event *protos.NotifyRequest,
+	cfg *protos.NotificationConfig,
+	pipeline *protos.Pipeline,
+) error {
 	switch cfg.GetType() {
 	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
-		return n.handleEmail(ctx, event, cfg.GetEmail())
+		return n.handleEmail(ctx, event, cfg.GetEmail(), pipeline)
 	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
-		return n.handleSlack(ctx, event, cfg.GetSlack())
+		return n.handleSlack(ctx, event, cfg.GetSlack(), pipeline)
 	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
-		return n.handlePagerDuty(ctx, event, cfg.GetPagerduty())
+		return n.handlePagerDuty(ctx, event, cfg.GetPagerduty(), pipeline)
 	default:
 		return errors.Errorf("unknown notify type: %s", cfg.Type)
 	}
 }
 
-func (n *Notify) handleEmail(ctx context.Context, event *Notification, cfg *protos.NotificationEmail) error {
+func (n *Notify) handleEmail(
+	ctx context.Context,
+	event *protos.NotifyRequest,
+	cfg *protos.NotificationEmail,
+	pipeline *protos.Pipeline,
+) error {
 	switch cfg.GetType() {
 	case protos.NotificationEmail_TYPE_SMTP:
-		return n.handleEmailSMTP(ctx, event, cfg)
+		return n.handleEmailSMTP(ctx, event, cfg, pipeline)
 	case protos.NotificationEmail_TYPE_SES:
-		return n.handleEmailSES(ctx, event, cfg)
+		return n.handleEmailSES(ctx, event, cfg, pipeline)
 	default:
 		return errors.Errorf("unknown email type: %s", cfg.Type)
 	}
 }
 
-func (n *Notify) handleEmailSMTP(ctx context.Context, event *Notification, emailCfg *protos.NotificationEmail) error {
-	body, err := n.getEmailBody(ctx, event, "notification")
+func (n *Notify) handleEmailSMTP(
+	ctx context.Context,
+	event *protos.NotifyRequest,
+	emailCfg *protos.NotificationEmail,
+	pipeline *protos.Pipeline,
+) error {
+	body, err := n.getEmailBody(ctx, event, "notification", pipeline)
 	if err != nil {
 		return errors.Wrap(err, "unable to generate email body")
 	}
@@ -194,8 +218,8 @@ func (n *Notify) handleEmailSMTP(ctx context.Context, event *Notification, email
 	return nil
 }
 
-func (n *Notify) handleEmailSES(ctx context.Context, event *Notification, emailCfg *protos.NotificationEmail) error {
-	body, err := n.getEmailBody(ctx, event, "notification")
+func (n *Notify) handleEmailSES(ctx context.Context, event *protos.NotifyRequest, emailCfg *protos.NotificationEmail, pipeline *protos.Pipeline) error {
+	body, err := n.getEmailBody(ctx, event, "notification", pipeline)
 	if err != nil {
 		return errors.Wrap(err, "unable to generate email body")
 	}
@@ -267,24 +291,67 @@ func (n *Notify) handleEmailSES(ctx context.Context, event *Notification, emailC
 	}
 	return nil
 }
-
-func (n *Notify) handleSlack(ctx context.Context, event *Notification, cfg *protos.NotificationSlack) error {
+func (n *Notify) handleSlack(ctx context.Context, event *protos.NotifyRequest, cfg *protos.NotificationSlack, pipeline *protos.Pipeline) error {
 	api := slack.New(cfg.BotToken)
 
-	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Alert", false, false))
-
-	sectionBlock := slack.NewSectionBlock(nil, []*slack.TextBlockObject{
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline ID*: %s\n", event.Pipeline.Id), false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Pipeline Name*: %s\n", event.Pipeline.Name), false, false),
-		slack.NewTextBlockObject(slack.MarkdownType, fmt.Sprintf("*Step Name*: %s\n", event.Req.StepName), false, false),
-	}, nil)
-
-	// Divider before buttons
+	headerBlock := slack.NewHeaderBlock(slack.NewTextBlockObject(slack.PlainTextType, "Streamdal Alert Triggered", false, false))
 	divBlock := slack.NewDividerBlock()
 
-	_, _, err := api.PostMessage(
+	infoBlocks := []*slack.TextBlockObject{
+		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline ID*\n`"+pipeline.Id+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Pipeline Name*\n`"+pipeline.Name+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Step Type*\n`"+stepToString(event.Step)+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Step Name*\n`"+event.Step.Name+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Condition Met*\n`"+conditionToString(event)+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Service Name*\n`"+event.Audience.ServiceName+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Name*\n`"+event.Audience.OperationName+"`", false, false),
+		slack.NewTextBlockObject(slack.MarkdownType, "*Operation Type*\n`"+operationTypeString(event.Audience.OperationType)+"`", false, false),
+	}
+
+	blocks := []slack.Block{
+		headerBlock,
+		divBlock,
+		slack.NewSectionBlock(nil, infoBlocks, nil),
+	}
+
+	cond := getConditionFromRequest(event)
+
+	// If metadata is an empty string, slack will fail validation on PostMessage() call
+	// so we only include it if any metadata is actually present
+	if len(cond.Metadata) > 0 {
+		metadataBlock := slack.NewTextBlockObject(slack.MarkdownType, "*Metadata*", false, false)
+		metadata := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(metadataToString(cond.Metadata), &slack.RichTextSectionTextStyle{}))
+		metadata.Type = slack.RTEPreformatted
+		blocks = append(blocks, slack.NewSectionBlock(nil, []*slack.TextBlockObject{metadataBlock}, nil))
+		blocks = append(blocks, slack.NewRichTextBlock("metadata", metadata))
+	}
+
+	// If we have a payload, include it in the alert
+	if len(event.Payload) > 0 {
+		payloadData, err := getPayload(event.Payload, cond.Notification)
+		if err != nil {
+			return errors.Wrap(err, "unable to get payload")
+		}
+
+		// Add payload to info blocks
+		payloadText := slack.NewTextBlockObject(slack.MarkdownType, "*Payload*", false, false)
+
+		// Payload is preformatted rich text
+		payload := slack.NewRichTextSection(slack.NewRichTextSectionTextElement(prettyJSON(payloadData), &slack.RichTextSectionTextStyle{}))
+		payload.Type = slack.RTEPreformatted
+
+		blocks = append(blocks, divBlock)
+		blocks = append(blocks, slack.NewSectionBlock(nil, []*slack.TextBlockObject{payloadText}, nil))
+		blocks = append(blocks, slack.NewRichTextBlock("payload", payload))
+	}
+
+	blocks = append(blocks, divBlock)
+
+	_, _, err := api.PostMessageContext(
+		ctx,
 		cfg.Channel,
-		slack.MsgOptionBlocks(headerBlock, divBlock, sectionBlock),
+		slack.MsgOptionText("Streamdal Alert", false),
+		slack.MsgOptionBlocks(blocks...),
 		slack.MsgOptionAsUser(true),
 	)
 	if err != nil {
@@ -294,13 +361,23 @@ func (n *Notify) handleSlack(ctx context.Context, event *Notification, cfg *prot
 	return nil
 }
 
-func (n *Notify) handlePagerDuty(ctx context.Context, event *Notification, cfg *protos.NotificationPagerDuty) error {
+func (n *Notify) handlePagerDuty(ctx context.Context, event *protos.NotifyRequest, cfg *protos.NotificationPagerDuty, pipeline *protos.Pipeline) error {
 	urgency := "low"
 	if cfg.Urgency == protos.NotificationPagerDuty_URGENCY_HIGH {
 		urgency = "high"
 	}
 
 	pdClient := pagerduty.NewClient(cfg.Token)
+
+	cond := getConditionFromRequest(event)
+	if cond == nil {
+		return errors.New("Unknown condition type")
+	}
+
+	payload, err := getPayload(event.Payload, cond.Notification)
+	if err != nil {
+		return errors.Wrap(err, "unable to get payload")
+	}
 
 	incidentOptions := &pagerduty.CreateIncidentOptions{
 		Service: &pagerduty.APIReference{
@@ -309,14 +386,28 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *Notification, cfg *
 		},
 		Title:       "Streamdal Alert",
 		Urgency:     urgency,
-		IncidentKey: event.Pipeline.Id,
+		IncidentKey: pipeline.Id,
 		Body: &pagerduty.APIDetails{
 			Type: "incident_body",
 			Details: fmt.Sprintf(
-				"Pipeline ID: %s\nPipeline Name: %s\nStep Name: %s",
-				event.Pipeline.Id,
-				event.Pipeline.Name,
-				event.Req.StepName,
+				"Pipeline ID: %s\n"+
+					"Pipeline Name: %s\n"+
+					"Step Name: %s\n"+
+					"Condition: %s\n"+
+					"Service Name: %s\n"+
+					"Operation Name: %s\n"+
+					"Operation Type: %s\n"+
+					"Metadata:\n%s\n\n"+
+					"Payload:\n%s\n",
+				pipeline.Id,
+				pipeline.Name,
+				event.Step.Name,
+				conditionToString(event),
+				event.Audience.ServiceName,
+				event.Audience.OperationName,
+				operationTypeString(event.Audience.OperationType),
+				metadataToString(cond.Metadata),
+				prettyJSON(payload),
 			),
 		},
 	}
@@ -328,9 +419,14 @@ func (n *Notify) handlePagerDuty(ctx context.Context, event *Notification, cfg *
 	return nil
 }
 
-func (n *Notify) getEmailBody(_ context.Context, event *Notification, templateName string) (string, error) {
-	if event == nil {
-		return "", errors.New("event is nil")
+func (n *Notify) getEmailBody(
+	_ context.Context,
+	req *protos.NotifyRequest,
+	templateName string,
+	pipeline *protos.Pipeline,
+) (string, error) {
+	if req == nil {
+		return "", errors.New("req is nil")
 	}
 
 	if templateName == "" {
@@ -350,10 +446,27 @@ func (n *Notify) getEmailBody(_ context.Context, event *Notification, templateNa
 
 	var body bytes.Buffer
 
+	cond := getConditionFromRequest(req)
+	if cond == nil {
+		return "", errors.New("Unknown condition type")
+	}
+
+	payload, err := getPayload(req.Payload, cond.Notification)
+	if err != nil {
+		return "", errors.Wrap(err, "unable to get payload")
+	}
+
 	data := map[string]string{
-		"pipeline_name": event.Pipeline.Name,
-		"step_name":     event.Req.StepName,
-		"payload_data":  "", // TODO: implement
+		"pipeline_id":    pipeline.Id,
+		"pipeline_name":  pipeline.Name,
+		"step_name":      req.Step.Name,
+		"step_type":      stepToString(req.Step),
+		"service_name":   req.Audience.ServiceName,
+		"operation_name": req.Audience.OperationName,
+		"operation_type": operationTypeString(req.Audience.OperationType),
+		"payload_data":   string(payload),
+		"metadata":       metadataToString(cond.Metadata),
+		"condition":      conditionToString(req),
 	}
 
 	if err := tmpl.Execute(&body, data); err != nil {
@@ -361,6 +474,21 @@ func (n *Notify) getEmailBody(_ context.Context, event *Notification, templateNa
 	}
 
 	return body.String(), nil
+}
+
+func getPayload(payload []byte, cfg *protos.PipelineStepNotification) ([]byte, error) {
+	if payload == nil {
+		return nil, errors.New("payload is nil")
+	}
+
+	switch cfg.PayloadType {
+	case protos.PipelineStepNotification_PAYLOAD_TYPE_SELECT_PATHS:
+		return extractPayloadPaths(payload, cfg.Paths)
+	case protos.PipelineStepNotification_PAYLOAD_TYPE_FULL_PAYLOAD:
+		return payload, nil
+	default:
+		return []byte(``), nil
+	}
 }
 
 // extractPayloadPaths will extract the requested paths from the payload and return them as a JSON object

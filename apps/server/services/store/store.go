@@ -82,12 +82,9 @@ type IStore interface {
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
-	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
 	CreateNotificationConfig(ctx context.Context, req *protos.CreateNotificationRequest) error
 	UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
-	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
-	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
@@ -358,13 +355,6 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 		if err := proto.Unmarshal([]byte(pipelineData), pipeline); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling pipeline '%s'", key)
 		}
-
-		// Get any associated notification configs
-		nCfgs, err := s.GetNotificationConfigsByPipeline(ctx, pipeline.Id)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching notification configs for pipeline '%s'", pipeline.Id)
-		}
-		pipeline.XNotificationConfigs = nCfgs
 
 		pipelines[pipeline.Id] = pipeline
 	}
@@ -915,7 +905,7 @@ func (s *Store) GetNotificationConfigs(ctx context.Context) (map[string]*protos.
 			return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", key)
 		}
 
-		notificationConfigs[key] = notificationConfig
+		notificationConfigs[notificationConfig.GetId()] = notificationConfig
 	}
 
 	return notificationConfigs, nil
@@ -1031,62 +1021,6 @@ func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.Delete
 
 	return nil
 }
-
-func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error {
-	key := RedisNotificationAssocKey(req.PipelineId, req.NotificationId)
-	if err := s.options.RedisBackend.Set(ctx, key, []byte(``), 0).Err(); err != nil {
-		return errors.Wrap(err, "error saving notification association to store")
-	}
-
-	return nil
-}
-
-func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error {
-	key := RedisNotificationAssocKey(req.PipelineId, req.NotificationId)
-	if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
-		return errors.Wrap(err, "error deleting notification association from store")
-	}
-
-	return nil
-}
-
-func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
-	cfgs := make([]*protos.NotificationConfig, 0)
-
-	// Fetch all notify config keys from store
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisNotificationAssocPrefix+":"+pipelineID+":*").Result()
-	if err != nil {
-		return nil, errors.Wrap(err, "error fetching notify config keys from store")
-	}
-
-	for _, key := range keys {
-		configID := strings.TrimPrefix(key, RedisNotificationAssocPrefix+":"+pipelineID+":")
-
-		// Fetch key so we get the notify config
-		data, err := s.options.RedisBackend.Get(ctx, RedisNotificationConfigKey(configID)).Result()
-		if err != nil {
-			if errors.Is(err, redis.Nil) {
-				continue
-			}
-			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from store", configID)
-		}
-
-		decrypted, err := s.options.Encryption.Decrypt([]byte(data))
-		if err != nil {
-			return nil, errors.Wrapf(err, "error decrypting notification config '%s'", configID)
-		}
-
-		notifyConfig := &protos.NotificationConfig{}
-		if err := proto.Unmarshal(decrypted, notifyConfig); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshalling notify config for key '%s'", configID)
-		}
-
-		cfgs = append(cfgs, notifyConfig)
-	}
-
-	return cfgs, nil
-}
-
 func (o *Options) validate() error {
 	if o == nil {
 		return errors.New("options cannot be nil")
