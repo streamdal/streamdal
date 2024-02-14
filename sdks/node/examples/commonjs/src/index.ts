@@ -1,10 +1,7 @@
-import { SDKResponse } from "@streamdal/node-sdk";
-
 const {
   ExecStatus,
-  SDKResponse,
   OperationType,
-  Streamdal,
+  registerStreamdal,
   // eslint-disable-next-line @typescript-eslint/no-var-requires
 } = require("@streamdal/node-sdk");
 
@@ -51,8 +48,8 @@ const audience = {
 };
 
 export const example = async () => {
-  const streamdal = new Streamdal(config);
-  const result: SDKResponse = await streamdal.process({
+  const streamdal = await registerStreamdal(config);
+  const result = await streamdal.process({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });

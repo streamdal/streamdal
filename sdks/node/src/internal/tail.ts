@@ -43,7 +43,7 @@ export const sendTail = ({
       }
 
       if (tailStream == null) {
-        console.info("tail stream is closed, reopening...");
+        console.debug("tail stream is closed, reopening...");
         tailStream = openTailStream(configs);
       }
 

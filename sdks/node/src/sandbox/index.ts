@@ -1,8 +1,13 @@
 import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ExecStatus } from "@streamdal/protos/protos/sp_sdk";
 
-import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
-import { billingExample } from "./billing.js";
+import {
+  OperationType,
+  registerStreamdal,
+  Streamdal,
+  StreamdalConfigs,
+} from "../streamdal.js";
+import { onboardingExample } from "./billing.js";
 
 export const QUIET = true;
 
@@ -166,9 +171,9 @@ export const randomPipeline = (
   );
 };
 
-export const exampleStaggered = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const exampleStaggered = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
 
   randomPipeline(streamdalA, audienceAConsumer, exampleData);
   runPipeline(streamdalA, audienceAProducer, exampleData, 4000);
@@ -176,9 +181,9 @@ export const exampleStaggered = () => {
   runPipeline(streamdalB, audienceBProducer, exampleData, 12000);
 };
 
-export const tailFriendly = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const tailFriendly = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
 
   runPipeline(streamdalA, audienceAConsumer, exampleData);
 
@@ -211,9 +216,9 @@ export const tailFriendly = () => {
   );
 };
 
-export const highVolumeTail = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const highVolumeTail = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
 
   runPipeline(streamdalA, audienceAConsumer, exampleData, 500);
 
@@ -256,9 +261,9 @@ export const highVolumeTail = () => {
   );
 };
 
-export const throughputFriendly = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const throughputFriendly = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
 
   randomPipeline(streamdalA, audienceAConsumer, exampleData);
 
@@ -291,14 +296,14 @@ export const throughputFriendly = () => {
   );
 };
 
-export const tailFast = () => {
-  const streamdalB = new Streamdal(serviceBConfig);
+export const tailFast = async () => {
+  const streamdalB = await registerStreamdal(serviceBConfig);
   runPipeline(streamdalB, audienceBConsumer, exampleData, 100);
 };
 
-export const exampleConcurrent = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const exampleConcurrent = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
   runPipeline(streamdalA, audienceAConsumer, exampleData, 4000);
 
   runPipeline(streamdalA, audienceAProducer, exampleData);
@@ -306,9 +311,9 @@ export const exampleConcurrent = () => {
   runPipeline(streamdalB, audienceBProducer, exampleData);
 };
 
-export const exampleMultipleGroup = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const exampleMultipleGroup = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
 
   runPipeline(streamdalA, audienceAConsumer, exampleData);
   runPipeline(
@@ -326,9 +331,9 @@ export const exampleMultipleGroup = () => {
   );
 };
 
-export const exampleMultipleComponentsPerService = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
+export const exampleMultipleComponentsPerService = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
+  const streamdalB = await registerStreamdal(serviceBConfig);
 
   runPipeline(streamdalA, audienceAConsumer, exampleData);
   runPipeline(
@@ -346,54 +351,56 @@ export const exampleMultipleComponentsPerService = () => {
   );
 };
 
-export const exampleSimple = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
+export const exampleSimple = async () => {
+  const streamdalA = await registerStreamdal(serviceAConfig);
   runPipeline(streamdalA, audienceAConsumer, exampleData);
 };
 
-export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup = () => {
-  const streamdalA = new Streamdal(serviceAConfig);
-  const streamdalB = new Streamdal(serviceBConfig);
-  const streamdalC = new Streamdal(serviceCConfig);
+export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
+  async () => {
+    const streamdalA = await registerStreamdal(serviceAConfig);
+    const streamdalB = await registerStreamdal(serviceBConfig);
+    const streamdalC = await registerStreamdal(serviceCConfig);
 
-  runPipeline(streamdalA, audienceAConsumer, exampleData, 2000);
+    runPipeline(streamdalA, audienceAConsumer, exampleData, 2000);
 
-  runPipeline(
-    streamdalA,
-    { ...audienceAConsumer, operationName: "kafka-consumer-two" },
-    exampleData,
-    4000
-  );
+    runPipeline(
+      streamdalA,
+      { ...audienceAConsumer, operationName: "kafka-consumer-two" },
+      exampleData,
+      4000
+    );
 
-  runPipeline(
-    streamdalA,
-    { ...audienceAConsumer, operationName: "kafka-consumer-three" },
-    exampleData,
-    6000
-  );
+    runPipeline(
+      streamdalA,
+      { ...audienceAConsumer, operationName: "kafka-consumer-three" },
+      exampleData,
+      6000
+    );
 
-  runPipeline(
-    streamdalA,
-    { ...audienceAConsumer, componentName: "another-kafka" },
-    exampleData,
-    8000
-  );
+    runPipeline(
+      streamdalA,
+      { ...audienceAConsumer, componentName: "another-kafka" },
+      exampleData,
+      8000
+    );
 
-  runPipeline(streamdalA, audienceAProducer, exampleData, 10000);
-  runPipeline(streamdalB, audienceBConsumer, exampleData, 12000);
-  runPipeline(streamdalB, audienceBProducer, exampleData, 14000);
-  runPipeline(
-    streamdalB,
-    { ...audienceBProducer, componentName: "kafka" },
-    exampleData,
-    16000
-  );
+    runPipeline(streamdalA, audienceAProducer, exampleData, 10000);
+    runPipeline(streamdalB, audienceBConsumer, exampleData, 12000);
+    runPipeline(streamdalB, audienceBProducer, exampleData, 14000);
+    runPipeline(
+      streamdalB,
+      { ...audienceBProducer, componentName: "kafka" },
+      exampleData,
+      16000
+    );
 
-  runPipeline(streamdalC, audienceCConsumer, exampleData, 2000);
-  runPipeline(streamdalC, audienceCProducer, exampleData, 2000);
-};
+    runPipeline(streamdalC, audienceCConsumer, exampleData, 2000);
+    runPipeline(streamdalC, audienceCProducer, exampleData, 2000);
+  };
 
 //
-// kv();
-billingExample();
-// singleWelcomeExample();
+// void kvExample();
+// void singleWelcomeExample();
+// void singleSignupExample();
+onboardingExample();

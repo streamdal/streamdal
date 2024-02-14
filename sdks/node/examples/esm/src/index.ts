@@ -2,8 +2,8 @@ import {
   Audience,
   ExecStatus,
   OperationType,
+  registerStreamdal,
   SDKResponse,
-  Streamdal,
   StreamdalConfigs,
 } from "@streamdal/node-sdk";
 
@@ -50,7 +50,7 @@ const audience: Audience = {
 };
 
 export const example = async () => {
-  const streamdal = new Streamdal(config);
+  const streamdal = await registerStreamdal(config);
   const result: SDKResponse = await streamdal.process({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),

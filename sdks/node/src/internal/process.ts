@@ -13,7 +13,7 @@ import {
 } from "@streamdal/protos/protos/sp_sdk";
 import { InterStepResult, WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
-import { Configs, StreamdalRequest } from "../streamdal.js";
+import { InternalConfigs, StreamdalRequest } from "../streamdal.js";
 import { addAudience } from "./audience.js";
 import { httpRequest } from "./httpRequest.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
@@ -55,7 +55,7 @@ export const retryProcessPipelines = async ({
   audience,
   data,
 }: {
-  configs: Configs;
+  configs: InternalConfigs;
 } & StreamdalRequest): Promise<SDKResponse> => {
   let retries = 1;
   try {
@@ -119,7 +119,7 @@ export const processPipeline = async ({
 }: {
   originalData: Uint8Array;
   audience: Audience;
-  configs: Configs;
+  configs: InternalConfigs;
   pipeline: Pipeline;
 }): Promise<{ pipelineStatus: EnchancedPipelineStatus; data: Uint8Array }> => {
   const pipelineStatus: EnchancedPipelineStatus = {
@@ -179,7 +179,7 @@ export const processPipelines = async ({
   configs,
   audience,
   data,
-}: { configs: Configs } & StreamdalRequest): Promise<SDKResponse> => {
+}: { configs: InternalConfigs } & StreamdalRequest): Promise<SDKResponse> => {
   await initPipelines(configs);
   await addAudience({ configs: configs, audience });
 

@@ -8,7 +8,7 @@ import { client } from "./internal/grpc.js";
 import { heartbeat, HEARTBEAT_INTERVAL } from "./internal/heartbeat.js";
 import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { retryProcessPipelines } from "./internal/process.js";
-import { register } from "./internal/register.js";
+import { register as internalRegister } from "./internal/register.js";
 
 export { Audience, ExecStatus, OperationType, SDKResponse };
 
@@ -23,7 +23,7 @@ export interface StreamdalConfigs {
   quiet?: boolean;
 }
 
-export interface Configs {
+export interface InternalConfigs {
   grpcClient: IInternalClient;
   streamdalUrl: string;
   streamdalToken: string;
@@ -40,62 +40,67 @@ export interface StreamdalRequest {
   data: Uint8Array;
 }
 
-export class Streamdal {
-  private configs: Configs;
-
-  constructor({
-    streamdalUrl,
-    streamdalToken,
-    serviceName,
-    pipelineTimeout,
-    stepTimeout,
-    dryRun,
-    audiences,
-    quiet,
-  }: StreamdalConfigs) {
-    if (quiet || process.env.NODE_ENV === "production") {
-      console.debug = () => null;
-    }
-
-    const url = streamdalUrl ? streamdalUrl : process.env.STREAMDAL_URL;
-    const token = streamdalToken ? streamdalToken : process.env.STREAMDAL_TOKEN;
-    const name = serviceName ? serviceName : process.env.STREAMDAL_SERVICE_NAME;
-
-    if (!url || !token || !name) {
-      throw new Error(`Required configs are missing. You must provide configs streamdalUrl, streamdalToken and serviceName 
-        either as constructor arguments to Streamdal() or as environment variables in the form of STREAMDAL_URL, STREAMDAL_TOKEN and STREAMDAL_SERVICE_NAME`);
-    }
-
-    const sessionId = uuidv4();
-    const grpcClient = client(url);
-
-    this.configs = {
-      grpcClient,
-      sessionId,
-      streamdalUrl: url,
-      streamdalToken: token,
-      serviceName: name,
-      pipelineTimeout:
-        pipelineTimeout ?? process.env.STREAMDAL_PIPELINE_TIMEOUT ?? "100",
-      stepTimeout: stepTimeout ?? process.env.STREAMDAL_STEP_TIMEOUT ?? "10",
-      dryRun: dryRun ?? !!process.env.STREAMDAL_DRY_RUN,
-      audiences,
-    };
-
-    // Heartbeat is obsolete
-    setInterval(() => {
-      void heartbeat(this.configs);
-    }, HEARTBEAT_INTERVAL);
-
-    setInterval(() => {
-      sendMetrics(this.configs);
-    }, METRIC_INTERVAL);
-
-    void addAudiences(this.configs);
-    void register(this.configs);
-  }
-
-  async process({ audience, data }: StreamdalRequest): Promise<SDKResponse> {
-    return retryProcessPipelines({ configs: this.configs, audience, data });
-  }
+export interface Streamdal {
+  process: (arg: StreamdalRequest) => Promise<SDKResponse>;
 }
+
+export const registerStreamdal = async (
+  configs: StreamdalConfigs
+): Promise<Streamdal> => {
+  if (configs.quiet || process.env.NODE_ENV === "production") {
+    console.debug = () => null;
+  }
+
+  const url = configs.streamdalUrl ?? process.env.STREAMDAL_URL;
+  const token = configs.streamdalToken ?? process.env.STREAMDAL_TOKEN;
+  const name = configs.serviceName ?? process.env.STREAMDAL_SERVICE_NAME;
+
+  if (!url || !token || !name) {
+    throw new Error(`Required configs are missing. You must provide configs streamdalUrl, streamdalToken and serviceName 
+        either as constructor arguments to Streamdal() or as environment variables in the form of STREAMDAL_URL, STREAMDAL_TOKEN and STREAMDAL_SERVICE_NAME`);
+  }
+
+  const sessionId = uuidv4();
+  const grpcClient = client(url);
+
+  const internalConfigs = {
+    grpcClient,
+    sessionId,
+    streamdalUrl: url,
+    streamdalToken: token,
+    serviceName: name,
+    pipelineTimeout:
+      configs.pipelineTimeout ??
+      process.env.STREAMDAL_PIPELINE_TIMEOUT ??
+      "100",
+    stepTimeout:
+      configs.stepTimeout ?? process.env.STREAMDAL_STEP_TIMEOUT ?? "10",
+    dryRun: configs.dryRun ?? !!process.env.STREAMDAL_DRY_RUN,
+    audiences: configs.audiences,
+  };
+
+  // Heartbeat is obsolete
+  setInterval(() => {
+    void heartbeat(internalConfigs);
+  }, HEARTBEAT_INTERVAL);
+
+  setInterval(() => {
+    sendMetrics(internalConfigs);
+  }, METRIC_INTERVAL);
+
+  await addAudiences(internalConfigs);
+  await internalRegister(internalConfigs);
+
+  return {
+    process: async ({
+      audience,
+      data,
+    }: StreamdalRequest): Promise<SDKResponse> => {
+      return retryProcessPipelines({
+        configs: internalConfigs,
+        audience,
+        data,
+      });
+    },
+  };
+};

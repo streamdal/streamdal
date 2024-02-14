@@ -2,8 +2,13 @@ import { readFileSync } from "node:fs";
 
 import { Audience } from "@streamdal/protos/protos/sp_common";
 
-import { OperationType, Streamdal, StreamdalConfigs } from "../streamdal.js";
-import { runPipeline } from "./index.js";
+import {
+  OperationType,
+  registerStreamdal,
+  Streamdal,
+  StreamdalConfigs,
+} from "../streamdal.js";
+import { QUIET, runPipeline } from "./index.js";
 
 const serviceBillingConfig: StreamdalConfigs = {
   streamdalUrl: "localhost:8082",
@@ -114,27 +119,64 @@ export const randomPipelineAndData = (
   );
 };
 
-export const billingExample = () => {
-  const billing = new Streamdal(serviceBillingConfig);
-  const signup = new Streamdal(serviceSignupConfig);
-  const welcome = new Streamdal(serviceWelcomeConfig);
+export const billingExample = async () => {
+  const streamdal = await registerStreamdal({
+    ...serviceBillingConfig,
+    quiet: QUIET,
+  });
 
   const bcData = loadData("./src/sandbox/assets/sample-billing-consumer.json");
   const bpData = loadData("./src/sandbox/assets/sample-billing-producer.json");
+
+  randomPipelineAndData(streamdal, billingConsumer, bcData);
+  randomPipelineAndData(streamdal, billingProducer, bpData);
+};
+
+export const signupExample = async () => {
+  const streamdal = await registerStreamdal({
+    ...serviceSignupConfig,
+    quiet: QUIET,
+  });
+
+  const sData = loadData("./src/sandbox/assets/sample.json");
   const spData = loadData("./src/sandbox/assets/sample-signup-producer.json");
+
+  randomPipelineAndData(streamdal, signupProducer, spData);
+  randomPipelineAndData(streamdal, signupProducer1, sData);
+};
+
+export const singleSignupExample = async () => {
+  const streamdal = await registerStreamdal({
+    ...serviceSignupConfig,
+    quiet: QUIET,
+  });
+
+  const spData = loadData("./src/sandbox/assets/sample-signup-producer.json");
+
+  randomPipelineAndData(streamdal, signupProducer, spData);
+};
+
+export const welcomeExample = async () => {
+  const streamdal = await registerStreamdal(serviceWelcomeConfig);
+
   const sData = loadData("./src/sandbox/assets/sample.json");
   const wpData = loadData("./src/sandbox/assets/sample-welcome-producer.json");
 
-  randomPipelineAndData(billing, billingConsumer, bcData);
-  randomPipelineAndData(billing, billingProducer, bpData);
-  randomPipelineAndData(signup, signupProducer, spData);
-  randomPipelineAndData(signup, signupProducer1, sData);
-  randomPipelineAndData(welcome, welcomeConsumer, sData);
-  randomPipelineAndData(welcome, welcomeProducer, wpData);
+  randomPipelineAndData(streamdal, welcomeConsumer, sData);
+  randomPipelineAndData(streamdal, welcomeProducer, wpData);
 };
 
-export const singleWelcomeExample = () => {
-  const welcome = new Streamdal(serviceWelcomeConfig);
+export const singleWelcomeExample = async () => {
+  const streamdal = await registerStreamdal({
+    ...serviceWelcomeConfig,
+    quiet: QUIET,
+  });
   const wpData = loadData("./src/sandbox/assets/sample-welcome-producer.json");
-  randomPipelineAndData(welcome, welcomeProducer, wpData);
+  randomPipelineAndData(streamdal, welcomeProducer, wpData);
+};
+
+export const onboardingExample = () => {
+  void signupExample();
+  void billingExample();
+  void welcomeExample();
 };
