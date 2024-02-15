@@ -1,11 +1,14 @@
 import { readFileSync } from "node:fs";
 
+import { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
+import { Command } from "@streamdal/protos/protos/sp_command";
 import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ClientType } from "@streamdal/protos/protos/sp_info";
+import { RegisterRequest } from "@streamdal/protos/protos/sp_internal";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
 
-import { Configs } from "../streamdal.js";
+import { InternalConfigs } from "../streamdal.js";
 import { processResponse } from "./pipeline.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
 
@@ -26,8 +29,8 @@ export interface Tail {
 }
 
 export const internal = {
-  // we track registered status because we can't await registering
-  // in the streamdal constructor
+  // we track registered status so downstream process pipeline
+  // requests can be retried
   registered: false,
   pipelineInitialized: false,
   pipelines: new Map<string, Map<string, Pipeline>>(),
@@ -64,7 +67,37 @@ export const clientInfo = {
   os: process.platform,
 };
 
-export const register = async (configs: Configs) => {
+export const processRegisterResponses = async (
+  call: ServerStreamingCall<RegisterRequest, Command>,
+  configs: InternalConfigs
+) => {
+  try {
+    for await (const response of call.responses) {
+      if (response.command.oneofKind !== "keepAlive") {
+        await processResponse(response);
+      }
+    }
+  } catch (error) {
+    internal.registered = false;
+    console.error(
+      "error processing register responses, retrying register",
+      error
+    );
+    retryRegister(configs);
+  }
+};
+
+export const retryRegister = (configs: InternalConfigs) =>
+  setTimeout(() => {
+    console.info(
+      `retrying registering with grpc server in ${
+        REGISTRATION_RETRY_INTERVAL / 1000
+      } seconds...`
+    );
+    void register(configs);
+  }, REGISTRATION_RETRY_INTERVAL);
+
+export const register = async (configs: InternalConfigs) => {
   try {
     console.info(`### running node-sdk version: ${clientInfo.libraryVersion}`);
     console.info(`### registering with grpc server...`);
@@ -86,24 +119,13 @@ export const register = async (configs: Configs) => {
     await call.headers;
     console.info(`### registered with grpc server`);
     //
-    // considering response headers without errors as registered
+    // considering response headers without errors as registered;
+    // don't block while we wait to process stream responses
     internal.registered = true;
-
-    for await (const response of call.responses) {
-      if (response.command.oneofKind !== "keepAlive") {
-        await processResponse(response);
-      }
-    }
+    void processRegisterResponses(call, configs);
   } catch (error) {
     internal.registered = false;
     console.error("error registering with grpc server", error);
-    setTimeout(() => {
-      console.info(
-        `retrying registering with grpc server in ${
-          REGISTRATION_RETRY_INTERVAL / 1000
-        } seconds...`
-      );
-      void register(configs);
-    }, REGISTRATION_RETRY_INTERVAL);
+    retryRegister(configs);
   }
 };

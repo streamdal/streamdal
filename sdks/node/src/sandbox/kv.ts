@@ -3,7 +3,7 @@ import { Audience } from "@streamdal/protos/protos/sp_common";
 import {
   ExecStatus,
   OperationType,
-  Streamdal,
+  registerStreamdal,
   StreamdalConfigs,
 } from "../streamdal.js";
 import { loadData } from "./billing.js";
@@ -36,8 +36,8 @@ const KVProducer: Audience = {
  *      --data '{"kvs": [{"key": "eaab67a7-f8af-48b9-b65f-1f0f15de9956","value": "eaab67a7-f8af-48b9-b65f-1f0f15de9956"}]}' \
  *      "http://localhost:8081/api/v1/kv"
  */
-export const kv = () => {
-  const kvService = new Streamdal(serviceKVConfig);
+export const kvExample = async () => {
+  const kvService = await registerStreamdal(serviceKVConfig);
   const kvData = loadData("./src/sandbox/assets/sample-welcome-producer.json");
   const key0 = kvData[0];
   const key1 = kvData[1];

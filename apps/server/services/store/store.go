@@ -82,12 +82,9 @@ type IStore interface {
 	GetAudiences(ctx context.Context) ([]*protos.Audience, error)
 	GetNotificationConfig(ctx context.Context, req *protos.GetNotificationRequest) (*protos.NotificationConfig, error)
 	GetNotificationConfigs(ctx context.Context) (map[string]*protos.NotificationConfig, error)
-	GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error)
 	CreateNotificationConfig(ctx context.Context, req *protos.CreateNotificationRequest) error
 	UpdateNotificationConfig(ctx context.Context, req *protos.UpdateNotificationRequest) error
 	DeleteNotificationConfig(ctx context.Context, req *protos.DeleteNotificationRequest) error
-	AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error
-	DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error
 	GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error)
 	GetActivePipelineUsage(ctx context.Context, pipelineID string) ([]*PipelineUsage, error)
 	GetActiveTailCommandsByService(ctx context.Context, serviceName string) ([]*protos.Command, error)
@@ -153,6 +150,74 @@ type IStore interface {
 	// GetPipelinesByAudience will fetch pipeline configs and then use the ID to
 	// fetch the actual pipeline from store + update the paused state.
 	GetPipelinesByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error)
+
+	// DeletePipelineConfig deletes a pipeline config for all audiences that use
+	// given pipeline ID; it will return a list of audiences that the pipeline id
+	// was used by.
+	DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+
+	// GetAudiencesByPipelineID returns a slice of audiences that use a pipeline ID
+	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+}
+
+func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
+	llog := s.log.WithField("method", "DeletePipelineConfigsByPipelineID")
+	llog.Debug("received request to delete pipeline configs by pipeline ID")
+
+	// Fetch all pipeline configs
+	pipelineConfigs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error fetching pipeline configs")
+	}
+
+	newPipelineConfigs := make(map[*protos.Audience]*protos.PipelineConfigs)
+	audiences := make([]*protos.Audience, 0)
+
+	// Build a new pipeline config for each audience that uses the pipeline ID,
+	// skipping over pipeline ID that we want to delete
+	for aud, configs := range pipelineConfigs {
+		for _, cfg := range configs.Configs {
+			if cfg.Id == pipelineID {
+				continue
+			}
+
+			if _, ok := newPipelineConfigs[aud]; !ok {
+				newPipelineConfigs[aud] = &protos.PipelineConfigs{
+					Configs: make([]*protos.PipelineConfig, 0),
+				}
+			}
+
+			newPipelineConfigs[aud].Configs = append(newPipelineConfigs[aud].Configs, cfg)
+			audiences = append(audiences, aud)
+		}
+	}
+
+	// Save the new pipeline configs
+	if err := s.savePipelineConfigs(ctx, newPipelineConfigs); err != nil {
+		llog.Errorf("unable to save new pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error saving new pipeline configs")
+	}
+
+	return audiences, nil
+}
+
+func (s *Store) savePipelineConfigs(ctx context.Context, pipelineConfigs map[*protos.Audience]*protos.PipelineConfigs) error {
+	llog := s.log.WithField("method", "savePipelineConfigs")
+	llog.Debug("received request to save pipeline configs")
+
+	for aud, cfgs := range pipelineConfigs {
+		data, err := proto.Marshal(cfgs)
+		if err != nil {
+			return errors.Wrap(err, "error encoding pipeline configs")
+		}
+
+		if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(aud)), data, 0).Err(); err != nil {
+			return errors.Wrapf(err, "error saving pipeline to store in key '%s'", RedisAudienceKey(util.AudienceToStr(aud)))
+		}
+	}
+
+	return nil
 }
 
 func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
@@ -175,6 +240,30 @@ func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string
 	}
 
 	return sessionIDs, nil
+}
+
+func (s *Store) GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
+	llog := s.log.WithField("method", "GetAudiencesByPipelineID")
+	llog.Debug("received request to get audiences by pipeline ID")
+
+	// Get all pipeline configs
+	pipelineConfigs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error fetching pipeline configs")
+	}
+
+	audiences := make([]*protos.Audience, 0)
+
+	for aud, cfg := range pipelineConfigs {
+		for _, pc := range cfg.Configs {
+			if pc.Id == pipelineID {
+				audiences = append(audiences, aud)
+			}
+		}
+	}
+
+	return audiences, nil
 }
 
 // TODO: Needs tests
@@ -358,13 +447,6 @@ func (s *Store) GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, 
 		if err := proto.Unmarshal([]byte(pipelineData), pipeline); err != nil {
 			return nil, errors.Wrapf(err, "error unmarshaling pipeline '%s'", key)
 		}
-
-		// Get any associated notification configs
-		nCfgs, err := s.GetNotificationConfigsByPipeline(ctx, pipeline.Id)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching notification configs for pipeline '%s'", pipeline.Id)
-		}
-		pipeline.XNotificationConfigs = nCfgs
 
 		pipelines[pipeline.Id] = pipeline
 	}
@@ -915,7 +997,7 @@ func (s *Store) GetNotificationConfigs(ctx context.Context) (map[string]*protos.
 			return nil, errors.Wrapf(err, "error unmarshaling notification config '%s'", key)
 		}
 
-		notificationConfigs[key] = notificationConfig
+		notificationConfigs[notificationConfig.GetId()] = notificationConfig
 	}
 
 	return notificationConfigs, nil
@@ -1031,62 +1113,6 @@ func (s *Store) DeleteNotificationConfig(ctx context.Context, req *protos.Delete
 
 	return nil
 }
-
-func (s *Store) AttachNotificationConfig(ctx context.Context, req *protos.AttachNotificationRequest) error {
-	key := RedisNotificationAssocKey(req.PipelineId, req.NotificationId)
-	if err := s.options.RedisBackend.Set(ctx, key, []byte(``), 0).Err(); err != nil {
-		return errors.Wrap(err, "error saving notification association to store")
-	}
-
-	return nil
-}
-
-func (s *Store) DetachNotificationConfig(ctx context.Context, req *protos.DetachNotificationRequest) error {
-	key := RedisNotificationAssocKey(req.PipelineId, req.NotificationId)
-	if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
-		return errors.Wrap(err, "error deleting notification association from store")
-	}
-
-	return nil
-}
-
-func (s *Store) GetNotificationConfigsByPipeline(ctx context.Context, pipelineID string) ([]*protos.NotificationConfig, error) {
-	cfgs := make([]*protos.NotificationConfig, 0)
-
-	// Fetch all notify config keys from store
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisNotificationAssocPrefix+":"+pipelineID+":*").Result()
-	if err != nil {
-		return nil, errors.Wrap(err, "error fetching notify config keys from store")
-	}
-
-	for _, key := range keys {
-		configID := strings.TrimPrefix(key, RedisNotificationAssocPrefix+":"+pipelineID+":")
-
-		// Fetch key so we get the notify config
-		data, err := s.options.RedisBackend.Get(ctx, RedisNotificationConfigKey(configID)).Result()
-		if err != nil {
-			if errors.Is(err, redis.Nil) {
-				continue
-			}
-			return nil, errors.Wrapf(err, "error fetching notify config key '%s' from store", configID)
-		}
-
-		decrypted, err := s.options.Encryption.Decrypt([]byte(data))
-		if err != nil {
-			return nil, errors.Wrapf(err, "error decrypting notification config '%s'", configID)
-		}
-
-		notifyConfig := &protos.NotificationConfig{}
-		if err := proto.Unmarshal(decrypted, notifyConfig); err != nil {
-			return nil, errors.Wrapf(err, "error unmarshalling notify config for key '%s'", configID)
-		}
-
-		cfgs = append(cfgs, notifyConfig)
-	}
-
-	return cfgs, nil
-}
-
 func (o *Options) validate() error {
 	if o == nil {
 		return errors.New("options cannot be nil")
