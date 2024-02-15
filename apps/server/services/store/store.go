@@ -155,6 +155,9 @@ type IStore interface {
 	// given pipeline ID; it will return a list of audiences that the pipeline id
 	// was used by.
 	DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+
+	// GetAudiencesByPipelineID returns a slice of audiences that use a pipeline ID
+	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
 }
 
 func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
@@ -237,6 +240,30 @@ func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string
 	}
 
 	return sessionIDs, nil
+}
+
+func (s *Store) GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
+	llog := s.log.WithField("method", "GetAudiencesByPipelineID")
+	llog.Debug("received request to get audiences by pipeline ID")
+
+	// Get all pipeline configs
+	pipelineConfigs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error fetching pipeline configs")
+	}
+
+	audiences := make([]*protos.Audience, 0)
+
+	for aud, cfg := range pipelineConfigs {
+		for _, pc := range cfg.Configs {
+			if pc.Id == pipelineID {
+				audiences = append(audiences, aud)
+			}
+		}
+	}
+
+	return audiences, nil
 }
 
 // TODO: Needs tests
