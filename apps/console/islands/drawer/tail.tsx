@@ -95,7 +95,12 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
   useEffect(() => {
     tailSignal.value = [];
-    tailPausedSignal.value = false;
+    if (
+      tailPausedSignal.value
+    ) {
+      tailPausedSignal.value = false;
+    }
+    return () => stop();
   }, []);
 
   useSignalEffect(() => {
@@ -114,12 +119,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
         inline: "start",
       });
   }, [tailSignal.value]);
-
-  useEffect(() => {}, [
-    tailPausedSignal.value,
-    tailDiffSignal.value,
-    fullScreen,
-  ]);
 
   useLayoutEffect(async () => {
     const { initFlowbite } = await import("flowbite");

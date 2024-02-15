@@ -1,8 +1,5 @@
-import { SDKResponse } from "@streamdal/node-sdk";
-
 const {
   ExecStatus,
-  SDKResponse,
   OperationType,
   Streamdal,
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -41,6 +38,7 @@ const config = {
   pipelineTimeout: "100",
   stepTimeout: "10",
   dryRun: false,
+  quiet: true,
 };
 
 const audience = {
@@ -50,9 +48,10 @@ const audience = {
   operationName: "test-kafka-consumer",
 };
 
+const streamdal = new Streamdal(config);
+
 export const example = async () => {
-  const streamdal = new Streamdal(config);
-  const result: SDKResponse = await streamdal.process({
+  const result = await streamdal.process({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
   });

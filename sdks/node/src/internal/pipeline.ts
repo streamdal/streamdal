@@ -3,13 +3,13 @@ import { Audience, TailRequestType } from "@streamdal/protos/protos/sp_common";
 import { GetSetPipelinesCommandsByServiceResponse } from "@streamdal/protos/protos/sp_internal";
 import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
-import { Configs } from "../streamdal.js";
+import { InternalConfigs } from "../streamdal.js";
 import { kvCommand } from "./kv.js";
 import { audienceKey, internal, Tail } from "./register.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
 import { instantiateWasm } from "./wasm.js";
 
-export const initPipelines = async (configs: Configs) => {
+export const initPipelines = async (configs: InternalConfigs) => {
   try {
     if (internal.pipelineInitialized) {
       return;

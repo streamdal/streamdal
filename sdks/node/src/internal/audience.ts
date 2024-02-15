@@ -1,14 +1,14 @@
 import { Audience, ResponseCode } from "@streamdal/protos/protos/sp_common";
 
-import { Configs } from "../streamdal.js";
+import { InternalConfigs } from "../streamdal.js";
 import { audienceKey, internal, Tail } from "./register.js";
 
 export interface AddAudience {
-  configs: Configs;
+  configs: InternalConfigs;
   audience: Audience;
 }
 
-export const addAudiences = async (configs: Configs) => {
+export const addAudiences = async (configs: InternalConfigs) => {
   if (!configs.audiences || configs.audiences.length === 0) {
     return;
   }

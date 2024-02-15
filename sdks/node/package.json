@@ -13,14 +13,22 @@
   ],
   "type": "module",
   "exports": {
-    "require": "./cjs/streamdal.js",
-    "import": "./esm/streamdal.js"
+    ".": {
+      "require": {
+        "types": "./cjs/streamdal.d.ts",
+        "default": "./cjs/streamdal.js"
+      },
+      "import": {
+        "types": "./streamdal.d.ts",
+        "default": "./streamdal.js"
+      }
+    }
   },
   "main": "esm/streamdal.js",
   "scripts": {
     "build": "npm run clean && npm run build:esm && npm run build:commonjs && ./generatePackages.sh",
     "build:commonjs": "npx tsc --module commonjs --outDir build/cjs/",
-    "build:esm": "npx tsc --module es2022 --outDir build/esm/",
+    "build:esm": "npx tsc --module nodenext --outDir build/",
     "clean": "rimraf build",
     "sandbox": "tsc-watch --onSuccess \"node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js\"",
     "lint": "eslint src --ext .ts --fix",
