@@ -40,7 +40,7 @@ export interface StreamdalRequest {
   data: Uint8Array;
 }
 
-export interface Streamdal {
+export interface StreamdalRegistration {
   process: (arg: StreamdalRequest) => Promise<SDKResponse>;
 }
 
@@ -89,9 +89,13 @@ const initConfigs = (configs: StreamdalConfigs) => {
   return internalConfigs;
 };
 
+/**
+ * This is the recommended way to register with the Streamdal server
+ * as you can await completion before processing pipelines.
+ */
 export const registerStreamdal = async (
   configs: StreamdalConfigs
-): Promise<Streamdal> => {
+): Promise<StreamdalRegistration> => {
   const internalConfigs = initConfigs(configs);
 
   await addAudiences(internalConfigs);
@@ -112,27 +116,24 @@ export const registerStreamdal = async (
 };
 
 /**
- * For use in envs that don't support top level await.
- * Subsequent process pipeline requests will retry until
- * registration is done.
+ * Prefer registerStreamdal for guaranteed registration before processing pipelines.
+ *
+ * This class can be used in envs that don't support top level await.
+ * Subsequent process pipeline requests will retry until registration is done.
  */
-export const legacyRegisterStreamdal = (
-  configs: StreamdalConfigs
-): Streamdal => {
-  const internalConfigs = initConfigs(configs);
-  void addAudiences(internalConfigs);
-  void internalRegister(internalConfigs);
+export class Streamdal {
+  private internalConfigs: InternalConfigs;
+  constructor(configs: StreamdalConfigs) {
+    this.internalConfigs = initConfigs(configs);
+    void addAudiences(this.internalConfigs);
+    void internalRegister(this.internalConfigs);
+  }
 
-  return {
-    process: async ({
+  async process({ audience, data }: StreamdalRequest): Promise<SDKResponse> {
+    return retryProcessPipelines({
+      configs: this.internalConfigs,
       audience,
       data,
-    }: StreamdalRequest): Promise<SDKResponse> => {
-      return retryProcessPipelines({
-        configs: internalConfigs,
-        audience,
-        data,
-      });
-    },
-  };
-};
+    });
+  }
+}

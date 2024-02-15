@@ -4,8 +4,8 @@ import { ExecStatus } from "@streamdal/protos/protos/sp_sdk";
 import {
   OperationType,
   registerStreamdal,
-  Streamdal,
   StreamdalConfigs,
+  StreamdalRegistration,
 } from "../streamdal.js";
 import { onboardingExample } from "./billing.js";
 
@@ -107,7 +107,7 @@ const audienceCProducer: Audience = {
 };
 
 const logPipeline = async (
-  streamdal: Streamdal,
+  streamdal: StreamdalRegistration,
   audience: Audience,
   input: any
 ) => {
@@ -148,7 +148,7 @@ const logPipeline = async (
 };
 
 export const runPipeline = (
-  streamdal: Streamdal,
+  streamdal: StreamdalRegistration,
   audience: Audience,
   input: any,
   interval = 0
@@ -160,7 +160,7 @@ export const runPipeline = (
     : void logPipeline(streamdal, audience, input);
 
 export const randomPipeline = (
-  streamdal: Streamdal,
+  streamdal: StreamdalRegistration,
   audience: Audience,
   input: any
 ) => {

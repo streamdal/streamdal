@@ -1,7 +1,7 @@
 const {
   ExecStatus,
   OperationType,
-  legacyRegisterStreamdal,
+  Streamdal,
   // eslint-disable-next-line @typescript-eslint/no-var-requires
 } = require("@streamdal/node-sdk");
 
@@ -48,7 +48,7 @@ const audience = {
   operationName: "test-kafka-consumer",
 };
 
-const streamdal = legacyRegisterStreamdal(config);
+const streamdal = new Streamdal(config);
 
 export const example = async () => {
   const result = await streamdal.process({

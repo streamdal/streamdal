@@ -49,8 +49,9 @@ const audience: Audience = {
   operationName: "test-kafka-consumer",
 };
 
+const streamdal = await registerStreamdal(config);
+
 export const example = async () => {
-  const streamdal = await registerStreamdal(config);
   const result: SDKResponse = await streamdal.process({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),

@@ -5,8 +5,8 @@ import { Audience } from "@streamdal/protos/protos/sp_common";
 import {
   OperationType,
   registerStreamdal,
-  Streamdal,
   StreamdalConfigs,
+  StreamdalRegistration,
 } from "../streamdal.js";
 import { QUIET, runPipeline } from "./index.js";
 
@@ -104,7 +104,7 @@ export const loadData = (path: string): any[] => {
 };
 
 export const randomPipelineAndData = (
-  streamdal: Streamdal,
+  streamdal: StreamdalRegistration,
   audience: Audience,
   input: any[]
 ) => {
