@@ -1,15 +1,20 @@
 CLI
 ===
-[![Pull Request](https://github.com/streamdal/cli/actions/workflows/pr.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/pr.yaml)
-[![Release](https://github.com/streamdal/cli/actions/workflows/release.yaml/badge.svg)](https://github.com/streamdal/cli/actions/workflows/release.yaml)
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-CLI tool for [Streamdal](https://streamdal.com)!
+_**CLI tool for [Streamdal](https://streamdal.com).**_
 
-> It's like a `tail -f` for your data!
+> It's like a `tail -f` for watching the I/O in your app!
 
 NOTE: This app looks best if you use it in a _modern_ terminal that has TrueColor
 support such as iTerm2, Alacrity, Konsole, PowerShell and many, many more.
+
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
 
 ## Demo
 <img src="./assets/demo.gif">
@@ -28,7 +33,7 @@ _**OR**_
 
 Install manually:
 
-1. Download latest release [here](https://github.com/streamdal/cli/releases)
+1. Download latest release [here](https://github.com/streamdal/streamdal/releases)
 2. `chmod +x streamdal-darwin-arm64`
 3. `mv streamdal-darwin-arm64 /usr/local/bin/streamdal-cli`
 4. Verify that it works: `streamdal-cli --version`
@@ -69,15 +74,16 @@ file. Alternatively, you can set them in a `.env` file in whichever directory
 you launch the CLI from.
 
 ## Release
-The process of releasing is semi-automated. You will have to push a new version
-tag which will kick off a release Github action and publish a new release on
-the [releases](https://github.com/streamdal/cli/releases) page.
 
-You will also need to perform a manual update to the 
-[homebrew formula](https://github.com/streamdal/homebrew-tap).
-For that, edit `cli.rb`, update `url` and `sha256` for each release and get the
-change merged. Verify that new version is available by running 
-`brew upgrade streamdal/tap/cli`.
+Any push or merge to the `main` branch with any changes in `/apps/cli/*`
+will automatically tag and release a new console version with `apps/cli/vX.Y.Z`.
+
+<sub>(1) If you'd like to skip running the release action on push/merge to `main`,
+include `norelease` anywhere in the commit message.</sub>
+
+<sub>(2) Updating homebrew is manual and requires running the `/scripts/helper/install-tags.sh` script.</sub>
+
+<sub>(3) The installer script will automatically fetch and install the latest CLI release.</sub>
 
 ## Community
 

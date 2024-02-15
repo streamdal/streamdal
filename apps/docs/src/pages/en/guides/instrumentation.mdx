@@ -30,7 +30,7 @@ When initializing the Streamdal client with `streamdal.New()`, you pass a config
 | **StreamdalURL** | The URL of the Streamdal server instance. | String | `"localhost:8082"` |
 | **StreamdalToken** | The authentication token for the Streamdal server. | String | `"streamdal"` |
 | **StepTimeout** | Sets the maximum duration for Wasm execution in each step. | Duration | `time.Millisecond * 10` |
-| **PipelineTimeout** | Defines the total allowable execution time for the entire pipeline. | Duration | `time.Millisecond * 100` |
+| **PipelineTimeout** | Defines the total allowable execution time for the entire [pipeline](/en/guides/pipelines/). | Duration | `time.Millisecond * 100` |
 | **DryRun** | A switch to toggle between actual execution and a logging-only mode. If set to true, it won't actually execute but will only log. | Boolean | `false` |
 | **ServiceName** | A name that represents the specific service in your infrastructure using this client. | String | `"billing-svc"` |
 | **ShutdownCtx** | Context used to manage the lifecycle and potential shutdown of the Streamdal client. | Context | `ctx` |
@@ -100,9 +100,9 @@ func main() {
 
 The SDK is currently available in the following languages:
 
-- **[Go](https://github.com/streamdal/go-sdk)**
-- **[Node](https://github.com/streamdal/node-sdk)**
-- **[Python](https://github.com/streamdal/python-sdk)**
+- **[Go](https://github.com/streamdal/streamdal/tree/main/sdks/go)**
+- **[Node](https://github.com/streamdal/streamdal/tree/main/sdks/node)**
+- **[Python](https://github.com/streamdal/streamdal/tree/main/sdks/python)**
 
 ---
 

@@ -22,14 +22,14 @@ straightforward with our Node SDK.
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    <p>For detailed information on the SDK and its functionalities, refer to
-    the [SDK README](https://github.com/streamdal/go-sdk).</p>
+    <p>For detailed information on the Node SDK and its functionalities, refer to
+    the [Node SDK README](https://github.com/streamdal/streamdal/blob/main/sdks/node/README.md).</p>
   </div>
 </Notification>
 
 ## Instrumentation
 
-Start with the [instrumentation guide](../../guides/instrumentation) if you
+Start with the [instrumentation guide](/en/guides/instrumentation/) if you
 haven't already. It will walk you through the process of setting up Streamdal
 and its components.
 
@@ -95,7 +95,14 @@ node --experimental-wasi-unstable-preview1 ./build/sandbox/index.js
 
 ## More In-depth Examples
 
-Examples with docker-compose files are available for the following:
+Examples available for the following:
 
- - **[Node with Kafa](https://github.com/streamdal/streamdal-examples/tree/main/kafka/node)**
- - **[Node with Rabbitmq](https://github.com/streamdal/streamdal-examples/tree/main/rabbit/node)**
+ - **[CommonJS](https://github.com/streamdal/streamdal/tree/main/sdks/node/examples/commonjs)**
+ - **[ESM](https://github.com/streamdal/streamdal/tree/main/sdks/node/examples/esm)**
+
+
+ ## Libraries
+
+ Here are the current list of Go libraries/wrappers/shims:
+
+ - [prisma-extension-streamdal](https://github.com/streamdal/prisma-extension-streamdal)

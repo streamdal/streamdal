@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  console:
+    build: .
+    container_name: streamdal-console-container
+    image: streamdal-console-image
+    environment:
+      - STREAMDAL_API_URL=http://host.docker.internal:9191
+    ports:
+      - "3000:3000"

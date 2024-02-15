@@ -21,13 +21,13 @@ into your Go applications has never been simpler.
 <Notification type="information">
   <img src={info} alt="Information" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    <p>For detailed information on the SDK and its functionalities, refer to the [SDK README](https://github.com/streamdal/go-sdk).</p>
+    <p>For detailed information on the Go SDK and its functionalities, refer to the [Go SDK README](https://github.com/streamdal/streamdal/blob/main/sdks/go/README.md).</p>
   </div>
 </Notification>
 
 ## Instrumentation
 
-Start with the [instrumentation guide](../../guides/instrumentation) if you 
+Start with the [instrumentation guide](/en/guides/instrumentation/) if you 
 haven't already. It will walk you through the process of setting up Streamdal 
 and its components. 
 
@@ -73,12 +73,12 @@ func main() {
 	})
 
 	// Check if the .Process() call completed
-	if resp.Status != streamdal.StatusError {
+	if resp.Status != streamdal.ExecStatusError {
 		fmt.Println("Successfully processed payload")
 	}
 
 	// Or you can inspect each individual pipeline & step result
-	for _, pipeline := resp.PipelineStatus {
+	for _, pipeline := range resp.PipelineStatus {
 		fmt.Printf("Inspecting '%d' steps in pipeline '%s'...\n", len(resp.PipelineStatus), pipeline.Name)
 
 		for _, step := range pipeline.StepStatus {
@@ -106,3 +106,9 @@ func main() {
 
 - **Output:** 
    - The response from the processed data is then printed to the console, providing insight into the operation's result.
+
+## Libraries
+
+Here are the current list of Go libraries/wrappers/shims:
+
+- [streamdal/confluent-kafka-go](https://github.com/streamdal/confluent-kafka-go/)

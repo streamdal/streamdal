@@ -33,7 +33,17 @@ jobs:
           sed -i "s/version=\".*\"/version=\"${{ steps.get_new_version.outputs.new_version }}\"/" streamdal/__init__.py
           sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
 
+      # We do this because other jobs might have written to the repo while this
+      # job was running and making local changes; without this pull step, we
+      # might run into an error during auto-commit.
+      - name: Pull latest changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git pull --depth=10
+
       - uses: stefanzweifel/git-auto-commit-action@v4
+        id: auto_commit
         with:
           commit_message: Bumped version in setup.py to ${{ steps.get_new_version.outputs.new_version }}
 
@@ -42,6 +52,7 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         id: create_tag
         with:
+          commit_sha: ${{ steps.auto_commit.outputs.commit_hash }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ steps.get_new_version.outputs.new_version }}
           tag_prefix: "sdks/python/v"

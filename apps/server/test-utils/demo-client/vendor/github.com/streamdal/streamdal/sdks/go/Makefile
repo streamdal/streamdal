@@ -39,3 +39,4 @@ test/benchmark: description = Run all benchmarks
 test/benchmark:
 	bash ./init_wasm.sh
 	go test -bench=. -run=^#
+

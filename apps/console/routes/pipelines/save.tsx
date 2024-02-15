@@ -13,13 +13,13 @@ export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
     const formData = await req.formData();
 
-    const { data: pipeline, errors }: {
+    const {
+      data: pipeline,
+      errors,
+    }: {
       pipeline: Pipeline;
       errors: ErrorType;
-    } = validate(
-      pipelineSchema,
-      formData,
-    );
+    } = validate(pipelineSchema, formData);
 
     const { session } = ctx.state;
 
@@ -29,13 +29,10 @@ export const handler: Handlers<SuccessType> = {
         message: "Validation failed",
         errors,
       });
-      return new Response(
-        "",
-        {
-          status: 307,
-          headers: { Location: `/pipelines/${pipeline.id ? pipeline.id : ""}` },
-        },
-      );
+      return new Response("", {
+        status: 307,
+        headers: { Location: `/pipelines/${pipeline.id ? pipeline.id : ""}` },
+      });
     }
 
     await updatePipelineNotifications(pipeline.notifications, pipeline);
@@ -43,23 +40,21 @@ export const handler: Handlers<SuccessType> = {
 
     session.flash("success", {
       status: response.code === ResponseCode.OK,
-      message: response.code === ResponseCode.OK
-        ? "Success!"
-        : "Save pipeline failed. Please try again later",
-      ...response.code !== ResponseCode.OK
+      message:
+        response.code === ResponseCode.OK
+          ? "Success!"
+          : "Save pipeline failed. Please try again later",
+      ...(response.code !== ResponseCode.OK
         ? { errors: { apiError: response.message } }
-        : {},
+        : {}),
     });
 
-    return new Response(
-      "",
-      {
-        status: 307,
-        headers: {
-          Location: `/pipelines/${response.pipelineId}`,
-        },
+    return new Response("", {
+      status: 307,
+      headers: {
+        Location: `/pipelines/${response.pipelineId}`,
       },
-    );
+    });
   },
 };
 

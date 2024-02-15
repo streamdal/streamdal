@@ -13,6 +13,7 @@ import Changes from "@components/Misc/Changes.astro";
 import streamdalWorkflow from "@images/core-components/streamdalWorkflow.png";
 import sdkFlow from '@images/guides/sdkflow.png'
 import streamdalLogic from "@images/guides/streamdalLogic.png";
+import Footer from "@components/Callouts/pFooter.astro"
 
 
 <Changes />
@@ -39,10 +40,10 @@ interplay between our server and SDK can be _very_ helpful:
 <GraphWrap src={sdkFlow} alt="SDK flow" />
 
 ##  Access the Console UI
-Once the SDK and Server are connected you will manage your data via the [Console UI](../../core-components/console-ui)
+Once the SDK and Server are connected you will manage your data via the [Console UI](/en/core-components/console-ui)
 
 <ol>
-  <li><img src={beta} alt="Beta" style="display: inline" /> **Manage Pipelines**: Create, edit, and delete <a href="/en/resources-support/glossary#pipeline-or-ruleset" class="pkeyword">pipelines</a>.</li>
+  <li><img src={beta} alt="Beta" style="display: inline" /> **Manage Pipelines**: Create, edit, and delete [pipelines](/en/guides/pipelines/).</li>
   <ol class="sol">
     <li>You can attach/remove as many pipelines as needed</li>
   </ol>
@@ -59,3 +60,14 @@ Once the SDK and Server are connected you will manage your data via the [Console
 This is a high-level overview of how Streamdal's components all work together. 
 
 <GraphWrap src={streamdalLogic} alt="How It all Works Together Diagram" />
+
+{/* <Footer>[← What is Streamdal?](/en/what-is-streamdal/)&nbsp;┃&nbsp;[Use Cases →](/en/getting-started/use-cases/) </Footer> */}
+
+<Footer type="2">
+    <div slot="start">
+        [← What is Streamdal?](/en/what-is-streamdal/)
+    </div>
+    <div slot="end">
+        [Use Cases →](/en/getting-started/use-cases/)
+    </div>
+</Footer>

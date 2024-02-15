@@ -2,43 +2,30 @@
    
 <img src="./src/images/readme/streamdal-logo-dark.png#gh-dark-mode-only"><img src="./src/images/readme/streamdal-logo-light.png#gh-light-mode-only">  
 
-[![GitHub](https://img.shields.io/github/license/streamdal/streamdal)](https://github.com/streamdal/streamdal)
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-docs-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-docs-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-docs-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-docs-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-</div>  
+</div>
 
-**This is the documentation repo for the [Streamdal](https://streamdal.com) project.**
+_**An Astro app used for documentation found at https://docs.streamdal.com**._
 
-https://docs.streamdal.com
-
-Streamdal is a combination of open-source services and SDKs that enable 
-real-time:
-
-- Data observability _(think_ `tail -f`_, but for your app’s runtime data)_
-- Data quality monitoring
-- (Beta) Ultra-low overhead pipelines using [Wasm](https://webassembly.org/)
-- (Beta) Data transformation + obfuscation + masking + stripping
-
-
-To get a better understanding of what we're trying to do, our ethos, 
-principles, and really, our state of mind - check out our 
-[manifesto](https://streamdal.com/manifesto).
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
 
 ---
 
 <div align="center">
 
-[Overview](#overview) •
-[Developer Docs](#developer-docs) •
-[Resources](#resources) •
+[Overview](#overview) • •
 [Contributing](#contributing) •
 [Community](#community)
 </div>
 
 If you experience any issues with the documentation, whether it be poor 
 readability/experience, missing/incorrect info, typos, or anything, please feel 
-free to [reach out](#community) or simply open an 
-<a href="https://github.com/streamdal/docs/issues">issue</a>.
+free to [reach out](#community) or open an 
+<a href="https://github.com/streamdal/streamdal/issues">issue</a>.
 
 
 ## Overview
@@ -46,40 +33,11 @@ free to [reach out](#community) or simply open an
 The Streamdal documentation is broken up into two categories: `Developer Docs` 
 and `Resources`.
 
-### Developer Docs
-
-All of the necessary information for getting started and using Streamdal can 
-be found under `Developer Docs`. 
-
-Below are some sections picked from the _Developer Docs_ that should be the most 
-helpful for getting started with Streamdal:
-
-#### Streamdal Core
-
-- [What is Streamdal?](https://docs.streamdal.com/en/what-is-streamdal/)
-- [How Streamdal Works](https://docs.streamdal.com/en/getting-started/how-streamdal-works/)
-- [Quickstart](https://docs.streamdal.com/en/getting-started/quickstart/)
-- [Core Components Overview](https://docs.streamdal.com/en/core-components/overview/)
-
-#### Guides
-- [Instrumentation](https://docs.streamdal.com/en/guides/instrumentation/)
-- [Deployment](https://docs.streamdal.com/en/guides/deployment/)
-- [Tail](https://docs.streamdal.com/en/guides/tail/)
-
-### Resources
-
-The `Resources` section contains other important (but mostly supplemental) 
-information.
-
-Below are some sections picked from _Resources_ that should be pretty handy 
-when wanting support, clarity, or mesmerizing software factoids 🧙 :
-
-- [Getting Support](https://docs.streamdal.com/en/resources-support/get-support/)
-- [FAQ](https://docs.streamdal.com/en/resources-support/faq/)
-- [Open Source](https://docs.streamdal.com/en/resources-support/open-source/)
-
-
-
+* _Developer Docs_ contains all of the necessary information for getting started
+and using Streamdal.
+* _Resources_ contains supplemental information such as support, contributing, and 
+    open source information.
+    
 <div align="right">
 [<a href="#to-top">Back to top</a>]
 </div>
@@ -119,11 +77,19 @@ To contribute to this repo:
     
 That's it!
 
-We may modify your additions/subtractions over time for clarity and readability. Feel free to make design requests for anything you submit (or feel is needed), and we are happy to make it happen!
+We may modify your additions/subtractions over time for clarity and readability. Feel free to make design requests for anything you submit and we'll be happy to make it happen!
 
 <div align="right">
 [<a href="#to-top">Back to top</a>]
 </div>
+
+## Release
+
+Any push or merge to main with changes on `/apps/docs` will automatically tag
+and release a new console version with `apps/docs/vX.Y.Z`.
+
+<sub>If you'd like to skip running the release action on push/merge to `main`, 
+include "norelease" anywhere in the commit message.</sub>
 
 ## Community
 

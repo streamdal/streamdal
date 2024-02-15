@@ -11,6 +11,7 @@ import tip from "@images/icons/tip.png";
 import console_version from "@images/arch/console_version_example.png";
 import Accordion from "@components/Accordion/Accordion.astro";
 import Changes from "@components/Misc/Changes.astro";
+import RichImg from "@components/Misc/RichImg.astro";
 
 <Changes />
 
@@ -37,13 +38,18 @@ Here is the repo structure:
 # |   └── ...
 # ├── libs
 # │   ├── protos             <--- Common protobuf schemas
-# │   ├── wasm               <--- Wasm funcs used in pipeline steps
 # │   ├── wasm-detective     <--- Wasm lib used for data parsing and validation 
 # │   ├── wasm-transformer   <--- Wasm lib used for data transformation
+# │   ├── wasm               <--- Wasm funcs used in pipeline steps
 # │   └── ...
 # ├── scripts                   
 # │   ├── install
 # │   │	  └── install.sh     <--- Install script for installing Streamdal
+# │   └── ...
+# ├── sdks                   
+# │   ├── go                 <--- Golang SDK
+# │   ├── node               <--- Node SDK
+# │   ├── python             <--- Python SDK
 # │   └── ...
 # ├── LICENSE
 # ├── Makefile               <--- Makefile with common tasks; run `make help` for more info
@@ -52,9 +58,9 @@ Here is the repo structure:
 
 To maintain proper versioning, the current and future SDKs will have separate 
 repos:
-- [Node](https://github.com/streamdal/node-sdk)
-- [Go](https://github.com/streamdal/go-sdk)
-- [Python](https://github.com/streamdal/python-sdk)
+- [Node](https://github.com/streamdal/streamdal/tree/main/sdks/go)
+- [Go](https://github.com/streamdal/streamdal/tree/main/sdks/node)
+- [Python](https://github.com/streamdal/streamdal/tree/main/sdks/python)
 
 ## General Guidelines & References
 
@@ -163,9 +169,10 @@ versions, else you can do the following for each component:
     the URL (Replace `$lang` with the language you are using):
   <br />
   ```
-  https://github.com/streamdal/$lang-sdk/releases
+  https://github.com/streamdal/streamdal/tree/main/sdks/$lang
   ```
-  <br />
+  > Note: Since moving to the monorepo, the releases have changed. More info will be added here about listing SDK version soon!
+
   - **Console UI:**
   
     `cat` the `version.ts` file located in 
@@ -174,7 +181,7 @@ versions, else you can do the following for each component:
 
   <br />
 
-<img src={console_version} style="border-radius: 5px;" alt="Example of Streamdal console version" />
+<RichImg src={console_version} style="border-radius: 5px;" alt="Example of Streamdal console version" />
 
 </ul>
 

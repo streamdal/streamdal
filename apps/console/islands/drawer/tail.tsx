@@ -22,9 +22,7 @@ export type TailSampleRate = {
   intervalSeconds: number;
 };
 
-export const tailSignal = signal<TailData[] | null>(
-  null,
-);
+export const tailSignal = signal<TailData[] | null>(null);
 export const tailSocketSignal = signal<WebSocket | null>(null);
 export const tailEnabledSignal = signal<boolean>(false);
 export const tailPausedSignal = signal<boolean>(false);
@@ -36,23 +34,16 @@ export const tailDiffSignal = signal<boolean>(false);
 
 export type TailData = { timestamp: Date; data: string; originalData: string };
 
-export const TailRow = (
-  { row }: { row: TailData },
-) => {
+export const TailRow = ({ row }: { row: TailData }) => {
   return (
-    <div className="bg-black text-white py-2 px-4 text-sm flex flex-col justify-start dark-scrollbar border-b border-stormCloud">
+    <div className="dark-scrollbar border-stormCloud flex flex-col justify-start border-b bg-black px-4 py-2 text-sm text-white">
       <div className="text-stormCloud w-full">
-        {row.timestamp?.toLocaleDateString(
-          "en-us",
-          longDateFormat,
-        )}
+        {row.timestamp?.toLocaleDateString("en-us", longDateFormat)}
       </div>
-      <div class="flex flex-row justify-between item-center w-full">
+      <div class="item-center flex w-full flex-row justify-between">
         {tailDiffSignal.value && (
           <div class="w-[49%] overflow-x-scroll">
-            <div className="text-stormCloud text-sm">
-              Before:
-            </div>
+            <div className="text-stormCloud text-sm">Before:</div>
             <div class="opacity-50">
               <pre>
                 <code>
@@ -60,30 +51,24 @@ export const TailRow = (
                     dangerouslySetInnerHTML={{
                       __html: row.originalData,
                     }}
-                  >
-                  </div>
+                  ></div>
                 </code>
               </pre>
             </div>
           </div>
         )}
-        <div
-          class={`${tailDiffSignal.value && "w-[49%]"} overflow-x-scroll`}
-        >
+        <div class={`${tailDiffSignal.value && "w-[49%]"} overflow-x-scroll`}>
           {tailDiffSignal.value && (
-            <div className="text-stormCloud text-sm">
-              After:
-            </div>
+            <div className="text-stormCloud text-sm">After:</div>
           )}
           <pre>
-              <code>
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: row.data,
-                  }}
-                >
-                </div>
-              </code>
+            <code>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: row.data,
+                }}
+              ></div>
+            </code>
           </pre>
         </div>
       </div>
@@ -110,17 +95,12 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
   useEffect(() => {
     tailSignal.value = [];
-    tailPausedSignal.value = false;
-    const togglePause = () => {
-      tailPausedSignal.value = document.visibilityState !== "visible";
-    };
-    document.addEventListener("visibilitychange", togglePause);
-
-    return () => {
-      stop();
-      tailSignal.value = [];
-      document.removeEventListener("visibilitychange", togglePause);
-    };
+    if (
+      tailPausedSignal.value
+    ) {
+      tailPausedSignal.value = false;
+    }
+    return () => stop();
   }, []);
 
   useSignalEffect(() => {
@@ -140,9 +120,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
       });
   }, [tailSignal.value]);
 
-  useEffect(() => {
-  }, [tailPausedSignal.value, tailDiffSignal.value, fullScreen]);
-
   useLayoutEffect(async () => {
     const { initFlowbite } = await import("flowbite");
     initFlowbite();
@@ -150,52 +127,52 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
   return (
     <div
-      class={`relative flex flex-col h-screen w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+      class={`relative flex h-screen flex-col w-[calc(100vw-${OP_MODAL_WIDTH})]`}
     >
-      <div class="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
+      <div class="h-46 bg-streamdalPurple w-full p-4 text-sm font-semibold text-white">
         <span class="opacity-50">Home</span> / Tail
       </div>
       <div
-        class={`h-full flex flex-col bg-white p-4 ${
+        class={`flex h-full flex-col bg-white p-4 ${
           fullScreen
-            ? "absolute top-0 bottom-0 right-0 left-0 z-[51] w-screen h-screen"
+            ? "absolute bottom-0 left-0 right-0 top-0 z-[51] h-screen w-screen"
             : ""
         }`}
       >
         <div
-          class={`flex flew-row justify-between item-center mt-6 my-4 mx-auto text-3xl font-medium w-[${
+          class={`flew-row item-center mx-auto my-4 mt-6 flex justify-between text-3xl font-medium w-[${
             fullScreen ? "100" : "90"
           }%]`}
         >
-          <div class="flex flex-row justify-start items-center">
+          <div class="flex flex-row items-center justify-start">
             <span class="mr-1">Tail</span>
             <span class="text-streamdalPurple">{audience.operationName}</span>
           </div>
 
-          <div class="flex flex-row justify-end items-center">
+          <div class="flex flex-row items-center justify-end">
             <div
-              class="flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
+              class="bg-streamdalPurple flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-pause-play"
-              onClick={() => tailPausedSignal.value = !tailPausedSignal.value}
+              onClick={() => (tailPausedSignal.value = !tailPausedSignal.value)}
             >
               {tailPausedSignal.value
-                ? <IconPlayerPlayFilled class="w-6 h-6 text-white" />
-                : <IconPlayerPauseFilled class="w-6 h-6 text-white" />}
+                ? <IconPlayerPlayFilled class="h-6 w-6 text-white" />
+                : <IconPlayerPauseFilled class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-pause-play"
                 message={tailPausedSignal.value ? "Resume Tail" : "Pause Tail"}
               />
             </div>
             <div
-              class="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
+              class="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-diff"
               onClick={() => {
                 tailDiffSignal.value = !tailDiffSignal.value;
               }}
             >
               {tailDiffSignal.value
-                ? <IconColumns1 class="w-6 h-6 text-white" />
-                : <IconColumns2 class="w-6 h-6 text-white" />}
+                ? <IconColumns1 class="h-6 w-6 text-white" />
+                : <IconColumns2 class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-diff"
                 message={`${
@@ -204,37 +181,34 @@ export const Tail = ({ audience }: { audience: Audience }) => {
               />
             </div>
             <div
-              className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
+              className="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-fullscreen"
               onClick={() => setFullScreen(!fullScreen)}
             >
               {fullScreen
-                ? <IconWindowMinimize class="w-6 h-6 text-white" />
-                : <IconWindowMaximize class="w-6 h-6 text-white" />}
+                ? <IconWindowMinimize class="h-6 w-6 text-white" />
+                : <IconWindowMaximize class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-fullscreen"
                 message={fullScreen ? "Smaller" : "Fullscreen"}
               />
             </div>
             <div
-              className="ml-2 flex justify-center items-center w-[36px] h-[36px] rounded-[50%] bg-streamdalPurple cursor-pointer"
+              className="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-close"
-              onClick={() => tailEnabledSignal.value = false}
+              onClick={() => (tailEnabledSignal.value = false)}
             >
-              <IconX class="w-6 h-6 text-white" />
-              <Tooltip
-                targetId="tail-close"
-                message="Close Tail"
-              />
+              <IconX class="h-6 w-6 text-white" />
+              <Tooltip targetId="tail-close" message="Close Tail" />
             </div>
           </div>
         </div>
         <div
-          class={`flex flex-col mx-auto w-[${
+          class={`mx-auto flex flex-col w-[${
             fullScreen ? "100" : "90"
           }%] h-[calc(100vh-${
             fullScreen ? "200" : "260"
-          }px)] overflow-y-scroll rounded-md bg-black text-white dark-scrollbar`}
+          }px)] dark-scrollbar overflow-y-scroll rounded-md bg-black text-white`}
         >
           {tailSignal.value?.map((tail: TailData) => <TailRow row={tail} />)}
           <div ref={scrollBottom} />

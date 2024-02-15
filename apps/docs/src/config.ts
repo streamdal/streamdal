@@ -81,6 +81,11 @@ export const SIDEBAR: Sidebar = {
             link: "en/getting-started/how-streamdal-works",
           },
           {
+            text: "Use Cases",
+            slug: "use-cases",
+            link: "en/getting-started/use-cases",
+          },
+          {
             text: "Quickstart",
             slug: "quickstart",
             link: "en/getting-started/quickstart",
@@ -104,6 +109,11 @@ export const SIDEBAR: Sidebar = {
             text: "Tail",
             slug: "tail",
             link: "en/guides/tail",
+          },
+          {
+            text: "Pipelines",
+            slug: "pipelines",
+            link: "en/guides/pipelines",
           },
         ],
       },
@@ -131,7 +141,7 @@ export const SIDEBAR: Sidebar = {
             link: "en/core-components/console-ui",
           },
           {
-            text: "Libraries/Shims (TBA)",
+            text: "Libraries/Shims",
             slug: "libraries-shiums",
             link: "en/core-components/libraries-shims",
           },

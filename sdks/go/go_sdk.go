@@ -73,8 +73,8 @@ const (
 	AbortCurrentStr = "aborted current pipeline"
 	AbortNoneStr    = "no abort condition"
 
-	// ExecStatusTrue & ExecStatusFalse & ExecStatusError are used to indicate
-	// the execution status of a step.
+	// ExecStatusTrue ExecStatusFalse ExecStatusError are used to indicate
+	// the execution status of the _last_ step in the _last_ pipeline.
 	ExecStatusTrue  = protos.ExecStatus_EXEC_STATUS_TRUE
 	ExecStatusFalse = protos.ExecStatus_EXEC_STATUS_FALSE
 	ExecStatusError = protos.ExecStatus_EXEC_STATUS_ERROR
@@ -86,7 +86,6 @@ var (
 	ErrEmptyOperationName   = errors.New("operation name cannot be empty")
 	ErrInvalidOperationType = errors.New("operation type must be set to either OperationTypeConsumer or OperationTypeProducer")
 	ErrEmptyComponentName   = errors.New("component name cannot be empty")
-	ErrMissingShutdownCtx   = errors.New("shutdown context cannot be nil")
 	ErrEmptyCommand         = errors.New("command cannot be empty")
 	ErrEmptyProcessRequest  = errors.New("process request cannot be empty")
 
@@ -291,7 +290,7 @@ func validateConfig(cfg *Config) error {
 	}
 
 	if cfg.ShutdownCtx == nil {
-		return ErrMissingShutdownCtx
+		cfg.ShutdownCtx = context.Background()
 	}
 
 	if cfg.ServiceName == "" {
@@ -570,6 +569,11 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	payloadSize := int64(len(resp.Data))
 	aud := newAudience(req, s.config)
 
+	// Always send tail output
+	defer func() {
+		s.sendTail(aud, "", req.Data, resp.Data)
+	}()
+
 	// TODO: DRY this up
 	counterError := types.ConsumeErrorCount
 	counterProcessed := types.ConsumeProcessedCount
@@ -600,9 +604,6 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	// survive for the first few messages - after that, StatusMessage might get
 	// updated by the infer schema pipeline step.
 	if len(pipelines) == 0 {
-		// Send tail if there is any. Tails do not require a pipeline to operate
-		s.sendTail(aud, "", resp.Data, resp.Data)
-
 		// No pipelines for this mode, nothing to do
 		resp.Status = protos.ExecStatus_EXEC_STATUS_TRUE
 
@@ -851,9 +852,6 @@ PIPELINE:
 
 		// END pipeline loop
 	}
-
-	// Perform tail if necessary
-	s.sendTail(aud, "", req.Data, resp.Data)
 
 	// Dry run should not modify anything, but we must allow pipeline to
 	// mutate internal state in order to function properly

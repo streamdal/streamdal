@@ -15,12 +15,12 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/apps/server/validate"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 const (
@@ -302,12 +302,7 @@ func (s *ExternalServer) GetPipeline(ctx context.Context, req *protos.GetPipelin
 	// Strip WASM fields (to save on b/w)
 	util.StripWASMFields(pipeline)
 
-	// Get any associated notification configs
-	nCfgs, err := s.Options.StoreService.GetNotificationConfigsByPipeline(ctx, req.PipelineId)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to get notification configs")
-	}
-	pipeline.XNotificationConfigs = nCfgs
+	pipeline.XNotificationConfigs = make([]*protos.NotificationConfig, 0)
 
 	return &protos.GetPipelineResponse{
 		Pipeline: pipeline,
@@ -475,12 +470,30 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to fetch existing pipeline: "+err.Error()), nil
 	}
+
+	audiences, err := s.Options.StoreService.GetAudiencesByPipelineID(ctx, req.PipelineId)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get audiences by pipeline: "+err.Error()), nil
+	}
+
+	// Inject audiences into req so bus handler doesn't have to perform config lookup
+	req.XAudiences = audiences
 
 	// Pipeline exists, delete it
 	if err := s.Options.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to delete pipeline: "+err.Error()), nil
+	}
+
+	// Delete pipeline config (we can safely delete because bus handler will just
+	// emit a SetPipelines cmd without the pipeline config)
+	if _, err := s.Options.StoreService.DeletePipelineConfig(ctx, req.PipelineId); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to delete pipeline config(s): "+err.Error()), nil
 	}
 
 	// Send telemetry
@@ -773,43 +786,19 @@ func stripSensitiveFields(cfg *protos.NotificationConfig) {
 	}
 }
 
-func (s *ExternalServer) AttachNotification(ctx context.Context, req *protos.AttachNotificationRequest) (*protos.StandardResponse, error) {
-	if err := validate.AttachNotificationRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
-	}
-
-	if s.Options.DemoMode {
-		return demoResponse(ctx)
-	}
-
-	if err := s.Options.StoreService.AttachNotificationConfig(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
+func (s *ExternalServer) AttachNotification(ctx context.Context, _ *protos.AttachNotificationRequest) (*protos.StandardResponse, error) {
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: "Notification config attached",
+		Code:    protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		Message: "Endpoint is deprecated, do not use",
 	}, nil
 }
 
-func (s *ExternalServer) DetachNotification(ctx context.Context, req *protos.DetachNotificationRequest) (*protos.StandardResponse, error) {
-	if err := validate.DetachNotificationRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
-	}
-
-	if s.Options.DemoMode {
-		return demoResponse(ctx)
-	}
-
-	if err := s.Options.StoreService.DetachNotificationConfig(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
-	}
-
+func (s *ExternalServer) DetachNotification(ctx context.Context, _ *protos.DetachNotificationRequest) (*protos.StandardResponse, error) {
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: "Notification config detached",
+		Code:    protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+		Message: "Endpoint is deprecated, do not use",
 	}, nil
 }
 

@@ -1,11 +1,17 @@
 streamdal-server
 ================
-[![Test](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server)
-[![Pull Request](https://github.com/streamdal/server/actions/workflows/pr-test.yml/badge.svg)](https://github.com/streamdal/server/actions/workflows/pr-test.yml)
+[![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml)
+[![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-server-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+<!-- TODO: NEED TO UPDATE GOREPORTCARD -->
+<!-- [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server) -->
 
-The server component in the Streamdal ecosystem.
+_**Go server used for facilitating communications between SDKs and Console.**_
+
+<sub>For more details, see the main
+[streamdal repo](https://github.com/streamdal/streamdal).</sub>
+
+---
 
 The server exposes 3 APIs:
 
@@ -29,7 +35,7 @@ To develop the server itself, you'll want to only run the `redis` and
 
 ## gRPC API Usage
 
-You can view the available methods by looking at [protos](https://github.com/streamdal/protos)
+You can view the available methods by looking at [protos](https://github.com/streamdal/streamdal/tree/main/libs/protos)
 or doing it via `grpcurl`:
 
 ```bash
@@ -79,6 +85,14 @@ To generate a key, you can use the following command:
 ```bash
 openssl enc -aes-256-cbc -k secret -P -md sha1 -pbkdf2
 ```
+
+## Release
+
+Any push or merge to the `main` branch with any changes in `/apps/server/*` 
+will automatically tag and release a new console version with `apps/server/vX.Y.Z`.
+
+<sub>If you'd like to skip running the release action on push/merge to `main`,
+include "norelease" anywhere in the commit message.</sub>
 
 # Testing
 Make sure to run tests via `make test`. This is necessary as we have to set

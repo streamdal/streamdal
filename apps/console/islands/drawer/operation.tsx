@@ -60,7 +60,7 @@ export default function Operation(
             </h3>
             <div
               id="collapse-body-1"
-              class={`px-4 py-2 border-b border-purple-100 ${
+              class={`p-2 border-b border-purple-100 ${
                 managePipelines ? "" : "hidden"
               }`}
               aria-labelledby="collapse-heading-1"
