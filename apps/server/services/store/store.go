@@ -150,6 +150,74 @@ type IStore interface {
 	// GetPipelinesByAudience will fetch pipeline configs and then use the ID to
 	// fetch the actual pipeline from store + update the paused state.
 	GetPipelinesByAudience(ctx context.Context, aud *protos.Audience) ([]*protos.Pipeline, error)
+
+	// DeletePipelineConfig deletes a pipeline config for all audiences that use
+	// given pipeline ID; it will return a list of audiences that the pipeline id
+	// was used by.
+	DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+
+	// GetAudiencesByPipelineID returns a slice of audiences that use a pipeline ID
+	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+}
+
+func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
+	llog := s.log.WithField("method", "DeletePipelineConfigsByPipelineID")
+	llog.Debug("received request to delete pipeline configs by pipeline ID")
+
+	// Fetch all pipeline configs
+	pipelineConfigs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error fetching pipeline configs")
+	}
+
+	newPipelineConfigs := make(map[*protos.Audience]*protos.PipelineConfigs)
+	audiences := make([]*protos.Audience, 0)
+
+	// Build a new pipeline config for each audience that uses the pipeline ID,
+	// skipping over pipeline ID that we want to delete
+	for aud, configs := range pipelineConfigs {
+		for _, cfg := range configs.Configs {
+			if cfg.Id == pipelineID {
+				continue
+			}
+
+			if _, ok := newPipelineConfigs[aud]; !ok {
+				newPipelineConfigs[aud] = &protos.PipelineConfigs{
+					Configs: make([]*protos.PipelineConfig, 0),
+				}
+			}
+
+			newPipelineConfigs[aud].Configs = append(newPipelineConfigs[aud].Configs, cfg)
+			audiences = append(audiences, aud)
+		}
+	}
+
+	// Save the new pipeline configs
+	if err := s.savePipelineConfigs(ctx, newPipelineConfigs); err != nil {
+		llog.Errorf("unable to save new pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error saving new pipeline configs")
+	}
+
+	return audiences, nil
+}
+
+func (s *Store) savePipelineConfigs(ctx context.Context, pipelineConfigs map[*protos.Audience]*protos.PipelineConfigs) error {
+	llog := s.log.WithField("method", "savePipelineConfigs")
+	llog.Debug("received request to save pipeline configs")
+
+	for aud, cfgs := range pipelineConfigs {
+		data, err := proto.Marshal(cfgs)
+		if err != nil {
+			return errors.Wrap(err, "error encoding pipeline configs")
+		}
+
+		if err := s.options.RedisBackend.Set(ctx, RedisAudienceKey(util.AudienceToStr(aud)), data, 0).Err(); err != nil {
+			return errors.Wrapf(err, "error saving pipeline to store in key '%s'", RedisAudienceKey(util.AudienceToStr(aud)))
+		}
+	}
+
+	return nil
 }
 
 func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string) ([]string, error) {
@@ -172,6 +240,30 @@ func (s *Store) GetSessionIDsByPipelineID(ctx context.Context, pipelineID string
 	}
 
 	return sessionIDs, nil
+}
+
+func (s *Store) GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
+	llog := s.log.WithField("method", "GetAudiencesByPipelineID")
+	llog.Debug("received request to get audiences by pipeline ID")
+
+	// Get all pipeline configs
+	pipelineConfigs, err := s.GetAllConfig(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch pipeline configs: %s", err)
+		return nil, errors.Wrap(err, "error fetching pipeline configs")
+	}
+
+	audiences := make([]*protos.Audience, 0)
+
+	for aud, cfg := range pipelineConfigs {
+		for _, pc := range cfg.Configs {
+			if pc.Id == pipelineID {
+				audiences = append(audiences, aud)
+			}
+		}
+	}
+
+	return audiences, nil
 }
 
 // TODO: Needs tests

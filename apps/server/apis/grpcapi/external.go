@@ -470,12 +470,30 @@ func (s *ExternalServer) DeletePipeline(ctx context.Context, req *protos.DeleteP
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
 		}
 
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to fetch existing pipeline: "+err.Error()), nil
 	}
+
+	audiences, err := s.Options.StoreService.GetAudiencesByPipelineID(ctx, req.PipelineId)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get audiences by pipeline: "+err.Error()), nil
+	}
+
+	// Inject audiences into req so bus handler doesn't have to perform config lookup
+	req.XAudiences = audiences
 
 	// Pipeline exists, delete it
 	if err := s.Options.StoreService.DeletePipeline(ctx, req.PipelineId); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to delete pipeline: "+err.Error()), nil
+	}
+
+	// Delete pipeline config (we can safely delete because bus handler will just
+	// emit a SetPipelines cmd without the pipeline config)
+	if _, err := s.Options.StoreService.DeletePipelineConfig(ctx, req.PipelineId); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to delete pipeline config(s): "+err.Error()), nil
 	}
 
 	// Send telemetry
