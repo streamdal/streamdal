@@ -32,7 +32,6 @@ go get github.com/streamdal/streamdal/sdks/go
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -40,9 +39,6 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	sc, _ := streamdal.New(&streamdal.Config{
 		// Address of the streamdal server + gRPC API port
 		ServerURL: "streamdal-server-address:8082",
@@ -54,9 +50,7 @@ func main() {
 		ServiceName: "billing-svc",
 	})
 
-	})
-
-    resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
+	resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: "new-order-topic",
 		ComponentName: "kafka",
