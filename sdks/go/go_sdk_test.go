@@ -217,10 +217,14 @@ var _ = Describe("Streamdal", func() {
 
 		It("handles notify condition", func() {
 			condition := &protos.PipelineStepConditions{
-				Notify: true,
+				Notification: &protos.PipelineStepNotification{
+					NotificationConfigIds: []string{uuid.New().String()},
+					PayloadType:           2,
+					Paths:                 []string{},
+				},
 			}
 
-			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud)
+			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_TRUE)
 
 			Expect(cond.abortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 			Expect(cond.abortCurrent).To(BeFalse())
@@ -233,7 +237,7 @@ var _ = Describe("Streamdal", func() {
 				Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
 			}
 
-			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud)
+			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_TRUE)
 			Expect(cond.abortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT))
 			Expect(cond.abortCurrent).To(BeTrue())
 		})
