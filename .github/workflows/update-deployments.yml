@@ -28,11 +28,9 @@ jobs:
         python3 install-tags.py
         git config user.name "GitHub Actions"
         git config user.email "github-actions@github.com"
-
-        if git diff --quiet; then
-          echo "No changes detected."
-        else
-          git add .
-          git commit -m "Executed script and updated files"
-          git push origin HEAD
-        fi
+        git status # Check the status to debug
+        cd ../../
+        git add .
+        git status # Check status again after adding
+        git diff-index --quiet HEAD || git commit -m "Executed script and updated files" # Commit if there are changes
+        git push origin HEAD
