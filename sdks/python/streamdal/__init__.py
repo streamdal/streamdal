@@ -1,5 +1,5 @@
 import asyncio
-import streamdal.common
+import streamdal.common as common
 import datetime
 import logging
 import os
@@ -378,16 +378,19 @@ class StreamdalClient:
                 # Figure out which condition we're checking
                 cond = step.on_true
                 exec_status = protos.ExecStatus.EXEC_STATUS_TRUE
+                cond_type = protos.NotifyRequestConditionType.CONDITION_TYPE_ON_TRUE
                 if wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_FALSE:
                     cond = step.on_false
                     exec_status = protos.ExecStatus.EXEC_STATUS_FALSE
+                    cond_type = protos.NotifyRequestConditionType.CONDITION_TYPE_ON_FALSE
                 elif wasm_resp.exit_code == protos.WasmExitCode.WASM_EXIT_CODE_ERROR:
                     cond = step.on_error
                     exec_status = protos.ExecStatus.EXEC_STATUS_ERROR
+                    cond_type = protos.NotifyRequestConditionType.CONDITION_TYPE_ON_ERROR
                     isr = None  # avoid passing step result on error
 
                 # Send notification if necessary
-                self._notify_condition(pipeline, step, aud, cond, resp.data)
+                self._notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
 
                 # Continue to next step, nothing needed
                 if self.cfg.dry_run:
@@ -460,6 +463,7 @@ class StreamdalClient:
         aud: protos.Audience,
         cond: protos.PipelineStepConditions,
         payload: bytes,
+        cond_type: protos.NotifyRequestConditionType
     ):
         if cond is None:
             return
@@ -492,9 +496,10 @@ class StreamdalClient:
             req = protos.NotifyRequest(
                 pipeline_id=pipeline.id,
                 audience=aud,
-                step_name=step.name,
+                step=step,
                 occurred_at_unix_ts_utc=int(datetime.datetime.utcnow().timestamp()),
-                # TODO: include payload
+                condition_type=cond_type,
+                payload=payload
             )
 
             await self.grpc_stub.notify(
