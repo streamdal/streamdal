@@ -441,6 +441,7 @@ class StreamdalClient:
                     step_status.status = protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
                     pipeline_status.step_status.append(step_status)
                     resp.pipeline_status.append(pipeline_status)
+                    self._send_tail(aud, pipeline.id, original_data, resp.data)
                     return resp
 
                 pipeline_status.step_status.append(step_status)
