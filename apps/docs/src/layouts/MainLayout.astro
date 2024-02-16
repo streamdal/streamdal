@@ -62,18 +62,22 @@ const currentPage = Astro.url.pathname;
         bottom: 0;
         padding-bottom: 5%;
       }
+
       #left-sidebar {
         display: none;
-        background: var(--theme-bg-gradient);
-        z-index: 10;
         inset-inline-start: 0;
+        background: var(--theme-bg-gradient);
+        position: fixed;
+        z-index: 10;
       }
+
       #right-sidebar {
         display: none;
         top: var(--theme-navbar-height);
         inset-inline-end: 0;
         width: var(--theme-right-sidebar-width);
       }
+
       #main-content {
         display: flex;
         flex-direction: column;
@@ -85,38 +89,53 @@ const currentPage = Astro.url.pathname;
         font-weight: 300;
       }
 
-      /* Allow showing left sidebar as an overlay, but only while viewport stays narrow */
+      /* Mobile-specific styles */
+
       @media not screen and (min-width: 50em) {
-        /* Make the left sidebar visible and fill the entire viewport below the navbar */
-        :global(.mobile-sidebar-toggle #left-sidebar) {
-          display: block;
-          top: var(--theme-navbar-height);
-          inset-inline-end: 0;
-        }
-        /*
-			Try to prevent the rest of the page from scrolling,
-			and the main content from being visible below the overlay.
-
-			Unfortunately, iOS Safari doesn't currently play well with this
-			and will sometimes still scroll the page even though it shouldn't.
-
-			Once overscroll-behavior is properly supported, this should be fixed.
-		*/
         :global(.mobile-sidebar-toggle) {
           overflow: hidden;
         }
-        :global(.mobile-sidebar-toggle #main-content) {
+
+        #left-sidebar {
+          display: block;
+          position: fixed;
+          transform: translateX(200%);
+          transition: transform 0.2s ease, visibility 0.2s ease;
           visibility: hidden;
         }
+
+        :global(.mobile-sidebar-toggle #left-sidebar) {
+          transform: translateX(0);
+          visibility: visible;
+          border-radius: 15px;
+          margin: 5px 0;
+          inset-inline-start: auto;
+          inset-inline-end: 0;
+          top: var(--theme-navbar-height);
+          bottom: 0;
+          width: 75%;
+          overflow-y: auto;
+          overscroll-behavior-y: contain;
+        }
+
+        :global(body.mobile-menu-hidden) #left-sidebar {
+          transform: translateX(200%);
+          visibility: hidden;
+        }
+
+        :global(.mobile-sidebar-toggle #left-sidebar .nav-groups) {
+          max-height: calc(100vh - var(--theme-navbar-height));
+          overflow-y: auto;
+          padding-bottom: 150px;
+        }
+
         :global(.mobile-sidebar-toggle #left-sidebar ul) {
           overscroll-behavior: contain;
         }
       }
 
+      /* Desktop-specific styles */
       @media (min-width: 50em) {
-        #main-content {
-          margin-inline-start: var(--theme-left-sidebar-width);
-        }
         #left-sidebar {
           display: flex;
           padding-inline-start: var(--min-spacing-inline);
@@ -124,6 +143,10 @@ const currentPage = Astro.url.pathname;
           top: var(--theme-navbar-height);
           width: var(--theme-left-sidebar-width);
           background: transparent;
+        }
+
+        #main-content {
+          margin-inline-start: var(--theme-left-sidebar-width);
         }
       }
 
