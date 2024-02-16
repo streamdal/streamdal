@@ -51,7 +51,7 @@ github.com/sirupsen/logrus
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
 github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
-# github.com/streamdal/streamdal/sdks/go v0.1.8
+# github.com/streamdal/streamdal/sdks/go v0.1.9
 ## explicit; go 1.19
 github.com/streamdal/streamdal/sdks/go
 github.com/streamdal/streamdal/sdks/go/helper
