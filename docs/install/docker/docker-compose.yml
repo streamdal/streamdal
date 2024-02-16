@@ -4,7 +4,7 @@ services:
   # Used by console and SDKs
   streamdal-server:
     container_name: streamdal-server
-    image: streamdal/server:0.0.23-a753e0a
+    image: streamdal/server:0.0.24-9c9f52f
     depends_on:
       - streamdal-aes-gen
       - redis
