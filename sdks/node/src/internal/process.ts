@@ -17,6 +17,7 @@ import { InternalConfigs, StreamdalRequest } from "../streamdal.js";
 import { addAudience } from "./audience.js";
 import { httpRequest } from "./httpRequest.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
+import { notifyStep } from "./notify.js";
 import { initPipelines } from "./pipeline.js";
 import { audienceKey, internal, Tail } from "./register.js";
 import { sendSchema } from "./schema.js";
@@ -74,7 +75,7 @@ export const retryProcessPipelines = async ({
     return new Promise((resolve) => {
       const intervalId = setInterval(() => {
         retries++;
-        if (MAX_PIPELINE_RETRIES && retries >= MAX_PIPELINE_RETRIES) {
+        if (retries >= MAX_PIPELINE_RETRIES) {
           clearInterval(intervalId);
           return;
         }
@@ -254,26 +255,6 @@ export const processPipelines = async ({
   });
 };
 
-const notifyStep = async (
-  configs: PipelineConfigs,
-  step: PipelineStep,
-  pipeline: Pipeline
-) => {
-  console.debug("notifying error step", step.name);
-  try {
-    await configs.grpcClient.notify(
-      {
-        pipelineId: pipeline.id,
-        stepName: step.name,
-        occurredAtUnixTsUtc: Date.now().toString(),
-      },
-      { meta: { "auth-token": configs.streamdalToken } }
-    );
-  } catch (e) {
-    console.error("error sending notification to server", e);
-  }
-};
-
 export const getStepStatus = (exitCode: WASMExitCode): ExecStatus =>
   (exitCode === WASMExitCode.WASM_EXIT_CODE_TRUE
     ? ExecStatus.TRUE
@@ -285,14 +266,18 @@ export const getStepStatus = (exitCode: WASMExitCode): ExecStatus =>
 
 export const resultCondition = ({
   configs,
+  audience,
   step,
   pipeline,
   stepStatus,
+  payload,
 }: {
   configs: PipelineConfigs;
+  audience: Audience;
   step: PipelineStep;
   pipeline: Pipeline;
   stepStatus: EnhancedStepStatus;
+  payload: Uint8Array;
 }) => {
   const conditions =
     stepStatus.status === ExecStatus.TRUE
@@ -301,14 +286,22 @@ export const resultCondition = ({
       ? step.onFalse
       : step.onError;
 
-  conditions?.notify && void notifyStep(configs, step, pipeline);
+  void notifyStep({
+    configs,
+    audience,
+    step,
+    stepStatus,
+    pipelineId: pipeline.id,
+    payload,
+  });
 
   if (conditions?.metadata && Object.keys(conditions.metadata).length) {
     stepStatus.metadata = { ...stepStatus.metadata, ...conditions.metadata };
   }
 
-  stepStatus.abortCondition =
-    conditions && conditions.abort ? conditions.abort : AbortCondition.UNSET;
+  stepStatus.abortCondition = conditions?.abort
+    ? conditions.abort
+    : AbortCondition.UNSET;
 };
 
 export const runStep = async ({
@@ -354,6 +347,7 @@ export const runStep = async ({
     //
     // output gets passed back as data for the next function
     stepStatus.status = getStepStatus(exitCode);
+
     if (stepStatus.status !== ExecStatus.ERROR && outputPayload) {
       data = outputPayload;
     }
@@ -370,7 +364,15 @@ export const runStep = async ({
     stepStatus.statusMessage = error.toString();
   }
 
-  resultCondition({ configs, step, pipeline, stepStatus });
+  resultCondition({
+    configs,
+    audience,
+    step,
+    pipeline,
+    stepStatus,
+    payload: data,
+  });
+
   void stepMetrics({ audience, stepStatus, pipeline, payloadSize });
 
   return { data, interStepResult: stepResult, stepStatus };

@@ -8,6 +8,7 @@ import {
   AbortCondition,
   Pipeline,
   PipelineStep,
+  PipelineStepNotification_PayloadType,
 } from "streamdal-protos/protos/sp_pipeline.ts";
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 import {
@@ -46,7 +47,7 @@ import { DeleteModal } from "../components/modals/deleteModal.tsx";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
-import { PipelineNotifications } from "../components/pipeline/notifications.tsx";
+import { PipelineNotifications } from "../components/pipeline/stepNotifications.tsx";
 import { PipelineTransform } from "./pipelineTransform.tsx";
 import {
   JSONSchemaDraft,
@@ -96,6 +97,9 @@ const JSONSchemaDraftEnum = z.nativeEnum(JSONSchemaDraft);
 const KVActionTypeEnum = z.nativeEnum(KVAction);
 const KVModeTypeEnum = z.nativeEnum(KVMode);
 const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
+const NotificationPayloadTypeEnum = z.nativeEnum(
+  PipelineStepNotification_PayloadType,
+);
 
 const kinds = [
   { label: "Detective", value: "detective" },
@@ -317,6 +321,26 @@ const resultConditionSchema = z.object({
       z.string().min(1, { message: "Required" }),
     )
     .optional(),
+  notification: z.object({
+    notificationConfigIds: zfd.repeatable(z.array(z.string())),
+    payloadType: zfd.numeric(NotificationPayloadTypeEnum),
+    paths: zfd.repeatable(z.array(z.string())),
+  }).superRefine((notification, ctx) => {
+    if (
+      notification.payloadType ==
+        PipelineStepNotification_PayloadType.SELECT_PATHS &&
+      notification.paths.filter((a) => a.trim() !== "")?.length === 0
+    ) {
+      ctx.addIssue({
+        path: ["paths.0"],
+        code: z.ZodIssueCode.custom,
+        message: "Required",
+        fatal: true,
+      });
+
+      return z.never;
+    }
+  }).optional(),
 });
 
 const stepSchema = z
@@ -355,7 +379,6 @@ const stepSchema = z
 export const pipelineSchema = zfd.formData({
   id: z.string().optional(),
   name: z.string().min(1, { message: "Required" }),
-  notifications: zfd.repeatable(z.array(z.string())),
   steps: zfd.repeatable(
     z.array(stepSchema).min(1, { message: "At least one step is required" }),
   ),
@@ -475,38 +498,7 @@ const PipelineDetail = ({
             </a>
           </div>
         </div>
-        <div class="flex flex-col px-6">
-          <div class="mb-2 flex flex-row items-center justify-between">
-            <div class="flex flex-row items-center">
-              <div class="mr-2 text-[16px] font-semibold">Notifications</div>
-              <div class="text-stormCloud text-[14px] font-medium">
-                - used by the notify step settings below
-              </div>
-            </div>
-          </div>
-          <div class={`flex flex-col`}>
-            <div class="border-twilight flex flex-col rounded-sm border p-2">
-              {notifications?.length
-                ? (
-                  <PipelineNotifications
-                    notifications={notifications}
-                    data={data}
-                    setData={setData}
-                  />
-                )
-                : (
-                  <div class="text-stormCloud flex flex-row items-center justify-start text-sm font-medium">
-                    <a
-                      href="/notifications"
-                      class="text-underline flex flex-row items-center justify-start"
-                    >
-                      <IconPlus class={"mr-2 h-3 w-3"} /> add notifications
-                    </a>
-                  </div>
-                )}
-            </div>
-          </div>
-        </div>
+
         <div class="flex flex-col px-6 pt-6">
           <div class="mb-6 flex flex-row items-center justify-between">
             <div class="flex flex-row items-center">
@@ -710,6 +702,7 @@ const PipelineDetail = ({
                       />
                     )}
                     <StepConditions
+                      notifications={notifications}
                       stepIndex={i}
                       data={data}
                       setData={setData}

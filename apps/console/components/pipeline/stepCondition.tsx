@@ -1,6 +1,5 @@
 import { ErrorType } from "../form/validate.ts";
 import { AbortCondition } from "streamdal-protos/protos/sp_pipeline.ts";
-import { FormBoolean } from "../form/formBoolean.tsx";
 import { RadioGroup } from "../form/radioGroup.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
@@ -8,6 +7,8 @@ import { useState } from "preact/hooks";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import { FormStringKV } from "../form/formStringKV.tsx";
+import { StepNotifications } from "./stepNotifications.tsx";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 export type StepConditionType = {
   name: string;
@@ -16,10 +17,12 @@ export type StepConditionType = {
   data: any;
   setData: (data: any) => void;
   errors: ErrorType;
+  notifications: NotificationConfig[];
 };
 
 export const StepCondition = (
-  { name, label, toolTip, data, setData, errors }: StepConditionType,
+  { name, label, toolTip, data, setData, errors, notifications }:
+    StepConditionType,
 ) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -58,11 +61,6 @@ export const StepCondition = (
           expanded ? "visible" : "hidden"
         }`}
       >
-        <FormBoolean
-          name={`${name}.notify`}
-          data={data}
-          display="Notify"
-        />
         <RadioGroup
           name={`${name}.abort`}
           data={data}
@@ -78,6 +76,13 @@ export const StepCondition = (
           data={data}
           label={"Metadata"}
           description="Metadata are arbitrary keys and values that will be emitted to calling code"
+          errors={errors}
+        />
+        <StepNotifications
+          notifications={notifications}
+          name={`${name}.notification`}
+          data={data}
+          setData={setData}
           errors={errors}
         />
       </div>

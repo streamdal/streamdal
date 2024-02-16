@@ -103,3 +103,18 @@ export const kvModeFromEnum = (optionsEnum: any) =>
         label={v.replace("KV_MODE_", "")}
       />
     ));
+
+export const payloadIncludeEnum = (optionsEnum: any) =>
+  Object.entries(optionsEnum).filter((
+    [k, _],
+  ) => isNumeric(k) && k > 0)
+    .map(([
+      k,
+      v,
+    ], i) => (
+      <option
+        key={`option-type-key-${i}-${k}`}
+        value={k}
+        label={v.replace("_", " ")}
+      />
+    ));
