@@ -35,15 +35,13 @@ export const handler: Handlers<SuccessType> = {
       });
     }
 
-    await updatePipelineNotifications(pipeline.notifications, pipeline);
     const response = await upsertPipeline(pipeline);
 
     session.flash("success", {
       status: response.code === ResponseCode.OK,
-      message:
-        response.code === ResponseCode.OK
-          ? "Success!"
-          : "Save pipeline failed. Please try again later",
+      message: response.code === ResponseCode.OK
+        ? "Success!"
+        : "Save pipeline failed. Please try again later",
       ...(response.code !== ResponseCode.OK
         ? { errors: { apiError: response.message } }
         : {}),
