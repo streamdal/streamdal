@@ -2,8 +2,8 @@ name: Execute Python Script in Subdirectory
 
 on:
   push:
-    tags:
-      - update-deployments-* 
+    branches:
+      - 'update-deployments-*'
 
 jobs:
   execute_script:
@@ -11,18 +11,26 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-      
+
     - name: Set up Python 3
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    
+
     - name: Install Dependencies
       run: |
         cd scripts/helper/
         pip3 install -r requirements.txt
-        
+
     - name: Execute install-tags.py
       run: |
         cd scripts/helper/
         python3 install-tags.py
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@github.com"
+        git status # Check the status to debug
+        cd ../../
+        git add .
+        git status # Check status again after adding
+        git diff-index --quiet HEAD || git commit -m "Executed script and updated files" # Commit if there are changes
+        git push origin HEAD
