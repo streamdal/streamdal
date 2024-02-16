@@ -23,7 +23,7 @@ See https://docs.streamdal.com
 ### Installation
 
 ```bash
-go get github.com/streamdal/go-sdk
+go get github.com/streamdal/streamdal/sdks/go
 ```
 
 ### Example Usage
@@ -32,7 +32,6 @@ go get github.com/streamdal/go-sdk
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -43,7 +42,7 @@ func main() {
 	sc, _ := streamdal.New(&streamdal.Config{
 		// Address of the streamdal server + gRPC API port
 		ServerURL: "streamdal-server-address:8082",
-
+		
 		// Token used for authenticating with the streamdal server
 		ServerToken: "1234",
 
