@@ -26,25 +26,28 @@ const { type, defaultActiveTab, sidebarSections, currentPageMatch } =
 }
 
 <style lang="scss" is:global>
-  .nav-group-top {
-    margin-bottom: 1rem;
-  }
-  .nav-group .placeholder {
-    opacity: 0.6;
-    text-align: center;
-    display: block;
-  }
-  @media (max-width: 50em) {
-    .sm-hidden {
-      display: none !important;
-    }
-  }
-  @media (min-width: 50em) {
-    .nav-group {
-      display: none;
-    }
-  }
+  // .nav-group-top {
+  //   margin-bottom: 1rem;
+  // }
+  // .nav-group .placeholder {
+  //   opacity: 0.6;
+  //   text-align: center;
+  //   display: block;
+  // }
+  // @media (max-width: 50em) {
+  //   .sm-hidden {
+  //     display: none !important;
+  //   }
+  // }
+  // @media (min-width: 50em) {
+  //   .nav-group {
+  //     display: none;
+  //   }
+  // }
 
+  .nav-group {
+    display: none;
+  }
   .nav-group.active {
     display: block;
   }
@@ -52,11 +55,12 @@ const { type, defaultActiveTab, sidebarSections, currentPageMatch } =
   .nav-group-title > h2 {
     font-size: 12px;
     letter-spacing: 0.25px;
+    order: 1;
   }
 
   .nav-group-title-top > h2 {
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 0.25px;
   }
 
@@ -79,7 +83,6 @@ const { type, defaultActiveTab, sidebarSections, currentPageMatch } =
     &[aria-current="page"],
     &[data-current-parent="true"] {
       color: var(--theme-text);
-      background-color: var(--theme-bg-accent);
       font-weight: 500;
       /* Indicates the current page for forced colors users in older browsers */
       outline: 1px solid transparent;
@@ -148,6 +151,7 @@ const { type, defaultActiveTab, sidebarSections, currentPageMatch } =
 
   svg {
     transform: rotate(0);
+    float: right;
     transition: 0.15s transform ease;
     vertical-align: middle;
     display: inline;
@@ -159,5 +163,18 @@ const { type, defaultActiveTab, sidebarSections, currentPageMatch } =
 
   svg path {
     fill: currentColor;
+  }
+
+  @media not screen and (min-width: 50em) {
+    .nav-group-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    svg {
+      margin-left: auto;
+      order: 3;
+      transition: transform 0.15s ease;
+    }
   }
 </style>

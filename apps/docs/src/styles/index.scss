@@ -271,14 +271,14 @@ strong {
       display: inline-flex;
 
       &:hover {
-        background-color: #BDA1FD;
+        background-color: #bda1fd;
         transition: ease-in-out;
         background-image: none;
-        transition-duration: .5s;
+        transition-duration: 0.5s;
       }
 
       .discord-content-wrapper {
-        background-color: #FFD260;
+        background-color: #ffd260;
         border-radius: 5px;
         display: flex;
         margin: auto;
@@ -354,7 +354,7 @@ pre {
   padding-left: 3px;
   padding-right: 3px;
   vertical-align: baseline;
-  border: 1px solid var(--theme-hypertext); 
+  border: 1px solid var(--theme-hypertext);
   border-radius: 5px;
   transition: all 0.3s ease;
   color: inherit;
@@ -393,20 +393,25 @@ a.pkeyword:hover {
 }
 
 /* Additional table design */
+.table-container {
+  overflow-x: auto;
+}
+
 table {
-  overflow: hidden;
   width: 100%;
+  overflow-x: auto;
   padding: var(--padding-block) 0;
   margin: 0;
   background-color: var(--color-purple-1000);
 
-  th, td {
+  th,
+  td {
     background-color: var(--color-purple-1000);
     padding: 6px;
   }
 
   thead tr:first-child th:first-child,
-  tbody tr:first-child, 
+  tbody tr:first-child,
   tfoot tr:first-child td:first-child {
     border-top-left-radius: 0.9375em;
   }
@@ -430,7 +435,8 @@ table {
 
 .ltable {
   table {
-    th, td {
+    th,
+    td {
       background-color: var(--color-purple-300);
     }
     tr {
@@ -459,7 +465,7 @@ table thead tr:not(:last-child) th {
 
 table tr:not(:last-child) td:first-child::before,
 table thead tr:not(:last-child) th:first-child::before {
-    left: 1.25em;
+  left: 1.25em;
 }
 
 table thead tr:first-child th,
@@ -627,7 +633,6 @@ h1 {
   padding-bottom: 3px;
   padding-top: 25px;
 }
-
 
 /* Visual Styles */
 

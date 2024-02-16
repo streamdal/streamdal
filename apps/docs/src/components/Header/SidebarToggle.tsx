@@ -1,44 +1,74 @@
 /** @jsxImportSource preact */
-import type { FunctionalComponent } from "preact";
 import { useState, useEffect } from "preact/hooks";
+import type { FunctionalComponent } from "preact";
+import "./MenuToggle.css";
 
 const MenuToggle: FunctionalComponent = () => {
   const [sidebarShown, setSidebarShown] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
 
   useEffect(() => {
-    const body = document.querySelector("body")!;
+    if (isToggling) return;
+
+    const body = document.querySelector("body");
+    setIsToggling(true);
+
     if (sidebarShown) {
       body.classList.add("mobile-sidebar-toggle");
+      body.classList.remove("mobile-menu-hidden");
     } else {
-      body.classList.remove("mobile-sidebar-toggle");
+      body.classList.add("mobile-menu-hidden");
+      setTimeout(() => {
+        body.classList.remove("mobile-sidebar-toggle");
+      }, 200);
     }
+
+    setTimeout(() => {
+      setIsToggling(false);
+    }, 200);
   }, [sidebarShown]);
+
+  const toggleSidebar = () => {
+    if (isToggling) return;
+    setSidebarShown(!sidebarShown);
+  };
+
+  useEffect(() => {
+    let resizeTimer;
+
+    const handleResize = () => {
+      document.getElementById("left-sidebar").classList.add("no-transition");
+
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        document
+          .getElementById("left-sidebar")
+          .classList.remove("no-transition");
+      }, 300);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, []);
 
   return (
     <button
       type="button"
       aria-pressed={sidebarShown ? "true" : "false"}
       id="menu-toggle"
-      onClick={() => setSidebarShown(!sidebarShown)}
+      onClick={toggleSidebar}
+      className={`hamburger ${sidebarShown ? "is-active" : ""}`}
       style={{
         backgroundColor: "transparent",
+        padding: 0,
+        border: "none",
       }}
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="1em"
-        height="1em"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"
-        />
-      </svg>
+      <span className="bar"></span>
       <span className="sr-only">Toggle sidebar</span>
     </button>
   );
