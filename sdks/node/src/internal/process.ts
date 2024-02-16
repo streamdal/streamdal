@@ -279,28 +279,29 @@ export const resultCondition = ({
   stepStatus: EnhancedStepStatus;
   payload: Uint8Array;
 }) => {
-  const conditions =
+  const condition =
     stepStatus.status === ExecStatus.TRUE
       ? step.onTrue
       : stepStatus.status === ExecStatus.FALSE
       ? step.onFalse
       : step.onError;
 
-  void notifyStep({
-    configs,
-    audience,
-    step,
-    stepStatus,
-    pipelineId: pipeline.id,
-    payload,
-  });
+  condition?.notification?.notificationConfigIds.length &&
+    void notifyStep({
+      configs,
+      audience,
+      step,
+      stepStatus,
+      pipelineId: pipeline.id,
+      payload,
+    });
 
-  if (conditions?.metadata && Object.keys(conditions.metadata).length) {
-    stepStatus.metadata = { ...stepStatus.metadata, ...conditions.metadata };
+  if (condition?.metadata && Object.keys(condition.metadata).length) {
+    stepStatus.metadata = { ...stepStatus.metadata, ...condition.metadata };
   }
 
-  stepStatus.abortCondition = conditions?.abort
-    ? conditions.abort
+  stepStatus.abortCondition = condition?.abort
+    ? condition.abort
     : AbortCondition.UNSET;
 };
 
