@@ -55,6 +55,7 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          fetch_all_tags: true
           tag_prefix: "libs/wasm/v"
 
       - name: Create release
