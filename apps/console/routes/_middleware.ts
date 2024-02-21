@@ -2,6 +2,7 @@ import { MiddlewareHandlerContext } from "$fresh/server.ts";
 import { cookieSession, WithSession } from "fresh-session/mod.ts";
 import { ErrorType } from "../components/form/validate.ts";
 import { PRODUCTION } from "../lib/configs.ts";
+import { getCookies } from "$std/http/cookie.ts";
 
 export type SuccessType = {
   status: boolean;
@@ -45,17 +46,15 @@ const emailPromptHandler = async (
   ctx: MiddlewareHandlerContext<SessionState>,
 ) => {
   const { pathname } = new URL(req.url);
-  const { session } = ctx.state;
-  const emailPrompted = session?.get("emailPrompted");
 
   if (
-    !PRODUCTION || emailPrompted || ctx.destination !== "route" ||
+    !PRODUCTION || ctx.destination !== "route" ||
     emailExcludes.some((route) => pathname.startsWith(route))
   ) {
     return ctx.next();
   }
 
-  if (!emailPrompted) {
+  if (!getCookies(req.headers).emailPrompted) {
     return new Response(null, {
       status: 307,
       headers: { Location: "/email" },
