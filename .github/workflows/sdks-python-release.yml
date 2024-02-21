@@ -26,6 +26,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
+          fetch_all_tags: true
           tag_prefix: "sdks/python/v"
 
       - name: Inject version into setup.py

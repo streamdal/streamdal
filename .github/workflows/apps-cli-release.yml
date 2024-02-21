@@ -34,6 +34,7 @@ jobs:
         id: create_tag
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          fetch_all_tags: true
           tag_prefix: "apps/cli/v"
 
       - name: Set version vars
