@@ -1,7 +1,6 @@
 import { Handlers, RouteConfig } from "$fresh/src/server/types.ts";
 import { TailResponse } from "streamdal-protos/protos/sp_common.ts";
 import {
-  audienceMetricsAbortSignal,
   audienceMetricsConnected,
   getAudienceMetrics,
 } from "../../lib/audienceMetrics.ts";

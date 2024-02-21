@@ -1,4 +1,4 @@
-import { HandlerContext, Handlers } from "$fresh/server.ts";
+import { HandlerContext, Handlers, RouteConfig } from "$fresh/server.ts";
 import { AppRegistrationRequest } from "streamdal-protos/protos/sp_external.ts";
 import { ErrorType, validate } from "../components/form/validate.ts";
 import {
@@ -7,6 +7,8 @@ import {
 } from "../islands/emailCollectionForm.tsx";
 import { rejectEmailCollection, sendEmail } from "../lib/mutation.ts";
 import { WithSession } from "fresh-session/mod.ts";
+import { SuccessType } from "./_middleware.ts";
+import { setCookie } from "$std/http/cookie.ts";
 
 export type SessionData = { session: Record<string, string>; message?: string };
 
@@ -14,15 +16,14 @@ export const config: RouteConfig = {
   skipInheritedLayouts: true,
 };
 
-export const handler: Handlers<> = {
+export const handler: Handlers<SuccessType> = {
   async POST(req: Request, ctx: HandlerContext<SessionData, WithSession>) {
-    const { session } = ctx.state;
     const emailData = await req.formData();
 
     if (emailData.get("decline")) {
       void rejectEmailCollection();
-      session.set("emailPrompted", true);
     } else {
+      const { session } = ctx.state;
       const { data: email, errors }: {
         email: AppRegistrationRequest;
         errors: ErrorType;
@@ -42,16 +43,24 @@ export const handler: Handlers<> = {
         status: true,
         message: "Thanks!",
       });
-      session.set("emailPrompted", true);
     }
 
-    return new Response(
+    const resp = new Response(
       "",
       {
         status: 307,
         headers: { Location: "/" },
       },
     );
+
+    setCookie(resp.headers, {
+      name: "emailPrompted",
+      value: true,
+      //
+      //https://developer.chrome.com/blog/cookie-max-age-expires/
+      maxAge: 400 * 24 * 60 * 60,
+    });
+    return resp;
   },
 };
 
