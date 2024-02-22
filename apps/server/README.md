@@ -22,6 +22,33 @@ The server exposes 3 APIs:
 3. REST API on port `8081`
    1. Exposes metrics, prometheus and health-check endpoints
 
+## Configuration
+
+The server can be configured via environment variables.
+
+All environment variables are prefixed with `STREAMDAL_SERVER`.
+
+| Variable        | Description                                          | Default                        | Required |
+|-----------------|------------------------------------------------------|--------------------------------|----------| 
+| `NODE_NAME` | Name for this node (MUST BE UNIQUE IN CLUSTER)       | NONE                           | ✅        |
+| `AUTH_TOKEN` | Authentication token                                 | NONE                           | ✅        |
+| `HTTP_API_LISTEN_ADDRESS` | HTTP API listen address    | :8081                          | ❌        |
+| `GRPC_API_LISTEN_ADDRESS` | gRPC API listen address    | :8082                          | ❌        |
+| `REDIS_URL` | Address for Redis cluster used by Streamdal server   | localhost:6379                 | ❌        |
+| `REDIS_DATABASE` | Redis database number to use                         | 0                              | ❌        |
+| `REDIS_PASSWORD` | Redis password             | NONE                           | ❌        |
+| `HEALTH_FREQ_SEC` | How often to perform health checks on dependencies   | 60                             | ❌        |
+| `SESSION_TTL` | TTL for session keys in RedisBackend live K/V bucket | 5s                             | ❌        |
+| `WASM_DIR` | Directory where WASM files are stored                | ./assets/wasm                  | ❌        |
+| `NUM_TAIL_WORKERS` | Number of tail workers to run                        | 4                              | ❌        |
+| `NUM_BROADCAST_WORKERS` | Number of (Redis) broadcast workers to run           | 4                              | ❌        |
+| `DEMO_MODE` | Run server in demo mode. This disables modifications | false                          | ❌        |
+| `TELEMETRY_DISABLE` | Disable sending usage analytics to Streamdal         | false                          | ❌        |
+| `TELEMETRY_ADDRESS` | Address to send telemetry to                         | "telemetry.streamdal.com:8125" | ❌        |
+| `DEBUG` | Enable debug logging       | false                          | ❌        |
+
+<sub>NOTE: For most up-to-date list of available configuration options, see [`config/config.go`](./config/config.go).</sub>
+
 ## Development
 
 To develop _against_ the server, you must have Go installed as you 
