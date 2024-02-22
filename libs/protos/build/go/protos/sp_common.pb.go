@@ -304,14 +304,13 @@ type Audience struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Name of the service -- let's include the service name on all calls, we can
-	// optimize later ~DS
+	// Name of the client/service the SDK is announcing itself as
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// Name of the component the SDK is interacting with (ie. kafka-$topic-name)
 	ComponentName string `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
-	// Consumer or Producer
+	// Is this a Consumer (read) or Producer (write)
 	OperationType OperationType `protobuf:"varint,3,opt,name=operation_type,json=operationType,proto3,enum=protos.OperationType" json:"operation_type,omitempty"`
-	// Name for the consumer or producer
+	// Friendly name for the consumer or producer
 	OperationName string `protobuf:"bytes,4,opt,name=operation_name,json=operationName,proto3" json:"operation_name,omitempty"`
 }
 

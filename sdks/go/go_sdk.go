@@ -43,6 +43,9 @@ type OperationType int
 // ClientType is used to indicate if this library is being used by a shim or directly (as an SDK)
 type ClientType int
 
+// TODO: ProcessRequest is the request struct that should be passed to Process()
+type ProcessRequest1 protos.SDKRequest
+
 // ProcessResponse is the response struct from a Process() call
 type ProcessResponse protos.SDKResponse
 

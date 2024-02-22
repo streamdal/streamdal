@@ -162,39 +162,19 @@ class ExecStatus(betterproto.Enum):
     """
 
 
-class ShimErrorMode(betterproto.Enum):
+class SdkClientType(betterproto.Enum):
     """
-    ShimErrorMode is used to alter the error behavior of a shim library
-    instrumented with the Streamdal SDK at runtime. NOTE: This structure is
-    usually used when the SDK is used via a shim/wrapper library where you have
-    less control over SDK behavior. Read more about shims here:
-    https://docs.streamdal.com/en/core-components/libraries-shims/
-    """
-
-    SHIM_ERROR_MODE_UNSET = 0
-    """
-    This instructs the shim to IGNORE any non-recoverable errors that the SDK
-    might run into. If the SDK runs into an error, the shim will NOT pass the
-    error back to the user - it will instead return the whatever the upstream
-    library would normally return to the user. *** This is the default behavior
-    *** Example with Redis Shim ------------------------ Under normal
-    conditions, a Redis shim would work in the following way when user is
-    performing a read operation: 1. The shim would call the upstream Redis
-    library to perform the read operation 2. Upstream library returns results
-    to the shim 3. Shim passes the result to the integrated Streamdal SDK for
-    processing 4. SDK returns (potentially) modified data to the shim 5. Shim
-    returns the modified data to the user This setting tells the shim that IF
-    it runs into a non-recoverable error while calling the SDK (step 3), it
-    will side-step steps 4 and 5 and instead return the _original_ payload
-    (read during step 1) to the user.
+    Indicates whether the SDK is being used directly or via a shim/wrapper
+    library. This is primarily intended to be used by shims so that the SDK can
+    determine if the ServerURL and ServerToken should be optional or required.
+    protolint:disable ENUM_FIELD_NAMES_PREFIX
     """
 
-    SHIM_ERROR_MODE_STRICT = 1
-    """
-    This instructs the shim to ABORT execution if the SDK runs into any non-
-    recoverable errors. Upon aborting, the shim will return the error that the
-    SDK ran into and the error will be passed all the way back to the user.
-    """
+    SDK_CLIENT_TYPE_DIRECT = 0
+    """The SDK is used directly as a standalone library"""
+
+    SDK_CLIENT_TYPE_SHIM = 1
+    """The SDK is used within a shim/wrapper library"""
 
 
 class WasmExitCode(betterproto.Enum):
@@ -232,10 +212,7 @@ class Audience(betterproto.Message):
     """Used to indicate who a command is intended for"""
 
     service_name: str = betterproto.string_field(1)
-    """
-    Name of the service -- let's include the service name on all calls, we can
-    optimize later ~DS
-    """
+    """Name of the client/service the SDK is announcing itself as"""
 
     component_name: str = betterproto.string_field(2)
     """
@@ -243,10 +220,10 @@ class Audience(betterproto.Message):
     """
 
     operation_type: "OperationType" = betterproto.enum_field(3)
-    """Consumer or Producer"""
+    """Is this a Consumer (read) or Producer (write)"""
 
     operation_name: str = betterproto.string_field(4)
-    """Name for the consumer or producer"""
+    """Friendly name for the consumer or producer"""
 
 
 @dataclass(eq=False, repr=False)
@@ -1218,6 +1195,17 @@ class BusEvent(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class SdkRequest(betterproto.Message):
+    """Common request used by all SDKs in their .Process() method"""
+
+    data: bytes = betterproto.bytes_field(1)
+    """The input payload that the SDK will process"""
+
+    audience: "Audience" = betterproto.message_field(2)
+    """Audience that should be announced for this request"""
+
+
+@dataclass(eq=False, repr=False)
 class SdkResponse(betterproto.Message):
     """Common return response used by all SDKs"""
 
@@ -1247,6 +1235,114 @@ class SdkResponse(betterproto.Message):
     response will be the value set by the last step in the pipeline. To learn
     more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error Behavior"
     section.
+    """
+
+
+@dataclass(eq=False, repr=False)
+class SdkStartupConfig(betterproto.Message):
+    """
+    SDKStartupConfig is a common configuration structure that is used by all
+    Streamdal SDKs to configure the client at startup. NOTE: These are
+    _baseline_ options - some SDKs may expose additional options.
+    protolint:disable FIELD_NAMES_LOWER_SNAKE_CASE
+    """
+
+    server_url: str = betterproto.string_field(1)
+    """
+    REQUIRED: URL for the Streamdal server gRPC API. Example: "streamdal-
+    server-address:8082"
+    """
+
+    auth_token: str = betterproto.string_field(2)
+    """
+    REQUIRED: Auth token used to authenticate with the Streamdal server. NOTE:
+    should be the same as the token used for running the Streamdal server.
+    """
+
+    service_name: str = betterproto.string_field(3)
+    """
+    REQUIRED: Service name used for identifying the SDK client in the Streamdal
+    server and console.
+    """
+
+    audiences: List["Audience"] = betterproto.message_field(4)
+    """
+    OPTIONAL: List of audiences you can specify at registration time. This is
+    useful if you know your audiences in advance and want to populate service
+    groups in the Streamdal UI _before_ your code executes any .Process()
+    calls.
+    """
+
+    pipeline_timeout_seconds: int = betterproto.int32_field(5)
+    """
+    OPTIONAL: How long to wait for a pipeline execution to complete before
+    timing out
+    """
+
+    step_timeout_seconds: int = betterproto.int32_field(6)
+    """
+    OPTIONAL: How long to wait for a step execution to complete before timing
+    out
+    """
+
+    dry_run: bool = betterproto.bool_field(7)
+    """
+    OPTIONAL: Instruct the SDK to execute pipelines but return ORIGINAL input
+    payload instead of (potentially) modified payload.
+    """
+
+    internal_client_type: Optional["SdkClientType"] = betterproto.enum_field(
+        1000, optional=True, group="X_internal_client_type"
+    )
+    """
+    ClientType specifies whether this of the SDK is used in a shim library or
+    as a standalone SDK. This information is used for both debug info and to
+    help SDKs determine whether ServerURL and ServerToken should be optional or
+    required. Unless you are developing a shim, you should not have to set
+    this. Default: SDKClientTypeSDK
+    """
+
+    internal_shim_require_runtime_config: bool = betterproto.bool_field(2000)
+    """
+    By default, the shim will execute pipelines on every read/write call to the
+    upstream library. If this is set to true, the shim will only execute its
+    workload if the upstream library is called with a protos.SDKRuntimeConfig.
+    Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+    """
+
+    internal_shim_strict_error_handling: bool = betterproto.bool_field(2001)
+    """
+    When enabled and the shim run into any non-recoverable errors, it will
+    return the error to the upstream library. If left unset, the shim will
+    ignore the error and pass the original data back to the upstream library.
+    """
+
+
+@dataclass(eq=False, repr=False)
+class SdkRuntimeConfig(betterproto.Message):
+    """
+    SDKRuntimeConfig is the configuration structure that is used primarily by
+    shims to configure SDK behavior at runtime. It is most often exposed as an
+    optional parameter that you can pass to an upstream library's read or write
+    operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
+    Read more about shims: https://docs.streamdal.com/en/core-
+    components/libraries-shims/
+    """
+
+    audience: "Audience" = betterproto.message_field(1)
+    """
+    Audience that will be used by shim when calling SDK.Process(). NOTE: If
+    ServiceName is not provided, the shim will use the service name provided in
+    the SDKStartupConfig.
+    """
+
+    strict_error_handling: Optional[bool] = betterproto.bool_field(
+        2, optional=True, group="_strict_error_handling"
+    )
+    """
+    Specifies how the shim should behave if it runs into any errors when
+    calling the SDK. If set, this setting will override the behavior set in
+    SDKStartupConfig._internal_shim_strict_error_handling.
     """
 
 
@@ -1282,93 +1378,6 @@ class StepStatus(betterproto.Message):
     future pipelines - the user must define the abort conditions for
     "on_error".
     """
-
-
-@dataclass(eq=False, repr=False)
-class SdkStartupConfig(betterproto.Message):
-    """
-    SDKStartupConfig is the configuration structure that is used in Streamdal
-    SDKs to configure the client at startup. Some SDKs may expose additional
-    config options aside from these baseline options.
-    """
-
-    url: str = betterproto.string_field(1)
-    """
-    URL for the Streamdal server gRPC API. Example: "streamdal-server-
-    address:8082"
-    """
-
-    token: str = betterproto.string_field(2)
-    """
-    Auth token used to authenticate with the Streamdal server (NOTE: should be
-    the same as the token used for running the Streamdal server).
-    """
-
-    service_name: str = betterproto.string_field(3)
-    """
-    Service name used for identifying the SDK client in the Streamdal server
-    and console
-    """
-
-    pipeline_timeout_seconds: Optional[int] = betterproto.int32_field(
-        4, optional=True, group="_pipeline_timeout_seconds"
-    )
-    """
-    How long to wait for a pipeline execution to complete before timing out
-    """
-
-    step_timeout_seconds: Optional[int] = betterproto.int32_field(
-        5, optional=True, group="_step_timeout_seconds"
-    )
-    """How long to wait for a step execution to complete before timing out"""
-
-    dry_run: Optional[bool] = betterproto.bool_field(6, optional=True, group="_dry_run")
-    """
-    Instruct the SDK to execute pipelines but return ORIGINAL input payload
-    instead of (potentially) modified payload.
-    """
-
-    shim_require_runtime_config: Optional[bool] = betterproto.bool_field(
-        1000, optional=True, group="_shim_require_runtime_config"
-    )
-    """
-    By default, the shim will execute pipelines on every read/write call to the
-    upstream library. If this is set to true, the shim will only execute its
-    workload if the upstream library is called with a protos.SDKRuntimeConfig.
-    Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
-    """
-
-    shim_error_mode: Optional["ShimErrorMode"] = betterproto.enum_field(
-        1001, optional=True, group="_shim_error_mode"
-    )
-    """Tells the SDK how to behave when it runs into an error"""
-
-
-@dataclass(eq=False, repr=False)
-class ShimRuntimeConfig(betterproto.Message):
-    """
-    SDKRuntimeConfig is the configuration structure that is used in SDKs to
-    configure how the SDK behaves at runtime. It is most often exposed as an
-    optional parameter that you can pass to an upstream library's read or write
-    operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
-    NOTE: This structure is usually used when the SDK is used via a
-    shim/wrapper library where you have less control over SDK behavior. Read
-    more about shims here: https://docs.streamdal.com/en/core-
-    components/libraries-shims/
-    """
-
-    error_mode: Optional["ShimErrorMode"] = betterproto.enum_field(
-        1, optional=True, group="_error_mode"
-    )
-    """
-    Specifies how the shim should behave if it runs into any errors when
-    calling the SDK
-    """
-
-    audience: Optional["Audience"] = betterproto.message_field(
-        2, optional=True, group="_audience"
-    )
-    """Audience that will be used by shim when calling SDK.Process()"""
 
 
 @dataclass(eq=False, repr=False)

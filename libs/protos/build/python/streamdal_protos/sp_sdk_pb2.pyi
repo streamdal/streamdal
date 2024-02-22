@@ -11,8 +11,8 @@ EXEC_STATUS_ERROR: ExecStatus
 EXEC_STATUS_FALSE: ExecStatus
 EXEC_STATUS_TRUE: ExecStatus
 EXEC_STATUS_UNSET: ExecStatus
-SHIM_ERROR_MODE_STRICT: ShimErrorMode
-SHIM_ERROR_MODE_UNSET: ShimErrorMode
+SDK_CLIENT_TYPE_DIRECT: SDKClientType
+SDK_CLIENT_TYPE_SHIM: SDKClientType
 
 class PipelineStatus(_message.Message):
     __slots__ = ["id", "name", "step_status"]
@@ -23,6 +23,14 @@ class PipelineStatus(_message.Message):
     name: str
     step_status: _containers.RepeatedCompositeFieldContainer[StepStatus]
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., step_status: _Optional[_Iterable[_Union[StepStatus, _Mapping]]] = ...) -> None: ...
+
+class SDKRequest(_message.Message):
+    __slots__ = ["audience", "data"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    DATA_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    data: bytes
+    def __init__(self, data: _Optional[bytes] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class SDKResponse(_message.Message):
     __slots__ = ["data", "metadata", "pipeline_status", "status", "status_message"]
@@ -45,33 +53,37 @@ class SDKResponse(_message.Message):
     status_message: str
     def __init__(self, data: _Optional[bytes] = ..., status: _Optional[_Union[ExecStatus, str]] = ..., status_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
+class SDKRuntimeConfig(_message.Message):
+    __slots__ = ["audience", "strict_error_handling"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    STRICT_ERROR_HANDLING_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    strict_error_handling: bool
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., strict_error_handling: bool = ...) -> None: ...
+
 class SDKStartupConfig(_message.Message):
-    __slots__ = ["dry_run", "pipeline_timeout_seconds", "service_name", "shim_error_mode", "shim_require_runtime_config", "step_timeout_seconds", "token", "url"]
+    __slots__ = ["_internal_client_type", "_internal_shim_require_runtime_config", "_internal_shim_strict_error_handling", "audiences", "auth_token", "dry_run", "pipeline_timeout_seconds", "server_url", "service_name", "step_timeout_seconds"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    AUTH_TOKEN_FIELD_NUMBER: _ClassVar[int]
     DRY_RUN_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_TIMEOUT_SECONDS_FIELD_NUMBER: _ClassVar[int]
+    SERVER_URL_FIELD_NUMBER: _ClassVar[int]
     SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
-    SHIM_ERROR_MODE_FIELD_NUMBER: _ClassVar[int]
-    SHIM_REQUIRE_RUNTIME_CONFIG_FIELD_NUMBER: _ClassVar[int]
     STEP_TIMEOUT_SECONDS_FIELD_NUMBER: _ClassVar[int]
-    TOKEN_FIELD_NUMBER: _ClassVar[int]
-    URL_FIELD_NUMBER: _ClassVar[int]
+    _INTERNAL_CLIENT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    _INTERNAL_SHIM_REQUIRE_RUNTIME_CONFIG_FIELD_NUMBER: _ClassVar[int]
+    _INTERNAL_SHIM_STRICT_ERROR_HANDLING_FIELD_NUMBER: _ClassVar[int]
+    _internal_client_type: SDKClientType
+    _internal_shim_require_runtime_config: bool
+    _internal_shim_strict_error_handling: bool
+    audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
+    auth_token: str
     dry_run: bool
     pipeline_timeout_seconds: int
+    server_url: str
     service_name: str
-    shim_error_mode: ShimErrorMode
-    shim_require_runtime_config: bool
     step_timeout_seconds: int
-    token: str
-    url: str
-    def __init__(self, url: _Optional[str] = ..., token: _Optional[str] = ..., service_name: _Optional[str] = ..., pipeline_timeout_seconds: _Optional[int] = ..., step_timeout_seconds: _Optional[int] = ..., dry_run: bool = ..., shim_require_runtime_config: bool = ..., shim_error_mode: _Optional[_Union[ShimErrorMode, str]] = ...) -> None: ...
-
-class ShimRuntimeConfig(_message.Message):
-    __slots__ = ["audience", "error_mode"]
-    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    ERROR_MODE_FIELD_NUMBER: _ClassVar[int]
-    audience: _sp_common_pb2.Audience
-    error_mode: ShimErrorMode
-    def __init__(self, error_mode: _Optional[_Union[ShimErrorMode, str]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+    def __init__(self, server_url: _Optional[str] = ..., auth_token: _Optional[str] = ..., service_name: _Optional[str] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipeline_timeout_seconds: _Optional[int] = ..., step_timeout_seconds: _Optional[int] = ..., dry_run: bool = ..., _internal_client_type: _Optional[_Union[SDKClientType, str]] = ..., _internal_shim_require_runtime_config: bool = ..., _internal_shim_strict_error_handling: bool = ...) -> None: ...
 
 class StepStatus(_message.Message):
     __slots__ = ["abort_condition", "name", "status", "status_message"]
@@ -88,5 +100,5 @@ class StepStatus(_message.Message):
 class ExecStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
 
-class ShimErrorMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+class SDKClientType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

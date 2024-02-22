@@ -25,6 +25,150 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_3_0;
 
+///  Common request used by all SDKs in their .Process() method
+// @@protoc_insertion_point(message:protos.SDKRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct SDKRequest {
+    // message fields
+    ///  The input payload that the SDK will process
+    // @@protoc_insertion_point(field:protos.SDKRequest.data)
+    pub data: ::std::vec::Vec<u8>,
+    ///  Audience that should be announced for this request
+    // @@protoc_insertion_point(field:protos.SDKRequest.audience)
+    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.SDKRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a SDKRequest {
+    fn default() -> &'a SDKRequest {
+        <SDKRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl SDKRequest {
+    pub fn new() -> SDKRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "data",
+            |m: &SDKRequest| { &m.data },
+            |m: &mut SDKRequest| { &mut m.data },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
+            "audience",
+            |m: &SDKRequest| { &m.audience },
+            |m: &mut SDKRequest| { &mut m.audience },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKRequest>(
+            "SDKRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for SDKRequest {
+    const NAME: &'static str = "SDKRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.data = is.read_bytes()?;
+                },
+                18 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.data);
+        }
+        if let Some(v) = self.audience.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.data.is_empty() {
+            os.write_bytes(1, &self.data)?;
+        }
+        if let Some(v) = self.audience.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> SDKRequest {
+        SDKRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.data.clear();
+        self.audience.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static SDKRequest {
+        static instance: SDKRequest = SDKRequest {
+            data: ::std::vec::Vec::new(),
+            audience: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for SDKRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("SDKRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for SDKRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for SDKRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  Common return response used by all SDKs
 // @@protoc_insertion_point(message:protos.SDKResponse)
 #[derive(PartialEq,Clone,Default,Debug)]
@@ -244,6 +388,472 @@ impl ::std::fmt::Display for SDKResponse {
 }
 
 impl ::protobuf::reflect::ProtobufValue for SDKResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  SDKStartupConfig is a common configuration structure that is used by all
+///  Streamdal SDKs to configure the client at startup. NOTE: These are _baseline_
+///  options - some SDKs may expose additional options.
+///  protolint:disable FIELD_NAMES_LOWER_SNAKE_CASE
+// @@protoc_insertion_point(message:protos.SDKStartupConfig)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct SDKStartupConfig {
+    // message fields
+    ///  REQUIRED: URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.server_url)
+    pub server_url: ::std::string::String,
+    ///  REQUIRED: Auth token used to authenticate with the Streamdal server.
+    ///  NOTE: should be the same as the token used for running the Streamdal server.
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.auth_token)
+    pub auth_token: ::std::string::String,
+    ///  REQUIRED: Service name used for identifying the SDK client in the Streamdal
+    ///  server and console.
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.service_name)
+    pub service_name: ::std::string::String,
+    ///  OPTIONAL: List of audiences you can specify at registration time. This is
+    ///  useful if you know your audiences in advance and want to populate service
+    ///  groups in the Streamdal UI _before_ your code executes any .Process() calls.
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.audiences)
+    pub audiences: ::std::vec::Vec<super::sp_common::Audience>,
+    ///  OPTIONAL: How long to wait for a pipeline execution to complete before timing out
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.pipeline_timeout_seconds)
+    pub pipeline_timeout_seconds: i32,
+    ///  OPTIONAL: How long to wait for a step execution to complete before timing out
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.step_timeout_seconds)
+    pub step_timeout_seconds: i32,
+    ///  OPTIONAL: Instruct the SDK to execute pipelines but return ORIGINAL input
+    ///  payload instead of (potentially) modified payload.
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.dry_run)
+    pub dry_run: bool,
+    ///  ClientType specifies whether this of the SDK is used in a shim library or
+    ///  as a standalone SDK. This information is used for both debug info and to
+    ///  help SDKs determine whether ServerURL and ServerToken should be optional or
+    ///  required. Unless you are developing a shim, you should not have to set this.
+    ///  Default: SDKClientTypeSDK
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig._internal_client_type)
+    pub _internal_client_type: ::std::option::Option<::protobuf::EnumOrUnknown<SDKClientType>>,
+    ///  By default, the shim will execute pipelines on every read/write call to the
+    ///  upstream library. If this is set to true, the shim will only execute its
+    ///  workload if the upstream library is called with a protos.SDKRuntimeConfig.
+    ///  Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig._internal_shim_require_runtime_config)
+    pub _internal_shim_require_runtime_config: bool,
+    ///  When enabled and the shim run into any non-recoverable errors, it will
+    ///  return the error to the upstream library. If left unset, the shim will
+    ///  ignore the error and pass the original data back to the upstream library.
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig._internal_shim_strict_error_handling)
+    pub _internal_shim_strict_error_handling: bool,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.SDKStartupConfig.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a SDKStartupConfig {
+    fn default() -> &'a SDKStartupConfig {
+        <SDKStartupConfig as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl SDKStartupConfig {
+    pub fn new() -> SDKStartupConfig {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(10);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "server_url",
+            |m: &SDKStartupConfig| { &m.server_url },
+            |m: &mut SDKStartupConfig| { &mut m.server_url },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "auth_token",
+            |m: &SDKStartupConfig| { &m.auth_token },
+            |m: &mut SDKStartupConfig| { &mut m.auth_token },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "service_name",
+            |m: &SDKStartupConfig| { &m.service_name },
+            |m: &mut SDKStartupConfig| { &mut m.service_name },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "audiences",
+            |m: &SDKStartupConfig| { &m.audiences },
+            |m: &mut SDKStartupConfig| { &mut m.audiences },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "pipeline_timeout_seconds",
+            |m: &SDKStartupConfig| { &m.pipeline_timeout_seconds },
+            |m: &mut SDKStartupConfig| { &mut m.pipeline_timeout_seconds },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "step_timeout_seconds",
+            |m: &SDKStartupConfig| { &m.step_timeout_seconds },
+            |m: &mut SDKStartupConfig| { &mut m.step_timeout_seconds },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "dry_run",
+            |m: &SDKStartupConfig| { &m.dry_run },
+            |m: &mut SDKStartupConfig| { &mut m.dry_run },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "_internal_client_type",
+            |m: &SDKStartupConfig| { &m._internal_client_type },
+            |m: &mut SDKStartupConfig| { &mut m._internal_client_type },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "_internal_shim_require_runtime_config",
+            |m: &SDKStartupConfig| { &m._internal_shim_require_runtime_config },
+            |m: &mut SDKStartupConfig| { &mut m._internal_shim_require_runtime_config },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "_internal_shim_strict_error_handling",
+            |m: &SDKStartupConfig| { &m._internal_shim_strict_error_handling },
+            |m: &mut SDKStartupConfig| { &mut m._internal_shim_strict_error_handling },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKStartupConfig>(
+            "SDKStartupConfig",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for SDKStartupConfig {
+    const NAME: &'static str = "SDKStartupConfig";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.server_url = is.read_string()?;
+                },
+                18 => {
+                    self.auth_token = is.read_string()?;
+                },
+                26 => {
+                    self.service_name = is.read_string()?;
+                },
+                34 => {
+                    self.audiences.push(is.read_message()?);
+                },
+                40 => {
+                    self.pipeline_timeout_seconds = is.read_int32()?;
+                },
+                48 => {
+                    self.step_timeout_seconds = is.read_int32()?;
+                },
+                56 => {
+                    self.dry_run = is.read_bool()?;
+                },
+                8000 => {
+                    self._internal_client_type = ::std::option::Option::Some(is.read_enum_or_unknown()?);
+                },
+                16000 => {
+                    self._internal_shim_require_runtime_config = is.read_bool()?;
+                },
+                16008 => {
+                    self._internal_shim_strict_error_handling = is.read_bool()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.server_url.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.server_url);
+        }
+        if !self.auth_token.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.auth_token);
+        }
+        if !self.service_name.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.service_name);
+        }
+        for value in &self.audiences {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        if self.pipeline_timeout_seconds != 0 {
+            my_size += ::protobuf::rt::int32_size(5, self.pipeline_timeout_seconds);
+        }
+        if self.step_timeout_seconds != 0 {
+            my_size += ::protobuf::rt::int32_size(6, self.step_timeout_seconds);
+        }
+        if self.dry_run != false {
+            my_size += 1 + 1;
+        }
+        if let Some(v) = self._internal_client_type {
+            my_size += ::protobuf::rt::int32_size(1000, v.value());
+        }
+        if self._internal_shim_require_runtime_config != false {
+            my_size += 2 + 1;
+        }
+        if self._internal_shim_strict_error_handling != false {
+            my_size += 2 + 1;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.server_url.is_empty() {
+            os.write_string(1, &self.server_url)?;
+        }
+        if !self.auth_token.is_empty() {
+            os.write_string(2, &self.auth_token)?;
+        }
+        if !self.service_name.is_empty() {
+            os.write_string(3, &self.service_name)?;
+        }
+        for v in &self.audiences {
+            ::protobuf::rt::write_message_field_with_cached_size(4, v, os)?;
+        };
+        if self.pipeline_timeout_seconds != 0 {
+            os.write_int32(5, self.pipeline_timeout_seconds)?;
+        }
+        if self.step_timeout_seconds != 0 {
+            os.write_int32(6, self.step_timeout_seconds)?;
+        }
+        if self.dry_run != false {
+            os.write_bool(7, self.dry_run)?;
+        }
+        if let Some(v) = self._internal_client_type {
+            os.write_enum(1000, ::protobuf::EnumOrUnknown::value(&v))?;
+        }
+        if self._internal_shim_require_runtime_config != false {
+            os.write_bool(2000, self._internal_shim_require_runtime_config)?;
+        }
+        if self._internal_shim_strict_error_handling != false {
+            os.write_bool(2001, self._internal_shim_strict_error_handling)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> SDKStartupConfig {
+        SDKStartupConfig::new()
+    }
+
+    fn clear(&mut self) {
+        self.server_url.clear();
+        self.auth_token.clear();
+        self.service_name.clear();
+        self.audiences.clear();
+        self.pipeline_timeout_seconds = 0;
+        self.step_timeout_seconds = 0;
+        self.dry_run = false;
+        self._internal_client_type = ::std::option::Option::None;
+        self._internal_shim_require_runtime_config = false;
+        self._internal_shim_strict_error_handling = false;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static SDKStartupConfig {
+        static instance: SDKStartupConfig = SDKStartupConfig {
+            server_url: ::std::string::String::new(),
+            auth_token: ::std::string::String::new(),
+            service_name: ::std::string::String::new(),
+            audiences: ::std::vec::Vec::new(),
+            pipeline_timeout_seconds: 0,
+            step_timeout_seconds: 0,
+            dry_run: false,
+            _internal_client_type: ::std::option::Option::None,
+            _internal_shim_require_runtime_config: false,
+            _internal_shim_strict_error_handling: false,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for SDKStartupConfig {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("SDKStartupConfig").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for SDKStartupConfig {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for SDKStartupConfig {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+///  SDKRuntimeConfig is the configuration structure that is used primarily by
+///  shims to configure SDK behavior at runtime. It is most often exposed as an
+///  optional parameter that you can pass to an upstream library's read or write
+///  operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
+///
+///  Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
+// @@protoc_insertion_point(message:protos.SDKRuntimeConfig)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct SDKRuntimeConfig {
+    // message fields
+    ///  Audience that will be used by shim when calling SDK.Process().
+    ///  NOTE: If ServiceName is not provided, the shim will use the service name
+    ///  provided in the SDKStartupConfig.
+    // @@protoc_insertion_point(field:protos.SDKRuntimeConfig.audience)
+    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
+    ///  Specifies how the shim should behave if it runs into any errors when
+    ///  calling the SDK. If set, this setting will override the behavior set in
+    ///  SDKStartupConfig._internal_shim_strict_error_handling.
+    // @@protoc_insertion_point(field:protos.SDKRuntimeConfig.strict_error_handling)
+    pub strict_error_handling: ::std::option::Option<bool>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.SDKRuntimeConfig.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a SDKRuntimeConfig {
+    fn default() -> &'a SDKRuntimeConfig {
+        <SDKRuntimeConfig as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl SDKRuntimeConfig {
+    pub fn new() -> SDKRuntimeConfig {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
+            "audience",
+            |m: &SDKRuntimeConfig| { &m.audience },
+            |m: &mut SDKRuntimeConfig| { &mut m.audience },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "strict_error_handling",
+            |m: &SDKRuntimeConfig| { &m.strict_error_handling },
+            |m: &mut SDKRuntimeConfig| { &mut m.strict_error_handling },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKRuntimeConfig>(
+            "SDKRuntimeConfig",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for SDKRuntimeConfig {
+    const NAME: &'static str = "SDKRuntimeConfig";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
+                },
+                16 => {
+                    self.strict_error_handling = ::std::option::Option::Some(is.read_bool()?);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.audience.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        if let Some(v) = self.strict_error_handling {
+            my_size += 1 + 1;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.audience.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        if let Some(v) = self.strict_error_handling {
+            os.write_bool(2, v)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> SDKRuntimeConfig {
+        SDKRuntimeConfig::new()
+    }
+
+    fn clear(&mut self) {
+        self.audience.clear();
+        self.strict_error_handling = ::std::option::Option::None;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static SDKRuntimeConfig {
+        static instance: SDKRuntimeConfig = SDKRuntimeConfig {
+            audience: ::protobuf::MessageField::none(),
+            strict_error_handling: ::std::option::Option::None,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for SDKRuntimeConfig {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("SDKRuntimeConfig").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for SDKRuntimeConfig {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for SDKRuntimeConfig {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -593,421 +1203,6 @@ impl ::protobuf::reflect::ProtobufValue for StepStatus {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
-///  SDKStartupConfig is the configuration structure that is used in Streamdal SDKs
-///  to configure the client at startup. Some SDKs may expose additional config
-///  options aside from these baseline options.
-// @@protoc_insertion_point(message:protos.SDKStartupConfig)
-#[derive(PartialEq,Clone,Default,Debug)]
-pub struct SDKStartupConfig {
-    // message fields
-    ///  URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.url)
-    pub url: ::std::string::String,
-    ///  Auth token used to authenticate with the Streamdal server (NOTE: should be
-    ///  the same as the token used for running the Streamdal server).
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.token)
-    pub token: ::std::string::String,
-    ///  Service name used for identifying the SDK client in the Streamdal server and console
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.service_name)
-    pub service_name: ::std::string::String,
-    ///  How long to wait for a pipeline execution to complete before timing out
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.pipeline_timeout_seconds)
-    pub pipeline_timeout_seconds: ::std::option::Option<i32>,
-    ///  How long to wait for a step execution to complete before timing out
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.step_timeout_seconds)
-    pub step_timeout_seconds: ::std::option::Option<i32>,
-    ///  Instruct the SDK to execute pipelines but return ORIGINAL input payload
-    ///  instead of (potentially) modified payload.
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.dry_run)
-    pub dry_run: ::std::option::Option<bool>,
-    ///  By default, the shim will execute pipelines on every read/write call to the
-    ///  upstream library. If this is set to true, the shim will only execute its
-    ///  workload if the upstream library is called with a protos.SDKRuntimeConfig.
-    ///  Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.shim_require_runtime_config)
-    pub shim_require_runtime_config: ::std::option::Option<bool>,
-    ///  Tells the SDK how to behave when it runs into an error
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.shim_error_mode)
-    pub shim_error_mode: ::std::option::Option<::protobuf::EnumOrUnknown<ShimErrorMode>>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.SDKStartupConfig.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a SDKStartupConfig {
-    fn default() -> &'a SDKStartupConfig {
-        <SDKStartupConfig as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl SDKStartupConfig {
-    pub fn new() -> SDKStartupConfig {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(8);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "url",
-            |m: &SDKStartupConfig| { &m.url },
-            |m: &mut SDKStartupConfig| { &mut m.url },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "token",
-            |m: &SDKStartupConfig| { &m.token },
-            |m: &mut SDKStartupConfig| { &mut m.token },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "service_name",
-            |m: &SDKStartupConfig| { &m.service_name },
-            |m: &mut SDKStartupConfig| { &mut m.service_name },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "pipeline_timeout_seconds",
-            |m: &SDKStartupConfig| { &m.pipeline_timeout_seconds },
-            |m: &mut SDKStartupConfig| { &mut m.pipeline_timeout_seconds },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "step_timeout_seconds",
-            |m: &SDKStartupConfig| { &m.step_timeout_seconds },
-            |m: &mut SDKStartupConfig| { &mut m.step_timeout_seconds },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "dry_run",
-            |m: &SDKStartupConfig| { &m.dry_run },
-            |m: &mut SDKStartupConfig| { &mut m.dry_run },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "shim_require_runtime_config",
-            |m: &SDKStartupConfig| { &m.shim_require_runtime_config },
-            |m: &mut SDKStartupConfig| { &mut m.shim_require_runtime_config },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "shim_error_mode",
-            |m: &SDKStartupConfig| { &m.shim_error_mode },
-            |m: &mut SDKStartupConfig| { &mut m.shim_error_mode },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKStartupConfig>(
-            "SDKStartupConfig",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for SDKStartupConfig {
-    const NAME: &'static str = "SDKStartupConfig";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.url = is.read_string()?;
-                },
-                18 => {
-                    self.token = is.read_string()?;
-                },
-                26 => {
-                    self.service_name = is.read_string()?;
-                },
-                32 => {
-                    self.pipeline_timeout_seconds = ::std::option::Option::Some(is.read_int32()?);
-                },
-                40 => {
-                    self.step_timeout_seconds = ::std::option::Option::Some(is.read_int32()?);
-                },
-                48 => {
-                    self.dry_run = ::std::option::Option::Some(is.read_bool()?);
-                },
-                8000 => {
-                    self.shim_require_runtime_config = ::std::option::Option::Some(is.read_bool()?);
-                },
-                8008 => {
-                    self.shim_error_mode = ::std::option::Option::Some(is.read_enum_or_unknown()?);
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.url.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.url);
-        }
-        if !self.token.is_empty() {
-            my_size += ::protobuf::rt::string_size(2, &self.token);
-        }
-        if !self.service_name.is_empty() {
-            my_size += ::protobuf::rt::string_size(3, &self.service_name);
-        }
-        if let Some(v) = self.pipeline_timeout_seconds {
-            my_size += ::protobuf::rt::int32_size(4, v);
-        }
-        if let Some(v) = self.step_timeout_seconds {
-            my_size += ::protobuf::rt::int32_size(5, v);
-        }
-        if let Some(v) = self.dry_run {
-            my_size += 1 + 1;
-        }
-        if let Some(v) = self.shim_require_runtime_config {
-            my_size += 2 + 1;
-        }
-        if let Some(v) = self.shim_error_mode {
-            my_size += ::protobuf::rt::int32_size(1001, v.value());
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.url.is_empty() {
-            os.write_string(1, &self.url)?;
-        }
-        if !self.token.is_empty() {
-            os.write_string(2, &self.token)?;
-        }
-        if !self.service_name.is_empty() {
-            os.write_string(3, &self.service_name)?;
-        }
-        if let Some(v) = self.pipeline_timeout_seconds {
-            os.write_int32(4, v)?;
-        }
-        if let Some(v) = self.step_timeout_seconds {
-            os.write_int32(5, v)?;
-        }
-        if let Some(v) = self.dry_run {
-            os.write_bool(6, v)?;
-        }
-        if let Some(v) = self.shim_require_runtime_config {
-            os.write_bool(1000, v)?;
-        }
-        if let Some(v) = self.shim_error_mode {
-            os.write_enum(1001, ::protobuf::EnumOrUnknown::value(&v))?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> SDKStartupConfig {
-        SDKStartupConfig::new()
-    }
-
-    fn clear(&mut self) {
-        self.url.clear();
-        self.token.clear();
-        self.service_name.clear();
-        self.pipeline_timeout_seconds = ::std::option::Option::None;
-        self.step_timeout_seconds = ::std::option::Option::None;
-        self.dry_run = ::std::option::Option::None;
-        self.shim_require_runtime_config = ::std::option::Option::None;
-        self.shim_error_mode = ::std::option::Option::None;
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static SDKStartupConfig {
-        static instance: SDKStartupConfig = SDKStartupConfig {
-            url: ::std::string::String::new(),
-            token: ::std::string::String::new(),
-            service_name: ::std::string::String::new(),
-            pipeline_timeout_seconds: ::std::option::Option::None,
-            step_timeout_seconds: ::std::option::Option::None,
-            dry_run: ::std::option::Option::None,
-            shim_require_runtime_config: ::std::option::Option::None,
-            shim_error_mode: ::std::option::Option::None,
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for SDKStartupConfig {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("SDKStartupConfig").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for SDKStartupConfig {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for SDKStartupConfig {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
-///  SDKRuntimeConfig is the configuration structure that is used in SDKs to
-///  configure how the SDK behaves at runtime. It is most often exposed as an
-///  optional parameter that you can pass to an upstream library's read or write
-///  operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
-///
-///  NOTE: This structure is usually used when the SDK is used via a shim/wrapper
-///  library where you have less control over SDK behavior. Read more about shims
-///  here: https://docs.streamdal.com/en/core-components/libraries-shims/
-// @@protoc_insertion_point(message:protos.ShimRuntimeConfig)
-#[derive(PartialEq,Clone,Default,Debug)]
-pub struct ShimRuntimeConfig {
-    // message fields
-    ///  Specifies how the shim should behave if it runs into any errors when calling the SDK
-    // @@protoc_insertion_point(field:protos.ShimRuntimeConfig.error_mode)
-    pub error_mode: ::std::option::Option<::protobuf::EnumOrUnknown<ShimErrorMode>>,
-    ///  Audience that will be used by shim when calling SDK.Process()
-    // @@protoc_insertion_point(field:protos.ShimRuntimeConfig.audience)
-    pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.ShimRuntimeConfig.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a ShimRuntimeConfig {
-    fn default() -> &'a ShimRuntimeConfig {
-        <ShimRuntimeConfig as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl ShimRuntimeConfig {
-    pub fn new() -> ShimRuntimeConfig {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "error_mode",
-            |m: &ShimRuntimeConfig| { &m.error_mode },
-            |m: &mut ShimRuntimeConfig| { &mut m.error_mode },
-        ));
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
-            "audience",
-            |m: &ShimRuntimeConfig| { &m.audience },
-            |m: &mut ShimRuntimeConfig| { &mut m.audience },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<ShimRuntimeConfig>(
-            "ShimRuntimeConfig",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for ShimRuntimeConfig {
-    const NAME: &'static str = "ShimRuntimeConfig";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                8 => {
-                    self.error_mode = ::std::option::Option::Some(is.read_enum_or_unknown()?);
-                },
-                18 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if let Some(v) = self.error_mode {
-            my_size += ::protobuf::rt::int32_size(1, v.value());
-        }
-        if let Some(v) = self.audience.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.error_mode {
-            os.write_enum(1, ::protobuf::EnumOrUnknown::value(&v))?;
-        }
-        if let Some(v) = self.audience.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> ShimRuntimeConfig {
-        ShimRuntimeConfig::new()
-    }
-
-    fn clear(&mut self) {
-        self.error_mode = ::std::option::Option::None;
-        self.audience.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static ShimRuntimeConfig {
-        static instance: ShimRuntimeConfig = ShimRuntimeConfig {
-            error_mode: ::std::option::Option::None,
-            audience: ::protobuf::MessageField::none(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for ShimRuntimeConfig {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("ShimRuntimeConfig").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for ShimRuntimeConfig {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for ShimRuntimeConfig {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
 // @@protoc_insertion_point(enum:protos.ExecStatus)
 pub enum ExecStatus {
@@ -1080,54 +1275,52 @@ impl ExecStatus {
     }
 }
 
-///  ShimErrorMode is used to alter the error behavior of a shim library
-///  instrumented with the Streamdal SDK at runtime.
-///
-///  NOTE: This structure is usually used when the SDK is used via a shim/wrapper
-///  library where you have less control over SDK behavior. Read more about shims
-///  here: https://docs.streamdal.com/en/core-components/libraries-shims/
+///  Indicates whether the SDK is being used directly or via a shim/wrapper library.
+///  This is primarily intended to be used by shims so that the SDK can determine
+///  if the ServerURL and ServerToken should be optional or required.
+///  protolint:disable ENUM_FIELD_NAMES_PREFIX
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.ShimErrorMode)
-pub enum ShimErrorMode {
-    // @@protoc_insertion_point(enum_value:protos.ShimErrorMode.SHIM_ERROR_MODE_UNSET)
-    SHIM_ERROR_MODE_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.ShimErrorMode.SHIM_ERROR_MODE_STRICT)
-    SHIM_ERROR_MODE_STRICT = 1,
+// @@protoc_insertion_point(enum:protos.SDKClientType)
+pub enum SDKClientType {
+    // @@protoc_insertion_point(enum_value:protos.SDKClientType.SDK_CLIENT_TYPE_DIRECT)
+    SDK_CLIENT_TYPE_DIRECT = 0,
+    // @@protoc_insertion_point(enum_value:protos.SDKClientType.SDK_CLIENT_TYPE_SHIM)
+    SDK_CLIENT_TYPE_SHIM = 1,
 }
 
-impl ::protobuf::Enum for ShimErrorMode {
-    const NAME: &'static str = "ShimErrorMode";
+impl ::protobuf::Enum for SDKClientType {
+    const NAME: &'static str = "SDKClientType";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<ShimErrorMode> {
+    fn from_i32(value: i32) -> ::std::option::Option<SDKClientType> {
         match value {
-            0 => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_UNSET),
-            1 => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_STRICT),
+            0 => ::std::option::Option::Some(SDKClientType::SDK_CLIENT_TYPE_DIRECT),
+            1 => ::std::option::Option::Some(SDKClientType::SDK_CLIENT_TYPE_SHIM),
             _ => ::std::option::Option::None
         }
     }
 
-    fn from_str(str: &str) -> ::std::option::Option<ShimErrorMode> {
+    fn from_str(str: &str) -> ::std::option::Option<SDKClientType> {
         match str {
-            "SHIM_ERROR_MODE_UNSET" => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_UNSET),
-            "SHIM_ERROR_MODE_STRICT" => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_STRICT),
+            "SDK_CLIENT_TYPE_DIRECT" => ::std::option::Option::Some(SDKClientType::SDK_CLIENT_TYPE_DIRECT),
+            "SDK_CLIENT_TYPE_SHIM" => ::std::option::Option::Some(SDKClientType::SDK_CLIENT_TYPE_SHIM),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [ShimErrorMode] = &[
-        ShimErrorMode::SHIM_ERROR_MODE_UNSET,
-        ShimErrorMode::SHIM_ERROR_MODE_STRICT,
+    const VALUES: &'static [SDKClientType] = &[
+        SDKClientType::SDK_CLIENT_TYPE_DIRECT,
+        SDKClientType::SDK_CLIENT_TYPE_SHIM,
     ];
 }
 
-impl ::protobuf::EnumFull for ShimErrorMode {
+impl ::protobuf::EnumFull for SDKClientType {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("ShimErrorMode").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("SDKClientType").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -1136,256 +1329,270 @@ impl ::protobuf::EnumFull for ShimErrorMode {
     }
 }
 
-impl ::std::default::Default for ShimErrorMode {
+impl ::std::default::Default for SDKClientType {
     fn default() -> Self {
-        ShimErrorMode::SHIM_ERROR_MODE_UNSET
+        SDKClientType::SDK_CLIENT_TYPE_DIRECT
     }
 }
 
-impl ShimErrorMode {
+impl SDKClientType {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<ShimErrorMode>("ShimErrorMode")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<SDKClientType>("SDKClientType")
     }
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0csp_sdk.proto\x12\x06protos\x1a\x0fsp_common.proto\x1a\x11sp_pipeli\
-    ne.proto\"\xc9\x02\n\x0bSDKResponse\x12\x12\n\x04data\x18\x01\x20\x01(\
-    \x0cR\x04data\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecStat\
-    usR\x06status\x12*\n\x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatusMes\
-    sage\x88\x01\x01\x12?\n\x0fpipeline_status\x18\x04\x20\x03(\x0b2\x16.pro\
-    tos.PipelineStatusR\x0epipelineStatus\x12=\n\x08metadata\x18\x05\x20\x03\
-    (\x0b2!.protos.SDKResponse.MetadataEntryR\x08metadata\x1a;\n\rMetadataEn\
-    try\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\
-    \x02\x20\x01(\tR\x05value:\x028\x01B\x11\n\x0f_status_message\"i\n\x0ePi\
-    pelineStatus\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\
-    \x18\x02\x20\x01(\tR\x04name\x123\n\x0bstep_status\x18\x03\x20\x03(\x0b2\
-    \x12.protos.StepStatusR\nstepStatus\"\xcc\x01\n\nStepStatus\x12\x12\n\
-    \x04name\x18\x01\x20\x01(\tR\x04name\x12*\n\x06status\x18\x02\x20\x01(\
-    \x0e2\x12.protos.ExecStatusR\x06status\x12*\n\x0estatus_message\x18\x03\
-    \x20\x01(\tH\0R\rstatusMessage\x88\x01\x01\x12?\n\x0fabort_condition\x18\
-    \x04\x20\x01(\x0e2\x16.protos.AbortConditionR\x0eabortConditionB\x11\n\
-    \x0f_status_message\"\xf1\x03\n\x10SDKStartupConfig\x12\x10\n\x03url\x18\
-    \x01\x20\x01(\tR\x03url\x12\x14\n\x05token\x18\x02\x20\x01(\tR\x05token\
-    \x12!\n\x0cservice_name\x18\x03\x20\x01(\tR\x0bserviceName\x12=\n\x18pip\
-    eline_timeout_seconds\x18\x04\x20\x01(\x05H\0R\x16pipelineTimeoutSeconds\
-    \x88\x01\x01\x125\n\x14step_timeout_seconds\x18\x05\x20\x01(\x05H\x01R\
-    \x12stepTimeoutSeconds\x88\x01\x01\x12\x1c\n\x07dry_run\x18\x06\x20\x01(\
-    \x08H\x02R\x06dryRun\x88\x01\x01\x12C\n\x1bshim_require_runtime_config\
-    \x18\xe8\x07\x20\x01(\x08H\x03R\x18shimRequireRuntimeConfig\x88\x01\x01\
-    \x12C\n\x0fshim_error_mode\x18\xe9\x07\x20\x01(\x0e2\x15.protos.ShimErro\
-    rModeH\x04R\rshimErrorMode\x88\x01\x01B\x1b\n\x19_pipeline_timeout_secon\
-    dsB\x17\n\x15_step_timeout_secondsB\n\n\x08_dry_runB\x1e\n\x1c_shim_requ\
-    ire_runtime_configB\x12\n\x10_shim_error_mode\"\x9d\x01\n\x11ShimRuntime\
-    Config\x129\n\nerror_mode\x18\x01\x20\x01(\x0e2\x15.protos.ShimErrorMode\
-    H\0R\terrorMode\x88\x01\x01\x121\n\x08audience\x18\x02\x20\x01(\x0b2\x10\
-    .protos.AudienceH\x01R\x08audience\x88\x01\x01B\r\n\x0b_error_modeB\x0b\
-    \n\t_audience*g\n\nExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\x10\0\x12\
-    \x14\n\x10EXEC_STATUS_TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FALSE\x10\
-    \x02\x12\x15\n\x11EXEC_STATUS_ERROR\x10\x03*F\n\rShimErrorMode\x12\x19\n\
-    \x15SHIM_ERROR_MODE_UNSET\x10\0\x12\x1a\n\x16SHIM_ERROR_MODE_STRICT\x10\
-    \x01B<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xd27\
-    \n\x07\x12\x05\0\0\xac\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
-    \x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\
-    \x03\x01\x12\x03\x05\0\x1b\n\x08\n\x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\
-    \x0b\x12\x03\x07\0Q\n\n\n\x02\x05\0\x12\x04\t\0\x18\x01\n\n\n\x03\x05\0\
-    \x01\x12\x03\t\x05\x0f\n\x87\x01\n\x04\x05\0\x02\0\x12\x03\x0c\x02\x18\
-    \x1az\x20Unset\x20status.\x20This\x20should\x20never\x20be\x20returned\
-    \x20by\x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20is\n\x20probably\x20\
-    a\x20bug\x20(and\x20you\x20should\x20file\x20an\x20issue)\n\n\x0c\n\x05\
-    \x05\0\x02\0\x01\x12\x03\x0c\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\
-    \x0c\x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0f\x02\x17\x1a7\x20Indicate\
-    s\x20that\x20the\x20step\x20execution\x20evaluated\x20to\x20\"true\"\n\n\
-    \x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x05\0\x02\
-    \x01\x02\x12\x03\x0f\x15\x16\nE\n\x04\x05\0\x02\x02\x12\x03\x12\x02\x18\
-    \x1a8\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\x20t\
-    o\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x13\n\x0c\
-    \n\x05\x05\0\x02\x02\x02\x12\x03\x12\x16\x17\n\xd6\x01\n\x04\x05\0\x02\
-    \x03\x12\x03\x17\x02\x18\x1a\xc8\x01\x20Indicates\x20that\x20the\x20SDK\
-    \x20encountered\x20an\x20error\x20while\x20trying\x20to\x20process\x20th\
-    e\n\x20request.\x20Example\x20error\x20cases:\x20SDK\x20can't\x20find\
-    \x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\x20function\x20canno\
-    t\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\x0c\n\x05\x05\0\x02\
-    \x03\x01\x12\x03\x17\x02\x13\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x17\
-    \x16\x17\n5\n\x02\x04\0\x12\x04\x1b\01\x01\x1a)\x20Common\x20return\x20r\
-    esponse\x20used\x20by\x20all\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\x1b\
-    \x08\x13\n9\n\x04\x04\0\x02\0\x12\x03\x1d\x02\x11\x1a,\x20Contains\x20(p\
-    otentially)\x20modified\x20input\x20data\n\n\x0c\n\x05\x04\0\x02\0\x05\
-    \x12\x03\x1d\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1d\x08\x0c\n\
-    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1d\x0f\x10\n0\n\x04\x04\0\x02\x01\
-    \x12\x03\x20\x02\x18\x1a#\x20Execution\x20status\x20of\x20the\x20last\
-    \x20step\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x20\x02\x0c\n\x0c\n\x05\
-    \x04\0\x02\x01\x01\x12\x03\x20\r\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\
-    \x03\x20\x16\x17\nN\n\x04\x04\0\x02\x02\x12\x03#\x02%\x1aA\x20Optional\
-    \x20message\x20accompanying\x20the\x20exec\x20status\x20for\x20the\x20la\
-    st\x20step\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03#\x02\n\n\x0c\n\x05\
-    \x04\0\x02\x02\x05\x12\x03#\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
-    \x03#\x12\x20\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03##$\nV\n\x04\x04\0\
-    \x02\x03\x12\x03&\x02.\x1aI\x20An\x20array\x20of\x20pipelines\x20that\
-    \x20the\x20SDK\x20executed\x20and\x20the\x20status\x20of\x20each\x20step\
-    \n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\x03&\x02\n\n\x0c\n\x05\x04\0\x02\
-    \x03\x06\x12\x03&\x0b\x19\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03&\x1a)\n\
-    \x0c\n\x05\x04\0\x02\x03\x03\x12\x03&,-\n\x92\x03\n\x04\x04\0\x02\x04\
-    \x12\x030\x02#\x1a\x84\x03\x20Includes\x20any\x20metadata\x20that\x20the\
-    \x20step(s)\x20may\x20want\x20to\x20pass\x20back\x20to\x20the\x20user.\n\
-    \n\x20NOTE:\x20Metadata\x20is\x20aggregated\x20across\x20all\x20steps\
-    \x20in\x20the\x20pipeline,\x20so\x20if\x20two\n\x20steps\x20both\x20set\
-    \x20a\x20key\x20\"foo\"\x20to\x20different\x20values,\x20the\x20value\
-    \x20of\x20\"foo\"\x20in\x20the\n\x20response\x20will\x20be\x20the\x20val\
-    ue\x20set\x20by\x20the\x20last\x20step\x20in\x20the\x20pipeline.\n\n\x20\
-    To\x20learn\x20more\x20about\x20\"metadata\",\x20see\x20SDK\x20Spec\x20V\
-    2\x20doc\x20\"Pipeline\x20Step\x20&\x20Error\n\x20Behavior\"\x20section.\
-    \n\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x030\x02\x15\n\x0c\n\x05\x04\0\x02\
-    \x04\x01\x12\x030\x16\x1e\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x030!\"\n\n\
-    \n\x02\x04\x01\x12\x043\0<\x01\n\n\n\x03\x04\x01\x01\x12\x033\x08\x16\n!\
-    \n\x04\x04\x01\x02\0\x12\x035\x02\x10\x1a\x14\x20ID\x20of\x20the\x20pipe\
-    line\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x035\x02\x08\n\x0c\n\x05\x04\
-    \x01\x02\0\x01\x12\x035\t\x0b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x035\x0e\
-    \x0f\n'\n\x04\x04\x01\x02\x01\x12\x038\x02\x12\x1a\x1a\x20The\x20name\
-    \x20of\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x038\x02\
-    \x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x038\t\r\n\x0c\n\x05\x04\x01\
-    \x02\x01\x03\x12\x038\x10\x11\n6\n\x04\x04\x01\x02\x02\x12\x03;\x02&\x1a\
-    )\x20The\x20status\x20of\x20each\x20step\x20in\x20the\x20pipeline\n\n\
-    \x0c\n\x05\x04\x01\x02\x02\x04\x12\x03;\x02\n\n\x0c\n\x05\x04\x01\x02\
-    \x02\x06\x12\x03;\x0b\x15\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03;\x16!\
-    \n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03;$%\n\n\n\x02\x04\x02\x12\x04>\0\
-    N\x01\n\n\n\x03\x04\x02\x01\x12\x03>\x08\x12\n#\n\x04\x04\x02\x02\0\x12\
-    \x03@\x02\x12\x1a\x16\x20The\x20name\x20of\x20the\x20step\n\n\x0c\n\x05\
-    \x04\x02\x02\0\x05\x12\x03@\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\
-    \x03@\t\r\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03@\x10\x11\n3\n\x04\x04\
-    \x02\x02\x01\x12\x03C\x02\x18\x1a&\x20Execution\x20outcome\x20status\x20\
-    of\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\x01\x06\x12\x03C\x02\x0c\n\
-    \x0c\n\x05\x04\x02\x02\x01\x01\x12\x03C\r\x13\n\x0c\n\x05\x04\x02\x02\
-    \x01\x03\x12\x03C\x16\x17\n<\n\x04\x04\x02\x02\x02\x12\x03F\x02%\x1a/\
-    \x20Optional\x20message\x20accompanying\x20the\x20exec\x20status\n\n\x0c\
-    \n\x05\x04\x02\x02\x02\x04\x12\x03F\x02\n\n\x0c\n\x05\x04\x02\x02\x02\
-    \x05\x12\x03F\x0b\x11\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03F\x12\x20\n\
-    \x0c\n\x05\x04\x02\x02\x02\x03\x12\x03F#$\n\xf0\x01\n\x04\x04\x02\x02\
-    \x03\x12\x03M\x02%\x1a\xe2\x01\x20Indicates\x20if\x20current\x20or\x20al\
-    l\x20future\x20pipelines\x20were\x20aborted.\n\n\x20IMPORTANT:\x20The\
-    \x20SDK\x20running\x20into\x20an\x20error\x20does\x20not\x20automaticall\
-    y\x20abort\n\x20current\x20or\x20all\x20future\x20pipelines\x20-\x20the\
-    \x20user\x20must\x20define\x20the\x20abort\x20conditions\n\x20for\x20\"o\
-    n_error\".\n\n\x0c\n\x05\x04\x02\x02\x03\x06\x12\x03M\x02\x10\n\x0c\n\
-    \x05\x04\x02\x02\x03\x01\x12\x03M\x11\x20\n\x0c\n\x05\x04\x02\x02\x03\
-    \x03\x12\x03M#$\n\xd5\x01\n\x02\x04\x03\x12\x04S\0x\x01\x1a\xc8\x01\x20S\
-    DKStartupConfig\x20is\x20the\x20configuration\x20structure\x20that\x20is\
-    \x20used\x20in\x20Streamdal\x20SDKs\n\x20to\x20configure\x20the\x20clien\
-    t\x20at\x20startup.\x20Some\x20SDKs\x20may\x20expose\x20additional\x20co\
-    nfig\n\x20options\x20aside\x20from\x20these\x20baseline\x20options.\n\n\
-    \n\n\x03\x04\x03\x01\x12\x03S\x08\x18\n^\n\x04\x04\x03\x02\0\x12\x03U\
-    \x02\x11\x1aQ\x20URL\x20for\x20the\x20Streamdal\x20server\x20gRPC\x20API\
-    .\x20Example:\x20\"streamdal-server-address:8082\"\n\n\x0c\n\x05\x04\x03\
-    \x02\0\x05\x12\x03U\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03U\t\x0c\
-    \n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03U\x0f\x10\n\x99\x01\n\x04\x04\x03\
-    \x02\x01\x12\x03Y\x02\x13\x1a\x8b\x01\x20Auth\x20token\x20used\x20to\x20\
-    authenticate\x20with\x20the\x20Streamdal\x20server\x20(NOTE:\x20should\
-    \x20be\n\x20the\x20same\x20as\x20the\x20token\x20used\x20for\x20running\
-    \x20the\x20Streamdal\x20server).\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\
-    \x03Y\x02\x08\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x03Y\t\x0e\n\x0c\n\x05\
-    \x04\x03\x02\x01\x03\x12\x03Y\x11\x12\nc\n\x04\x04\x03\x02\x02\x12\x03\\\
-    \x02\x1a\x1aV\x20Service\x20name\x20used\x20for\x20identifying\x20the\
-    \x20SDK\x20client\x20in\x20the\x20Streamdal\x20server\x20and\x20console\
-    \n\n\x0c\n\x05\x04\x03\x02\x02\x05\x12\x03\\\x02\x08\n\x0c\n\x05\x04\x03\
-    \x02\x02\x01\x12\x03\\\t\x15\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x03\\\
-    \x18\x19\nV\n\x04\x04\x03\x02\x03\x12\x03_\x02.\x1aI\x20How\x20long\x20t\
-    o\x20wait\x20for\x20a\x20pipeline\x20execution\x20to\x20complete\x20befo\
-    re\x20timing\x20out\n\n\x0c\n\x05\x04\x03\x02\x03\x04\x12\x03_\x02\n\n\
-    \x0c\n\x05\x04\x03\x02\x03\x05\x12\x03_\x0b\x10\n\x0c\n\x05\x04\x03\x02\
-    \x03\x01\x12\x03_\x11)\n\x0c\n\x05\x04\x03\x02\x03\x03\x12\x03_,-\nR\n\
-    \x04\x04\x03\x02\x04\x12\x03b\x02*\x1aE\x20How\x20long\x20to\x20wait\x20\
-    for\x20a\x20step\x20execution\x20to\x20complete\x20before\x20timing\x20o\
-    ut\n\n\x0c\n\x05\x04\x03\x02\x04\x04\x12\x03b\x02\n\n\x0c\n\x05\x04\x03\
-    \x02\x04\x05\x12\x03b\x0b\x10\n\x0c\n\x05\x04\x03\x02\x04\x01\x12\x03b\
-    \x11%\n\x0c\n\x05\x04\x03\x02\x04\x03\x12\x03b()\n\x82\x01\n\x04\x04\x03\
-    \x02\x05\x12\x03f\x02\x1c\x1au\x20Instruct\x20the\x20SDK\x20to\x20execut\
-    e\x20pipelines\x20but\x20return\x20ORIGINAL\x20input\x20payload\n\x20ins\
-    tead\x20of\x20(potentially)\x20modified\x20payload.\n\n\x0c\n\x05\x04\
-    \x03\x02\x05\x04\x12\x03f\x02\n\n\x0c\n\x05\x04\x03\x02\x05\x05\x12\x03f\
-    \x0b\x0f\n\x0c\n\x05\x04\x03\x02\x05\x01\x12\x03f\x10\x17\n\x0c\n\x05\
-    \x04\x03\x02\x05\x03\x12\x03f\x1a\x1b\n\xe8\x04\n\x04\x04\x03\x02\x06\
-    \x12\x03t\x023\x1a\xa5\x02\x20By\x20default,\x20the\x20shim\x20will\x20e\
-    xecute\x20pipelines\x20on\x20every\x20read/write\x20call\x20to\x20the\n\
+    ne.proto\"N\n\nSDKRequest\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\x04dat\
+    a\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audie\
+    nce\"\xc9\x02\n\x0bSDKResponse\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\
+    \x04data\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecStatusR\
+    \x06status\x12*\n\x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatusMessag\
+    e\x88\x01\x01\x12?\n\x0fpipeline_status\x18\x04\x20\x03(\x0b2\x16.protos\
+    .PipelineStatusR\x0epipelineStatus\x12=\n\x08metadata\x18\x05\x20\x03(\
+    \x0b2!.protos.SDKResponse.MetadataEntryR\x08metadata\x1a;\n\rMetadataEnt\
+    ry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\
+    \x02\x20\x01(\tR\x05value:\x028\x01B\x11\n\x0f_status_message\"\xb4\x04\
+    \n\x10SDKStartupConfig\x12\x1d\n\nserver_url\x18\x01\x20\x01(\tR\tserver\
+    Url\x12\x1d\n\nauth_token\x18\x02\x20\x01(\tR\tauthToken\x12!\n\x0cservi\
+    ce_name\x18\x03\x20\x01(\tR\x0bserviceName\x12.\n\taudiences\x18\x04\x20\
+    \x03(\x0b2\x10.protos.AudienceR\taudiences\x128\n\x18pipeline_timeout_se\
+    conds\x18\x05\x20\x01(\x05R\x16pipelineTimeoutSeconds\x120\n\x14step_tim\
+    eout_seconds\x18\x06\x20\x01(\x05R\x12stepTimeoutSeconds\x12\x17\n\x07dr\
+    y_run\x18\x07\x20\x01(\x08R\x06dryRun\x12N\n\x15_internal_client_type\
+    \x18\xe8\x07\x20\x01(\x0e2\x15.protos.SDKClientTypeH\0R\x12InternalClien\
+    tType\x88\x01\x01\x12P\n%_internal_shim_require_runtime_config\x18\xd0\
+    \x0f\x20\x01(\x08R\x20InternalShimRequireRuntimeConfig\x12N\n$_internal_\
+    shim_strict_error_handling\x18\xd1\x0f\x20\x01(\x08R\x1fInternalShimStri\
+    ctErrorHandlingB\x18\n\x16X_internal_client_type\"\x93\x01\n\x10SDKRunti\
+    meConfig\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\
+    \x08audience\x127\n\x15strict_error_handling\x18\x02\x20\x01(\x08H\0R\
+    \x13strictErrorHandling\x88\x01\x01B\x18\n\x16_strict_error_handling\"i\
+    \n\x0ePipelineStatus\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\
+    \x04name\x18\x02\x20\x01(\tR\x04name\x123\n\x0bstep_status\x18\x03\x20\
+    \x03(\x0b2\x12.protos.StepStatusR\nstepStatus\"\xcc\x01\n\nStepStatus\
+    \x12\x12\n\x04name\x18\x01\x20\x01(\tR\x04name\x12*\n\x06status\x18\x02\
+    \x20\x01(\x0e2\x12.protos.ExecStatusR\x06status\x12*\n\x0estatus_message\
+    \x18\x03\x20\x01(\tH\0R\rstatusMessage\x88\x01\x01\x12?\n\x0fabort_condi\
+    tion\x18\x04\x20\x01(\x0e2\x16.protos.AbortConditionR\x0eabortConditionB\
+    \x11\n\x0f_status_message*g\n\nExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\
+    \x10\0\x12\x14\n\x10EXEC_STATUS_TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FA\
+    LSE\x10\x02\x12\x15\n\x11EXEC_STATUS_ERROR\x10\x03*E\n\rSDKClientType\
+    \x12\x1a\n\x16SDK_CLIENT_TYPE_DIRECT\x10\0\x12\x18\n\x14SDK_CLIENT_TYPE_\
+    SHIM\x10\x01B<Z:github.com/streamdal/streamdal/libs/protos/build/go/prot\
+    osJ\xe89\n\x07\x12\x05\0\0\xb4\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
+    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\
+    \x02\x03\x01\x12\x03\x05\0\x1b\n\x08\n\x01\x08\x12\x03\x07\0Q\n\t\n\x02\
+    \x08\x0b\x12\x03\x07\0Q\n\n\n\x02\x05\0\x12\x04\t\0\x18\x01\n\n\n\x03\
+    \x05\0\x01\x12\x03\t\x05\x0f\n\x87\x01\n\x04\x05\0\x02\0\x12\x03\x0c\x02\
+    \x18\x1az\x20Unset\x20status.\x20This\x20should\x20never\x20be\x20return\
+    ed\x20by\x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20is\n\x20probably\
+    \x20a\x20bug\x20(and\x20you\x20should\x20file\x20an\x20issue)\n\n\x0c\n\
+    \x05\x05\0\x02\0\x01\x12\x03\x0c\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\
+    \x03\x0c\x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0f\x02\x17\x1a7\x20Indi\
+    cates\x20that\x20the\x20step\x20execution\x20evaluated\x20to\x20\"true\"\
+    \n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x05\0\
+    \x02\x01\x02\x12\x03\x0f\x15\x16\nE\n\x04\x05\0\x02\x02\x12\x03\x12\x02\
+    \x18\x1a8\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\
+    \x20to\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x13\
+    \n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x12\x16\x17\n\xd6\x01\n\x04\x05\0\
+    \x02\x03\x12\x03\x17\x02\x18\x1a\xc8\x01\x20Indicates\x20that\x20the\x20\
+    SDK\x20encountered\x20an\x20error\x20while\x20trying\x20to\x20process\
+    \x20the\n\x20request.\x20Example\x20error\x20cases:\x20SDK\x20can't\x20f\
+    ind\x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\x20function\x20ca\
+    nnot\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\x0c\n\x05\x05\0\
+    \x02\x03\x01\x12\x03\x17\x02\x13\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\
+    \x17\x16\x17\n\x99\x02\n\x02\x05\x01\x12\x04\x1e\0$\x01\x1a\x8c\x02\x20I\
+    ndicates\x20whether\x20the\x20SDK\x20is\x20being\x20used\x20directly\x20\
+    or\x20via\x20a\x20shim/wrapper\x20library.\n\x20This\x20is\x20primarily\
+    \x20intended\x20to\x20be\x20used\x20by\x20shims\x20so\x20that\x20the\x20\
+    SDK\x20can\x20determine\n\x20if\x20the\x20ServerURL\x20and\x20ServerToke\
+    n\x20should\x20be\x20optional\x20or\x20required.\n\x20protolint:disable\
+    \x20ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\x01\x01\x12\x03\x1e\x05\x12\
+    \n?\n\x04\x05\x01\x02\0\x12\x03\x20\x02\x1d\x1a2\x20The\x20SDK\x20is\x20\
+    used\x20directly\x20as\x20a\x20standalone\x20library\n\n\x0c\n\x05\x05\
+    \x01\x02\0\x01\x12\x03\x20\x02\x18\n\x0c\n\x05\x05\x01\x02\0\x02\x12\x03\
+    \x20\x1b\x1c\n<\n\x04\x05\x01\x02\x01\x12\x03#\x02\x1b\x1a/\x20The\x20SD\
+    K\x20is\x20used\x20within\x20a\x20shim/wrapper\x20library\n\n\x0c\n\x05\
+    \x05\x01\x02\x01\x01\x12\x03#\x02\x16\n\x0c\n\x05\x05\x01\x02\x01\x02\
+    \x12\x03#\x19\x1a\nH\n\x02\x04\0\x12\x04'\0-\x01\x1a<\x20Common\x20reque\
+    st\x20used\x20by\x20all\x20SDKs\x20in\x20their\x20.Process()\x20method\n\
+    \n\n\n\x03\x04\0\x01\x12\x03'\x08\x12\n:\n\x04\x04\0\x02\0\x12\x03)\x02\
+    \x11\x1a-\x20The\x20input\x20payload\x20that\x20the\x20SDK\x20will\x20pr\
+    ocess\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03)\x02\x07\n\x0c\n\x05\x04\0\
+    \x02\0\x01\x12\x03)\x08\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03)\x0f\x10\
+    \nA\n\x04\x04\0\x02\x01\x12\x03,\x02\x1f\x1a4\x20Audience\x20that\x20sho\
+    uld\x20be\x20announced\x20for\x20this\x20request\n\n\x0c\n\x05\x04\0\x02\
+    \x01\x06\x12\x03,\x02\x11\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03,\x12\x1a\
+    \n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03,\x1d\x1e\n5\n\x02\x04\x01\x12\x04\
+    0\0F\x01\x1a)\x20Common\x20return\x20response\x20used\x20by\x20all\x20SD\
+    Ks\n\n\n\n\x03\x04\x01\x01\x12\x030\x08\x13\n9\n\x04\x04\x01\x02\0\x12\
+    \x032\x02\x11\x1a,\x20Contains\x20(potentially)\x20modified\x20input\x20\
+    data\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x032\x02\x07\n\x0c\n\x05\x04\
+    \x01\x02\0\x01\x12\x032\x08\x0c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x032\
+    \x0f\x10\n0\n\x04\x04\x01\x02\x01\x12\x035\x02\x18\x1a#\x20Execution\x20\
+    status\x20of\x20the\x20last\x20step\n\n\x0c\n\x05\x04\x01\x02\x01\x06\
+    \x12\x035\x02\x0c\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x035\r\x13\n\x0c\n\
+    \x05\x04\x01\x02\x01\x03\x12\x035\x16\x17\nN\n\x04\x04\x01\x02\x02\x12\
+    \x038\x02%\x1aA\x20Optional\x20message\x20accompanying\x20the\x20exec\
+    \x20status\x20for\x20the\x20last\x20step\n\n\x0c\n\x05\x04\x01\x02\x02\
+    \x04\x12\x038\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x038\x0b\x11\n\
+    \x0c\n\x05\x04\x01\x02\x02\x01\x12\x038\x12\x20\n\x0c\n\x05\x04\x01\x02\
+    \x02\x03\x12\x038#$\nV\n\x04\x04\x01\x02\x03\x12\x03;\x02.\x1aI\x20An\
+    \x20array\x20of\x20pipelines\x20that\x20the\x20SDK\x20executed\x20and\
+    \x20the\x20status\x20of\x20each\x20step\n\n\x0c\n\x05\x04\x01\x02\x03\
+    \x04\x12\x03;\x02\n\n\x0c\n\x05\x04\x01\x02\x03\x06\x12\x03;\x0b\x19\n\
+    \x0c\n\x05\x04\x01\x02\x03\x01\x12\x03;\x1a)\n\x0c\n\x05\x04\x01\x02\x03\
+    \x03\x12\x03;,-\n\x92\x03\n\x04\x04\x01\x02\x04\x12\x03E\x02#\x1a\x84\
+    \x03\x20Includes\x20any\x20metadata\x20that\x20the\x20step(s)\x20may\x20\
+    want\x20to\x20pass\x20back\x20to\x20the\x20user.\n\n\x20NOTE:\x20Metadat\
+    a\x20is\x20aggregated\x20across\x20all\x20steps\x20in\x20the\x20pipeline\
+    ,\x20so\x20if\x20two\n\x20steps\x20both\x20set\x20a\x20key\x20\"foo\"\
+    \x20to\x20different\x20values,\x20the\x20value\x20of\x20\"foo\"\x20in\
+    \x20the\n\x20response\x20will\x20be\x20the\x20value\x20set\x20by\x20the\
+    \x20last\x20step\x20in\x20the\x20pipeline.\n\n\x20To\x20learn\x20more\
+    \x20about\x20\"metadata\",\x20see\x20SDK\x20Spec\x20V2\x20doc\x20\"Pipel\
+    ine\x20Step\x20&\x20Error\n\x20Behavior\"\x20section.\n\n\x0c\n\x05\x04\
+    \x01\x02\x04\x06\x12\x03E\x02\x15\n\x0c\n\x05\x04\x01\x02\x04\x01\x12\
+    \x03E\x16\x1e\n\x0c\n\x05\x04\x01\x02\x04\x03\x12\x03E!\"\n\x8b\x02\n\
+    \x02\x04\x02\x12\x05L\0\x85\x01\x01\x1a\xfd\x01\x20SDKStartupConfig\x20i\
+    s\x20a\x20common\x20configuration\x20structure\x20that\x20is\x20used\x20\
+    by\x20all\n\x20Streamdal\x20SDKs\x20to\x20configure\x20the\x20client\x20\
+    at\x20startup.\x20NOTE:\x20These\x20are\x20_baseline_\n\x20options\x20-\
+    \x20some\x20SDKs\x20may\x20expose\x20additional\x20options.\n\x20protoli\
+    nt:disable\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\n\n\x03\x04\x02\x01\x12\
+    \x03L\x08\x18\nh\n\x04\x04\x02\x02\0\x12\x03N\x02\x18\x1a[\x20REQUIRED:\
+    \x20URL\x20for\x20the\x20Streamdal\x20server\x20gRPC\x20API.\x20Example:\
+    \x20\"streamdal-server-address:8082\"\n\n\x0c\n\x05\x04\x02\x02\0\x05\
+    \x12\x03N\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03N\t\x13\n\x0c\n\
+    \x05\x04\x02\x02\0\x03\x12\x03N\x16\x17\n\xa2\x01\n\x04\x04\x02\x02\x01\
+    \x12\x03R\x02\x18\x1a\x94\x01\x20REQUIRED:\x20Auth\x20token\x20used\x20t\
+    o\x20authenticate\x20with\x20the\x20Streamdal\x20server.\n\x20NOTE:\x20s\
+    hould\x20be\x20the\x20same\x20as\x20the\x20token\x20used\x20for\x20runni\
+    ng\x20the\x20Streamdal\x20server.\n\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\
+    \x03R\x02\x08\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x03R\t\x13\n\x0c\n\x05\
+    \x04\x02\x02\x01\x03\x12\x03R\x16\x17\no\n\x04\x04\x02\x02\x02\x12\x03V\
+    \x02\x1a\x1ab\x20REQUIRED:\x20Service\x20name\x20used\x20for\x20identify\
+    ing\x20the\x20SDK\x20client\x20in\x20the\x20Streamdal\n\x20server\x20and\
+    \x20console.\n\n\x0c\n\x05\x04\x02\x02\x02\x05\x12\x03V\x02\x08\n\x0c\n\
+    \x05\x04\x02\x02\x02\x01\x12\x03V\t\x15\n\x0c\n\x05\x04\x02\x02\x02\x03\
+    \x12\x03V\x18\x19\n\xf2\x01\n\x04\x04\x02\x02\x03\x12\x03[\x02)\x1a\xe4\
+    \x01\x20OPTIONAL:\x20List\x20of\x20audiences\x20you\x20can\x20specify\
+    \x20at\x20registration\x20time.\x20This\x20is\n\x20useful\x20if\x20you\
+    \x20know\x20your\x20audiences\x20in\x20advance\x20and\x20want\x20to\x20p\
+    opulate\x20service\n\x20groups\x20in\x20the\x20Streamdal\x20UI\x20_befor\
+    e_\x20your\x20code\x20executes\x20any\x20.Process()\x20calls.\n\n\x0c\n\
+    \x05\x04\x02\x02\x03\x04\x12\x03[\x02\n\n\x0c\n\x05\x04\x02\x02\x03\x06\
+    \x12\x03[\x0b\x1a\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\x03[\x1b$\n\x0c\n\
+    \x05\x04\x02\x02\x03\x03\x12\x03['(\n`\n\x04\x04\x02\x02\x04\x12\x03^\
+    \x02%\x1aS\x20OPTIONAL:\x20How\x20long\x20to\x20wait\x20for\x20a\x20pipe\
+    line\x20execution\x20to\x20complete\x20before\x20timing\x20out\n\n\x0c\n\
+    \x05\x04\x02\x02\x04\x05\x12\x03^\x02\x07\n\x0c\n\x05\x04\x02\x02\x04\
+    \x01\x12\x03^\x08\x20\n\x0c\n\x05\x04\x02\x02\x04\x03\x12\x03^#$\n\\\n\
+    \x04\x04\x02\x02\x05\x12\x03a\x02!\x1aO\x20OPTIONAL:\x20How\x20long\x20t\
+    o\x20wait\x20for\x20a\x20step\x20execution\x20to\x20complete\x20before\
+    \x20timing\x20out\n\n\x0c\n\x05\x04\x02\x02\x05\x05\x12\x03a\x02\x07\n\
+    \x0c\n\x05\x04\x02\x02\x05\x01\x12\x03a\x08\x1c\n\x0c\n\x05\x04\x02\x02\
+    \x05\x03\x12\x03a\x1f\x20\n\x8c\x01\n\x04\x04\x02\x02\x06\x12\x03e\x02\
+    \x13\x1a\x7f\x20OPTIONAL:\x20Instruct\x20the\x20SDK\x20to\x20execute\x20\
+    pipelines\x20but\x20return\x20ORIGINAL\x20input\n\x20payload\x20instead\
+    \x20of\x20(potentially)\x20modified\x20payload.\n\n\x0c\n\x05\x04\x02\
+    \x02\x06\x05\x12\x03e\x02\x06\n\x0c\n\x05\x04\x02\x02\x06\x01\x12\x03e\
+    \x07\x0e\n\x0c\n\x05\x04\x02\x02\x06\x03\x12\x03e\x11\x12\n\xfa\x03\n\
+    \x04\x04\x02\x02\x07\x12\x03q\x026\x1a\xcb\x02\x20ClientType\x20specifie\
+    s\x20whether\x20this\x20of\x20the\x20SDK\x20is\x20used\x20in\x20a\x20shi\
+    m\x20library\x20or\n\x20as\x20a\x20standalone\x20SDK.\x20This\x20informa\
+    tion\x20is\x20used\x20for\x20both\x20debug\x20info\x20and\x20to\n\x20hel\
+    p\x20SDKs\x20determine\x20whether\x20ServerURL\x20and\x20ServerToken\x20\
+    should\x20be\x20optional\x20or\n\x20required.\x20Unless\x20you\x20are\
+    \x20developing\x20a\x20shim,\x20you\x20should\x20not\x20have\x20to\x20se\
+    t\x20this.\n\x20Default:\x20SDKClientTypeSDK\n2\x9e\x01\x20-------------\
+    ------------\x20Internal\x20Settings\x20------------------------\n\n\x20\
+    These\x20are\x20\"internal\"\x20settings\x20that\x20generally\x20do\x20n\
+    ot\x20have\x20to\x20be\x20used\x20by\x20the\n\x20SDK\x20user.\n\n\x0c\n\
+    \x05\x04\x02\x02\x07\x04\x12\x03q\x02\n\n\x0c\n\x05\x04\x02\x02\x07\x06\
+    \x12\x03q\x0b\x18\n\x0c\n\x05\x04\x02\x02\x07\x01\x12\x03q\x19.\n\x0c\n\
+    \x05\x04\x02\x02\x07\x03\x12\x03q15\n\xea\x04\n\x04\x04\x02\x02\x08\x12\
+    \x03\x7f\x024\x1a\xa5\x02\x20By\x20default,\x20the\x20shim\x20will\x20ex\
+    ecute\x20pipelines\x20on\x20every\x20read/write\x20call\x20to\x20the\n\
     \x20upstream\x20library.\x20If\x20this\x20is\x20set\x20to\x20true,\x20th\
     e\x20shim\x20will\x20only\x20execute\x20its\n\x20workload\x20if\x20the\
     \x20upstream\x20library\x20is\x20called\x20with\x20a\x20protos.SDKRuntim\
     eConfig.\n\x20Ie.\x20kafkaProducer.Write(data,\x20&streamdal.SDKRuntimeC\
-    onfig{...}).\n2\xb2\x02\x20---------------------\x20Shim/Wrapper\x20Libr\
-    ary\x20Settings\x20--------------------\n\n\x20These\x20settings\x20are\
-    \x20_primarily_\x20used\x20when\x20the\x20SDK\x20is\x20used\x20within\
-    \x20a\x20shim/wrapper\x20library.\n\x20Setting\x20them\x20outside\x20of\
+    onfig{...}).\n2\xb4\x02\x20---------------------\x20Shim/Wrapper\x20Libr\
+    ary\x20Settings\x20---------------------\n\n\x20\"Shim\"\x20settings\x20\
+    are\x20_primarily_\x20used\x20when\x20the\x20SDK\x20is\x20used\x20within\
+    \x20a\x20shim/wrapper\n\x20library.\x20Setting\x20them\x20outside\x20of\
     \x20a\x20shim\x20will\x20have\x20no\x20effect.\n\n\x20Read\x20more\x20ab\
     out\x20shims:\x20https://docs.streamdal.com/en/core-components/libraries\
-    -shims/\n\n\n\x0c\n\x05\x04\x03\x02\x06\x04\x12\x03t\x02\n\n\x0c\n\x05\
-    \x04\x03\x02\x06\x05\x12\x03t\x0b\x0f\n\x0c\n\x05\x04\x03\x02\x06\x01\
-    \x12\x03t\x10+\n\x0c\n\x05\x04\x03\x02\x06\x03\x12\x03t.2\nE\n\x04\x04\
-    \x03\x02\x07\x12\x03w\x020\x1a8\x20Tells\x20the\x20SDK\x20how\x20to\x20b\
-    ehave\x20when\x20it\x20runs\x20into\x20an\x20error\n\n\x0c\n\x05\x04\x03\
-    \x02\x07\x04\x12\x03w\x02\n\n\x0c\n\x05\x04\x03\x02\x07\x06\x12\x03w\x0b\
-    \x18\n\x0c\n\x05\x04\x03\x02\x07\x01\x12\x03w\x19(\n\x0c\n\x05\x04\x03\
-    \x02\x07\x03\x12\x03w+/\n\xe8\x02\n\x02\x05\x01\x12\x06\x80\x01\0\x9c\
-    \x01\x01\x1a\xd9\x02\x20ShimErrorMode\x20is\x20used\x20to\x20alter\x20th\
-    e\x20error\x20behavior\x20of\x20a\x20shim\x20library\n\x20instrumented\
-    \x20with\x20the\x20Streamdal\x20SDK\x20at\x20runtime.\n\n\x20NOTE:\x20Th\
-    is\x20structure\x20is\x20usually\x20used\x20when\x20the\x20SDK\x20is\x20\
-    used\x20via\x20a\x20shim/wrapper\n\x20library\x20where\x20you\x20have\
-    \x20less\x20control\x20over\x20SDK\x20behavior.\x20Read\x20more\x20about\
-    \x20shims\n\x20here:\x20https://docs.streamdal.com/en/core-components/li\
-    braries-shims/\n\n\x0b\n\x03\x05\x01\x01\x12\x04\x80\x01\x05\x12\n\xf6\
-    \x07\n\x04\x05\x01\x02\0\x12\x04\x96\x01\x02\x1c\x1a\xe7\x07\x20This\x20\
-    instructs\x20the\x20shim\x20to\x20IGNORE\x20any\x20non-recoverable\x20er\
-    rors\x20that\x20the\x20SDK\n\x20might\x20run\x20into.\x20If\x20the\x20SD\
-    K\x20runs\x20into\x20an\x20error,\x20the\x20shim\x20will\x20NOT\x20pass\
-    \x20the\n\x20error\x20back\x20to\x20the\x20user\x20-\x20it\x20will\x20in\
-    stead\x20return\x20the\x20whatever\x20the\x20upstream\n\x20library\x20wo\
-    uld\x20normally\x20return\x20to\x20the\x20user.\n\n\x20***\x20This\x20is\
-    \x20the\x20default\x20behavior\x20***\n\n\x20Example\x20with\x20Redis\
-    \x20Shim\n\x20------------------------\n\x20Under\x20normal\x20condition\
-    s,\x20a\x20Redis\x20shim\x20would\x20work\x20in\x20the\x20following\x20w\
-    ay\x20when\n\x20user\x20is\x20performing\x20a\x20read\x20operation:\n\n\
-    \x201.\x20The\x20shim\x20would\x20call\x20the\x20upstream\x20Redis\x20li\
-    brary\x20to\x20perform\x20the\x20read\x20operation\n\x202.\x20Upstream\
-    \x20library\x20returns\x20results\x20to\x20the\x20shim\n\x203.\x20Shim\
-    \x20passes\x20the\x20result\x20to\x20the\x20integrated\x20Streamdal\x20S\
-    DK\x20for\x20processing\n\x204.\x20SDK\x20returns\x20(potentially)\x20mo\
-    dified\x20data\x20to\x20the\x20shim\n\x205.\x20Shim\x20returns\x20the\
-    \x20modified\x20data\x20to\x20the\x20user\n\n\x20This\x20setting\x20tell\
-    s\x20the\x20shim\x20that\x20IF\x20it\x20runs\x20into\x20a\x20non-recover\
-    able\x20error\n\x20while\x20calling\x20the\x20SDK\x20(step\x203),\x20it\
-    \x20will\x20side-step\x20steps\x204\x20and\x205\x20and\x20instead\n\x20r\
-    eturn\x20the\x20_original_\x20payload\x20(read\x20during\x20step\x201)\
-    \x20to\x20the\x20user.\n\n\r\n\x05\x05\x01\x02\0\x01\x12\x04\x96\x01\x02\
-    \x17\n\r\n\x05\x05\x01\x02\0\x02\x12\x04\x96\x01\x1a\x1b\n\xed\x01\n\x04\
-    \x05\x01\x02\x01\x12\x04\x9b\x01\x02\x1d\x1a\xde\x01\x20This\x20instruct\
-    s\x20the\x20shim\x20to\x20ABORT\x20execution\x20if\x20the\x20SDK\x20runs\
-    \x20into\x20any\n\x20non-recoverable\x20errors.\x20Upon\x20aborting,\x20\
-    the\x20shim\x20will\x20return\x20the\x20error\x20that\n\x20the\x20SDK\
-    \x20ran\x20into\x20and\x20the\x20error\x20will\x20be\x20passed\x20all\
-    \x20the\x20way\x20back\x20to\x20the\x20user.\n\n\r\n\x05\x05\x01\x02\x01\
-    \x01\x12\x04\x9b\x01\x02\x18\n\r\n\x05\x05\x01\x02\x01\x02\x12\x04\x9b\
-    \x01\x1b\x1c\n\x9e\x04\n\x02\x04\x04\x12\x06\xa6\x01\0\xac\x01\x01\x1a\
-    \x8f\x04\x20SDKRuntimeConfig\x20is\x20the\x20configuration\x20structure\
-    \x20that\x20is\x20used\x20in\x20SDKs\x20to\n\x20configure\x20how\x20the\
-    \x20SDK\x20behaves\x20at\x20runtime.\x20It\x20is\x20most\x20often\x20exp\
-    osed\x20as\x20an\n\x20optional\x20parameter\x20that\x20you\x20can\x20pas\
-    s\x20to\x20an\x20upstream\x20library's\x20read\x20or\x20write\n\x20opera\
-    tion.\x20Ie.\x20kafkaProducer.Write(data,\x20&streamdal.SDKRuntimeConfig\
-    {...})\n\n\x20NOTE:\x20This\x20structure\x20is\x20usually\x20used\x20whe\
-    n\x20the\x20SDK\x20is\x20used\x20via\x20a\x20shim/wrapper\n\x20library\
-    \x20where\x20you\x20have\x20less\x20control\x20over\x20SDK\x20behavior.\
-    \x20Read\x20more\x20about\x20shims\n\x20here:\x20https://docs.streamdal.\
-    com/en/core-components/libraries-shims/\n\n\x0b\n\x03\x04\x04\x01\x12\
-    \x04\xa6\x01\x08\x19\nd\n\x04\x04\x04\x02\0\x12\x04\xa8\x01\x02(\x1aV\
-    \x20Specifies\x20how\x20the\x20shim\x20should\x20behave\x20if\x20it\x20r\
-    uns\x20into\x20any\x20errors\x20when\x20calling\x20the\x20SDK\n\n\r\n\
-    \x05\x04\x04\x02\0\x04\x12\x04\xa8\x01\x02\n\n\r\n\x05\x04\x04\x02\0\x06\
-    \x12\x04\xa8\x01\x0b\x18\n\r\n\x05\x04\x04\x02\0\x01\x12\x04\xa8\x01\x19\
-    #\n\r\n\x05\x04\x04\x02\0\x03\x12\x04\xa8\x01&'\nM\n\x04\x04\x04\x02\x01\
-    \x12\x04\xab\x01\x02(\x1a?\x20Audience\x20that\x20will\x20be\x20used\x20\
-    by\x20shim\x20when\x20calling\x20SDK.Process()\n\n\r\n\x05\x04\x04\x02\
-    \x01\x04\x12\x04\xab\x01\x02\n\n\r\n\x05\x04\x04\x02\x01\x06\x12\x04\xab\
-    \x01\x0b\x1a\n\r\n\x05\x04\x04\x02\x01\x01\x12\x04\xab\x01\x1b#\n\r\n\
-    \x05\x04\x04\x02\x01\x03\x12\x04\xab\x01&'b\x06proto3\
+    -shims/\n\n\n\x0c\n\x05\x04\x02\x02\x08\x05\x12\x03\x7f\x02\x06\n\x0c\n\
+    \x05\x04\x02\x02\x08\x01\x12\x03\x7f\x07,\n\x0c\n\x05\x04\x02\x02\x08\
+    \x03\x12\x03\x7f/3\n\xea\x01\n\x04\x04\x02\x02\t\x12\x04\x84\x01\x023\
+    \x1a\xdb\x01\x20When\x20enabled\x20and\x20the\x20shim\x20run\x20into\x20\
+    any\x20non-recoverable\x20errors,\x20it\x20will\n\x20return\x20the\x20er\
+    ror\x20to\x20the\x20upstream\x20library.\x20If\x20left\x20unset,\x20the\
+    \x20shim\x20will\n\x20ignore\x20the\x20error\x20and\x20pass\x20the\x20or\
+    iginal\x20data\x20back\x20to\x20the\x20upstream\x20library.\n\n\r\n\x05\
+    \x04\x02\x02\t\x05\x12\x04\x84\x01\x02\x06\n\r\n\x05\x04\x02\x02\t\x01\
+    \x12\x04\x84\x01\x07+\n\r\n\x05\x04\x02\x02\t\x03\x12\x04\x84\x01.2\n\
+    \x97\x03\n\x02\x04\x03\x12\x06\x8d\x01\0\x97\x01\x01\x1a\x88\x03\x20SDKR\
+    untimeConfig\x20is\x20the\x20configuration\x20structure\x20that\x20is\
+    \x20used\x20primarily\x20by\n\x20shims\x20to\x20configure\x20SDK\x20beha\
+    vior\x20at\x20runtime.\x20It\x20is\x20most\x20often\x20exposed\x20as\x20\
+    an\n\x20optional\x20parameter\x20that\x20you\x20can\x20pass\x20to\x20an\
+    \x20upstream\x20library's\x20read\x20or\x20write\n\x20operation.\x20Ie.\
+    \x20kafkaProducer.Write(data,\x20&streamdal.SDKRuntimeConfig{...})\n\n\
+    \x20Read\x20more\x20about\x20shims:\x20https://docs.streamdal.com/en/cor\
+    e-components/libraries-shims/\n\n\x0b\n\x03\x04\x03\x01\x12\x04\x8d\x01\
+    \x08\x18\n\xbc\x01\n\x04\x04\x03\x02\0\x12\x04\x91\x01\x02\x1f\x1a\xad\
+    \x01\x20Audience\x20that\x20will\x20be\x20used\x20by\x20shim\x20when\x20\
+    calling\x20SDK.Process().\n\x20NOTE:\x20If\x20ServiceName\x20is\x20not\
+    \x20provided,\x20the\x20shim\x20will\x20use\x20the\x20service\x20name\n\
+    \x20provided\x20in\x20the\x20SDKStartupConfig.\n\n\r\n\x05\x04\x03\x02\0\
+    \x06\x12\x04\x91\x01\x02\x11\n\r\n\x05\x04\x03\x02\0\x01\x12\x04\x91\x01\
+    \x12\x1a\n\r\n\x05\x04\x03\x02\0\x03\x12\x04\x91\x01\x1d\x1e\n\xd6\x01\n\
+    \x04\x04\x03\x02\x01\x12\x04\x96\x01\x02*\x1a\xc7\x01\x20Specifies\x20ho\
+    w\x20the\x20shim\x20should\x20behave\x20if\x20it\x20runs\x20into\x20any\
+    \x20errors\x20when\n\x20calling\x20the\x20SDK.\x20If\x20set,\x20this\x20\
+    setting\x20will\x20override\x20the\x20behavior\x20set\x20in\n\x20SDKStar\
+    tupConfig._internal_shim_strict_error_handling.\n\n\r\n\x05\x04\x03\x02\
+    \x01\x04\x12\x04\x96\x01\x02\n\n\r\n\x05\x04\x03\x02\x01\x05\x12\x04\x96\
+    \x01\x0b\x0f\n\r\n\x05\x04\x03\x02\x01\x01\x12\x04\x96\x01\x10%\n\r\n\
+    \x05\x04\x03\x02\x01\x03\x12\x04\x96\x01()\n\x0c\n\x02\x04\x04\x12\x06\
+    \x99\x01\0\xa2\x01\x01\n\x0b\n\x03\x04\x04\x01\x12\x04\x99\x01\x08\x16\n\
+    \"\n\x04\x04\x04\x02\0\x12\x04\x9b\x01\x02\x10\x1a\x14\x20ID\x20of\x20th\
+    e\x20pipeline\n\n\r\n\x05\x04\x04\x02\0\x05\x12\x04\x9b\x01\x02\x08\n\r\
+    \n\x05\x04\x04\x02\0\x01\x12\x04\x9b\x01\t\x0b\n\r\n\x05\x04\x04\x02\0\
+    \x03\x12\x04\x9b\x01\x0e\x0f\n(\n\x04\x04\x04\x02\x01\x12\x04\x9e\x01\
+    \x02\x12\x1a\x1a\x20The\x20name\x20of\x20the\x20pipeline\n\n\r\n\x05\x04\
+    \x04\x02\x01\x05\x12\x04\x9e\x01\x02\x08\n\r\n\x05\x04\x04\x02\x01\x01\
+    \x12\x04\x9e\x01\t\r\n\r\n\x05\x04\x04\x02\x01\x03\x12\x04\x9e\x01\x10\
+    \x11\n7\n\x04\x04\x04\x02\x02\x12\x04\xa1\x01\x02&\x1a)\x20The\x20status\
+    \x20of\x20each\x20step\x20in\x20the\x20pipeline\n\n\r\n\x05\x04\x04\x02\
+    \x02\x04\x12\x04\xa1\x01\x02\n\n\r\n\x05\x04\x04\x02\x02\x06\x12\x04\xa1\
+    \x01\x0b\x15\n\r\n\x05\x04\x04\x02\x02\x01\x12\x04\xa1\x01\x16!\n\r\n\
+    \x05\x04\x04\x02\x02\x03\x12\x04\xa1\x01$%\n\x0c\n\x02\x04\x05\x12\x06\
+    \xa4\x01\0\xb4\x01\x01\n\x0b\n\x03\x04\x05\x01\x12\x04\xa4\x01\x08\x12\n\
+    $\n\x04\x04\x05\x02\0\x12\x04\xa6\x01\x02\x12\x1a\x16\x20The\x20name\x20\
+    of\x20the\x20step\n\n\r\n\x05\x04\x05\x02\0\x05\x12\x04\xa6\x01\x02\x08\
+    \n\r\n\x05\x04\x05\x02\0\x01\x12\x04\xa6\x01\t\r\n\r\n\x05\x04\x05\x02\0\
+    \x03\x12\x04\xa6\x01\x10\x11\n4\n\x04\x04\x05\x02\x01\x12\x04\xa9\x01\
+    \x02\x18\x1a&\x20Execution\x20outcome\x20status\x20of\x20the\x20step\n\n\
+    \r\n\x05\x04\x05\x02\x01\x06\x12\x04\xa9\x01\x02\x0c\n\r\n\x05\x04\x05\
+    \x02\x01\x01\x12\x04\xa9\x01\r\x13\n\r\n\x05\x04\x05\x02\x01\x03\x12\x04\
+    \xa9\x01\x16\x17\n=\n\x04\x04\x05\x02\x02\x12\x04\xac\x01\x02%\x1a/\x20O\
+    ptional\x20message\x20accompanying\x20the\x20exec\x20status\n\n\r\n\x05\
+    \x04\x05\x02\x02\x04\x12\x04\xac\x01\x02\n\n\r\n\x05\x04\x05\x02\x02\x05\
+    \x12\x04\xac\x01\x0b\x11\n\r\n\x05\x04\x05\x02\x02\x01\x12\x04\xac\x01\
+    \x12\x20\n\r\n\x05\x04\x05\x02\x02\x03\x12\x04\xac\x01#$\n\xf1\x01\n\x04\
+    \x04\x05\x02\x03\x12\x04\xb3\x01\x02%\x1a\xe2\x01\x20Indicates\x20if\x20\
+    current\x20or\x20all\x20future\x20pipelines\x20were\x20aborted.\n\n\x20I\
+    MPORTANT:\x20The\x20SDK\x20running\x20into\x20an\x20error\x20does\x20not\
+    \x20automatically\x20abort\n\x20current\x20or\x20all\x20future\x20pipeli\
+    nes\x20-\x20the\x20user\x20must\x20define\x20the\x20abort\x20conditions\
+    \n\x20for\x20\"on_error\".\n\n\r\n\x05\x04\x05\x02\x03\x06\x12\x04\xb3\
+    \x01\x02\x10\n\r\n\x05\x04\x05\x02\x03\x01\x12\x04\xb3\x01\x11\x20\n\r\n\
+    \x05\x04\x05\x02\x03\x03\x12\x04\xb3\x01#$b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1405,15 +1612,16 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut deps = ::std::vec::Vec::with_capacity(2);
             deps.push(super::sp_common::file_descriptor().clone());
             deps.push(super::sp_pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(5);
+            let mut messages = ::std::vec::Vec::with_capacity(6);
+            messages.push(SDKRequest::generated_message_descriptor_data());
             messages.push(SDKResponse::generated_message_descriptor_data());
+            messages.push(SDKStartupConfig::generated_message_descriptor_data());
+            messages.push(SDKRuntimeConfig::generated_message_descriptor_data());
             messages.push(PipelineStatus::generated_message_descriptor_data());
             messages.push(StepStatus::generated_message_descriptor_data());
-            messages.push(SDKStartupConfig::generated_message_descriptor_data());
-            messages.push(ShimRuntimeConfig::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(ExecStatus::generated_enum_descriptor_data());
-            enums.push(ShimErrorMode::generated_enum_descriptor_data());
+            enums.push(SDKClientType::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

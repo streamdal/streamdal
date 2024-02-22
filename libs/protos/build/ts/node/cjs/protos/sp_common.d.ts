@@ -32,8 +32,7 @@ export interface StandardResponse {
  */
 export interface Audience {
     /**
-     * Name of the service -- let's include the service name on all calls, we can
-     * optimize later ~DS
+     * Name of the client/service the SDK is announcing itself as
      *
      * @generated from protobuf field: string service_name = 1;
      */
@@ -45,13 +44,13 @@ export interface Audience {
      */
     componentName: string;
     /**
-     * Consumer or Producer
+     * Is this a Consumer (read) or Producer (write)
      *
      * @generated from protobuf field: protos.OperationType operation_type = 3;
      */
     operationType: OperationType;
     /**
-     * Name for the consumer or producer
+     * Friendly name for the consumer or producer
      *
      * @generated from protobuf field: string operation_name = 4;
      */

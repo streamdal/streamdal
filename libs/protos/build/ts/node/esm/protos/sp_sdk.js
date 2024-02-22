@@ -3,8 +3,8 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Audience } from "./sp_common.js";
 import { AbortCondition } from "./sp_pipeline.js";
+import { Audience } from "./sp_common.js";
 /**
  * @generated from protobuf enum protos.ExecStatus
  */
@@ -39,52 +39,82 @@ export var ExecStatus;
     ExecStatus[ExecStatus["ERROR"] = 3] = "ERROR";
 })(ExecStatus || (ExecStatus = {}));
 /**
- * ShimErrorMode is used to alter the error behavior of a shim library
- * instrumented with the Streamdal SDK at runtime.
+ * Indicates whether the SDK is being used directly or via a shim/wrapper library.
+ * This is primarily intended to be used by shims so that the SDK can determine
+ * if the ServerURL and ServerToken should be optional or required.
+ * protolint:disable ENUM_FIELD_NAMES_PREFIX
  *
- * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
- * library where you have less control over SDK behavior. Read more about shims
- * here: https://docs.streamdal.com/en/core-components/libraries-shims/
- *
- * @generated from protobuf enum protos.ShimErrorMode
+ * @generated from protobuf enum protos.SDKClientType
  */
-export var ShimErrorMode;
-(function (ShimErrorMode) {
+export var SDKClientType;
+(function (SDKClientType) {
     /**
-     * This instructs the shim to IGNORE any non-recoverable errors that the SDK
-     * might run into. If the SDK runs into an error, the shim will NOT pass the
-     * error back to the user - it will instead return the whatever the upstream
-     * library would normally return to the user.
+     * The SDK is used directly as a standalone library
      *
-     * *** This is the default behavior ***
-     *
-     * Example with Redis Shim
-     * ------------------------
-     * Under normal conditions, a Redis shim would work in the following way when
-     * user is performing a read operation:
-     *
-     * 1. The shim would call the upstream Redis library to perform the read operation
-     * 2. Upstream library returns results to the shim
-     * 3. Shim passes the result to the integrated Streamdal SDK for processing
-     * 4. SDK returns (potentially) modified data to the shim
-     * 5. Shim returns the modified data to the user
-     *
-     * This setting tells the shim that IF it runs into a non-recoverable error
-     * while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
-     * return the _original_ payload (read during step 1) to the user.
-     *
-     * @generated from protobuf enum value: SHIM_ERROR_MODE_UNSET = 0;
+     * @generated from protobuf enum value: SDK_CLIENT_TYPE_DIRECT = 0;
      */
-    ShimErrorMode[ShimErrorMode["UNSET"] = 0] = "UNSET";
+    SDKClientType[SDKClientType["SDK_CLIENT_TYPE_DIRECT"] = 0] = "SDK_CLIENT_TYPE_DIRECT";
     /**
-     * This instructs the shim to ABORT execution if the SDK runs into any
-     * non-recoverable errors. Upon aborting, the shim will return the error that
-     * the SDK ran into and the error will be passed all the way back to the user.
+     * The SDK is used within a shim/wrapper library
      *
-     * @generated from protobuf enum value: SHIM_ERROR_MODE_STRICT = 1;
+     * @generated from protobuf enum value: SDK_CLIENT_TYPE_SHIM = 1;
      */
-    ShimErrorMode[ShimErrorMode["STRICT"] = 1] = "STRICT";
-})(ShimErrorMode || (ShimErrorMode = {}));
+    SDKClientType[SDKClientType["SDK_CLIENT_TYPE_SHIM"] = 1] = "SDK_CLIENT_TYPE_SHIM";
+})(SDKClientType || (SDKClientType = {}));
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKRequest$Type extends MessageType {
+    constructor() {
+        super("protos.SDKRequest", [
+            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value) {
+        const message = { data: new Uint8Array(0) };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes data */ 1:
+                    message.data = reader.bytes();
+                    break;
+                case /* protos.Audience audience */ 2:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bytes data = 1; */
+        if (message.data.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.data);
+        /* protos.Audience audience = 2; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKRequest
+ */
+export const SDKRequest = new SDKRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType {
     constructor() {
@@ -176,6 +206,170 @@ class SDKResponse$Type extends MessageType {
  * @generated MessageType for protobuf message protos.SDKResponse
  */
 export const SDKResponse = new SDKResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKStartupConfig$Type extends MessageType {
+    constructor() {
+        super("protos.SDKStartupConfig", [
+            { no: 1, name: "server_url", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "auth_token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 5, name: "pipeline_timeout_seconds", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "step_timeout_seconds", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 1000, name: "_internal_client_type", kind: "enum", opt: true, T: () => ["protos.SDKClientType", SDKClientType] },
+            { no: 2000, name: "_internal_shim_require_runtime_config", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2001, name: "_internal_shim_strict_error_handling", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { serverUrl: "", authToken: "", serviceName: "", audiences: [], pipelineTimeoutSeconds: 0, stepTimeoutSeconds: 0, dryRun: false, InternalShimRequireRuntimeConfig: false, InternalShimStrictErrorHandling: false };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string server_url */ 1:
+                    message.serverUrl = reader.string();
+                    break;
+                case /* string auth_token */ 2:
+                    message.authToken = reader.string();
+                    break;
+                case /* string service_name */ 3:
+                    message.serviceName = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 4:
+                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* int32 pipeline_timeout_seconds */ 5:
+                    message.pipelineTimeoutSeconds = reader.int32();
+                    break;
+                case /* int32 step_timeout_seconds */ 6:
+                    message.stepTimeoutSeconds = reader.int32();
+                    break;
+                case /* bool dry_run */ 7:
+                    message.dryRun = reader.bool();
+                    break;
+                case /* optional protos.SDKClientType _internal_client_type */ 1000:
+                    message.InternalClientType = reader.int32();
+                    break;
+                case /* bool _internal_shim_require_runtime_config */ 2000:
+                    message.InternalShimRequireRuntimeConfig = reader.bool();
+                    break;
+                case /* bool _internal_shim_strict_error_handling */ 2001:
+                    message.InternalShimStrictErrorHandling = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* string server_url = 1; */
+        if (message.serverUrl !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serverUrl);
+        /* string auth_token = 2; */
+        if (message.authToken !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.authToken);
+        /* string service_name = 3; */
+        if (message.serviceName !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.serviceName);
+        /* repeated protos.Audience audiences = 4; */
+        for (let i = 0; i < message.audiences.length; i++)
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* int32 pipeline_timeout_seconds = 5; */
+        if (message.pipelineTimeoutSeconds !== 0)
+            writer.tag(5, WireType.Varint).int32(message.pipelineTimeoutSeconds);
+        /* int32 step_timeout_seconds = 6; */
+        if (message.stepTimeoutSeconds !== 0)
+            writer.tag(6, WireType.Varint).int32(message.stepTimeoutSeconds);
+        /* bool dry_run = 7; */
+        if (message.dryRun !== false)
+            writer.tag(7, WireType.Varint).bool(message.dryRun);
+        /* optional protos.SDKClientType _internal_client_type = 1000; */
+        if (message.InternalClientType !== undefined)
+            writer.tag(1000, WireType.Varint).int32(message.InternalClientType);
+        /* bool _internal_shim_require_runtime_config = 2000; */
+        if (message.InternalShimRequireRuntimeConfig !== false)
+            writer.tag(2000, WireType.Varint).bool(message.InternalShimRequireRuntimeConfig);
+        /* bool _internal_shim_strict_error_handling = 2001; */
+        if (message.InternalShimStrictErrorHandling !== false)
+            writer.tag(2001, WireType.Varint).bool(message.InternalShimStrictErrorHandling);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKStartupConfig
+ */
+export const SDKStartupConfig = new SDKStartupConfig$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKRuntimeConfig$Type extends MessageType {
+    constructor() {
+        super("protos.SDKRuntimeConfig", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "strict_error_handling", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                case /* optional bool strict_error_handling */ 2:
+                    message.strictErrorHandling = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* optional bool strict_error_handling = 2; */
+        if (message.strictErrorHandling !== undefined)
+            writer.tag(2, WireType.Varint).bool(message.strictErrorHandling);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKRuntimeConfig
+ */
+export const SDKRuntimeConfig = new SDKRuntimeConfig$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PipelineStatus$Type extends MessageType {
     constructor() {
@@ -305,153 +499,3 @@ class StepStatus$Type extends MessageType {
  * @generated MessageType for protobuf message protos.StepStatus
  */
 export const StepStatus = new StepStatus$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class SDKStartupConfig$Type extends MessageType {
-    constructor() {
-        super("protos.SDKStartupConfig", [
-            { no: 1, name: "url", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "pipeline_timeout_seconds", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "step_timeout_seconds", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "dry_run", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
-            { no: 1000, name: "shim_require_runtime_config", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
-            { no: 1001, name: "shim_error_mode", kind: "enum", opt: true, T: () => ["protos.ShimErrorMode", ShimErrorMode, "SHIM_ERROR_MODE_"] }
-        ]);
-    }
-    create(value) {
-        const message = { url: "", token: "", serviceName: "" };
-        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string url */ 1:
-                    message.url = reader.string();
-                    break;
-                case /* string token */ 2:
-                    message.token = reader.string();
-                    break;
-                case /* string service_name */ 3:
-                    message.serviceName = reader.string();
-                    break;
-                case /* optional int32 pipeline_timeout_seconds */ 4:
-                    message.pipelineTimeoutSeconds = reader.int32();
-                    break;
-                case /* optional int32 step_timeout_seconds */ 5:
-                    message.stepTimeoutSeconds = reader.int32();
-                    break;
-                case /* optional bool dry_run */ 6:
-                    message.dryRun = reader.bool();
-                    break;
-                case /* optional bool shim_require_runtime_config */ 1000:
-                    message.shimRequireRuntimeConfig = reader.bool();
-                    break;
-                case /* optional protos.ShimErrorMode shim_error_mode */ 1001:
-                    message.shimErrorMode = reader.int32();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* string url = 1; */
-        if (message.url !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.url);
-        /* string token = 2; */
-        if (message.token !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.token);
-        /* string service_name = 3; */
-        if (message.serviceName !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.serviceName);
-        /* optional int32 pipeline_timeout_seconds = 4; */
-        if (message.pipelineTimeoutSeconds !== undefined)
-            writer.tag(4, WireType.Varint).int32(message.pipelineTimeoutSeconds);
-        /* optional int32 step_timeout_seconds = 5; */
-        if (message.stepTimeoutSeconds !== undefined)
-            writer.tag(5, WireType.Varint).int32(message.stepTimeoutSeconds);
-        /* optional bool dry_run = 6; */
-        if (message.dryRun !== undefined)
-            writer.tag(6, WireType.Varint).bool(message.dryRun);
-        /* optional bool shim_require_runtime_config = 1000; */
-        if (message.shimRequireRuntimeConfig !== undefined)
-            writer.tag(1000, WireType.Varint).bool(message.shimRequireRuntimeConfig);
-        /* optional protos.ShimErrorMode shim_error_mode = 1001; */
-        if (message.shimErrorMode !== undefined)
-            writer.tag(1001, WireType.Varint).int32(message.shimErrorMode);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.SDKStartupConfig
- */
-export const SDKStartupConfig = new SDKStartupConfig$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ShimRuntimeConfig$Type extends MessageType {
-    constructor() {
-        super("protos.ShimRuntimeConfig", [
-            { no: 1, name: "error_mode", kind: "enum", opt: true, T: () => ["protos.ShimErrorMode", ShimErrorMode, "SHIM_ERROR_MODE_"] },
-            { no: 2, name: "audience", kind: "message", T: () => Audience }
-        ]);
-    }
-    create(value) {
-        const message = {};
-        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* optional protos.ShimErrorMode error_mode */ 1:
-                    message.errorMode = reader.int32();
-                    break;
-                case /* optional protos.Audience audience */ 2:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* optional protos.ShimErrorMode error_mode = 1; */
-        if (message.errorMode !== undefined)
-            writer.tag(1, WireType.Varint).int32(message.errorMode);
-        /* optional protos.Audience audience = 2; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.ShimRuntimeConfig
- */
-export const ShimRuntimeConfig = new ShimRuntimeConfig$Type();

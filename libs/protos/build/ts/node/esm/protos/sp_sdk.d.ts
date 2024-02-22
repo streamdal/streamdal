@@ -4,8 +4,27 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Audience } from "./sp_common.js";
 import { AbortCondition } from "./sp_pipeline.js";
+import { Audience } from "./sp_common.js";
+/**
+ * Common request used by all SDKs in their .Process() method
+ *
+ * @generated from protobuf message protos.SDKRequest
+ */
+export interface SDKRequest {
+    /**
+     * The input payload that the SDK will process
+     *
+     * @generated from protobuf field: bytes data = 1;
+     */
+    data: Uint8Array;
+    /**
+     * Audience that should be announced for this request
+     *
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
+}
 /**
  * Common return response used by all SDKs
  *
@@ -51,6 +70,118 @@ export interface SDKResponse {
     metadata: {
         [key: string]: string;
     };
+}
+/**
+ * SDKStartupConfig is a common configuration structure that is used by all
+ * Streamdal SDKs to configure the client at startup. NOTE: These are _baseline_
+ * options - some SDKs may expose additional options.
+ * protolint:disable FIELD_NAMES_LOWER_SNAKE_CASE
+ *
+ * @generated from protobuf message protos.SDKStartupConfig
+ */
+export interface SDKStartupConfig {
+    /**
+     * REQUIRED: URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
+     *
+     * @generated from protobuf field: string server_url = 1;
+     */
+    serverUrl: string;
+    /**
+     * REQUIRED: Auth token used to authenticate with the Streamdal server.
+     * NOTE: should be the same as the token used for running the Streamdal server.
+     *
+     * @generated from protobuf field: string auth_token = 2;
+     */
+    authToken: string;
+    /**
+     * REQUIRED: Service name used for identifying the SDK client in the Streamdal
+     * server and console.
+     *
+     * @generated from protobuf field: string service_name = 3;
+     */
+    serviceName: string;
+    /**
+     * OPTIONAL: List of audiences you can specify at registration time. This is
+     * useful if you know your audiences in advance and want to populate service
+     * groups in the Streamdal UI _before_ your code executes any .Process() calls.
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 4;
+     */
+    audiences: Audience[];
+    /**
+     * OPTIONAL: How long to wait for a pipeline execution to complete before timing out
+     *
+     * @generated from protobuf field: int32 pipeline_timeout_seconds = 5;
+     */
+    pipelineTimeoutSeconds: number;
+    /**
+     * OPTIONAL: How long to wait for a step execution to complete before timing out
+     *
+     * @generated from protobuf field: int32 step_timeout_seconds = 6;
+     */
+    stepTimeoutSeconds: number;
+    /**
+     * OPTIONAL: Instruct the SDK to execute pipelines but return ORIGINAL input
+     * payload instead of (potentially) modified payload.
+     *
+     * @generated from protobuf field: bool dry_run = 7;
+     */
+    dryRun: boolean;
+    /**
+     * ClientType specifies whether this of the SDK is used in a shim library or
+     * as a standalone SDK. This information is used for both debug info and to
+     * help SDKs determine whether ServerURL and ServerToken should be optional or
+     * required. Unless you are developing a shim, you should not have to set this.
+     * Default: SDKClientTypeSDK
+     *
+     * @generated from protobuf field: optional protos.SDKClientType _internal_client_type = 1000;
+     */
+    InternalClientType?: SDKClientType;
+    /**
+     * By default, the shim will execute pipelines on every read/write call to the
+     * upstream library. If this is set to true, the shim will only execute its
+     * workload if the upstream library is called with a protos.SDKRuntimeConfig.
+     * Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+     *
+     * @generated from protobuf field: bool _internal_shim_require_runtime_config = 2000;
+     */
+    InternalShimRequireRuntimeConfig: boolean;
+    /**
+     * When enabled and the shim run into any non-recoverable errors, it will
+     * return the error to the upstream library. If left unset, the shim will
+     * ignore the error and pass the original data back to the upstream library.
+     *
+     * @generated from protobuf field: bool _internal_shim_strict_error_handling = 2001;
+     */
+    InternalShimStrictErrorHandling: boolean;
+}
+/**
+ * SDKRuntimeConfig is the configuration structure that is used primarily by
+ * shims to configure SDK behavior at runtime. It is most often exposed as an
+ * optional parameter that you can pass to an upstream library's read or write
+ * operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
+ *
+ * Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
+ *
+ * @generated from protobuf message protos.SDKRuntimeConfig
+ */
+export interface SDKRuntimeConfig {
+    /**
+     * Audience that will be used by shim when calling SDK.Process().
+     * NOTE: If ServiceName is not provided, the shim will use the service name
+     * provided in the SDKStartupConfig.
+     *
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+    /**
+     * Specifies how the shim should behave if it runs into any errors when
+     * calling the SDK. If set, this setting will override the behavior set in
+     * SDKStartupConfig._internal_shim_strict_error_handling.
+     *
+     * @generated from protobuf field: optional bool strict_error_handling = 2;
+     */
+    strictErrorHandling?: boolean;
 }
 /**
  * @generated from protobuf message protos.PipelineStatus
@@ -109,94 +240,6 @@ export interface StepStatus {
     abortCondition: AbortCondition;
 }
 /**
- * SDKStartupConfig is the configuration structure that is used in Streamdal SDKs
- * to configure the client at startup. Some SDKs may expose additional config
- * options aside from these baseline options.
- *
- * @generated from protobuf message protos.SDKStartupConfig
- */
-export interface SDKStartupConfig {
-    /**
-     * URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
-     *
-     * @generated from protobuf field: string url = 1;
-     */
-    url: string;
-    /**
-     * Auth token used to authenticate with the Streamdal server (NOTE: should be
-     * the same as the token used for running the Streamdal server).
-     *
-     * @generated from protobuf field: string token = 2;
-     */
-    token: string;
-    /**
-     * Service name used for identifying the SDK client in the Streamdal server and console
-     *
-     * @generated from protobuf field: string service_name = 3;
-     */
-    serviceName: string;
-    /**
-     * How long to wait for a pipeline execution to complete before timing out
-     *
-     * @generated from protobuf field: optional int32 pipeline_timeout_seconds = 4;
-     */
-    pipelineTimeoutSeconds?: number;
-    /**
-     * How long to wait for a step execution to complete before timing out
-     *
-     * @generated from protobuf field: optional int32 step_timeout_seconds = 5;
-     */
-    stepTimeoutSeconds?: number;
-    /**
-     * Instruct the SDK to execute pipelines but return ORIGINAL input payload
-     * instead of (potentially) modified payload.
-     *
-     * @generated from protobuf field: optional bool dry_run = 6;
-     */
-    dryRun?: boolean;
-    /**
-     * By default, the shim will execute pipelines on every read/write call to the
-     * upstream library. If this is set to true, the shim will only execute its
-     * workload if the upstream library is called with a protos.SDKRuntimeConfig.
-     * Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
-     *
-     * @generated from protobuf field: optional bool shim_require_runtime_config = 1000;
-     */
-    shimRequireRuntimeConfig?: boolean;
-    /**
-     * Tells the SDK how to behave when it runs into an error
-     *
-     * @generated from protobuf field: optional protos.ShimErrorMode shim_error_mode = 1001;
-     */
-    shimErrorMode?: ShimErrorMode;
-}
-/**
- * SDKRuntimeConfig is the configuration structure that is used in SDKs to
- * configure how the SDK behaves at runtime. It is most often exposed as an
- * optional parameter that you can pass to an upstream library's read or write
- * operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
- *
- * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
- * library where you have less control over SDK behavior. Read more about shims
- * here: https://docs.streamdal.com/en/core-components/libraries-shims/
- *
- * @generated from protobuf message protos.ShimRuntimeConfig
- */
-export interface ShimRuntimeConfig {
-    /**
-     * Specifies how the shim should behave if it runs into any errors when calling the SDK
-     *
-     * @generated from protobuf field: optional protos.ShimErrorMode error_mode = 1;
-     */
-    errorMode?: ShimErrorMode;
-    /**
-     * Audience that will be used by shim when calling SDK.Process()
-     *
-     * @generated from protobuf field: optional protos.Audience audience = 2;
-     */
-    audience?: Audience;
-}
-/**
  * @generated from protobuf enum protos.ExecStatus
  */
 export declare enum ExecStatus {
@@ -229,51 +272,37 @@ export declare enum ExecStatus {
     ERROR = 3
 }
 /**
- * ShimErrorMode is used to alter the error behavior of a shim library
- * instrumented with the Streamdal SDK at runtime.
+ * Indicates whether the SDK is being used directly or via a shim/wrapper library.
+ * This is primarily intended to be used by shims so that the SDK can determine
+ * if the ServerURL and ServerToken should be optional or required.
+ * protolint:disable ENUM_FIELD_NAMES_PREFIX
  *
- * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
- * library where you have less control over SDK behavior. Read more about shims
- * here: https://docs.streamdal.com/en/core-components/libraries-shims/
- *
- * @generated from protobuf enum protos.ShimErrorMode
+ * @generated from protobuf enum protos.SDKClientType
  */
-export declare enum ShimErrorMode {
+export declare enum SDKClientType {
     /**
-     * This instructs the shim to IGNORE any non-recoverable errors that the SDK
-     * might run into. If the SDK runs into an error, the shim will NOT pass the
-     * error back to the user - it will instead return the whatever the upstream
-     * library would normally return to the user.
+     * The SDK is used directly as a standalone library
      *
-     * *** This is the default behavior ***
-     *
-     * Example with Redis Shim
-     * ------------------------
-     * Under normal conditions, a Redis shim would work in the following way when
-     * user is performing a read operation:
-     *
-     * 1. The shim would call the upstream Redis library to perform the read operation
-     * 2. Upstream library returns results to the shim
-     * 3. Shim passes the result to the integrated Streamdal SDK for processing
-     * 4. SDK returns (potentially) modified data to the shim
-     * 5. Shim returns the modified data to the user
-     *
-     * This setting tells the shim that IF it runs into a non-recoverable error
-     * while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
-     * return the _original_ payload (read during step 1) to the user.
-     *
-     * @generated from protobuf enum value: SHIM_ERROR_MODE_UNSET = 0;
+     * @generated from protobuf enum value: SDK_CLIENT_TYPE_DIRECT = 0;
      */
-    UNSET = 0,
+    SDK_CLIENT_TYPE_DIRECT = 0,
     /**
-     * This instructs the shim to ABORT execution if the SDK runs into any
-     * non-recoverable errors. Upon aborting, the shim will return the error that
-     * the SDK ran into and the error will be passed all the way back to the user.
+     * The SDK is used within a shim/wrapper library
      *
-     * @generated from protobuf enum value: SHIM_ERROR_MODE_STRICT = 1;
+     * @generated from protobuf enum value: SDK_CLIENT_TYPE_SHIM = 1;
      */
-    STRICT = 1
+    SDK_CLIENT_TYPE_SHIM = 1
 }
+declare class SDKRequest$Type extends MessageType<SDKRequest> {
+    constructor();
+    create(value?: PartialMessage<SDKRequest>): SDKRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKRequest): SDKRequest;
+    internalBinaryWrite(message: SDKRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKRequest
+ */
+export declare const SDKRequest: SDKRequest$Type;
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();
     create(value?: PartialMessage<SDKResponse>): SDKResponse;
@@ -285,6 +314,26 @@ declare class SDKResponse$Type extends MessageType<SDKResponse> {
  * @generated MessageType for protobuf message protos.SDKResponse
  */
 export declare const SDKResponse: SDKResponse$Type;
+declare class SDKStartupConfig$Type extends MessageType<SDKStartupConfig> {
+    constructor();
+    create(value?: PartialMessage<SDKStartupConfig>): SDKStartupConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKStartupConfig): SDKStartupConfig;
+    internalBinaryWrite(message: SDKStartupConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKStartupConfig
+ */
+export declare const SDKStartupConfig: SDKStartupConfig$Type;
+declare class SDKRuntimeConfig$Type extends MessageType<SDKRuntimeConfig> {
+    constructor();
+    create(value?: PartialMessage<SDKRuntimeConfig>): SDKRuntimeConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKRuntimeConfig): SDKRuntimeConfig;
+    internalBinaryWrite(message: SDKRuntimeConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKRuntimeConfig
+ */
+export declare const SDKRuntimeConfig: SDKRuntimeConfig$Type;
 declare class PipelineStatus$Type extends MessageType<PipelineStatus> {
     constructor();
     create(value?: PartialMessage<PipelineStatus>): PipelineStatus;
@@ -305,24 +354,4 @@ declare class StepStatus$Type extends MessageType<StepStatus> {
  * @generated MessageType for protobuf message protos.StepStatus
  */
 export declare const StepStatus: StepStatus$Type;
-declare class SDKStartupConfig$Type extends MessageType<SDKStartupConfig> {
-    constructor();
-    create(value?: PartialMessage<SDKStartupConfig>): SDKStartupConfig;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKStartupConfig): SDKStartupConfig;
-    internalBinaryWrite(message: SDKStartupConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.SDKStartupConfig
- */
-export declare const SDKStartupConfig: SDKStartupConfig$Type;
-declare class ShimRuntimeConfig$Type extends MessageType<ShimRuntimeConfig> {
-    constructor();
-    create(value?: PartialMessage<ShimRuntimeConfig>): ShimRuntimeConfig;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ShimRuntimeConfig): ShimRuntimeConfig;
-    internalBinaryWrite(message: ShimRuntimeConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.ShimRuntimeConfig
- */
-export declare const ShimRuntimeConfig: ShimRuntimeConfig$Type;
 export {};

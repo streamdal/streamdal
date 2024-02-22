@@ -11,8 +11,27 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Audience } from "./sp_common.ts";
 import { AbortCondition } from "./sp_pipeline.ts";
+import { Audience } from "./sp_common.ts";
+/**
+ * Common request used by all SDKs in their .Process() method
+ *
+ * @generated from protobuf message protos.SDKRequest
+ */
+export interface SDKRequest {
+    /**
+     * The input payload that the SDK will process
+     *
+     * @generated from protobuf field: bytes data = 1;
+     */
+    data: Uint8Array;
+    /**
+     * Audience that should be announced for this request
+     *
+     * @generated from protobuf field: protos.Audience audience = 2;
+     */
+    audience?: Audience;
+}
 /**
  * Common return response used by all SDKs
  *
@@ -58,6 +77,131 @@ export interface SDKResponse {
     metadata: {
         [key: string]: string;
     };
+}
+/**
+ * SDKStartupConfig is a common configuration structure that is used by all
+ * Streamdal SDKs to configure the client at startup. NOTE: These are _baseline_
+ * options - some SDKs may expose additional options.
+ * protolint:disable FIELD_NAMES_LOWER_SNAKE_CASE
+ *
+ * @generated from protobuf message protos.SDKStartupConfig
+ */
+export interface SDKStartupConfig {
+    /**
+     * REQUIRED: URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
+     *
+     * @generated from protobuf field: string server_url = 1;
+     */
+    serverUrl: string;
+    /**
+     * REQUIRED: Auth token used to authenticate with the Streamdal server.
+     * NOTE: should be the same as the token used for running the Streamdal server.
+     *
+     * @generated from protobuf field: string auth_token = 2;
+     */
+    authToken: string;
+    /**
+     * REQUIRED: Service name used for identifying the SDK client in the Streamdal
+     * server and console.
+     *
+     * @generated from protobuf field: string service_name = 3;
+     */
+    serviceName: string;
+    /**
+     * OPTIONAL: List of audiences you can specify at registration time. This is
+     * useful if you know your audiences in advance and want to populate service
+     * groups in the Streamdal UI _before_ your code executes any .Process() calls.
+     *
+     * @generated from protobuf field: repeated protos.Audience audiences = 4;
+     */
+    audiences: Audience[];
+    /**
+     * OPTIONAL: How long to wait for a pipeline execution to complete before timing out
+     *
+     * @generated from protobuf field: int32 pipeline_timeout_seconds = 5;
+     */
+    pipelineTimeoutSeconds: number;
+    /**
+     * OPTIONAL: How long to wait for a step execution to complete before timing out
+     *
+     * @generated from protobuf field: int32 step_timeout_seconds = 6;
+     */
+    stepTimeoutSeconds: number;
+    /**
+     * OPTIONAL: Instruct the SDK to execute pipelines but return ORIGINAL input
+     * payload instead of (potentially) modified payload.
+     *
+     * @generated from protobuf field: bool dry_run = 7;
+     */
+    dryRun: boolean;
+    // ------------------------- Internal Settings ------------------------
+    // 
+    // These are "internal" settings that generally do not have to be used by the
+    // SDK user.
+
+    /**
+     * ClientType specifies whether this of the SDK is used in a shim library or
+     * as a standalone SDK. This information is used for both debug info and to
+     * help SDKs determine whether ServerURL and ServerToken should be optional or
+     * required. Unless you are developing a shim, you should not have to set this.
+     * Default: SDKClientTypeSDK
+     *
+     * @generated from protobuf field: optional protos.SDKClientType _internal_client_type = 1000;
+     */
+    InternalClientType?: SDKClientType;
+    // --------------------- Shim/Wrapper Library Settings ---------------------
+    // 
+    // "Shim" settings are _primarily_ used when the SDK is used within a shim/wrapper
+    // library. Setting them outside of a shim will have no effect.
+    // 
+    // Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
+    // 
+
+    /**
+     * By default, the shim will execute pipelines on every read/write call to the
+     * upstream library. If this is set to true, the shim will only execute its
+     * workload if the upstream library is called with a protos.SDKRuntimeConfig.
+     * Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+     *
+     * @generated from protobuf field: bool _internal_shim_require_runtime_config = 2000;
+     */
+    InternalShimRequireRuntimeConfig: boolean;
+    /**
+     * When enabled and the shim run into any non-recoverable errors, it will
+     * return the error to the upstream library. If left unset, the shim will
+     * ignore the error and pass the original data back to the upstream library.
+     *
+     * @generated from protobuf field: bool _internal_shim_strict_error_handling = 2001;
+     */
+    InternalShimStrictErrorHandling: boolean;
+}
+/**
+ * SDKRuntimeConfig is the configuration structure that is used primarily by
+ * shims to configure SDK behavior at runtime. It is most often exposed as an
+ * optional parameter that you can pass to an upstream library's read or write
+ * operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
+ *
+ * Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
+ *
+ * @generated from protobuf message protos.SDKRuntimeConfig
+ */
+export interface SDKRuntimeConfig {
+    /**
+     * Audience that will be used by shim when calling SDK.Process().
+     * NOTE: If ServiceName is not provided, the shim will use the service name
+     * provided in the SDKStartupConfig.
+     *
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+    /**
+     * Specifies how the shim should behave if it runs into any errors when
+     * calling the SDK. If set, this setting will override the behavior set in
+     * SDKStartupConfig._internal_shim_strict_error_handling.
+     *
+     * @generated from protobuf field: optional bool strict_error_handling = 2;
+     */
+    strictErrorHandling?: boolean;
 }
 /**
  * @generated from protobuf message protos.PipelineStatus
@@ -116,102 +260,6 @@ export interface StepStatus {
     abortCondition: AbortCondition;
 }
 /**
- * SDKStartupConfig is the configuration structure that is used in Streamdal SDKs
- * to configure the client at startup. Some SDKs may expose additional config
- * options aside from these baseline options.
- *
- * @generated from protobuf message protos.SDKStartupConfig
- */
-export interface SDKStartupConfig {
-    /**
-     * URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
-     *
-     * @generated from protobuf field: string url = 1;
-     */
-    url: string;
-    /**
-     * Auth token used to authenticate with the Streamdal server (NOTE: should be
-     * the same as the token used for running the Streamdal server).
-     *
-     * @generated from protobuf field: string token = 2;
-     */
-    token: string;
-    /**
-     * Service name used for identifying the SDK client in the Streamdal server and console
-     *
-     * @generated from protobuf field: string service_name = 3;
-     */
-    serviceName: string;
-    /**
-     * How long to wait for a pipeline execution to complete before timing out
-     *
-     * @generated from protobuf field: optional int32 pipeline_timeout_seconds = 4;
-     */
-    pipelineTimeoutSeconds?: number;
-    /**
-     * How long to wait for a step execution to complete before timing out
-     *
-     * @generated from protobuf field: optional int32 step_timeout_seconds = 5;
-     */
-    stepTimeoutSeconds?: number;
-    /**
-     * Instruct the SDK to execute pipelines but return ORIGINAL input payload
-     * instead of (potentially) modified payload.
-     *
-     * @generated from protobuf field: optional bool dry_run = 6;
-     */
-    dryRun?: boolean;
-    // --------------------- Shim/Wrapper Library Settings --------------------
-    // 
-    // These settings are _primarily_ used when the SDK is used within a shim/wrapper library.
-    // Setting them outside of a shim will have no effect.
-    // 
-    // Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
-    // 
-
-    /**
-     * By default, the shim will execute pipelines on every read/write call to the
-     * upstream library. If this is set to true, the shim will only execute its
-     * workload if the upstream library is called with a protos.SDKRuntimeConfig.
-     * Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
-     *
-     * @generated from protobuf field: optional bool shim_require_runtime_config = 1000;
-     */
-    shimRequireRuntimeConfig?: boolean;
-    /**
-     * Tells the SDK how to behave when it runs into an error
-     *
-     * @generated from protobuf field: optional protos.ShimErrorMode shim_error_mode = 1001;
-     */
-    shimErrorMode?: ShimErrorMode;
-}
-/**
- * SDKRuntimeConfig is the configuration structure that is used in SDKs to
- * configure how the SDK behaves at runtime. It is most often exposed as an
- * optional parameter that you can pass to an upstream library's read or write
- * operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
- *
- * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
- * library where you have less control over SDK behavior. Read more about shims
- * here: https://docs.streamdal.com/en/core-components/libraries-shims/
- *
- * @generated from protobuf message protos.ShimRuntimeConfig
- */
-export interface ShimRuntimeConfig {
-    /**
-     * Specifies how the shim should behave if it runs into any errors when calling the SDK
-     *
-     * @generated from protobuf field: optional protos.ShimErrorMode error_mode = 1;
-     */
-    errorMode?: ShimErrorMode;
-    /**
-     * Audience that will be used by shim when calling SDK.Process()
-     *
-     * @generated from protobuf field: optional protos.Audience audience = 2;
-     */
-    audience?: Audience;
-}
-/**
  * @generated from protobuf enum protos.ExecStatus
  */
 export enum ExecStatus {
@@ -244,51 +292,81 @@ export enum ExecStatus {
     ERROR = 3
 }
 /**
- * ShimErrorMode is used to alter the error behavior of a shim library
- * instrumented with the Streamdal SDK at runtime.
+ * Indicates whether the SDK is being used directly or via a shim/wrapper library.
+ * This is primarily intended to be used by shims so that the SDK can determine
+ * if the ServerURL and ServerToken should be optional or required.
+ * protolint:disable ENUM_FIELD_NAMES_PREFIX
  *
- * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
- * library where you have less control over SDK behavior. Read more about shims
- * here: https://docs.streamdal.com/en/core-components/libraries-shims/
- *
- * @generated from protobuf enum protos.ShimErrorMode
+ * @generated from protobuf enum protos.SDKClientType
  */
-export enum ShimErrorMode {
+export enum SDKClientType {
     /**
-     * This instructs the shim to IGNORE any non-recoverable errors that the SDK
-     * might run into. If the SDK runs into an error, the shim will NOT pass the
-     * error back to the user - it will instead return the whatever the upstream
-     * library would normally return to the user.
+     * The SDK is used directly as a standalone library
      *
-     * *** This is the default behavior ***
-     *
-     * Example with Redis Shim
-     * ------------------------
-     * Under normal conditions, a Redis shim would work in the following way when
-     * user is performing a read operation:
-     *
-     * 1. The shim would call the upstream Redis library to perform the read operation
-     * 2. Upstream library returns results to the shim
-     * 3. Shim passes the result to the integrated Streamdal SDK for processing
-     * 4. SDK returns (potentially) modified data to the shim
-     * 5. Shim returns the modified data to the user
-     *
-     * This setting tells the shim that IF it runs into a non-recoverable error
-     * while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
-     * return the _original_ payload (read during step 1) to the user.
-     *
-     * @generated from protobuf enum value: SHIM_ERROR_MODE_UNSET = 0;
+     * @generated from protobuf enum value: SDK_CLIENT_TYPE_DIRECT = 0;
      */
-    UNSET = 0,
+    SDK_CLIENT_TYPE_DIRECT = 0,
     /**
-     * This instructs the shim to ABORT execution if the SDK runs into any
-     * non-recoverable errors. Upon aborting, the shim will return the error that
-     * the SDK ran into and the error will be passed all the way back to the user.
+     * The SDK is used within a shim/wrapper library
      *
-     * @generated from protobuf enum value: SHIM_ERROR_MODE_STRICT = 1;
+     * @generated from protobuf enum value: SDK_CLIENT_TYPE_SHIM = 1;
      */
-    STRICT = 1
+    SDK_CLIENT_TYPE_SHIM = 1
 }
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKRequest$Type extends MessageType<SDKRequest> {
+    constructor() {
+        super("protos.SDKRequest", [
+            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value?: PartialMessage<SDKRequest>): SDKRequest {
+        const message = { data: new Uint8Array(0) };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<SDKRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKRequest): SDKRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes data */ 1:
+                    message.data = reader.bytes();
+                    break;
+                case /* protos.Audience audience */ 2:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SDKRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes data = 1; */
+        if (message.data.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.data);
+        /* protos.Audience audience = 2; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKRequest
+ */
+export const SDKRequest = new SDKRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor() {
@@ -380,6 +458,170 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
  * @generated MessageType for protobuf message protos.SDKResponse
  */
 export const SDKResponse = new SDKResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKStartupConfig$Type extends MessageType<SDKStartupConfig> {
+    constructor() {
+        super("protos.SDKStartupConfig", [
+            { no: 1, name: "server_url", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "auth_token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 5, name: "pipeline_timeout_seconds", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "step_timeout_seconds", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "dry_run", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 1000, name: "_internal_client_type", kind: "enum", opt: true, T: () => ["protos.SDKClientType", SDKClientType] },
+            { no: 2000, name: "_internal_shim_require_runtime_config", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2001, name: "_internal_shim_strict_error_handling", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SDKStartupConfig>): SDKStartupConfig {
+        const message = { serverUrl: "", authToken: "", serviceName: "", audiences: [], pipelineTimeoutSeconds: 0, stepTimeoutSeconds: 0, dryRun: false, InternalShimRequireRuntimeConfig: false, InternalShimStrictErrorHandling: false };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<SDKStartupConfig>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKStartupConfig): SDKStartupConfig {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string server_url */ 1:
+                    message.serverUrl = reader.string();
+                    break;
+                case /* string auth_token */ 2:
+                    message.authToken = reader.string();
+                    break;
+                case /* string service_name */ 3:
+                    message.serviceName = reader.string();
+                    break;
+                case /* repeated protos.Audience audiences */ 4:
+                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* int32 pipeline_timeout_seconds */ 5:
+                    message.pipelineTimeoutSeconds = reader.int32();
+                    break;
+                case /* int32 step_timeout_seconds */ 6:
+                    message.stepTimeoutSeconds = reader.int32();
+                    break;
+                case /* bool dry_run */ 7:
+                    message.dryRun = reader.bool();
+                    break;
+                case /* optional protos.SDKClientType _internal_client_type */ 1000:
+                    message.InternalClientType = reader.int32();
+                    break;
+                case /* bool _internal_shim_require_runtime_config */ 2000:
+                    message.InternalShimRequireRuntimeConfig = reader.bool();
+                    break;
+                case /* bool _internal_shim_strict_error_handling */ 2001:
+                    message.InternalShimStrictErrorHandling = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SDKStartupConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string server_url = 1; */
+        if (message.serverUrl !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.serverUrl);
+        /* string auth_token = 2; */
+        if (message.authToken !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.authToken);
+        /* string service_name = 3; */
+        if (message.serviceName !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.serviceName);
+        /* repeated protos.Audience audiences = 4; */
+        for (let i = 0; i < message.audiences.length; i++)
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* int32 pipeline_timeout_seconds = 5; */
+        if (message.pipelineTimeoutSeconds !== 0)
+            writer.tag(5, WireType.Varint).int32(message.pipelineTimeoutSeconds);
+        /* int32 step_timeout_seconds = 6; */
+        if (message.stepTimeoutSeconds !== 0)
+            writer.tag(6, WireType.Varint).int32(message.stepTimeoutSeconds);
+        /* bool dry_run = 7; */
+        if (message.dryRun !== false)
+            writer.tag(7, WireType.Varint).bool(message.dryRun);
+        /* optional protos.SDKClientType _internal_client_type = 1000; */
+        if (message.InternalClientType !== undefined)
+            writer.tag(1000, WireType.Varint).int32(message.InternalClientType);
+        /* bool _internal_shim_require_runtime_config = 2000; */
+        if (message.InternalShimRequireRuntimeConfig !== false)
+            writer.tag(2000, WireType.Varint).bool(message.InternalShimRequireRuntimeConfig);
+        /* bool _internal_shim_strict_error_handling = 2001; */
+        if (message.InternalShimStrictErrorHandling !== false)
+            writer.tag(2001, WireType.Varint).bool(message.InternalShimStrictErrorHandling);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKStartupConfig
+ */
+export const SDKStartupConfig = new SDKStartupConfig$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKRuntimeConfig$Type extends MessageType<SDKRuntimeConfig> {
+    constructor() {
+        super("protos.SDKRuntimeConfig", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience },
+            { no: 2, name: "strict_error_handling", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value?: PartialMessage<SDKRuntimeConfig>): SDKRuntimeConfig {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<SDKRuntimeConfig>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKRuntimeConfig): SDKRuntimeConfig {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                case /* optional bool strict_error_handling */ 2:
+                    message.strictErrorHandling = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: SDKRuntimeConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* optional bool strict_error_handling = 2; */
+        if (message.strictErrorHandling !== undefined)
+            writer.tag(2, WireType.Varint).bool(message.strictErrorHandling);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.SDKRuntimeConfig
+ */
+export const SDKRuntimeConfig = new SDKRuntimeConfig$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PipelineStatus$Type extends MessageType<PipelineStatus> {
     constructor() {
@@ -509,153 +751,3 @@ class StepStatus$Type extends MessageType<StepStatus> {
  * @generated MessageType for protobuf message protos.StepStatus
  */
 export const StepStatus = new StepStatus$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class SDKStartupConfig$Type extends MessageType<SDKStartupConfig> {
-    constructor() {
-        super("protos.SDKStartupConfig", [
-            { no: 1, name: "url", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "pipeline_timeout_seconds", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "step_timeout_seconds", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "dry_run", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
-            { no: 1000, name: "shim_require_runtime_config", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
-            { no: 1001, name: "shim_error_mode", kind: "enum", opt: true, T: () => ["protos.ShimErrorMode", ShimErrorMode, "SHIM_ERROR_MODE_"] }
-        ]);
-    }
-    create(value?: PartialMessage<SDKStartupConfig>): SDKStartupConfig {
-        const message = { url: "", token: "", serviceName: "" };
-        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial<SDKStartupConfig>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKStartupConfig): SDKStartupConfig {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string url */ 1:
-                    message.url = reader.string();
-                    break;
-                case /* string token */ 2:
-                    message.token = reader.string();
-                    break;
-                case /* string service_name */ 3:
-                    message.serviceName = reader.string();
-                    break;
-                case /* optional int32 pipeline_timeout_seconds */ 4:
-                    message.pipelineTimeoutSeconds = reader.int32();
-                    break;
-                case /* optional int32 step_timeout_seconds */ 5:
-                    message.stepTimeoutSeconds = reader.int32();
-                    break;
-                case /* optional bool dry_run */ 6:
-                    message.dryRun = reader.bool();
-                    break;
-                case /* optional bool shim_require_runtime_config */ 1000:
-                    message.shimRequireRuntimeConfig = reader.bool();
-                    break;
-                case /* optional protos.ShimErrorMode shim_error_mode */ 1001:
-                    message.shimErrorMode = reader.int32();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: SDKStartupConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string url = 1; */
-        if (message.url !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.url);
-        /* string token = 2; */
-        if (message.token !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.token);
-        /* string service_name = 3; */
-        if (message.serviceName !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.serviceName);
-        /* optional int32 pipeline_timeout_seconds = 4; */
-        if (message.pipelineTimeoutSeconds !== undefined)
-            writer.tag(4, WireType.Varint).int32(message.pipelineTimeoutSeconds);
-        /* optional int32 step_timeout_seconds = 5; */
-        if (message.stepTimeoutSeconds !== undefined)
-            writer.tag(5, WireType.Varint).int32(message.stepTimeoutSeconds);
-        /* optional bool dry_run = 6; */
-        if (message.dryRun !== undefined)
-            writer.tag(6, WireType.Varint).bool(message.dryRun);
-        /* optional bool shim_require_runtime_config = 1000; */
-        if (message.shimRequireRuntimeConfig !== undefined)
-            writer.tag(1000, WireType.Varint).bool(message.shimRequireRuntimeConfig);
-        /* optional protos.ShimErrorMode shim_error_mode = 1001; */
-        if (message.shimErrorMode !== undefined)
-            writer.tag(1001, WireType.Varint).int32(message.shimErrorMode);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.SDKStartupConfig
- */
-export const SDKStartupConfig = new SDKStartupConfig$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ShimRuntimeConfig$Type extends MessageType<ShimRuntimeConfig> {
-    constructor() {
-        super("protos.ShimRuntimeConfig", [
-            { no: 1, name: "error_mode", kind: "enum", opt: true, T: () => ["protos.ShimErrorMode", ShimErrorMode, "SHIM_ERROR_MODE_"] },
-            { no: 2, name: "audience", kind: "message", T: () => Audience }
-        ]);
-    }
-    create(value?: PartialMessage<ShimRuntimeConfig>): ShimRuntimeConfig {
-        const message = {};
-        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial<ShimRuntimeConfig>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ShimRuntimeConfig): ShimRuntimeConfig {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* optional protos.ShimErrorMode error_mode */ 1:
-                    message.errorMode = reader.int32();
-                    break;
-                case /* optional protos.Audience audience */ 2:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: ShimRuntimeConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* optional protos.ShimErrorMode error_mode = 1; */
-        if (message.errorMode !== undefined)
-            writer.tag(1, WireType.Varint).int32(message.errorMode);
-        /* optional protos.Audience audience = 2; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.ShimRuntimeConfig
- */
-export const ShimRuntimeConfig = new ShimRuntimeConfig$Type();
