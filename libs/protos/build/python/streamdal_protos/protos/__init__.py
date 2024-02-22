@@ -162,6 +162,42 @@ class ExecStatus(betterproto.Enum):
     """
 
 
+class SdkErrorMode(betterproto.Enum):
+    """
+    SDKErrorMode is used to alter the error behavior of a shim library
+    instrumented with the Streamdal SDK at runtime. NOTE: This structure is
+    usually used when the SDK is used via a shim/wrapper library where you have
+    less control over SDK behavior. Read more about shims here:
+    https://docs.streamdal.com/en/core-components/libraries-shims/
+    protolint:disable ENUM_FIELD_NAMES_PREFIX
+    """
+
+    SDK_ERROR_MODE_UNSET = 0
+    """
+    This instructs the shim to IGNORE any non-recoverable errors that the SDK
+    might run into. If the SDK runs into an error, the shim will NOT pass the
+    error back to the user - it will instead return the whatever the upstream
+    library would normally return to the user. *** This is the default behavior
+    *** Example with Redis Shim ------------------------ Under normal
+    conditions, a Redis shim would work in the following way when user is
+    performing a read operation: 1. The shim would call the upstream Redis
+    library to perform the read operation 2. Upstream library returns results
+    to the shim 3. Shim passes the result to the integrated Streamdal SDK for
+    processing 4. SDK returns (potentially) modified data to the shim 5. Shim
+    returns the modified data to the user This setting tells the shim that IF
+    it runs into a non-recoverable error while calling the SDK (step 3), it
+    will side-step steps 4 and 5 and instead return the _original_ payload
+    (read during step 1) to the user.
+    """
+
+    SDK_ERROR_MODE_STRICT = 1
+    """
+    This instructs the shim to ABORT execution if the SDK runs into any non-
+    recoverable errors. Upon aborting, the shim will return the error that the
+    SDK ran into and the error will be passed all the way back to the user.
+    """
+
+
 class WasmExitCode(betterproto.Enum):
     """
     Included in Wasm response; the SDK should use the WASMExitCode to determine
@@ -1247,6 +1283,82 @@ class StepStatus(betterproto.Message):
     future pipelines - the user must define the abort conditions for
     "on_error".
     """
+
+
+@dataclass(eq=False, repr=False)
+class SdkStartupConfig(betterproto.Message):
+    """
+    SDKStartupConfig is the configuration structure that is used in Streamdal
+    SDKs to configure the client at startup. Some SDKs may expose additional
+    config options aside from these baseline options.
+    """
+
+    url: str = betterproto.string_field(1)
+    """
+    URL for the Streamdal server gRPC API. Example: "streamdal-server-
+    address:8082"
+    """
+
+    token: str = betterproto.string_field(2)
+    """
+    Auth token used to authenticate with the Streamdal server (NOTE: should be
+    the same as the token used for running the Streamdal server).
+    """
+
+    service_name: str = betterproto.string_field(3)
+    """
+    Service name used for identifying the SDK client in the Streamdal server
+    and console
+    """
+
+    pipeline_timeout_seconds: Optional[int] = betterproto.int32_field(
+        4, optional=True, group="_pipeline_timeout_seconds"
+    )
+    """
+    How long to wait for a pipeline execution to complete before timing out
+    """
+
+    step_timeout_seconds: Optional[int] = betterproto.int32_field(
+        5, optional=True, group="_step_timeout_seconds"
+    )
+    """How long to wait for a step execution to complete before timing out"""
+
+    error_mode: Optional["SdkErrorMode"] = betterproto.enum_field(
+        6, optional=True, group="_error_mode"
+    )
+    """
+    Tells the SDK how to behave when it runs into an error. This setting has no
+    effect if the SDK is NOT used within a shim/wrapper library. Read more
+    about shims here: https://docs.streamdal.com/en/core-components/libraries-
+    shims/
+    """
+
+
+@dataclass(eq=False, repr=False)
+class SdkRuntimeConfig(betterproto.Message):
+    """
+    SDKRuntimeConfig is the configuration structure that is used in SDKs to
+    configure how the SDK behaves at runtime. It is most often exposed as an
+    optional parameter that you can pass to an upstream library's read or write
+    operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
+    NOTE: This structure is usually used when the SDK is used via a
+    shim/wrapper library where you have less control over SDK behavior. Read
+    more about shims here: https://docs.streamdal.com/en/core-
+    components/libraries-shims/
+    """
+
+    error_mode: Optional["SdkErrorMode"] = betterproto.enum_field(
+        1, optional=True, group="_error_mode"
+    )
+    """
+    Specifies how the shim should behave if it runs into any errors when
+    calling the SDK
+    """
+
+    audience: Optional["Audience"] = betterproto.message_field(
+        2, optional=True, group="_audience"
+    )
+    """Audience that will be used by shim when calling SDK.Process()"""
 
 
 @dataclass(eq=False, repr=False)
