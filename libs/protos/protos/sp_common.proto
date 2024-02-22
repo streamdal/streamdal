@@ -31,17 +31,16 @@ enum OperationType {
 
 // Used to indicate who a command is intended for
 message Audience {
-  // Name of the service -- let's include the service name on all calls, we can
-  // optimize later ~DS
+  // Name of the client/service the SDK is announcing itself as
   string service_name = 1;
 
   // Name of the component the SDK is interacting with (ie. kafka-$topic-name)
   string component_name = 2;
 
-  // Consumer or Producer
+  // Is this a Consumer (read) or Producer (write)
   OperationType operation_type = 3;
 
-  // Name for the consumer or producer
+  // Friendly name for the consumer or producer
   string operation_name = 4;
 }
 

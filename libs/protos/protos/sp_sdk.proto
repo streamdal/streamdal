@@ -24,6 +24,23 @@ enum ExecStatus {
   EXEC_STATUS_ERROR = 3;
 }
 
+enum SDKClientType {
+  // The SDK is used as a standalone client
+  SDKClientTypeSDK = 0;
+
+  // The SDK is used within a shim/wrapper library
+  SDKClientTypeShim = 1;
+}
+
+// Common request used by all SDKs in their .Process() method
+message SDKRequest {
+  // The input payload that the SDK will process
+  bytes data = 1;
+
+  // Audience that should be announced for this request
+  protos.Audience audience = 2;
+}
+
 // Common return response used by all SDKs
 message SDKResponse {
   // Contains (potentially) modified input data
@@ -47,6 +64,84 @@ message SDKResponse {
   // To learn more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error
   // Behavior" section.
   map<string, string> metadata = 5;
+}
+
+// SDKStartupConfig is a common configuration structure that is used by all
+// Streamdal SDKs to configure the client at startup. NOTE: These are _baseline_
+// options - some SDKs may expose additional options.
+message SDKStartupConfig {
+  // REQUIRED: URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
+  string server_url = 1;
+
+  // REQUIRED: Auth token used to authenticate with the Streamdal server.
+  // NOTE: should be the same as the token used for running the Streamdal server.
+  string auth_token = 2;
+
+  // REQUIRED: Service name used for identifying the SDK client in the Streamdal
+  // server and console.
+  string service_name = 3;
+
+  // OPTIONAL: List of audiences you can specify at registration time. This is
+  // useful if you know your audiences in advance and want to populate service
+  // groups in the Streamdal UI _before_ your code executes any .Process() calls.
+  repeated protos.Audience audiences = 4;
+
+  // OPTIONAL: How long to wait for a pipeline execution to complete before timing out
+  int32 pipeline_timeout_seconds = 5;
+
+  // OPTIONAL: How long to wait for a step execution to complete before timing out
+  int32 step_timeout_seconds = 6;
+
+  // OPTIONAL: Instruct the SDK to execute pipelines but return ORIGINAL input
+  // payload instead of (potentially) modified payload.
+  bool dry_run = 7;
+
+  // ------------------------- Internal Settings ------------------------
+  //
+  // These are "internal" settings that generally do not have to be used by the
+  // SDK user.
+
+  // ClientType specifies whether this of the SDK is used in a shim library or
+  // as a standalone SDK. This information is used for both debug info and to
+  // help SDKs determine whether ServerURL and ServerToken should be optional or
+  // required. Unless you are developing a shim, you should not have to set this.
+  // Default: SDKClientTypeSDK
+  optional SDKClientType _internal_client_type = 1000;
+
+  // --------------------- Shim/Wrapper Library Settings ---------------------
+  //
+  // "Shim" settings are _primarily_ used when the SDK is used within a shim/wrapper
+  // library. Setting them outside of a shim will have no effect.
+  //
+  // Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
+  //
+
+  // By default, the shim will execute pipelines on every read/write call to the
+  // upstream library. If this is set to true, the shim will only execute its
+  // workload if the upstream library is called with a protos.SDKRuntimeConfig.
+  // Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+  bool _internal_require_runtime_config = 2000;
+
+  // When enabled and the shim run into any non-recoverable errors, it will
+  // return the error to the upstream library. By default, the shim will ignore
+  // the error and pass the original data back to the upstream library.
+  bool _internal_shim_strict_error_mode = 2001;
+}
+
+// SDKRuntimeConfig is the configuration structure that is used in SDKs to
+// configure how the SDK behaves at runtime. It is most often exposed as an
+// optional parameter that you can pass to an upstream library's read or write
+// operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
+//
+// NOTE: This structure is usually used when the SDK is used within a shim/wrapper
+// library where you have less control over SDK behavior. Read more about shims
+// here: https://docs.streamdal.com/en/core-components/libraries-shims/
+message SDKRuntimeConfig {
+  // Audience that will be used by shim when calling SDK.Process()
+  protos.Audience audience = 1;
+
+  // Specifies how the shim should behave if it runs into any errors when calling the SDK
+  bool strict_error_mode = 2;
 }
 
 message PipelineStatus {
@@ -76,98 +171,4 @@ message StepStatus {
   // current or all future pipelines - the user must define the abort conditions
   // for "on_error".
   AbortCondition abort_condition = 4;
-}
-
-// SDKStartupConfig is the configuration structure that is used in Streamdal SDKs
-// to configure the client at startup. Some SDKs may expose additional config
-// options aside from these baseline options.
-message SDKStartupConfig {
-  // URL for the Streamdal server gRPC API. Example: "streamdal-server-address:8082"
-  string url = 1;
-
-  // Auth token used to authenticate with the Streamdal server (NOTE: should be
-  // the same as the token used for running the Streamdal server).
-  string token = 2;
-
-  // Service name used for identifying the SDK client in the Streamdal server and console
-  string service_name = 3;
-
-  // How long to wait for a pipeline execution to complete before timing out
-  optional int32 pipeline_timeout_seconds = 4;
-
-  // How long to wait for a step execution to complete before timing out
-  optional int32 step_timeout_seconds = 5;
-
-  // Instruct the SDK to execute pipelines but return ORIGINAL input payload
-  // instead of (potentially) modified payload.
-  optional bool dry_run = 6;
-
-  // --------------------- Shim/Wrapper Library Settings --------------------
-  //
-  // These settings are _primarily_ used when the SDK is used within a shim/wrapper library.
-  // Setting them outside of a shim will have no effect.
-  //
-  // Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
-  //
-
-  // By default, the shim will execute pipelines on every read/write call to the
-  // upstream library. If this is set to true, the shim will only execute its
-  // workload if the upstream library is called with a protos.SDKRuntimeConfig.
-  // Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
-  optional bool shim_require_runtime_config = 1000;
-
-  // Tells the SDK how to behave when it runs into an error
-  optional ShimErrorMode shim_error_mode = 1001;
-}
-
-// ShimErrorMode is used to alter the error behavior of a shim library
-// instrumented with the Streamdal SDK at runtime.
-//
-// NOTE: This structure is usually used when the SDK is used via a shim/wrapper
-// library where you have less control over SDK behavior. Read more about shims
-// here: https://docs.streamdal.com/en/core-components/libraries-shims/
-enum ShimErrorMode {
-  // This instructs the shim to IGNORE any non-recoverable errors that the SDK
-  // might run into. If the SDK runs into an error, the shim will NOT pass the
-  // error back to the user - it will instead return the whatever the upstream
-  // library would normally return to the user.
-  //
-  // *** This is the default behavior ***
-  //
-  // Example with Redis Shim
-  // ------------------------
-  // Under normal conditions, a Redis shim would work in the following way when
-  // user is performing a read operation:
-  //
-  // 1. The shim would call the upstream Redis library to perform the read operation
-  // 2. Upstream library returns results to the shim
-  // 3. Shim passes the result to the integrated Streamdal SDK for processing
-  // 4. SDK returns (potentially) modified data to the shim
-  // 5. Shim returns the modified data to the user
-  //
-  // This setting tells the shim that IF it runs into a non-recoverable error
-  // while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
-  // return the _original_ payload (read during step 1) to the user.
-  SHIM_ERROR_MODE_UNSET = 0;
-
-  // This instructs the shim to ABORT execution if the SDK runs into any
-  // non-recoverable errors. Upon aborting, the shim will return the error that
-  // the SDK ran into and the error will be passed all the way back to the user.
-  SHIM_ERROR_MODE_STRICT = 1;
-}
-
-// SDKRuntimeConfig is the configuration structure that is used in SDKs to
-// configure how the SDK behaves at runtime. It is most often exposed as an
-// optional parameter that you can pass to an upstream library's read or write
-// operation. Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...})
-//
-// NOTE: This structure is usually used when the SDK is used via a shim/wrapper
-// library where you have less control over SDK behavior. Read more about shims
-// here: https://docs.streamdal.com/en/core-components/libraries-shims/
-message ShimRuntimeConfig {
-  // Specifies how the shim should behave if it runs into any errors when calling the SDK
-  optional ShimErrorMode error_mode = 1;
-
-  // Audience that will be used by shim when calling SDK.Process()
-  optional protos.Audience audience = 2;
 }
