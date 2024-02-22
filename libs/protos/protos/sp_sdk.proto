@@ -98,21 +98,35 @@ message SDKStartupConfig {
   // How long to wait for a step execution to complete before timing out
   optional int32 step_timeout_seconds = 5;
 
-  // Tells the SDK how to behave when it runs into an error. This setting has
-  // no effect if the SDK is NOT used within a shim/wrapper library. Read more
-  // about shims here: https://docs.streamdal.com/en/core-components/libraries-shims/
-  optional SDKErrorMode error_mode = 6;
+  // Instruct the SDK to execute pipelines but return ORIGINAL input payload
+  // instead of (potentially) modified payload.
+  optional bool dry_run = 6;
+
+  // --------------------- Shim/Wrapper Library Settings --------------------
+  //
+  // These settings are _primarily_ used when the SDK is used within a shim/wrapper library.
+  // Setting them outside of a shim will have no effect.
+  //
+  // Read more about shims: https://docs.streamdal.com/en/core-components/libraries-shims/
+  //
+
+  // By default, the shim will execute pipelines on every read/write call to the
+  // upstream library. If this is set to true, the shim will only execute its
+  // workload if the upstream library is called with a protos.SDKRuntimeConfig.
+  // Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+  optional bool shim_require_runtime_config = 1000;
+
+  // Tells the SDK how to behave when it runs into an error
+  optional ShimErrorMode shim_error_mode = 1001;
 }
 
-// SDKErrorMode is used to alter the error behavior of a shim library
+// ShimErrorMode is used to alter the error behavior of a shim library
 // instrumented with the Streamdal SDK at runtime.
 //
 // NOTE: This structure is usually used when the SDK is used via a shim/wrapper
 // library where you have less control over SDK behavior. Read more about shims
 // here: https://docs.streamdal.com/en/core-components/libraries-shims/
-//
-// protolint:disable ENUM_FIELD_NAMES_PREFIX
-enum SDKErrorMode {
+enum ShimErrorMode {
   // This instructs the shim to IGNORE any non-recoverable errors that the SDK
   // might run into. If the SDK runs into an error, the shim will NOT pass the
   // error back to the user - it will instead return the whatever the upstream
@@ -134,12 +148,12 @@ enum SDKErrorMode {
   // This setting tells the shim that IF it runs into a non-recoverable error
   // while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
   // return the _original_ payload (read during step 1) to the user.
-  SDK_ERROR_MODE_UNSET = 0;
+  SHIM_ERROR_MODE_UNSET = 0;
 
   // This instructs the shim to ABORT execution if the SDK runs into any
   // non-recoverable errors. Upon aborting, the shim will return the error that
   // the SDK ran into and the error will be passed all the way back to the user.
-  SDK_ERROR_MODE_STRICT = 1;
+  SHIM_ERROR_MODE_STRICT = 1;
 }
 
 // SDKRuntimeConfig is the configuration structure that is used in SDKs to
@@ -150,9 +164,9 @@ enum SDKErrorMode {
 // NOTE: This structure is usually used when the SDK is used via a shim/wrapper
 // library where you have less control over SDK behavior. Read more about shims
 // here: https://docs.streamdal.com/en/core-components/libraries-shims/
-message SDKRuntimeConfig {
+message ShimRuntimeConfig {
   // Specifies how the shim should behave if it runs into any errors when calling the SDK
-  optional SDKErrorMode error_mode = 1;
+  optional ShimErrorMode error_mode = 1;
 
   // Audience that will be used by shim when calling SDK.Process()
   optional protos.Audience audience = 2;

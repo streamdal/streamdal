@@ -39,19 +39,17 @@ export var ExecStatus;
     ExecStatus[ExecStatus["ERROR"] = 3] = "ERROR";
 })(ExecStatus || (ExecStatus = {}));
 /**
- * SDKErrorMode is used to alter the error behavior of a shim library
+ * ShimErrorMode is used to alter the error behavior of a shim library
  * instrumented with the Streamdal SDK at runtime.
  *
  * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
  * library where you have less control over SDK behavior. Read more about shims
  * here: https://docs.streamdal.com/en/core-components/libraries-shims/
  *
- * protolint:disable ENUM_FIELD_NAMES_PREFIX
- *
- * @generated from protobuf enum protos.SDKErrorMode
+ * @generated from protobuf enum protos.ShimErrorMode
  */
-export var SDKErrorMode;
-(function (SDKErrorMode) {
+export var ShimErrorMode;
+(function (ShimErrorMode) {
     /**
      * This instructs the shim to IGNORE any non-recoverable errors that the SDK
      * might run into. If the SDK runs into an error, the shim will NOT pass the
@@ -75,18 +73,18 @@ export var SDKErrorMode;
      * while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
      * return the _original_ payload (read during step 1) to the user.
      *
-     * @generated from protobuf enum value: SDK_ERROR_MODE_UNSET = 0;
+     * @generated from protobuf enum value: SHIM_ERROR_MODE_UNSET = 0;
      */
-    SDKErrorMode[SDKErrorMode["SDK_ERROR_MODE_UNSET"] = 0] = "SDK_ERROR_MODE_UNSET";
+    ShimErrorMode[ShimErrorMode["UNSET"] = 0] = "UNSET";
     /**
      * This instructs the shim to ABORT execution if the SDK runs into any
      * non-recoverable errors. Upon aborting, the shim will return the error that
      * the SDK ran into and the error will be passed all the way back to the user.
      *
-     * @generated from protobuf enum value: SDK_ERROR_MODE_STRICT = 1;
+     * @generated from protobuf enum value: SHIM_ERROR_MODE_STRICT = 1;
      */
-    SDKErrorMode[SDKErrorMode["SDK_ERROR_MODE_STRICT"] = 1] = "SDK_ERROR_MODE_STRICT";
-})(SDKErrorMode || (SDKErrorMode = {}));
+    ShimErrorMode[ShimErrorMode["STRICT"] = 1] = "STRICT";
+})(ShimErrorMode || (ShimErrorMode = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType {
     constructor() {
@@ -316,7 +314,9 @@ class SDKStartupConfig$Type extends MessageType {
             { no: 3, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_timeout_seconds", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "step_timeout_seconds", kind: "scalar", opt: true, T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "error_mode", kind: "enum", opt: true, T: () => ["protos.SDKErrorMode", SDKErrorMode] }
+            { no: 6, name: "dry_run", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1000, name: "shim_require_runtime_config", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1001, name: "shim_error_mode", kind: "enum", opt: true, T: () => ["protos.ShimErrorMode", ShimErrorMode, "SHIM_ERROR_MODE_"] }
         ]);
     }
     create(value) {
@@ -346,8 +346,14 @@ class SDKStartupConfig$Type extends MessageType {
                 case /* optional int32 step_timeout_seconds */ 5:
                     message.stepTimeoutSeconds = reader.int32();
                     break;
-                case /* optional protos.SDKErrorMode error_mode */ 6:
-                    message.errorMode = reader.int32();
+                case /* optional bool dry_run */ 6:
+                    message.dryRun = reader.bool();
+                    break;
+                case /* optional bool shim_require_runtime_config */ 1000:
+                    message.shimRequireRuntimeConfig = reader.bool();
+                    break;
+                case /* optional protos.ShimErrorMode shim_error_mode */ 1001:
+                    message.shimErrorMode = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -376,9 +382,15 @@ class SDKStartupConfig$Type extends MessageType {
         /* optional int32 step_timeout_seconds = 5; */
         if (message.stepTimeoutSeconds !== undefined)
             writer.tag(5, WireType.Varint).int32(message.stepTimeoutSeconds);
-        /* optional protos.SDKErrorMode error_mode = 6; */
-        if (message.errorMode !== undefined)
-            writer.tag(6, WireType.Varint).int32(message.errorMode);
+        /* optional bool dry_run = 6; */
+        if (message.dryRun !== undefined)
+            writer.tag(6, WireType.Varint).bool(message.dryRun);
+        /* optional bool shim_require_runtime_config = 1000; */
+        if (message.shimRequireRuntimeConfig !== undefined)
+            writer.tag(1000, WireType.Varint).bool(message.shimRequireRuntimeConfig);
+        /* optional protos.ShimErrorMode shim_error_mode = 1001; */
+        if (message.shimErrorMode !== undefined)
+            writer.tag(1001, WireType.Varint).int32(message.shimErrorMode);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -390,10 +402,10 @@ class SDKStartupConfig$Type extends MessageType {
  */
 export const SDKStartupConfig = new SDKStartupConfig$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class SDKRuntimeConfig$Type extends MessageType {
+class ShimRuntimeConfig$Type extends MessageType {
     constructor() {
-        super("protos.SDKRuntimeConfig", [
-            { no: 1, name: "error_mode", kind: "enum", opt: true, T: () => ["protos.SDKErrorMode", SDKErrorMode] },
+        super("protos.ShimRuntimeConfig", [
+            { no: 1, name: "error_mode", kind: "enum", opt: true, T: () => ["protos.ShimErrorMode", ShimErrorMode, "SHIM_ERROR_MODE_"] },
             { no: 2, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
@@ -409,7 +421,7 @@ class SDKRuntimeConfig$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* optional protos.SDKErrorMode error_mode */ 1:
+                case /* optional protos.ShimErrorMode error_mode */ 1:
                     message.errorMode = reader.int32();
                     break;
                 case /* optional protos.Audience audience */ 2:
@@ -427,7 +439,7 @@ class SDKRuntimeConfig$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* optional protos.SDKErrorMode error_mode = 1; */
+        /* optional protos.ShimErrorMode error_mode = 1; */
         if (message.errorMode !== undefined)
             writer.tag(1, WireType.Varint).int32(message.errorMode);
         /* optional protos.Audience audience = 2; */
@@ -440,6 +452,6 @@ class SDKRuntimeConfig$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.SDKRuntimeConfig
+ * @generated MessageType for protobuf message protos.ShimRuntimeConfig
  */
-export const SDKRuntimeConfig = new SDKRuntimeConfig$Type();
+export const ShimRuntimeConfig = new ShimRuntimeConfig$Type();

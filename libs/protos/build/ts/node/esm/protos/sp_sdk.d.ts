@@ -148,13 +148,27 @@ export interface SDKStartupConfig {
      */
     stepTimeoutSeconds?: number;
     /**
-     * Tells the SDK how to behave when it runs into an error. This setting has
-     * no effect if the SDK is NOT used within a shim/wrapper library. Read more
-     * about shims here: https://docs.streamdal.com/en/core-components/libraries-shims/
+     * Instruct the SDK to execute pipelines but return ORIGINAL input payload
+     * instead of (potentially) modified payload.
      *
-     * @generated from protobuf field: optional protos.SDKErrorMode error_mode = 6;
+     * @generated from protobuf field: optional bool dry_run = 6;
      */
-    errorMode?: SDKErrorMode;
+    dryRun?: boolean;
+    /**
+     * By default, the shim will execute pipelines on every read/write call to the
+     * upstream library. If this is set to true, the shim will only execute its
+     * workload if the upstream library is called with a protos.SDKRuntimeConfig.
+     * Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+     *
+     * @generated from protobuf field: optional bool shim_require_runtime_config = 1000;
+     */
+    shimRequireRuntimeConfig?: boolean;
+    /**
+     * Tells the SDK how to behave when it runs into an error
+     *
+     * @generated from protobuf field: optional protos.ShimErrorMode shim_error_mode = 1001;
+     */
+    shimErrorMode?: ShimErrorMode;
 }
 /**
  * SDKRuntimeConfig is the configuration structure that is used in SDKs to
@@ -166,15 +180,15 @@ export interface SDKStartupConfig {
  * library where you have less control over SDK behavior. Read more about shims
  * here: https://docs.streamdal.com/en/core-components/libraries-shims/
  *
- * @generated from protobuf message protos.SDKRuntimeConfig
+ * @generated from protobuf message protos.ShimRuntimeConfig
  */
-export interface SDKRuntimeConfig {
+export interface ShimRuntimeConfig {
     /**
      * Specifies how the shim should behave if it runs into any errors when calling the SDK
      *
-     * @generated from protobuf field: optional protos.SDKErrorMode error_mode = 1;
+     * @generated from protobuf field: optional protos.ShimErrorMode error_mode = 1;
      */
-    errorMode?: SDKErrorMode;
+    errorMode?: ShimErrorMode;
     /**
      * Audience that will be used by shim when calling SDK.Process()
      *
@@ -215,18 +229,16 @@ export declare enum ExecStatus {
     ERROR = 3
 }
 /**
- * SDKErrorMode is used to alter the error behavior of a shim library
+ * ShimErrorMode is used to alter the error behavior of a shim library
  * instrumented with the Streamdal SDK at runtime.
  *
  * NOTE: This structure is usually used when the SDK is used via a shim/wrapper
  * library where you have less control over SDK behavior. Read more about shims
  * here: https://docs.streamdal.com/en/core-components/libraries-shims/
  *
- * protolint:disable ENUM_FIELD_NAMES_PREFIX
- *
- * @generated from protobuf enum protos.SDKErrorMode
+ * @generated from protobuf enum protos.ShimErrorMode
  */
-export declare enum SDKErrorMode {
+export declare enum ShimErrorMode {
     /**
      * This instructs the shim to IGNORE any non-recoverable errors that the SDK
      * might run into. If the SDK runs into an error, the shim will NOT pass the
@@ -250,17 +262,17 @@ export declare enum SDKErrorMode {
      * while calling the SDK (step 3), it will side-step steps 4 and 5 and instead
      * return the _original_ payload (read during step 1) to the user.
      *
-     * @generated from protobuf enum value: SDK_ERROR_MODE_UNSET = 0;
+     * @generated from protobuf enum value: SHIM_ERROR_MODE_UNSET = 0;
      */
-    SDK_ERROR_MODE_UNSET = 0,
+    UNSET = 0,
     /**
      * This instructs the shim to ABORT execution if the SDK runs into any
      * non-recoverable errors. Upon aborting, the shim will return the error that
      * the SDK ran into and the error will be passed all the way back to the user.
      *
-     * @generated from protobuf enum value: SDK_ERROR_MODE_STRICT = 1;
+     * @generated from protobuf enum value: SHIM_ERROR_MODE_STRICT = 1;
      */
-    SDK_ERROR_MODE_STRICT = 1
+    STRICT = 1
 }
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();
@@ -303,14 +315,14 @@ declare class SDKStartupConfig$Type extends MessageType<SDKStartupConfig> {
  * @generated MessageType for protobuf message protos.SDKStartupConfig
  */
 export declare const SDKStartupConfig: SDKStartupConfig$Type;
-declare class SDKRuntimeConfig$Type extends MessageType<SDKRuntimeConfig> {
+declare class ShimRuntimeConfig$Type extends MessageType<ShimRuntimeConfig> {
     constructor();
-    create(value?: PartialMessage<SDKRuntimeConfig>): SDKRuntimeConfig;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SDKRuntimeConfig): SDKRuntimeConfig;
-    internalBinaryWrite(message: SDKRuntimeConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<ShimRuntimeConfig>): ShimRuntimeConfig;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ShimRuntimeConfig): ShimRuntimeConfig;
+    internalBinaryWrite(message: ShimRuntimeConfig, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.SDKRuntimeConfig
+ * @generated MessageType for protobuf message protos.ShimRuntimeConfig
  */
-export declare const SDKRuntimeConfig: SDKRuntimeConfig$Type;
+export declare const ShimRuntimeConfig: ShimRuntimeConfig$Type;
 export {};

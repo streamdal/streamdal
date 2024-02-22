@@ -616,11 +616,19 @@ pub struct SDKStartupConfig {
     ///  How long to wait for a step execution to complete before timing out
     // @@protoc_insertion_point(field:protos.SDKStartupConfig.step_timeout_seconds)
     pub step_timeout_seconds: ::std::option::Option<i32>,
-    ///  Tells the SDK how to behave when it runs into an error. This setting has
-    ///  no effect if the SDK is NOT used within a shim/wrapper library. Read more
-    ///  about shims here: https://docs.streamdal.com/en/core-components/libraries-shims/
-    // @@protoc_insertion_point(field:protos.SDKStartupConfig.error_mode)
-    pub error_mode: ::std::option::Option<::protobuf::EnumOrUnknown<SDKErrorMode>>,
+    ///  Instruct the SDK to execute pipelines but return ORIGINAL input payload
+    ///  instead of (potentially) modified payload.
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.dry_run)
+    pub dry_run: ::std::option::Option<bool>,
+    ///  By default, the shim will execute pipelines on every read/write call to the
+    ///  upstream library. If this is set to true, the shim will only execute its
+    ///  workload if the upstream library is called with a protos.SDKRuntimeConfig.
+    ///  Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.shim_require_runtime_config)
+    pub shim_require_runtime_config: ::std::option::Option<bool>,
+    ///  Tells the SDK how to behave when it runs into an error
+    // @@protoc_insertion_point(field:protos.SDKStartupConfig.shim_error_mode)
+    pub shim_error_mode: ::std::option::Option<::protobuf::EnumOrUnknown<ShimErrorMode>>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.SDKStartupConfig.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -638,7 +646,7 @@ impl SDKStartupConfig {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(6);
+        let mut fields = ::std::vec::Vec::with_capacity(8);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "url",
@@ -666,9 +674,19 @@ impl SDKStartupConfig {
             |m: &mut SDKStartupConfig| { &mut m.step_timeout_seconds },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "error_mode",
-            |m: &SDKStartupConfig| { &m.error_mode },
-            |m: &mut SDKStartupConfig| { &mut m.error_mode },
+            "dry_run",
+            |m: &SDKStartupConfig| { &m.dry_run },
+            |m: &mut SDKStartupConfig| { &mut m.dry_run },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "shim_require_runtime_config",
+            |m: &SDKStartupConfig| { &m.shim_require_runtime_config },
+            |m: &mut SDKStartupConfig| { &mut m.shim_require_runtime_config },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "shim_error_mode",
+            |m: &SDKStartupConfig| { &m.shim_error_mode },
+            |m: &mut SDKStartupConfig| { &mut m.shim_error_mode },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKStartupConfig>(
             "SDKStartupConfig",
@@ -704,7 +722,13 @@ impl ::protobuf::Message for SDKStartupConfig {
                     self.step_timeout_seconds = ::std::option::Option::Some(is.read_int32()?);
                 },
                 48 => {
-                    self.error_mode = ::std::option::Option::Some(is.read_enum_or_unknown()?);
+                    self.dry_run = ::std::option::Option::Some(is.read_bool()?);
+                },
+                8000 => {
+                    self.shim_require_runtime_config = ::std::option::Option::Some(is.read_bool()?);
+                },
+                8008 => {
+                    self.shim_error_mode = ::std::option::Option::Some(is.read_enum_or_unknown()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -733,8 +757,14 @@ impl ::protobuf::Message for SDKStartupConfig {
         if let Some(v) = self.step_timeout_seconds {
             my_size += ::protobuf::rt::int32_size(5, v);
         }
-        if let Some(v) = self.error_mode {
-            my_size += ::protobuf::rt::int32_size(6, v.value());
+        if let Some(v) = self.dry_run {
+            my_size += 1 + 1;
+        }
+        if let Some(v) = self.shim_require_runtime_config {
+            my_size += 2 + 1;
+        }
+        if let Some(v) = self.shim_error_mode {
+            my_size += ::protobuf::rt::int32_size(1001, v.value());
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -757,8 +787,14 @@ impl ::protobuf::Message for SDKStartupConfig {
         if let Some(v) = self.step_timeout_seconds {
             os.write_int32(5, v)?;
         }
-        if let Some(v) = self.error_mode {
-            os.write_enum(6, ::protobuf::EnumOrUnknown::value(&v))?;
+        if let Some(v) = self.dry_run {
+            os.write_bool(6, v)?;
+        }
+        if let Some(v) = self.shim_require_runtime_config {
+            os.write_bool(1000, v)?;
+        }
+        if let Some(v) = self.shim_error_mode {
+            os.write_enum(1001, ::protobuf::EnumOrUnknown::value(&v))?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -782,7 +818,9 @@ impl ::protobuf::Message for SDKStartupConfig {
         self.service_name.clear();
         self.pipeline_timeout_seconds = ::std::option::Option::None;
         self.step_timeout_seconds = ::std::option::Option::None;
-        self.error_mode = ::std::option::Option::None;
+        self.dry_run = ::std::option::Option::None;
+        self.shim_require_runtime_config = ::std::option::Option::None;
+        self.shim_error_mode = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
@@ -793,7 +831,9 @@ impl ::protobuf::Message for SDKStartupConfig {
             service_name: ::std::string::String::new(),
             pipeline_timeout_seconds: ::std::option::Option::None,
             step_timeout_seconds: ::std::option::Option::None,
-            error_mode: ::std::option::Option::None,
+            dry_run: ::std::option::Option::None,
+            shim_require_runtime_config: ::std::option::Option::None,
+            shim_error_mode: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -825,29 +865,29 @@ impl ::protobuf::reflect::ProtobufValue for SDKStartupConfig {
 ///  NOTE: This structure is usually used when the SDK is used via a shim/wrapper
 ///  library where you have less control over SDK behavior. Read more about shims
 ///  here: https://docs.streamdal.com/en/core-components/libraries-shims/
-// @@protoc_insertion_point(message:protos.SDKRuntimeConfig)
+// @@protoc_insertion_point(message:protos.ShimRuntimeConfig)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct SDKRuntimeConfig {
+pub struct ShimRuntimeConfig {
     // message fields
     ///  Specifies how the shim should behave if it runs into any errors when calling the SDK
-    // @@protoc_insertion_point(field:protos.SDKRuntimeConfig.error_mode)
-    pub error_mode: ::std::option::Option<::protobuf::EnumOrUnknown<SDKErrorMode>>,
+    // @@protoc_insertion_point(field:protos.ShimRuntimeConfig.error_mode)
+    pub error_mode: ::std::option::Option<::protobuf::EnumOrUnknown<ShimErrorMode>>,
     ///  Audience that will be used by shim when calling SDK.Process()
-    // @@protoc_insertion_point(field:protos.SDKRuntimeConfig.audience)
+    // @@protoc_insertion_point(field:protos.ShimRuntimeConfig.audience)
     pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.SDKRuntimeConfig.special_fields)
+    // @@protoc_insertion_point(special_field:protos.ShimRuntimeConfig.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a SDKRuntimeConfig {
-    fn default() -> &'a SDKRuntimeConfig {
-        <SDKRuntimeConfig as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a ShimRuntimeConfig {
+    fn default() -> &'a ShimRuntimeConfig {
+        <ShimRuntimeConfig as ::protobuf::Message>::default_instance()
     }
 }
 
-impl SDKRuntimeConfig {
-    pub fn new() -> SDKRuntimeConfig {
+impl ShimRuntimeConfig {
+    pub fn new() -> ShimRuntimeConfig {
         ::std::default::Default::default()
     }
 
@@ -856,24 +896,24 @@ impl SDKRuntimeConfig {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "error_mode",
-            |m: &SDKRuntimeConfig| { &m.error_mode },
-            |m: &mut SDKRuntimeConfig| { &mut m.error_mode },
+            |m: &ShimRuntimeConfig| { &m.error_mode },
+            |m: &mut ShimRuntimeConfig| { &mut m.error_mode },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Audience>(
             "audience",
-            |m: &SDKRuntimeConfig| { &m.audience },
-            |m: &mut SDKRuntimeConfig| { &mut m.audience },
+            |m: &ShimRuntimeConfig| { &m.audience },
+            |m: &mut ShimRuntimeConfig| { &mut m.audience },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKRuntimeConfig>(
-            "SDKRuntimeConfig",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<ShimRuntimeConfig>(
+            "ShimRuntimeConfig",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for SDKRuntimeConfig {
-    const NAME: &'static str = "SDKRuntimeConfig";
+impl ::protobuf::Message for ShimRuntimeConfig {
+    const NAME: &'static str = "ShimRuntimeConfig";
 
     fn is_initialized(&self) -> bool {
         true
@@ -931,8 +971,8 @@ impl ::protobuf::Message for SDKRuntimeConfig {
         &mut self.special_fields
     }
 
-    fn new() -> SDKRuntimeConfig {
-        SDKRuntimeConfig::new()
+    fn new() -> ShimRuntimeConfig {
+        ShimRuntimeConfig::new()
     }
 
     fn clear(&mut self) {
@@ -941,8 +981,8 @@ impl ::protobuf::Message for SDKRuntimeConfig {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static SDKRuntimeConfig {
-        static instance: SDKRuntimeConfig = SDKRuntimeConfig {
+    fn default_instance() -> &'static ShimRuntimeConfig {
+        static instance: ShimRuntimeConfig = ShimRuntimeConfig {
             error_mode: ::std::option::Option::None,
             audience: ::protobuf::MessageField::none(),
             special_fields: ::protobuf::SpecialFields::new(),
@@ -951,20 +991,20 @@ impl ::protobuf::Message for SDKRuntimeConfig {
     }
 }
 
-impl ::protobuf::MessageFull for SDKRuntimeConfig {
+impl ::protobuf::MessageFull for ShimRuntimeConfig {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("SDKRuntimeConfig").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("ShimRuntimeConfig").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for SDKRuntimeConfig {
+impl ::std::fmt::Display for ShimRuntimeConfig {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for SDKRuntimeConfig {
+impl ::protobuf::reflect::ProtobufValue for ShimRuntimeConfig {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -1040,56 +1080,54 @@ impl ExecStatus {
     }
 }
 
-///  SDKErrorMode is used to alter the error behavior of a shim library
+///  ShimErrorMode is used to alter the error behavior of a shim library
 ///  instrumented with the Streamdal SDK at runtime.
 ///
 ///  NOTE: This structure is usually used when the SDK is used via a shim/wrapper
 ///  library where you have less control over SDK behavior. Read more about shims
 ///  here: https://docs.streamdal.com/en/core-components/libraries-shims/
-///
-///  protolint:disable ENUM_FIELD_NAMES_PREFIX
 #[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
-// @@protoc_insertion_point(enum:protos.SDKErrorMode)
-pub enum SDKErrorMode {
-    // @@protoc_insertion_point(enum_value:protos.SDKErrorMode.SDK_ERROR_MODE_UNSET)
-    SDK_ERROR_MODE_UNSET = 0,
-    // @@protoc_insertion_point(enum_value:protos.SDKErrorMode.SDK_ERROR_MODE_STRICT)
-    SDK_ERROR_MODE_STRICT = 1,
+// @@protoc_insertion_point(enum:protos.ShimErrorMode)
+pub enum ShimErrorMode {
+    // @@protoc_insertion_point(enum_value:protos.ShimErrorMode.SHIM_ERROR_MODE_UNSET)
+    SHIM_ERROR_MODE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.ShimErrorMode.SHIM_ERROR_MODE_STRICT)
+    SHIM_ERROR_MODE_STRICT = 1,
 }
 
-impl ::protobuf::Enum for SDKErrorMode {
-    const NAME: &'static str = "SDKErrorMode";
+impl ::protobuf::Enum for ShimErrorMode {
+    const NAME: &'static str = "ShimErrorMode";
 
     fn value(&self) -> i32 {
         *self as i32
     }
 
-    fn from_i32(value: i32) -> ::std::option::Option<SDKErrorMode> {
+    fn from_i32(value: i32) -> ::std::option::Option<ShimErrorMode> {
         match value {
-            0 => ::std::option::Option::Some(SDKErrorMode::SDK_ERROR_MODE_UNSET),
-            1 => ::std::option::Option::Some(SDKErrorMode::SDK_ERROR_MODE_STRICT),
+            0 => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_UNSET),
+            1 => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_STRICT),
             _ => ::std::option::Option::None
         }
     }
 
-    fn from_str(str: &str) -> ::std::option::Option<SDKErrorMode> {
+    fn from_str(str: &str) -> ::std::option::Option<ShimErrorMode> {
         match str {
-            "SDK_ERROR_MODE_UNSET" => ::std::option::Option::Some(SDKErrorMode::SDK_ERROR_MODE_UNSET),
-            "SDK_ERROR_MODE_STRICT" => ::std::option::Option::Some(SDKErrorMode::SDK_ERROR_MODE_STRICT),
+            "SHIM_ERROR_MODE_UNSET" => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_UNSET),
+            "SHIM_ERROR_MODE_STRICT" => ::std::option::Option::Some(ShimErrorMode::SHIM_ERROR_MODE_STRICT),
             _ => ::std::option::Option::None
         }
     }
 
-    const VALUES: &'static [SDKErrorMode] = &[
-        SDKErrorMode::SDK_ERROR_MODE_UNSET,
-        SDKErrorMode::SDK_ERROR_MODE_STRICT,
+    const VALUES: &'static [ShimErrorMode] = &[
+        ShimErrorMode::SHIM_ERROR_MODE_UNSET,
+        ShimErrorMode::SHIM_ERROR_MODE_STRICT,
     ];
 }
 
-impl ::protobuf::EnumFull for SDKErrorMode {
+impl ::protobuf::EnumFull for ShimErrorMode {
     fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().enum_by_package_relative_name("SDKErrorMode").unwrap()).clone()
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("ShimErrorMode").unwrap()).clone()
     }
 
     fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
@@ -1098,15 +1136,15 @@ impl ::protobuf::EnumFull for SDKErrorMode {
     }
 }
 
-impl ::std::default::Default for SDKErrorMode {
+impl ::std::default::Default for ShimErrorMode {
     fn default() -> Self {
-        SDKErrorMode::SDK_ERROR_MODE_UNSET
+        ShimErrorMode::SHIM_ERROR_MODE_UNSET
     }
 }
 
-impl SDKErrorMode {
+impl ShimErrorMode {
     fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
-        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<SDKErrorMode>("SDKErrorMode")
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<ShimErrorMode>("ShimErrorMode")
     }
 }
 
@@ -1127,61 +1165,65 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x0e2\x12.protos.ExecStatusR\x06status\x12*\n\x0estatus_message\x18\x03\
     \x20\x01(\tH\0R\rstatusMessage\x88\x01\x01\x12?\n\x0fabort_condition\x18\
     \x04\x20\x01(\x0e2\x16.protos.AbortConditionR\x0eabortConditionB\x11\n\
-    \x0f_status_message\"\xd2\x02\n\x10SDKStartupConfig\x12\x10\n\x03url\x18\
+    \x0f_status_message\"\xf1\x03\n\x10SDKStartupConfig\x12\x10\n\x03url\x18\
     \x01\x20\x01(\tR\x03url\x12\x14\n\x05token\x18\x02\x20\x01(\tR\x05token\
     \x12!\n\x0cservice_name\x18\x03\x20\x01(\tR\x0bserviceName\x12=\n\x18pip\
     eline_timeout_seconds\x18\x04\x20\x01(\x05H\0R\x16pipelineTimeoutSeconds\
     \x88\x01\x01\x125\n\x14step_timeout_seconds\x18\x05\x20\x01(\x05H\x01R\
-    \x12stepTimeoutSeconds\x88\x01\x01\x128\n\nerror_mode\x18\x06\x20\x01(\
-    \x0e2\x14.protos.SDKErrorModeH\x02R\terrorMode\x88\x01\x01B\x1b\n\x19_pi\
-    peline_timeout_secondsB\x17\n\x15_step_timeout_secondsB\r\n\x0b_error_mo\
-    de\"\x9b\x01\n\x10SDKRuntimeConfig\x128\n\nerror_mode\x18\x01\x20\x01(\
-    \x0e2\x14.protos.SDKErrorModeH\0R\terrorMode\x88\x01\x01\x121\n\x08audie\
-    nce\x18\x02\x20\x01(\x0b2\x10.protos.AudienceH\x01R\x08audience\x88\x01\
-    \x01B\r\n\x0b_error_modeB\x0b\n\t_audience*g\n\nExecStatus\x12\x15\n\x11\
-    EXEC_STATUS_UNSET\x10\0\x12\x14\n\x10EXEC_STATUS_TRUE\x10\x01\x12\x15\n\
-    \x11EXEC_STATUS_FALSE\x10\x02\x12\x15\n\x11EXEC_STATUS_ERROR\x10\x03*C\n\
-    \x0cSDKErrorMode\x12\x18\n\x14SDK_ERROR_MODE_UNSET\x10\0\x12\x19\n\x15SD\
-    K_ERROR_MODE_STRICT\x10\x01B<Z:github.com/streamdal/streamdal/libs/proto\
-    s/build/go/protosJ\xcc2\n\x07\x12\x05\0\0\x9e\x01\x01\n\x08\n\x01\x0c\
-    \x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\
-    \x03\x04\0\x19\n\t\n\x02\x03\x01\x12\x03\x05\0\x1b\n\x08\n\x01\x08\x12\
-    \x03\x07\0Q\n\t\n\x02\x08\x0b\x12\x03\x07\0Q\n\n\n\x02\x05\0\x12\x04\t\0\
-    \x18\x01\n\n\n\x03\x05\0\x01\x12\x03\t\x05\x0f\n\x87\x01\n\x04\x05\0\x02\
-    \0\x12\x03\x0c\x02\x18\x1az\x20Unset\x20status.\x20This\x20should\x20nev\
-    er\x20be\x20returned\x20by\x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20\
-    is\n\x20probably\x20a\x20bug\x20(and\x20you\x20should\x20file\x20an\x20i\
-    ssue)\n\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x0c\x02\x13\n\x0c\n\x05\x05\
-    \0\x02\0\x02\x12\x03\x0c\x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0f\x02\
-    \x17\x1a7\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\
-    \x20to\x20\"true\"\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x12\n\
-    \x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x0f\x15\x16\nE\n\x04\x05\0\x02\x02\
-    \x12\x03\x12\x02\x18\x1a8\x20Indicates\x20that\x20the\x20step\x20executi\
-    on\x20evaluated\x20to\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
-    \x03\x12\x02\x13\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x12\x16\x17\n\xd6\
-    \x01\n\x04\x05\0\x02\x03\x12\x03\x17\x02\x18\x1a\xc8\x01\x20Indicates\
-    \x20that\x20the\x20SDK\x20encountered\x20an\x20error\x20while\x20trying\
-    \x20to\x20process\x20the\n\x20request.\x20Example\x20error\x20cases:\x20\
-    SDK\x20can't\x20find\x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\
-    \x20function\x20cannot\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\
-    \x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x17\x02\x13\n\x0c\n\x05\x05\0\x02\
-    \x03\x02\x12\x03\x17\x16\x17\n5\n\x02\x04\0\x12\x04\x1b\01\x01\x1a)\x20C\
-    ommon\x20return\x20response\x20used\x20by\x20all\x20SDKs\n\n\n\n\x03\x04\
-    \0\x01\x12\x03\x1b\x08\x13\n9\n\x04\x04\0\x02\0\x12\x03\x1d\x02\x11\x1a,\
-    \x20Contains\x20(potentially)\x20modified\x20input\x20data\n\n\x0c\n\x05\
-    \x04\0\x02\0\x05\x12\x03\x1d\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
-    \x1d\x08\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1d\x0f\x10\n0\n\x04\
-    \x04\0\x02\x01\x12\x03\x20\x02\x18\x1a#\x20Execution\x20status\x20of\x20\
-    the\x20last\x20step\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x20\x02\x0c\
-    \n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x20\r\x13\n\x0c\n\x05\x04\0\x02\
-    \x01\x03\x12\x03\x20\x16\x17\nN\n\x04\x04\0\x02\x02\x12\x03#\x02%\x1aA\
-    \x20Optional\x20message\x20accompanying\x20the\x20exec\x20status\x20for\
-    \x20the\x20last\x20step\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03#\x02\n\n\
-    \x0c\n\x05\x04\0\x02\x02\x05\x12\x03#\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\
-    \x01\x12\x03#\x12\x20\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03##$\nV\n\x04\
-    \x04\0\x02\x03\x12\x03&\x02.\x1aI\x20An\x20array\x20of\x20pipelines\x20t\
-    hat\x20the\x20SDK\x20executed\x20and\x20the\x20status\x20of\x20each\x20s\
-    tep\n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\x03&\x02\n\n\x0c\n\x05\x04\0\x02\
+    \x12stepTimeoutSeconds\x88\x01\x01\x12\x1c\n\x07dry_run\x18\x06\x20\x01(\
+    \x08H\x02R\x06dryRun\x88\x01\x01\x12C\n\x1bshim_require_runtime_config\
+    \x18\xe8\x07\x20\x01(\x08H\x03R\x18shimRequireRuntimeConfig\x88\x01\x01\
+    \x12C\n\x0fshim_error_mode\x18\xe9\x07\x20\x01(\x0e2\x15.protos.ShimErro\
+    rModeH\x04R\rshimErrorMode\x88\x01\x01B\x1b\n\x19_pipeline_timeout_secon\
+    dsB\x17\n\x15_step_timeout_secondsB\n\n\x08_dry_runB\x1e\n\x1c_shim_requ\
+    ire_runtime_configB\x12\n\x10_shim_error_mode\"\x9d\x01\n\x11ShimRuntime\
+    Config\x129\n\nerror_mode\x18\x01\x20\x01(\x0e2\x15.protos.ShimErrorMode\
+    H\0R\terrorMode\x88\x01\x01\x121\n\x08audience\x18\x02\x20\x01(\x0b2\x10\
+    .protos.AudienceH\x01R\x08audience\x88\x01\x01B\r\n\x0b_error_modeB\x0b\
+    \n\t_audience*g\n\nExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\x10\0\x12\
+    \x14\n\x10EXEC_STATUS_TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FALSE\x10\
+    \x02\x12\x15\n\x11EXEC_STATUS_ERROR\x10\x03*F\n\rShimErrorMode\x12\x19\n\
+    \x15SHIM_ERROR_MODE_UNSET\x10\0\x12\x1a\n\x16SHIM_ERROR_MODE_STRICT\x10\
+    \x01B<Z:github.com/streamdal/streamdal/libs/protos/build/go/protosJ\xd27\
+    \n\x07\x12\x05\0\0\xac\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    \x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x19\n\t\n\x02\
+    \x03\x01\x12\x03\x05\0\x1b\n\x08\n\x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\
+    \x0b\x12\x03\x07\0Q\n\n\n\x02\x05\0\x12\x04\t\0\x18\x01\n\n\n\x03\x05\0\
+    \x01\x12\x03\t\x05\x0f\n\x87\x01\n\x04\x05\0\x02\0\x12\x03\x0c\x02\x18\
+    \x1az\x20Unset\x20status.\x20This\x20should\x20never\x20be\x20returned\
+    \x20by\x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20is\n\x20probably\x20\
+    a\x20bug\x20(and\x20you\x20should\x20file\x20an\x20issue)\n\n\x0c\n\x05\
+    \x05\0\x02\0\x01\x12\x03\x0c\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\
+    \x0c\x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0f\x02\x17\x1a7\x20Indicate\
+    s\x20that\x20the\x20step\x20execution\x20evaluated\x20to\x20\"true\"\n\n\
+    \x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x05\0\x02\
+    \x01\x02\x12\x03\x0f\x15\x16\nE\n\x04\x05\0\x02\x02\x12\x03\x12\x02\x18\
+    \x1a8\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\x20t\
+    o\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x13\n\x0c\
+    \n\x05\x05\0\x02\x02\x02\x12\x03\x12\x16\x17\n\xd6\x01\n\x04\x05\0\x02\
+    \x03\x12\x03\x17\x02\x18\x1a\xc8\x01\x20Indicates\x20that\x20the\x20SDK\
+    \x20encountered\x20an\x20error\x20while\x20trying\x20to\x20process\x20th\
+    e\n\x20request.\x20Example\x20error\x20cases:\x20SDK\x20can't\x20find\
+    \x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\x20function\x20canno\
+    t\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\x0c\n\x05\x05\0\x02\
+    \x03\x01\x12\x03\x17\x02\x13\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x17\
+    \x16\x17\n5\n\x02\x04\0\x12\x04\x1b\01\x01\x1a)\x20Common\x20return\x20r\
+    esponse\x20used\x20by\x20all\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\x1b\
+    \x08\x13\n9\n\x04\x04\0\x02\0\x12\x03\x1d\x02\x11\x1a,\x20Contains\x20(p\
+    otentially)\x20modified\x20input\x20data\n\n\x0c\n\x05\x04\0\x02\0\x05\
+    \x12\x03\x1d\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1d\x08\x0c\n\
+    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1d\x0f\x10\n0\n\x04\x04\0\x02\x01\
+    \x12\x03\x20\x02\x18\x1a#\x20Execution\x20status\x20of\x20the\x20last\
+    \x20step\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x20\x02\x0c\n\x0c\n\x05\
+    \x04\0\x02\x01\x01\x12\x03\x20\r\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\
+    \x03\x20\x16\x17\nN\n\x04\x04\0\x02\x02\x12\x03#\x02%\x1aA\x20Optional\
+    \x20message\x20accompanying\x20the\x20exec\x20status\x20for\x20the\x20la\
+    st\x20step\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03#\x02\n\n\x0c\n\x05\
+    \x04\0\x02\x02\x05\x12\x03#\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
+    \x03#\x12\x20\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03##$\nV\n\x04\x04\0\
+    \x02\x03\x12\x03&\x02.\x1aI\x20An\x20array\x20of\x20pipelines\x20that\
+    \x20the\x20SDK\x20executed\x20and\x20the\x20status\x20of\x20each\x20step\
+    \n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\x03&\x02\n\n\x0c\n\x05\x04\0\x02\
     \x03\x06\x12\x03&\x0b\x19\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03&\x1a)\n\
     \x0c\n\x05\x04\0\x02\x03\x03\x12\x03&,-\n\x92\x03\n\x04\x04\0\x02\x04\
     \x12\x030\x02#\x1a\x84\x03\x20Includes\x20any\x20metadata\x20that\x20the\
@@ -1226,7 +1268,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x20user\x20must\x20define\x20the\x20abort\x20conditions\n\x20for\x20\"o\
     n_error\".\n\n\x0c\n\x05\x04\x02\x02\x03\x06\x12\x03M\x02\x10\n\x0c\n\
     \x05\x04\x02\x02\x03\x01\x12\x03M\x11\x20\n\x0c\n\x05\x04\x02\x02\x03\
-    \x03\x12\x03M#$\n\xd5\x01\n\x02\x04\x03\x12\x04S\0h\x01\x1a\xc8\x01\x20S\
+    \x03\x12\x03M#$\n\xd5\x01\n\x02\x04\x03\x12\x04S\0x\x01\x1a\xc8\x01\x20S\
     DKStartupConfig\x20is\x20the\x20configuration\x20structure\x20that\x20is\
     \x20used\x20in\x20Streamdal\x20SDKs\n\x20to\x20configure\x20the\x20clien\
     t\x20at\x20startup.\x20Some\x20SDKs\x20may\x20expose\x20additional\x20co\
@@ -1255,25 +1297,42 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     for\x20a\x20step\x20execution\x20to\x20complete\x20before\x20timing\x20o\
     ut\n\n\x0c\n\x05\x04\x03\x02\x04\x04\x12\x03b\x02\n\n\x0c\n\x05\x04\x03\
     \x02\x04\x05\x12\x03b\x0b\x10\n\x0c\n\x05\x04\x03\x02\x04\x01\x12\x03b\
-    \x11%\n\x0c\n\x05\x04\x03\x02\x04\x03\x12\x03b()\n\xf5\x01\n\x04\x04\x03\
-    \x02\x05\x12\x03g\x02'\x1a\xe7\x01\x20Tells\x20the\x20SDK\x20how\x20to\
-    \x20behave\x20when\x20it\x20runs\x20into\x20an\x20error.\x20This\x20sett\
-    ing\x20has\n\x20no\x20effect\x20if\x20the\x20SDK\x20is\x20NOT\x20used\
-    \x20within\x20a\x20shim/wrapper\x20library.\x20Read\x20more\n\x20about\
-    \x20shims\x20here:\x20https://docs.streamdal.com/en/core-components/libr\
-    aries-shims/\n\n\x0c\n\x05\x04\x03\x02\x05\x04\x12\x03g\x02\n\n\x0c\n\
-    \x05\x04\x03\x02\x05\x06\x12\x03g\x0b\x17\n\x0c\n\x05\x04\x03\x02\x05\
-    \x01\x12\x03g\x18\"\n\x0c\n\x05\x04\x03\x02\x05\x03\x12\x03g%&\n\x92\x03\
-    \n\x02\x05\x01\x12\x05r\0\x8e\x01\x01\x1a\x84\x03\x20SDKErrorMode\x20is\
-    \x20used\x20to\x20alter\x20the\x20error\x20behavior\x20of\x20a\x20shim\
-    \x20library\n\x20instrumented\x20with\x20the\x20Streamdal\x20SDK\x20at\
-    \x20runtime.\n\n\x20NOTE:\x20This\x20structure\x20is\x20usually\x20used\
-    \x20when\x20the\x20SDK\x20is\x20used\x20via\x20a\x20shim/wrapper\n\x20li\
-    brary\x20where\x20you\x20have\x20less\x20control\x20over\x20SDK\x20behav\
-    ior.\x20Read\x20more\x20about\x20shims\n\x20here:\x20https://docs.stream\
-    dal.com/en/core-components/libraries-shims/\n\n\x20protolint:disable\x20\
-    ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\x01\x01\x12\x03r\x05\x11\n\xf6\
-    \x07\n\x04\x05\x01\x02\0\x12\x04\x88\x01\x02\x1b\x1a\xe7\x07\x20This\x20\
+    \x11%\n\x0c\n\x05\x04\x03\x02\x04\x03\x12\x03b()\n\x82\x01\n\x04\x04\x03\
+    \x02\x05\x12\x03f\x02\x1c\x1au\x20Instruct\x20the\x20SDK\x20to\x20execut\
+    e\x20pipelines\x20but\x20return\x20ORIGINAL\x20input\x20payload\n\x20ins\
+    tead\x20of\x20(potentially)\x20modified\x20payload.\n\n\x0c\n\x05\x04\
+    \x03\x02\x05\x04\x12\x03f\x02\n\n\x0c\n\x05\x04\x03\x02\x05\x05\x12\x03f\
+    \x0b\x0f\n\x0c\n\x05\x04\x03\x02\x05\x01\x12\x03f\x10\x17\n\x0c\n\x05\
+    \x04\x03\x02\x05\x03\x12\x03f\x1a\x1b\n\xe8\x04\n\x04\x04\x03\x02\x06\
+    \x12\x03t\x023\x1a\xa5\x02\x20By\x20default,\x20the\x20shim\x20will\x20e\
+    xecute\x20pipelines\x20on\x20every\x20read/write\x20call\x20to\x20the\n\
+    \x20upstream\x20library.\x20If\x20this\x20is\x20set\x20to\x20true,\x20th\
+    e\x20shim\x20will\x20only\x20execute\x20its\n\x20workload\x20if\x20the\
+    \x20upstream\x20library\x20is\x20called\x20with\x20a\x20protos.SDKRuntim\
+    eConfig.\n\x20Ie.\x20kafkaProducer.Write(data,\x20&streamdal.SDKRuntimeC\
+    onfig{...}).\n2\xb2\x02\x20---------------------\x20Shim/Wrapper\x20Libr\
+    ary\x20Settings\x20--------------------\n\n\x20These\x20settings\x20are\
+    \x20_primarily_\x20used\x20when\x20the\x20SDK\x20is\x20used\x20within\
+    \x20a\x20shim/wrapper\x20library.\n\x20Setting\x20them\x20outside\x20of\
+    \x20a\x20shim\x20will\x20have\x20no\x20effect.\n\n\x20Read\x20more\x20ab\
+    out\x20shims:\x20https://docs.streamdal.com/en/core-components/libraries\
+    -shims/\n\n\n\x0c\n\x05\x04\x03\x02\x06\x04\x12\x03t\x02\n\n\x0c\n\x05\
+    \x04\x03\x02\x06\x05\x12\x03t\x0b\x0f\n\x0c\n\x05\x04\x03\x02\x06\x01\
+    \x12\x03t\x10+\n\x0c\n\x05\x04\x03\x02\x06\x03\x12\x03t.2\nE\n\x04\x04\
+    \x03\x02\x07\x12\x03w\x020\x1a8\x20Tells\x20the\x20SDK\x20how\x20to\x20b\
+    ehave\x20when\x20it\x20runs\x20into\x20an\x20error\n\n\x0c\n\x05\x04\x03\
+    \x02\x07\x04\x12\x03w\x02\n\n\x0c\n\x05\x04\x03\x02\x07\x06\x12\x03w\x0b\
+    \x18\n\x0c\n\x05\x04\x03\x02\x07\x01\x12\x03w\x19(\n\x0c\n\x05\x04\x03\
+    \x02\x07\x03\x12\x03w+/\n\xe8\x02\n\x02\x05\x01\x12\x06\x80\x01\0\x9c\
+    \x01\x01\x1a\xd9\x02\x20ShimErrorMode\x20is\x20used\x20to\x20alter\x20th\
+    e\x20error\x20behavior\x20of\x20a\x20shim\x20library\n\x20instrumented\
+    \x20with\x20the\x20Streamdal\x20SDK\x20at\x20runtime.\n\n\x20NOTE:\x20Th\
+    is\x20structure\x20is\x20usually\x20used\x20when\x20the\x20SDK\x20is\x20\
+    used\x20via\x20a\x20shim/wrapper\n\x20library\x20where\x20you\x20have\
+    \x20less\x20control\x20over\x20SDK\x20behavior.\x20Read\x20more\x20about\
+    \x20shims\n\x20here:\x20https://docs.streamdal.com/en/core-components/li\
+    braries-shims/\n\n\x0b\n\x03\x05\x01\x01\x12\x04\x80\x01\x05\x12\n\xf6\
+    \x07\n\x04\x05\x01\x02\0\x12\x04\x96\x01\x02\x1c\x1a\xe7\x07\x20This\x20\
     instructs\x20the\x20shim\x20to\x20IGNORE\x20any\x20non-recoverable\x20er\
     rors\x20that\x20the\x20SDK\n\x20might\x20run\x20into.\x20If\x20the\x20SD\
     K\x20runs\x20into\x20an\x20error,\x20the\x20shim\x20will\x20NOT\x20pass\
@@ -1295,16 +1354,16 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     able\x20error\n\x20while\x20calling\x20the\x20SDK\x20(step\x203),\x20it\
     \x20will\x20side-step\x20steps\x204\x20and\x205\x20and\x20instead\n\x20r\
     eturn\x20the\x20_original_\x20payload\x20(read\x20during\x20step\x201)\
-    \x20to\x20the\x20user.\n\n\r\n\x05\x05\x01\x02\0\x01\x12\x04\x88\x01\x02\
-    \x16\n\r\n\x05\x05\x01\x02\0\x02\x12\x04\x88\x01\x19\x1a\n\xed\x01\n\x04\
-    \x05\x01\x02\x01\x12\x04\x8d\x01\x02\x1c\x1a\xde\x01\x20This\x20instruct\
+    \x20to\x20the\x20user.\n\n\r\n\x05\x05\x01\x02\0\x01\x12\x04\x96\x01\x02\
+    \x17\n\r\n\x05\x05\x01\x02\0\x02\x12\x04\x96\x01\x1a\x1b\n\xed\x01\n\x04\
+    \x05\x01\x02\x01\x12\x04\x9b\x01\x02\x1d\x1a\xde\x01\x20This\x20instruct\
     s\x20the\x20shim\x20to\x20ABORT\x20execution\x20if\x20the\x20SDK\x20runs\
     \x20into\x20any\n\x20non-recoverable\x20errors.\x20Upon\x20aborting,\x20\
     the\x20shim\x20will\x20return\x20the\x20error\x20that\n\x20the\x20SDK\
     \x20ran\x20into\x20and\x20the\x20error\x20will\x20be\x20passed\x20all\
     \x20the\x20way\x20back\x20to\x20the\x20user.\n\n\r\n\x05\x05\x01\x02\x01\
-    \x01\x12\x04\x8d\x01\x02\x17\n\r\n\x05\x05\x01\x02\x01\x02\x12\x04\x8d\
-    \x01\x1a\x1b\n\x9e\x04\n\x02\x04\x04\x12\x06\x98\x01\0\x9e\x01\x01\x1a\
+    \x01\x12\x04\x9b\x01\x02\x18\n\r\n\x05\x05\x01\x02\x01\x02\x12\x04\x9b\
+    \x01\x1b\x1c\n\x9e\x04\n\x02\x04\x04\x12\x06\xa6\x01\0\xac\x01\x01\x1a\
     \x8f\x04\x20SDKRuntimeConfig\x20is\x20the\x20configuration\x20structure\
     \x20that\x20is\x20used\x20in\x20SDKs\x20to\n\x20configure\x20how\x20the\
     \x20SDK\x20behaves\x20at\x20runtime.\x20It\x20is\x20most\x20often\x20exp\
@@ -1316,17 +1375,17 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x20where\x20you\x20have\x20less\x20control\x20over\x20SDK\x20behavior.\
     \x20Read\x20more\x20about\x20shims\n\x20here:\x20https://docs.streamdal.\
     com/en/core-components/libraries-shims/\n\n\x0b\n\x03\x04\x04\x01\x12\
-    \x04\x98\x01\x08\x18\nd\n\x04\x04\x04\x02\0\x12\x04\x9a\x01\x02'\x1aV\
+    \x04\xa6\x01\x08\x19\nd\n\x04\x04\x04\x02\0\x12\x04\xa8\x01\x02(\x1aV\
     \x20Specifies\x20how\x20the\x20shim\x20should\x20behave\x20if\x20it\x20r\
     uns\x20into\x20any\x20errors\x20when\x20calling\x20the\x20SDK\n\n\r\n\
-    \x05\x04\x04\x02\0\x04\x12\x04\x9a\x01\x02\n\n\r\n\x05\x04\x04\x02\0\x06\
-    \x12\x04\x9a\x01\x0b\x17\n\r\n\x05\x04\x04\x02\0\x01\x12\x04\x9a\x01\x18\
-    \"\n\r\n\x05\x04\x04\x02\0\x03\x12\x04\x9a\x01%&\nM\n\x04\x04\x04\x02\
-    \x01\x12\x04\x9d\x01\x02(\x1a?\x20Audience\x20that\x20will\x20be\x20used\
-    \x20by\x20shim\x20when\x20calling\x20SDK.Process()\n\n\r\n\x05\x04\x04\
-    \x02\x01\x04\x12\x04\x9d\x01\x02\n\n\r\n\x05\x04\x04\x02\x01\x06\x12\x04\
-    \x9d\x01\x0b\x1a\n\r\n\x05\x04\x04\x02\x01\x01\x12\x04\x9d\x01\x1b#\n\r\
-    \n\x05\x04\x04\x02\x01\x03\x12\x04\x9d\x01&'b\x06proto3\
+    \x05\x04\x04\x02\0\x04\x12\x04\xa8\x01\x02\n\n\r\n\x05\x04\x04\x02\0\x06\
+    \x12\x04\xa8\x01\x0b\x18\n\r\n\x05\x04\x04\x02\0\x01\x12\x04\xa8\x01\x19\
+    #\n\r\n\x05\x04\x04\x02\0\x03\x12\x04\xa8\x01&'\nM\n\x04\x04\x04\x02\x01\
+    \x12\x04\xab\x01\x02(\x1a?\x20Audience\x20that\x20will\x20be\x20used\x20\
+    by\x20shim\x20when\x20calling\x20SDK.Process()\n\n\r\n\x05\x04\x04\x02\
+    \x01\x04\x12\x04\xab\x01\x02\n\n\r\n\x05\x04\x04\x02\x01\x06\x12\x04\xab\
+    \x01\x0b\x1a\n\r\n\x05\x04\x04\x02\x01\x01\x12\x04\xab\x01\x1b#\n\r\n\
+    \x05\x04\x04\x02\x01\x03\x12\x04\xab\x01&'b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -1351,10 +1410,10 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(PipelineStatus::generated_message_descriptor_data());
             messages.push(StepStatus::generated_message_descriptor_data());
             messages.push(SDKStartupConfig::generated_message_descriptor_data());
-            messages.push(SDKRuntimeConfig::generated_message_descriptor_data());
+            messages.push(ShimRuntimeConfig::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(ExecStatus::generated_enum_descriptor_data());
-            enums.push(SDKErrorMode::generated_enum_descriptor_data());
+            enums.push(ShimErrorMode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,

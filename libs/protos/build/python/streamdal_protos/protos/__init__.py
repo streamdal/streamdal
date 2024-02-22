@@ -162,17 +162,16 @@ class ExecStatus(betterproto.Enum):
     """
 
 
-class SdkErrorMode(betterproto.Enum):
+class ShimErrorMode(betterproto.Enum):
     """
-    SDKErrorMode is used to alter the error behavior of a shim library
+    ShimErrorMode is used to alter the error behavior of a shim library
     instrumented with the Streamdal SDK at runtime. NOTE: This structure is
     usually used when the SDK is used via a shim/wrapper library where you have
     less control over SDK behavior. Read more about shims here:
     https://docs.streamdal.com/en/core-components/libraries-shims/
-    protolint:disable ENUM_FIELD_NAMES_PREFIX
     """
 
-    SDK_ERROR_MODE_UNSET = 0
+    SHIM_ERROR_MODE_UNSET = 0
     """
     This instructs the shim to IGNORE any non-recoverable errors that the SDK
     might run into. If the SDK runs into an error, the shim will NOT pass the
@@ -190,7 +189,7 @@ class SdkErrorMode(betterproto.Enum):
     (read during step 1) to the user.
     """
 
-    SDK_ERROR_MODE_STRICT = 1
+    SHIM_ERROR_MODE_STRICT = 1
     """
     This instructs the shim to ABORT execution if the SDK runs into any non-
     recoverable errors. Upon aborting, the shim will return the error that the
@@ -1323,19 +1322,30 @@ class SdkStartupConfig(betterproto.Message):
     )
     """How long to wait for a step execution to complete before timing out"""
 
-    error_mode: Optional["SdkErrorMode"] = betterproto.enum_field(
-        6, optional=True, group="_error_mode"
+    dry_run: Optional[bool] = betterproto.bool_field(6, optional=True, group="_dry_run")
+    """
+    Instruct the SDK to execute pipelines but return ORIGINAL input payload
+    instead of (potentially) modified payload.
+    """
+
+    shim_require_runtime_config: Optional[bool] = betterproto.bool_field(
+        1000, optional=True, group="_shim_require_runtime_config"
     )
     """
-    Tells the SDK how to behave when it runs into an error. This setting has no
-    effect if the SDK is NOT used within a shim/wrapper library. Read more
-    about shims here: https://docs.streamdal.com/en/core-components/libraries-
-    shims/
+    By default, the shim will execute pipelines on every read/write call to the
+    upstream library. If this is set to true, the shim will only execute its
+    workload if the upstream library is called with a protos.SDKRuntimeConfig.
+    Ie. kafkaProducer.Write(data, &streamdal.SDKRuntimeConfig{...}).
     """
+
+    shim_error_mode: Optional["ShimErrorMode"] = betterproto.enum_field(
+        1001, optional=True, group="_shim_error_mode"
+    )
+    """Tells the SDK how to behave when it runs into an error"""
 
 
 @dataclass(eq=False, repr=False)
-class SdkRuntimeConfig(betterproto.Message):
+class ShimRuntimeConfig(betterproto.Message):
     """
     SDKRuntimeConfig is the configuration structure that is used in SDKs to
     configure how the SDK behaves at runtime. It is most often exposed as an
@@ -1347,7 +1357,7 @@ class SdkRuntimeConfig(betterproto.Message):
     components/libraries-shims/
     """
 
-    error_mode: Optional["SdkErrorMode"] = betterproto.enum_field(
+    error_mode: Optional["ShimErrorMode"] = betterproto.enum_field(
         1, optional=True, group="_error_mode"
     )
     """
