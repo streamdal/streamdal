@@ -256,6 +256,50 @@ export declare enum DetectiveType {
      */
     PII_HEALTH = 2016,
     /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_AWS_KEY_ID = 2017;
+     */
+    PII_AWS_KEY_ID = 2017,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_RSA_KEY = 2018;
+     */
+    PII_RSA_KEY = 2018,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_TITLE = 2019;
+     */
+    PII_TITLE = 2019,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_RELIGION = 2020;
+     */
+    PII_RELIGION = 2020,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_SLACK_TOKEN = 2021;
+     */
+    PII_SLACK_TOKEN = 2021,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_STRIPE_KEY = 2022;
+     */
+    PII_STRIPE_KEY = 2022,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_IBAN = 2023;
+     */
+    PII_IBAN = 2023,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_SWIFT_BIC = 2024;
+     */
+    PII_SWIFT_BIC = 2024,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER = 2025;
+     */
+    PII_BANK_ROUTING_NUMBER = 2025,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_CRYPTO_ADDRESS = 2026;
+     */
+    PII_CRYPTO_ADDRESS = 2026,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_GITHUB_PAT = 2027;
+     */
+    PII_GITHUB_PAT = 2027,
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     NUMERIC_EQUAL_TO = 3000,
