@@ -115,6 +115,28 @@ export const SIDEBAR: Sidebar = {
             slug: "pipelines",
             link: "en/guides/pipelines",
           },
+          {
+            text: "Notifications",
+            slug: "notifications",
+            link: "en/guides/notifications",
+            children: [
+              {
+                text: "Email",
+                slug: "email",
+                link: "en/guides/notifications/email",
+              },
+              {
+                text: "Slack",
+                slug: "slack",
+                link: "en/guides/notifications/slack",
+              },
+              {
+                text: "Pagerduty",
+                slug: "pagerduty",
+                link: "en/guides/notifications/pagerduty",
+              }
+            ]
+          },
         ],
       },
       {
