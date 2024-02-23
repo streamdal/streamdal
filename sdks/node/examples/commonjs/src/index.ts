@@ -1,9 +1,5 @@
-const {
-  ExecStatus,
-  OperationType,
-  Streamdal,
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require("@streamdal/node-sdk");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { ExecStatus, OperationType, Streamdal } = require("@streamdal/node-sdk");
 
 const exampleData = {
   boolean_t: true,

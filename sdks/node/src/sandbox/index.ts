@@ -6,7 +6,7 @@ import {
   registerStreamdal,
   StreamdalConfigs,
   StreamdalRegistration,
-} from "../streamdal.js";
+} from "../index.js";
 import { onboardingExample } from "./billing.js";
 
 export const QUIET = true;
