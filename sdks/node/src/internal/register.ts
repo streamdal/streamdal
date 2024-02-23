@@ -8,7 +8,7 @@ import { RegisterRequest } from "@streamdal/protos/protos/sp_internal";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
 
-import { InternalConfigs } from "../streamdal.js";
+import { InternalConfigs } from "../index.js";
 import { processResponse } from "./pipeline.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
 

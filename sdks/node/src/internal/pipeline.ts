@@ -3,7 +3,7 @@ import { Audience, TailRequestType } from "@streamdal/protos/protos/sp_common";
 import { GetSetPipelinesCommandsByServiceResponse } from "@streamdal/protos/protos/sp_internal";
 import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 
-import { InternalConfigs } from "../streamdal.js";
+import { InternalConfigs } from "../index.js";
 import { kvCommand } from "./kv.js";
 import { audienceKey, internal, Tail } from "./register.js";
 import { TokenBucket } from "./utils/tokenBucket.js";

@@ -5,7 +5,7 @@ import {
   OperationType,
   registerStreamdal,
   StreamdalConfigs,
-} from "../streamdal.js";
+} from "../index.js";
 import { loadData } from "./billing.js";
 
 const serviceKVConfig: StreamdalConfigs = {

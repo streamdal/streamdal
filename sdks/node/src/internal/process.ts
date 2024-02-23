@@ -13,7 +13,7 @@ import {
 } from "@streamdal/protos/protos/sp_sdk";
 import { InterStepResult, WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
-import { InternalConfigs, StreamdalRequest } from "../streamdal.js";
+import { InternalConfigs, StreamdalRequest } from "../index.js";
 import { addAudience } from "./audience.js";
 import { httpRequest } from "./httpRequest.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
