@@ -2,8 +2,9 @@ use crate::detective::parse_number;
 use crate::detective::Request;
 use crate::error::CustomError;
 use protos::sp_steps_detective::DetectiveType;
+use streamdal_gjson::Value;
 
-pub fn common(request: &Request, value: gjson::Value) -> Result<bool, CustomError> {
+pub fn common(request: &Request, value: Value) -> Result<bool, CustomError> {
     let mut required_len = 1;
 
     if request.match_type == DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE {

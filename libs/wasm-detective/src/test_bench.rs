@@ -1,8 +1,9 @@
 extern crate test;
+
+use crate::detective::parse_field;
 use crate::test_utils::generate_request_for_bench;
 use protos::sp_steps_detective::DetectiveType;
 use test::Bencher;
-use crate::detective::parse_field;
 
 #[bench]
 fn bench_ipv4_address(b: &mut Bencher) {
@@ -130,7 +131,6 @@ fn bench_hostname(b: &mut Bencher) {
     });
 }
 
-
 #[bench]
 fn bench_email(b: &mut Bencher) {
     let request = generate_request_for_bench(
@@ -161,11 +161,7 @@ fn bench_email_utf8(b: &mut Bencher) {
 
 #[bench]
 fn bench_email_payload(b: &mut Bencher) {
-    let request = generate_request_for_bench(
-        DetectiveType::DETECTIVE_TYPE_PII_EMAIL,
-        "",
-        vec![],
-    );
+    let request = generate_request_for_bench(DetectiveType::DETECTIVE_TYPE_PII_EMAIL, "", vec![]);
 
     b.iter(|| {
         let _ = crate::detective::Detective::new().matches(&request);
@@ -182,20 +178,16 @@ fn bench_credit_card(b: &mut Bencher) {
 
     b.iter(|| {
         let field = parse_field(request.data, &request.path).unwrap();
-        let _ = crate::matcher_pii::credit_card(&request, field);
+        let _ = crate::matcher_pii_payments::credit_card(&request, field);
     });
 }
 
 #[bench]
 fn bench_credit_card_payload(b: &mut Bencher) {
-    let request = generate_request_for_bench(
-        DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD,
-        "",
-        vec![],
-    );
+    let request =
+        generate_request_for_bench(DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD, "", vec![]);
 
     b.iter(|| {
         let _ = crate::detective::Detective::new().matches(&request);
     });
 }
-

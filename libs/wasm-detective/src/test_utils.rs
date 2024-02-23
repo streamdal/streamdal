@@ -80,6 +80,36 @@ pub const SAMPLE_JSON: &str = r#"{
     "timestamp_unix_nano_str": "1614556800000000000",
     "timestamp_unix_nano_num": 1614556800000000000,
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
+    "cloud": {
+        "aws": {
+            "key_id": "AKIAIOSFODNN7EXAMPLE"
+        },
+        "github": {
+            "pat": "ghp_qr7jU0ItnCxyvstfROjpYVngNWGidT0SOtwD"
+        }
+    },
+    "payments": {
+        "crypto": {
+            "eth": "0x1ABC7154748D1CE5144478CDEB574AE244B939B5"
+        },
+        "routing_number": "122105155",
+        "swift_bic": "AAAA-BB-CC-123",
+        "stripe": "pk_test_4eC39HqLyjWDarjtT1zdp7dc",
+        "iban": "GB82WEST12345698765432",
+    },
+    "slack": "xoxb-263594206564-FGqddMF8t08v8N7Oq4i57vs1",
+    "address": {
+        "postal_code": {
+            "usa": "12345",
+            "canada": "K1A 0B1"
+        }
+    },
+    "personal": {
+        "title": "Mr.",
+        "religion": "Buddhism",
+        "phone": "+13215781234",
+    },
+    "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----"
 }"#;
 
 lazy_static! {

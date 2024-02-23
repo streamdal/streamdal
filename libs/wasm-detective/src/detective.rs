@@ -2,6 +2,9 @@ use crate::error::CustomError;
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
+use crate::matcher_pii_payments as pii_payments;
+use crate::matcher_pii_cloud as pii_cloud;
+use streamdal_gjson as gjson;
 
 use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType};
 use std::str;
@@ -199,7 +202,7 @@ impl Detective {
 
             // PII matchers
             DetectiveType::DETECTIVE_TYPE_PII_ANY => pii::any,
-            DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD => pii::credit_card,
+            DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD => pii_payments::credit_card,
             DetectiveType::DETECTIVE_TYPE_PII_SSN => pii::ssn,
             DetectiveType::DETECTIVE_TYPE_PII_EMAIL => pii::email,
             DetectiveType::DETECTIVE_TYPE_PII_PHONE => pii::phone,
@@ -215,11 +218,22 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_EDUCATION => pii::education,
             DetectiveType::DETECTIVE_TYPE_PII_FINANCIAL => pii::financial,
             DetectiveType::DETECTIVE_TYPE_PII_HEALTH => pii::health,
+            DetectiveType::DETECTIVE_TYPE_PII_AWS_KEY_ID => pii_cloud::aws_key_id,
+            DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT => pii_cloud::github_pat,
+            DetectiveType::DETECTIVE_TYPE_PII_SLACK_TOKEN => pii_cloud::slack_token,
+            DetectiveType::DETECTIVE_TYPE_PII_STRIPE_KEY => pii_cloud::stripe_key,
+            DetectiveType::DETECTIVE_TYPE_PII_RSA_KEY => pii::rsa_key,
+            DetectiveType::DETECTIVE_TYPE_PII_TITLE => pii::title,
+            DetectiveType::DETECTIVE_TYPE_PII_RELIGION => pii::religion,
+            DetectiveType::DETECTIVE_TYPE_PII_IBAN => pii_payments::iban,
+            DetectiveType::DETECTIVE_TYPE_PII_SWIFT_BIC => pii_payments::swift_bic,
+            DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER => pii_payments::usa_bank_routing_number,
+            DetectiveType::DETECTIVE_TYPE_PII_CRYPTO_ADDRESS => pii_payments::crypto_currency_address,
 
             DetectiveType::DETECTIVE_TYPE_UNKNOWN => {
                 return Err(CustomError::Error(
                     "match type cannot be unknown".to_string(),
-                ))
+                ));
             }
         };
 
@@ -267,6 +281,7 @@ fn validate_request(request: &Request) -> Result<(), CustomError> {
 
     Ok(())
 }
+
 fn recurse_field(
     request: &Request,
     val: gjson::Value,
