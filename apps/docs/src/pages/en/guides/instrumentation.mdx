@@ -5,15 +5,16 @@ description: "Step-by-step instructions on integrating and instrumenting your co
 layout: ../../../layouts/MainLayout.astro
 ---
 
+import note from "@images/icons/note.png";
 import dataGraph from "@images/core-components/DataGraphSdk.png";
+import Notification  from "@components/Callouts/Notification.astro";
 import Changes from "@components/Misc/Changes.astro";
-import RichImg from "@components/Misc/RichImg.astro";
 
 <Changes />
 
-The [SDK](/en/core-components/sdk/) should initiliazed in your application 
-where data consumption or production takes place. The SDK is responsible for 
-sending data to the Streamdal [server](/en/core-components/server/), which then 
+The [SDK](/en/core-components/sdk/) should initiliazed in your application
+where data consumption or production takes place. The SDK is responsible for
+sending data to the Streamdal [server](/en/core-components/server/), which then
 processes it and returns a response.
 
 ## SDK flow
@@ -23,18 +24,34 @@ processes it and returns a response.
 
 ## Streamdal Client Configuration
 
+<Notification type="note">
+  <img src={note} alt="Note" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+      <p>This example uses the Golang SDK.</p>
+      <p style="font-weight: normal">The configuration parameters are similar across all SDKs, but the syntax may vary slightly.</p>
+  </div>
+</Notification>
+
 When initializing the Streamdal client with `streamdal.New()`, you pass a configuration object to customize its behavior. Here's a breakdown of the parameters in that configuration:
 
-| Parameter | Description | Type | Example |
+| Parameter | Description | Example | Required? |
 |-|-|-|-|
-| **StreamdalURL** | The URL of the Streamdal server instance. | String | `"localhost:8082"` |
-| **StreamdalToken** | The authentication token for the Streamdal server. | String | `"streamdal"` |
-| **StepTimeout** | Sets the maximum duration for Wasm execution in each step. | Duration | `time.Millisecond * 10` |
-| **PipelineTimeout** | Defines the total allowable execution time for the entire [pipeline](/en/guides/pipelines/). | Duration | `time.Millisecond * 100` |
-| **DryRun** | A switch to toggle between actual execution and a logging-only mode. If set to true, it won't actually execute but will only log. | Boolean | `false` |
-| **ServiceName** | A name that represents the specific service in your infrastructure using this client. | String | `"billing-svc"` |
-| **ShutdownCtx** | Context used to manage the lifecycle and potential shutdown of the Streamdal client. | Context | `ctx` |
+| **StreamdalURL** | The URL of the Streamdal server instance. | `"localhost:8082"` | ✅ |
+| **StreamdalToken** | The authentication token for the Streamdal server. | `"streamdal"` | ✅ |
+| **ServiceName** | A name that represents the specific service in your infrastructure using this client. | `"billing-svc"` | ✅ |
+| **StepTimeout** | Sets the maximum duration for Wasm execution in each step. | `time.Millisecond * 10` | ❌ |
+| **PipelineTimeout** | Defines the total allowable execution time for the entire [pipeline](/en/guides/pipelines/). | `time.Millisecond * 100` | ❌ |
+| **DryRun** | A switch to toggle between actual execution and a logging-only mode. If set to true, it won't actually execute but will only log. | `false` | ❌ |
+| **ShutdownCtx** | Context used to manage the lifecycle and potential shutdown of the Streamdal client. | `context.Background()` | ❌ |
 
+Alternatively, you can also configure many of these settings via environment variables. Refer to the [Go SDK README](https://github.com/streamdal/streamdal/blob/main/sdks/go/README.md) for more details.
+
+## Authentication
+
+All of the SDKs will require you to provide a "Streamdal (Auth) Token" as one of the parameters in the configuration object.
+This token is used to authenticate the SDK in your app with the Streamdal server.
+
+This is the same token as the `STREAMDAL_SERVER_AUTH_TOKEN` environment variable that you set when running the Streamdal server.
 
 ## Process() Parameters
 
@@ -54,7 +71,7 @@ Let's delve into the specifics of the `Process()` method:
 
 ## Golang SDK Example
 
-Using the [SDK](/en/core-components/sdk/) in your Golang applications is 
+Using the [SDK](/en/core-components/sdk/) in your Golang applications is
 straightforward. Here's a simple example to get you started:
 
 ```go
@@ -106,7 +123,7 @@ The SDK is currently available in the following languages:
 
 ---
 
-With this guide at your side, integrating Streamdal into your operations 
-becomes a piece of cake. Remember, the true magic unfolds when Streamdal's 
-capabilities meld seamlessly with your application's data flows. So, jump in, 
+With this guide at your side, integrating Streamdal into your operations
+becomes a piece of cake. Remember, the true magic unfolds when Streamdal's
+capabilities meld seamlessly with your application's data flows. So, jump in,
 integrate, and watch your data operations transform!
