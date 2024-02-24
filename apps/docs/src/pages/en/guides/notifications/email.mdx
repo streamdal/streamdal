@@ -1,0 +1,24 @@
+---
+title: Email Notifications
+metaTitle: Email Notifications
+description: A guide to setting up pipeline notifications via SMTP or SES
+layout: ../../../../layouts/MainLayout.astro
+---
+
+import smtpSettings from '@images/guides/notifications/email/smtp.png';
+import sesSettings from '@images/guides/notifications/email/ses.png';
+
+Email notifications can be sent via SMTP or Amazon SES.
+At least one recipient is required. If you wish to add additional recipients, click the *Add a new Recipient +* button.
+
+### SMTP
+
+Select `SMTP` from the **Email Notification Type** dropdown. All fields are required.
+
+<img src={smtpSettings} alt="SMTP Settings" />
+
+### AWS SES
+
+Select `SES` from the **Email Notification Type** dropdown. All fields are required.
+
+<img src={sesSettings} alt="SES Settings" />
