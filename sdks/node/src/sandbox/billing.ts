@@ -7,7 +7,7 @@ import {
   registerStreamdal,
   StreamdalConfigs,
   StreamdalRegistration,
-} from "../streamdal.js";
+} from "../index.js";
 import { QUIET, runPipeline } from "./index.js";
 
 const serviceBillingConfig: StreamdalConfigs = {

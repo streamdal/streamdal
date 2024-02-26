@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 import { initPipelines } from "../internal/pipeline.js";
 import { processPipeline } from "../internal/process.js";
 import { audienceKey, internal } from "../internal/register.js";
-import { ExecStatus } from "../streamdal.js";
+import { ExecStatus } from "../index";
 
 const testData = {
   boolean_t: true,

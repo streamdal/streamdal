@@ -3,7 +3,7 @@
   "workspaces": [
     "examples"
   ],
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "Streamdal's Node SDK",
   "keywords": [
     "streamdal",
@@ -15,12 +15,12 @@
   "exports": {
     ".": {
       "require": {
-        "types": "./cjs/streamdal.d.ts",
-        "default": "./cjs/streamdal.js"
+        "types": "./cjs/index.d.ts",
+        "default": "./cjs/index.js"
       },
       "import": {
-        "types": "./streamdal.d.ts",
-        "default": "./streamdal.js"
+        "types": "./index.d.ts",
+        "default": "./index.js"
       }
     }
   },

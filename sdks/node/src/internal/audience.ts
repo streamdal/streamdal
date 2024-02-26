@@ -1,6 +1,6 @@
 import { Audience, ResponseCode } from "@streamdal/protos/protos/sp_common";
 
-import { InternalConfigs } from "../streamdal.js";
+import { InternalConfigs } from "../index.js";
 import { audienceKey, internal, Tail } from "./register.js";
 
 export interface AddAudience {

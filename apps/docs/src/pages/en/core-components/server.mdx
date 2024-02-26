@@ -5,6 +5,8 @@ description: Dive into the heart of Streamdal's architecture, where rules conver
 layout: ../../../layouts/MainLayout.astro
 ---
 
+import info from "@images/icons/info.png";
+import Notification  from "@components/Callouts/Notification.astro";
 import serverDiagram from '@images/guides/HA-Deployment.png';
 import Changes from "@components/Misc/Changes.astro";
 
@@ -14,6 +16,8 @@ import Changes from "@components/Misc/Changes.astro";
 <br />
 The Server ensures that rules defined in the Console UI are fluently transformed into real-time operations. Boasting high availability, it doesn't merely store rules. Instead, it transmutes them into **WebAssembly (WASM)**, a format impeccably deciphered and executed by the SDK.
 
+For most up-to-date information, please refer to the [Streamdal Server GitHub repository](https://github.com/streamdal/streamdal/tree/main/apps/server).
+
 ## Core Features
 
 - **Bridge Between UI and Execution**: Seamlessly channels intentions from rule creation into actionable processes.
@@ -22,11 +26,74 @@ The Server ensures that rules defined in the Console UI are fluently transformed
 
 ## Server's Role & Functionality
 
-Central to Streamdal's ecosystem, the server receives rules from the Console UI, converting them into Wasm for real-time execution by the SDK. Check out the [server's README](https://github.com/streamdal/streamdal/tree/main/apps/server) to grasp its intricate usage.
+The server plays a pivotal role in the Streamdal ecosystem - it is the bridge between the Console and the SDKs.
+
+More specifically, the server is responsible for:
+
+1. Translating pipelines into WebAssembly rules for the SDKs
+2. Distributing configuration updates to SDKs
+3. Keeping track of "active" (currently running) clients (SDKs)
+4. Storing pipeline configuration
+5. Providing an API for the Console to allow configuring pipelines, steps, SDKs
+6. Aggregating metrics from SDKs
+7. .. and many other things
+
+For a more thorough understanding of the server's role, refer to the [server repo](https://github.com/streamdal/streamdal/tree/main/apps/server).
 
 ## Multi-Component Communication
 
 The server is pivotal in liaising between various components, ensuring streamlined communication and data operations.
+
+The server talks gRPC with both the Console and SDKs. The server does not perform any outbound connections, instead, the Console and SDKs establish a connection with the server.
+
+## Authentication
+
+In order for the Console and SDKs to be able to communicate with the server, they all must share the same authentication token.
+
+To set the authentication token, set the `STREAMDAL_SERVER_AUTH_TOKEN` environment variable to a unique value.
+
+Similarly, all SDKs and console must use this token when talking to the server.
+
+## Configuration
+
+The server is configured using environment variables that use a `STREAMDAL_SERVER` prefix.
+
+At minimum, the following environment variables MUST be set:
+
+1. `STREAMDAL_SERVER_AUTH_TOKEN` - the authentication token
+2. `STREAMDAL_SERVER_NODE_NAME` - the unique name for this service instance
+3. `STREAMDAL_SERVER_REDIS_URL` - the URL of the Redis instance or cluster
+
+<Notification type="note">
+    <img src={info} alt="Note" width="30px" height="30px" />
+    <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+        <p>Please refer to the [server README](https://github.com/streamdal/streamdal/tree/main/apps/server) for the most up-to-date and complete list of configuration options.</p>
+    </div>
+</Notification>
+
+## Redis
+
+The server uses Redis for the following purposes:
+
+1. To track actively connected and disconnected clients (SDKs)
+2. To store pipeline configurations
+3. To store the WebAssembly rules
+4. To store SDK metrics
+
+All Redis keys used by the server will be prefixed with `streamdal_`.
+
+If Redis goes away during the server's operation, the server will continue to operate normally and will automatically reconnect to Redis once it becomes available again.
+
+## Distributed by Default
+
+The Streamdal server is "distributed by default" - it is highly scalable, fault-tolerant, and designed to handle a large number of clients and pipelines.
+
+You can run as many server instances as you like as the server is stateless which means that there is no need for leader election or requiring an odd number of nodes.
+
+All you have to do to launch additional server instances is:
+
+1. Specify a unique node name
+2. Point the server instance to the same Redis cluster/instance
 
 ## Server High Level Architecture
 
