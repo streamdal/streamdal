@@ -78,7 +78,7 @@ export const DeleteServiceModal = (
                     <>
                       <div class="my-4">
                         <p class={"text-medium font-bold"}>
-                          Are you sure you want to delete this operation?
+                          Are you sure you want to delete this service?
                         </p>
                       </div>
                     </>
