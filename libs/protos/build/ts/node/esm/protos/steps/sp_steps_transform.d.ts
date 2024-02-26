@@ -102,9 +102,9 @@ export interface TransformTruncateOptions {
  */
 export interface TransformDeleteFieldOptions {
     /**
-     * @generated from protobuf field: string path = 1;
+     * @generated from protobuf field: repeated string paths = 1;
      */
-    path: string;
+    paths: string[];
 }
 /**
  * @generated from protobuf message protos.steps.TransformReplaceValueOptions

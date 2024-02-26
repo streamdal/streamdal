@@ -417,7 +417,7 @@ class TransformTruncateOptions(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class TransformDeleteFieldOptions(betterproto.Message):
-    path: str = betterproto.string_field(1)
+    paths: List[str] = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
