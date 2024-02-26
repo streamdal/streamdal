@@ -1,12 +1,15 @@
 #![feature(test)]
+
 use crate::error::CustomError;
-use gjson::Value;
+use streamdal_gjson::{Value, Kind};
 
 pub mod detective;
 pub mod error;
 pub mod matcher_core;
 pub mod matcher_numeric;
 pub mod matcher_pii;
+pub mod matcher_pii_payments;
+pub mod matcher_pii_cloud;
 
 #[cfg(test)]
 #[path = "matcher_numeric_tests.rs"]
@@ -24,6 +27,7 @@ mod matcher_pii_tests;
 #[path = "test_utils.rs"]
 mod test_utils;
 
+
 #[cfg(test)]
 #[path = "test_bench.rs"]
 mod test_bench;
@@ -37,7 +41,7 @@ where
 
 impl FromValue<'_> for bool {
     fn from_value(value: Value) -> Result<Self, CustomError> {
-        if value.kind() != gjson::Kind::True && value.kind() != gjson::Kind::False {
+        if value.kind() != Kind::True && value.kind() != Kind::False {
             return Err(CustomError::Error("not a boolean".to_string()));
         }
 
@@ -47,7 +51,7 @@ impl FromValue<'_> for bool {
 
 impl FromValue<'_> for f64 {
     fn from_value(value: Value) -> Result<Self, CustomError> {
-        if value.kind() != gjson::Kind::Number {
+        if value.kind() != Kind::Number {
             return Err(CustomError::Error("not a number".to_string()));
         }
 

@@ -1,7 +1,7 @@
 use crate::error::CustomError;
 use chrono::TimeZone;
 use crate::detective::{parse_number, Request};
-use gjson::Value;
+use streamdal_gjson::{Value, Kind};
 use protos::sp_steps_detective::DetectiveType;
 use regex::Regex;
 use std::net::IpAddr;
@@ -9,6 +9,7 @@ use std::str;
 use std::str::FromStr;
 use url::Url;
 use uuid::Uuid;
+
 
 pub fn string_equal_to(request: &Request, field: Value) -> Result<bool, CustomError> {
     if request.args.len() != 1 {
@@ -123,7 +124,7 @@ pub fn timestamp_unix(_request: &Request, field: Value) -> Result<bool, CustomEr
 }
 
 pub fn boolean_true(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    if field.kind() != gjson::Kind::True && field.kind() != gjson::Kind::False {
+    if field.kind() != Kind::True && field.kind() != Kind::False {
         return Err(CustomError::Error(format!("field is not a boolean: {}", field)));
     }
 
@@ -131,7 +132,7 @@ pub fn boolean_true(_request: &Request, field: Value) -> Result<bool, CustomErro
 }
 
 pub fn boolean_false(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    if field.kind() != gjson::Kind::False && field.kind() != gjson::Kind::True{
+    if field.kind() != Kind::False && field.kind() != Kind::True{
         return Err(CustomError::Error(format!("field is not a boolean: {}", field)));
     }
 
@@ -143,11 +144,11 @@ pub fn boolean_false(_request: &Request, field: Value) -> Result<bool, CustomErr
 pub fn is_empty(_request: &Request, field: Value) -> Result<bool, CustomError> {
     match field.kind() {
         // Null field
-        gjson::Kind::Null => Ok(true),
+        Kind::Null => Ok(true),
         // Maybe it's an array with 0 elements
-        gjson::Kind::Array => Ok(field.array().len() == 0),
+        Kind::Array => Ok(field.array().len() == 0),
         // Maybe an empty string?
-        gjson::Kind::String => Ok(field.to_string().len() == 0),
+        Kind::String => Ok(field.to_string().len() == 0),
         _ => Ok(false),
     }
 }
@@ -156,7 +157,7 @@ pub fn has_field(request: &Request, _field: Value) -> Result<bool, CustomError> 
     let data_as_str = str::from_utf8(request.data)
         .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
-    Ok(gjson::get(data_as_str, request.path.as_str()).exists())
+    Ok(streamdal_gjson::get(data_as_str, request.path.as_str()).exists())
 }
 
 pub fn is_type(request: &Request, field: Value) -> Result<bool, CustomError> {
@@ -167,13 +168,13 @@ pub fn is_type(request: &Request, field: Value) -> Result<bool, CustomError> {
     }
 
     match request.args[0].as_str() {
-        "string" => Ok(field.kind() == gjson::Kind::String),
-        "number" => Ok(field.kind() == gjson::Kind::Number),
-        "boolean" => Ok(field.kind() == gjson::Kind::True || field.kind() == gjson::Kind::False),
-        "bool" => Ok(field.kind() == gjson::Kind::True || field.kind() == gjson::Kind::False),
-        "array" => Ok(field.kind() == gjson::Kind::Array),
-        "object" => Ok(field.kind() == gjson::Kind::Object),
-        "null" => Ok(field.kind() == gjson::Kind::Null),
+        "string" => Ok(field.kind() == Kind::String),
+        "number" => Ok(field.kind() == Kind::Number),
+        "boolean" => Ok(field.kind() == Kind::True || field.kind() == Kind::False),
+        "bool" => Ok(field.kind() == Kind::True || field.kind() == Kind::False),
+        "array" => Ok(field.kind() == Kind::Array),
+        "object" => Ok(field.kind() == Kind::Object),
+        "null" => Ok(field.kind() == Kind::Null),
         _ => Err(CustomError::MatchError(format!(
             "unknown type: {}",
             request.args[0]

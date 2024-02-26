@@ -1,14 +1,14 @@
-use gjson::Value;
 use crate::detective::Request;
 use crate::error::CustomError;
+use crate::matcher_pii_payments as pii_payments;
+use streamdal_gjson::Value;
+use streamdal_gjson as gjson;
 use idna::domain_to_ascii_strict;
+use validators::prelude::*;
+use validators_prelude::phonenumber::PhoneNumber;
 
 pub fn any(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let matchers = vec![
-        credit_card,
-        ssn,
-        email,
-    ];
+    let matchers = vec![pii_payments::credit_card, ssn, email];
 
     for matcher in matchers {
         // TODO: is there a better way to avoid a borrow? We can't clone gjson::Value
@@ -21,44 +21,6 @@ pub fn any(_request: &Request, field: Value) -> Result<bool, CustomError> {
     }
 
     Ok(false)
-}
-
-pub fn credit_card(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let num = field.str().trim().replace(['-', ' '], "");
-
-    // Convert the card number string to a vector of digits
-    let digits: Vec<u32> = num
-        .chars()
-        .filter_map(|c| c.to_digit(10))
-        .collect();
-
-    // Check if the number of digits is valid for a credit card
-    if digits.len() < 13 || digits.len() > 19 {
-        return Ok(false);
-    }
-
-    // Implement the Luhn algorithm
-    let mut sum = 0;
-    let mut double = false;
-
-    for &digit in digits.iter().rev() {
-        let mut value = digit;
-
-        if double {
-            value *= 2;
-
-            if value > 9 {
-                value -= 9;
-            }
-        }
-
-        sum += value;
-        double = !double;
-    }
-
-    let res = sum % 10 == 0;
-
-    Ok(res)
 }
 
 pub fn ssn(_request: &Request, field: Value) -> Result<bool, CustomError> {
@@ -168,8 +130,14 @@ pub fn vin_number(_request: &Request, _field: Value) -> Result<bool, CustomError
     Err(CustomError::Error("not implemented".to_string()))
 }
 
-pub fn phone(_request: &Request, _field: Value) -> Result<bool, CustomError> {
-    Err(CustomError::Error("not implemented".to_string()))
+#[derive(Validator)]
+#[validator(phone)]
+pub struct InternationalPhone(pub PhoneNumber);
+
+pub fn phone(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim().replace(['-', ' ', '.'], "");
+    let res = InternationalPhone::parse_string(val).is_ok();
+    Ok(res)
 }
 
 // Intended to operate on the entire payload
@@ -188,7 +156,12 @@ pub fn taxpayer_id(_request: &Request, _field: Value) -> Result<bool, CustomErro
 
 // Intended to operate on the entire payload
 pub fn address(_request: &Request, _field: Value) -> Result<bool, CustomError> {
-    Err(CustomError::Error("not implemented".to_string()))
+
+    if let Ok(res) = postal_code(_request, _field.clone()) {
+        return Ok(res);
+    }
+
+    Ok(false)
 }
 
 // Intended to operate on the entire payload
@@ -214,4 +187,135 @@ pub fn financial(_request: &Request, _field: Value) -> Result<bool, CustomError>
 // Intended to operate on the entire payload
 pub fn health(_request: &Request, _field: Value) -> Result<bool, CustomError> {
     Err(CustomError::Error("not implemented".to_string()))
+}
+
+pub fn religion(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let religions: Vec<&str> = vec![
+        "Buddhism",
+        "Buddhist",
+        "Christianity",
+        "Christian",
+        "Islam",
+        "Muslim",
+        "Sunni",
+        "Shia",
+        "Shiite",
+        "Ismailism",
+        "Hinduism",
+        "Hindu",
+        "Sikhism",
+        "Judaism",
+        "Bahá'í",
+        "Bahai",
+        "Shinto",
+        "Taoism",
+        "Taoist",
+        "Confucianism",
+        "Catholicism",
+        "Catholic",
+        "Protestantism",
+        "Protestant",
+        "Orthodox",
+        "Anglicanism",
+        "Anglican",
+        "Lutheranism",
+        "Lutheran",
+        "Calvinism",
+        "Calvinist",
+        "Methodism",
+        "Methodist",
+        "Presbyterianism",
+        "Presbyterian",
+    ];
+
+    let field = field.str().trim().to_lowercase();
+    for religion in religions {
+        if field.contains(religion.to_lowercase().as_str()) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+pub fn title(_request: &Request, _field: Value) -> Result<bool, CustomError> {
+    let titles = vec![
+        "Mr.", "Mister", "Misses", "Mrs.", "Ms.", "Miss", "Dr.", "Prof.", "Rev.", "Fr.", "Sr.",
+        "Br.",
+    ];
+
+    let field = _field.str().trim().to_lowercase();
+    for title in titles {
+        if field.starts_with(title.to_lowercase().as_str()) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+pub fn postal_code(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let postal_code: String = field
+        .str()
+        .chars()
+        .filter(|&c| !c.is_whitespace())
+        .collect();
+
+
+    // US
+    if let Ok(res) = postal_code_us(_request, postal_code.clone()) {
+        if res {
+            return Ok(res);
+        }
+    }
+
+    // Canada
+    if let Ok(res) = postal_code_ca(_request, postal_code.clone()) {
+        if res {
+            return Ok(res);
+        }
+    }
+
+    Ok(false)
+}
+
+
+pub fn postal_code_us(_request: &Request, postal_code: String) -> Result<bool, CustomError> {
+    if postal_code.len() == 5 || postal_code.len() == 9 {
+        // Check if all characters are digits
+        if postal_code.chars().all(char::is_numeric) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+pub fn postal_code_ca(_request: &Request, postal_code: String) -> Result<bool, CustomError> {
+    let is_valid = postal_code.len() == 6
+        && postal_code.chars().next().unwrap().is_ascii_alphabetic()
+        && postal_code.chars().nth(1).unwrap().is_ascii_digit()
+        && postal_code.chars().nth(2).unwrap().is_ascii_alphabetic()
+        && postal_code.chars().nth(3).unwrap().is_ascii_digit()
+        && postal_code.chars().nth(4).unwrap().is_ascii_alphabetic()
+        && postal_code.chars().nth(5).unwrap().is_ascii_digit();
+
+    Ok(is_valid)
+}
+
+const RSA_KEY_PREFIXES: [&str; 3] = [
+    "-----BEGIN PRIVATE",
+    "-----BEGIN RSA PRIVATE",
+    "-----BEGIN ENCRYPTED",
+];
+
+pub fn rsa_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim();
+    for s in RSA_KEY_PREFIXES.iter() {
+        if val.replace("----- BEGIN", "-----BEGIN").starts_with(s) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
 }
