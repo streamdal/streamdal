@@ -106,36 +106,19 @@ export const SIDEBAR: Sidebar = {
             link: "en/guides/instrumentation",
           },
           {
-            text: "Tail",
-            slug: "tail",
-            link: "en/guides/tail",
-          },
-          {
             text: "Pipelines",
             slug: "pipelines",
             link: "en/guides/pipelines",
           },
           {
+            text: "Tail",
+            slug: "tail",
+            link: "en/guides/tail",
+          },
+          {
             text: "Notifications",
             slug: "notifications",
             link: "en/guides/notifications",
-            children: [
-              {
-                text: "Email",
-                slug: "email",
-                link: "en/guides/notifications/email",
-              },
-              {
-                text: "Slack",
-                slug: "slack",
-                link: "en/guides/notifications/slack",
-              },
-              {
-                text: "Pagerduty",
-                slug: "pagerduty",
-                link: "en/guides/notifications/pagerduty",
-              }
-            ]
           },
         ],
       },
@@ -148,9 +131,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/core-components/overview",
           },
           {
-            text: "SDK",
-            slug: "sdk",
-            link: "en/core-components/sdk",
+            text: "Console UI",
+            slug: "console-ui",
+            link: "en/core-components/console-ui",
           },
           {
             text: "Server",
@@ -158,9 +141,9 @@ export const SIDEBAR: Sidebar = {
             link: "en/core-components/server",
           },
           {
-            text: "Console UI",
-            slug: "console-ui",
-            link: "en/core-components/console-ui",
+            text: "SDK",
+            slug: "sdk",
+            link: "en/core-components/sdk",
           },
           {
             text: "Libraries/Shims",
