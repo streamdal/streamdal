@@ -205,6 +205,50 @@ export var DetectiveType;
      */
     DetectiveType[DetectiveType["PII_HEALTH"] = 2016] = "PII_HEALTH";
     /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_AWS_KEY_ID = 2017;
+     */
+    DetectiveType[DetectiveType["PII_AWS_KEY_ID"] = 2017] = "PII_AWS_KEY_ID";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_RSA_KEY = 2018;
+     */
+    DetectiveType[DetectiveType["PII_RSA_KEY"] = 2018] = "PII_RSA_KEY";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_TITLE = 2019;
+     */
+    DetectiveType[DetectiveType["PII_TITLE"] = 2019] = "PII_TITLE";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_RELIGION = 2020;
+     */
+    DetectiveType[DetectiveType["PII_RELIGION"] = 2020] = "PII_RELIGION";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_SLACK_TOKEN = 2021;
+     */
+    DetectiveType[DetectiveType["PII_SLACK_TOKEN"] = 2021] = "PII_SLACK_TOKEN";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_STRIPE_KEY = 2022;
+     */
+    DetectiveType[DetectiveType["PII_STRIPE_KEY"] = 2022] = "PII_STRIPE_KEY";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_IBAN = 2023;
+     */
+    DetectiveType[DetectiveType["PII_IBAN"] = 2023] = "PII_IBAN";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_SWIFT_BIC = 2024;
+     */
+    DetectiveType[DetectiveType["PII_SWIFT_BIC"] = 2024] = "PII_SWIFT_BIC";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER = 2025;
+     */
+    DetectiveType[DetectiveType["PII_BANK_ROUTING_NUMBER"] = 2025] = "PII_BANK_ROUTING_NUMBER";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_CRYPTO_ADDRESS = 2026;
+     */
+    DetectiveType[DetectiveType["PII_CRYPTO_ADDRESS"] = 2026] = "PII_CRYPTO_ADDRESS";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_GITHUB_PAT = 2027;
+     */
+    DetectiveType[DetectiveType["PII_GITHUB_PAT"] = 2027] = "PII_GITHUB_PAT";
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     DetectiveType[DetectiveType["NUMERIC_EQUAL_TO"] = 3000] = "NUMERIC_EQUAL_TO";
