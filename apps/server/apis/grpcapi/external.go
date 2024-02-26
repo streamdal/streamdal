@@ -16,11 +16,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/apps/server/validate"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 const (
@@ -889,6 +890,7 @@ func (s *ExternalServer) DeleteService(ctx context.Context, req *protos.DeleteSe
 
 		if err := s.Options.StoreService.DeleteAudience(ctx, &protos.DeleteAudienceRequest{
 			Audience: audience,
+			Force:    req.Force,
 		}); err != nil {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
 				fmt.Sprintf("unable to delete audience '%s' during service delete: %s", util.AudienceToStr(audience), err.Error())), nil
