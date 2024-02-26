@@ -254,7 +254,6 @@ pub fn title(_request: &Request, _field: Value) -> Result<bool, CustomError> {
     Ok(false)
 }
 
-// TODO: implement
 pub fn postal_code(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let postal_code: String = field
         .str()
