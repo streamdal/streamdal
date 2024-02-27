@@ -17,6 +17,10 @@ COPY . .
 
 # Build the application using Makefile (assuming it's set up for your project)
 CMD echo "make build/$TARGETOS-$TARGETARCH"
+
+# Go env inside docker
+CMD go env
+
 RUN make build/$TARGETOS-$TARGETARCH
 
 # Now, in the 2nd build stage, use a lightweight Alpine image
