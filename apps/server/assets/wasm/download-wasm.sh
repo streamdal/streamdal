@@ -1,4 +1,4 @@
-#!/bin/bashecho
+#!/bin/bash
 #
 # Download a specific version of the wasm release.
 #
