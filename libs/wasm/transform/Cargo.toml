@@ -9,7 +9,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-protobuf = "3.2.0"
+protobuf = "3.4.0"
 streamdal-protos = { path="../../protos/build/rust/protos" }
 streamdal-wasm-transform = { path="../../wasm-transform" }
 common = { path = "../common" }
