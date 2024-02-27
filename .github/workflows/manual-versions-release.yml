@@ -53,7 +53,7 @@ jobs:
 
     - name: Run Docker Buildx (Build and Push Docker Image)
       run: |
-        cd apps/server/test-utils/
+        cd apps/server/test-utils/demo-client
         make docker/build
 
   dispatch-update-event:
