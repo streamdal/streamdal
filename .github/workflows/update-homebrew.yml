@@ -2,7 +2,7 @@ name: Dispatch Update Event to Homebrew-Tap
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, closed]
     branches:
       - main
     paths:
