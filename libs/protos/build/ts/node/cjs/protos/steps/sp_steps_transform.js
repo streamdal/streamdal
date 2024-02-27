@@ -244,11 +244,11 @@ exports.TransformTruncateOptions = new TransformTruncateOptions$Type();
 class TransformDeleteFieldOptions$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.steps.TransformDeleteFieldOptions", [
-            { no: 1, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "paths", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { path: "" };
+        const message = { paths: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -259,8 +259,8 @@ class TransformDeleteFieldOptions$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string path */ 1:
-                    message.path = reader.string();
+                case /* repeated string paths */ 1:
+                    message.paths.push(reader.string());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -274,9 +274,9 @@ class TransformDeleteFieldOptions$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* string path = 1; */
-        if (message.path !== "")
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.path);
+        /* repeated string paths = 1; */
+        for (let i = 0; i < message.paths.length; i++)
+            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.paths[i]);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

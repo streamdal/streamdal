@@ -709,7 +709,6 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	return nil
 }
 
-// DEV (DONE): Minor update to support "force"
 func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error {
 	llog := s.log.WithField("method", "DeleteAudience")
 	llog.Debug("received request to delete audience")

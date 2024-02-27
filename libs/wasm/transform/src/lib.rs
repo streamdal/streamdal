@@ -1,8 +1,9 @@
 use protos::sp_steps_detective::DetectiveStepResultMatch;
 use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
 use protos::sp_steps_transform::TransformType;
-use protos::sp_wsm::inter_step_result::Input_from::DetectiveResult;
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
+use protos::sp_wsm::inter_step_result::Input_from::DetectiveResult;
+
 use streamdal_wasm_transform::transform;
 use streamdal_wasm_transform::transform::TruncateOptions;
 use streamdal_wasm_transform::transform::TruncateType::{Chars, Percent};
@@ -63,7 +64,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 WASMExitCode::WASM_EXIT_CODE_FALSE,
                 "Unknown transform type".to_string(),
-            )
+            );
         }
     };
 
@@ -143,10 +144,12 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
 
             // No inter-step result, pull path from request
             if paths.is_empty() {
-                paths.push(DetectiveStepResultMatch {
-                    path: opts.path.clone(),
-                    ..Default::default()
-                })
+                for path in opts.paths.iter() {
+                    paths.push(DetectiveStepResultMatch {
+                        path: path.clone(),
+                        ..Default::default()
+                    })
+                }
             }
 
             transform::Request {
