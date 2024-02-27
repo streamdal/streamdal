@@ -2,7 +2,7 @@
 ARG ALPINE_VERSION=3.18
 
 # Use the Go Alpine image for the builder stage
-FROM golang:1.20-alpine$ALPINE_VERSION AS builder
+FROM golang:1.21-alpine$ALPINE_VERSION AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -16,11 +16,6 @@ WORKDIR /
 COPY . .
 
 # Build the application using Makefile (assuming it's set up for your project)
-CMD echo "make build/$TARGETOS-$TARGETARCH"
-
-# Go env inside docker
-RUN go env
-
 RUN make build/$TARGETOS-$TARGETARCH
 
 # Now, in the 2nd build stage, use a lightweight Alpine image
