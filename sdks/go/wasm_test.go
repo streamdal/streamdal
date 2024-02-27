@@ -321,7 +321,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(resultJSON["object"].(map[string]interface{})["type"]).To(Equal("testing"))
 		})
 
-		It("deletes a field", func() {
+		It("deletes multiple fields", func() {
 			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
 			Expect(err).ToNot(HaveOccurred())
 
@@ -332,7 +332,7 @@ var _ = Describe("WASM Modules", func() {
 					Type: steps.TransformType_TRANSFORM_TYPE_DELETE_FIELD,
 					Options: &steps.TransformStep_DeleteFieldOptions{
 						DeleteFieldOptions: &steps.TransformDeleteFieldOptions{
-							Path: "object.type",
+							Paths: []string{"object.type", "object.cc_num"},
 						},
 					},
 				},
@@ -355,7 +355,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(wasmResp).ToNot(BeNil())
 			Expect(wasmResp.ExitCode).To(Equal(protos.WASMExitCode_WASM_EXIT_CODE_TRUE))
-			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {"cc_num": "1234"}}`))
+			Expect(wasmResp.OutputPayload).Should(MatchJSON(`{"object": {}}`))
 		})
 
 		It("truncates a field by total length", func() {
