@@ -1,9 +1,9 @@
-name: Execute Python Script in Subdirectory
+name: Manual Version Release
 
-on:
-  push:
-    branches:
-      - 'update-deployments-*'
+# Bumps all configs to latest available tags & creates demo-client docker img &
+# dispatches event to homebrew-tap to update CLI version.
+
+on: workflow_dispatch
 
 jobs:
   execute_script:
@@ -53,5 +53,17 @@ jobs:
 
     - name: Run Docker Buildx (Build and Push Docker Image)
       run: |
-        cd apps/server/test-utils/demo-client/
+        cd apps/server/test-utils/
         make docker/build
+
+  dispatch-update-event:
+    needs: execute_script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Event to homebrew-tap
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: streamdal/homebrew-tap
+          event-type: update-homebrew-tap
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
