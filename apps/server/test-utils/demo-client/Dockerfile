@@ -2,7 +2,7 @@
 ARG ALPINE_VERSION=3.18
 
 # Use the Go Alpine image for the builder stage
-FROM golang:1.20-alpine$ALPINE_VERSION AS builder
+FROM golang:1.21-alpine$ALPINE_VERSION AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -10,13 +10,13 @@ ARG TARGETOS
 RUN apk --update add make bash curl git
 
 # Set the working directory
-WORKDIR /demo-client
+WORKDIR /
 
 # Copy everything into the build container
 COPY . .
 
 # Build the application using Makefile (assuming it's set up for your project)
-CMD echo "make build/$TARGETOS-$TARGETARCH"
+RUN go get .
 RUN make build/$TARGETOS-$TARGETARCH
 
 # Now, in the 2nd build stage, use a lightweight Alpine image
@@ -28,8 +28,8 @@ ARG TARGETOS
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
 # Copy the built binary, test data, and assets directory
-COPY --from=builder /demo-client/build/demo-client-$TARGETOS-$TARGETARCH /demo-client
-COPY --from=builder /demo-client/assets /assets
+COPY --from=builder /build/demo-client-$TARGETOS-$TARGETARCH /demo-client
+COPY --from=builder /assets /assets
 
 # Make the binary executable
 RUN chmod +x /demo-client
