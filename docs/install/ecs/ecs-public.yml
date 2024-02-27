@@ -115,7 +115,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: streamdal-server-container
-          Image: streamdal/server:0.0.27-bce44b7
+          Image: streamdal/server:0.0.30-ae4b1cf
           EntryPoint: ["/bin/bash", "/entrypoint.sh"]
           Environment:
             - Name: STREAMDAL_SERVER_AUTH_TOKEN
