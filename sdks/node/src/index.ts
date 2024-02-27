@@ -44,14 +44,14 @@ export interface StreamdalRegistration {
   process: (arg: StreamdalRequest) => Promise<SDKResponse>;
 }
 
-const initConfigs = (configs: StreamdalConfigs) => {
-  if (configs.quiet || process.env.NODE_ENV === "production") {
+const initConfigs = (configs?: StreamdalConfigs) => {
+  if (configs?.quiet || process.env.NODE_ENV === "production") {
     console.debug = () => null;
   }
 
-  const url = configs.streamdalUrl ?? process.env.STREAMDAL_URL;
-  const token = configs.streamdalToken ?? process.env.STREAMDAL_TOKEN;
-  const name = configs.serviceName ?? process.env.STREAMDAL_SERVICE_NAME;
+  const url = configs?.streamdalUrl ?? process.env.STREAMDAL_URL;
+  const token = configs?.streamdalToken ?? process.env.STREAMDAL_TOKEN;
+  const name = configs?.serviceName ?? process.env.STREAMDAL_SERVICE_NAME;
 
   if (!url || !token || !name) {
     throw new Error(`Required configs are missing. You must provide configs streamdalUrl, streamdalToken and serviceName 
@@ -68,13 +68,13 @@ const initConfigs = (configs: StreamdalConfigs) => {
     streamdalToken: token,
     serviceName: name,
     pipelineTimeout:
-      configs.pipelineTimeout ??
+      configs?.pipelineTimeout ??
       process.env.STREAMDAL_PIPELINE_TIMEOUT ??
       "100",
     stepTimeout:
-      configs.stepTimeout ?? process.env.STREAMDAL_STEP_TIMEOUT ?? "10",
-    dryRun: configs.dryRun ?? !!process.env.STREAMDAL_DRY_RUN,
-    audiences: configs.audiences,
+      configs?.stepTimeout ?? process.env.STREAMDAL_STEP_TIMEOUT ?? "10",
+    dryRun: configs?.dryRun ?? !!process.env.STREAMDAL_DRY_RUN,
+    audiences: configs?.audiences,
   };
 
   // Heartbeat is obsolete
@@ -94,7 +94,7 @@ const initConfigs = (configs: StreamdalConfigs) => {
  * as you can await completion before processing pipelines.
  */
 export const registerStreamdal = async (
-  configs: StreamdalConfigs
+  configs?: StreamdalConfigs
 ): Promise<StreamdalRegistration> => {
   const internalConfigs = initConfigs(configs);
 
