@@ -123,7 +123,7 @@ export const registerStreamdal = async (
  */
 export class Streamdal {
   private internalConfigs: InternalConfigs;
-  constructor(configs: StreamdalConfigs) {
+  constructor(configs?: StreamdalConfigs) {
     this.internalConfigs = initConfigs(configs);
     void addAudiences(this.internalConfigs);
     void internalRegister(this.internalConfigs);
