@@ -1,7 +1,7 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
 SERVICE = demo-client
 ARCH ?= $(shell uname -m)
-GO = go 
+GO = go
 
 # Pattern #1 example: "example : description = Description for example target"
 # Pattern #2 example: "### Example separator text
@@ -149,4 +149,4 @@ docker/build:
 .PHONY: clean
 clean: description = Clean build
 clean:
-	rm -rf ./build
+	rm -rf ./build/demo-client-*
