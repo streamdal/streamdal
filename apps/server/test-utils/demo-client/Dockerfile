@@ -10,7 +10,7 @@ ARG TARGETOS
 RUN apk --update add make bash curl git
 
 # Set the working directory
-WORKDIR /demo-client
+WORKDIR /
 
 # Copy everything into the build container
 COPY . .
@@ -19,7 +19,7 @@ COPY . .
 CMD echo "make build/$TARGETOS-$TARGETARCH"
 
 # Go env inside docker
-CMD go env
+RUN go env
 
 RUN make build/$TARGETOS-$TARGETARCH
 
@@ -32,8 +32,8 @@ ARG TARGETOS
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
 # Copy the built binary, test data, and assets directory
-COPY --from=builder /demo-client/build/demo-client-$TARGETOS-$TARGETARCH /demo-client
-COPY --from=builder /demo-client/assets /assets
+COPY --from=builder /build/demo-client-$TARGETOS-$TARGETARCH /demo-client
+COPY --from=builder /assets /assets
 
 # Make the binary executable
 RUN chmod +x /demo-client
