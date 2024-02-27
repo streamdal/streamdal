@@ -12,10 +12,20 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
+    - name: Cache pip dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('scripts/helper/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Set up Python 3
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+        cache: 'pip'
+        cache-dependency-path: scripts/helper/requirements.txt
 
     - name: Install Dependencies
       run: |
