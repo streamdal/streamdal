@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'update-install-*'
+      - 'update-deployments-*'
 
 jobs:
   dispatch-update-event:
