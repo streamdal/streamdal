@@ -1,4 +1,4 @@
-PROTOC_IMAGE = streamdal/protoc:4.1.1-streamdal
+PROTOC_IMAGE = streamdal/protoc:v4.1.2-streamdal
 NODE_IMAGE = node:lts-alpine
 
 # Pattern #1 example: "example : description = Description for example target"

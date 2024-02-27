@@ -57,7 +57,7 @@ message TransformTruncateOptions {
 }
 
 message TransformDeleteFieldOptions {
-  string path = 1;
+  repeated string paths = 1;
 }
 
 message TransformReplaceValueOptions {

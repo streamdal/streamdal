@@ -174,7 +174,7 @@ export const OperationNode = (
   const highlight = opModal.value?.audience &&
     key === audienceKey(opModal.value?.audience) &&
     opModal.value?.displayType === "operation";
-  const trashActive = opModal.value?.delete;
+  const trashActive = opModal.value?.deleteOperation;
 
   return (
     <div
@@ -218,7 +218,7 @@ export const OperationNode = (
             audience: operation.audience,
             displayType: "operation",
             clients: operation.clients,
-            delete: true,
+            deleteOperation: true,
           };
         }}
         className={"p-2 rounded"}

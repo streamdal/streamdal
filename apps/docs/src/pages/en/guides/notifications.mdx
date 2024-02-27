@@ -1,9 +1,12 @@
 ---
-title: Pipeline Notifications
-metaTitle: Pipeline Notifications
-description: A guide to setting up pipeline notifications via slack/email/pagerduty
+title: Notifications
+metaTitle: Setting up pipeline notifications with Streamdal
+description: A guide to setting up pipeline notifications with Streamdal
 layout: ../../../layouts/MainLayout.astro
 ---
+
+import smtpSettings from '@images/guides/notifications/email/smtp.png';
+import sesSettings from '@images/guides/notifications/email/ses.png';
 
 import createSlackApp from '@images/guides/notifications/slack/create_slack_app.png';
 import createSlackAppName from '@images/guides/notifications/slack/create_slack_app_name.png';
@@ -16,13 +19,123 @@ import stepNotification from '@images/guides/notifications/slack/step_notificati
 import slackNotification from '@images/guides/notifications/slack/slack_notification.png';
 
 
-Pipeline notifications are a great way to keep your team informed about the status of your pipelines. You can set up notifications to be sent to Slack, email, or PagerDuty.
-Notifications can be configured to trigger on pipeline success, failure, or error.
+Pipeline notifications are a great way to keep your team informed about the 
+status of your pipelines. You can set up notifications to be sent to Slack, 
+email, or PagerDuty.
 
-### Notification Types
+Notifications can be configured to trigger on pipeline success, failure, or 
+error.
+
+## Notification Types
 
 The Streamdal server currently supports the following notification types:
 
-* [Slack](/en/guides/notifications/slack)
-* [Email](#)
-* [PagerDuty](#)
+* [Slack](#slack)
+* [Email](#e-mail-smtp-or-ses)
+* [PagerDuty](#pagerduty)
+
+## Slack
+To set up Slack notifications, you will need to create a Slack app and add it 
+to your workspace. Once you have the app installed, you can configure the 
+notifications in the Streamdal console.
+
+Steps:
+
+Head over to [https://api.slack.com/apps](https://api.slack.com/apps) and 
+create a new app from scratch.
+
+<img src={createSlackApp} alt="Create Slack App" />
+
+Let's name it **Streamdal Notifications**
+
+<img src={createSlackAppName} alt="Create Slack App Name" />
+
+Select **OAuth & Permissions** from the left-hand menu and add the following 
+scopes:
+
+
+
+Under **Scopes** > **Bot Token Scopes**, add the following scopes:
+    * `chat:write`
+    * `chat:write.public`
+
+<img src={selectCopes} alt="Select Scopes" />
+
+Click **Install to workspace** and install the app in your desired workspace
+
+<img src={installSlackApp} alt="Install Slack App" />
+
+Once installed, you can then copy the generated **Bot User OAuth Token**.
+
+<img src={copyBotToken} alt="Copy Bot Token" />
+
+Navigate to your installation of the Streamdal console and select 
+**Notifications** from the left-hand menu.
+
+<img src={streamdalConsole} alt="Streamdal Console" />
+
+Click **Add Notification**. Enter a name. We'll name our configuration 
+**Engineering Slack Channel** for clarity. Select **Slack** as the type, and 
+enter the **Bot Token** you copied earlier. You must also choose a slack 
+channel for the notifications to be sent to.
+
+<img src={configNotification} alt="Config Notification" />
+
+Now you have successfully set up a Slack notification config, you can enable it 
+on a pipeline step. Let's go edit one of our pipeline's steps and enable the 
+notification:
+
+<img src={stepNotification} alt="Step Notification" />
+
+You can enable this notification on either the success, failure, or error 
+events, or all three. We'll just enable it on the success event for now. Simply 
+expand the **On True** section and check the notification you just created.
+
+You can select whether to include the payload that triggered the notification. 
+There are three options available:
+* **EXCLUDE** - The payload will not be included in the notification
+* **FULL PAYLOAD** - The entire payload will be included in the notification
+* **SELECT PATHS** - You can select specific paths from the payload to include 
+in the notification. The paths should be in a dot notation format, e.g. 
+`data.user.name` to select the name field from the payload:
+
+```json
+{
+   "data": {
+      "user": {
+         "name": "John Doe",
+         "age": 30
+      }
+   }
+}
+```
+
+Save the pipeline and your notifications are now set up!
+
+Let's see what a Slack notification looks like:
+
+<img src={slackNotification} alt="Slack Notification" />
+
+## E-mail: SMTP or SES
+
+Email notifications can be sent via SMTP or Amazon SES.
+At least one recipient is required. If you wish to add additional recipients, 
+click the *Add a new Recipient +* button.
+
+### SMTP
+
+Select `SMTP` from the **Email Notification Type** dropdown. All fields are 
+required.
+
+<img src={smtpSettings} alt="SMTP Settings" />
+
+### AWS SES
+
+Select `SES` from the **Email Notification Type** dropdown. All fields are 
+required.
+
+<img src={sesSettings} alt="SES Settings" />
+
+## PagerDuty
+
+Instructions coming soon!

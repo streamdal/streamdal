@@ -1,0 +1,21 @@
+name: Dispatch Update Event to Homebrew-Tap
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+    paths:
+      - 'update-install-*'
+
+jobs:
+  dispatch-update-event:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Event to homebrew-tap
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          repository: streamdal/homebrew-tap
+          event-type: update-homebrew-tap
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
