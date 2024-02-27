@@ -1,7 +1,9 @@
 VERSION ?= $(shell git rev-parse --short HEAD)
 SERVICE = demo-client
 ARCH ?= $(shell uname -m)
-GO=go
+GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
+CGO_ENABLED ?= 0
+
 # Pattern #1 example: "example : description = Description for example target"
 # Pattern #2 example: "### Example separator text
 help: HELP_SCRIPT = \
@@ -148,4 +150,4 @@ docker/build:
 .PHONY: clean
 clean: description = Clean build
 clean:
-	rm -rf /path/to/your/build/artifacts
+	rm -rf ./build
