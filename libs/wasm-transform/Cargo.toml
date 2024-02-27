@@ -13,7 +13,7 @@ repository = "https://github.com/streamdal/wasm-transform"
 [dependencies]
 conv = "0.3.3"
 sha256 = "= 1.1.4"
-streamdal-gjson = "0.8.2-delete-path"
+streamdal-gjson = "0.8.4-delete-path-fix"
 streamdal-protos = { path="../protos/build/rust/protos" }
 serde_json = "1.0.110"
 protobuf = "3.3.0"
