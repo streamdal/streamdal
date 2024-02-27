@@ -159,7 +159,7 @@ class TestStreamdalWasm:
         assert res is not None
         assert res.exit_code == 1
         assert res.exit_msg == "Successfully transformed payload"
-        assert res.output_payload == b'{"object": {"another": "field"}}'
+        assert res.output_payload == b'{"object": {"payload": "old val"}}'
 
 
     def test_transform_wasm_replace(self):
