@@ -207,9 +207,9 @@ dependencies = [
 
 [[package]]
 name = "streamdal-gjson"
-version = "0.8.2-delete-path"
+version = "0.8.4-delete-path-fix"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6b7e894100c9934b77efc22dc3d68ac0d76761099930638fd3f4f59791ae39c"
+checksum = "470e35728a9f8c2a0ddf70de447d166d8ca997ecd0efef2b0d26e2b5437ff3e1"
 dependencies = [
  "bytes",
 ]

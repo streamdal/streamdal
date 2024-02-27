@@ -6,14 +6,12 @@ You must have a Streamdal Server running locally or deployed. For running locall
 [server](https://github.com/streamdal/server), for deploying to your cloud or 
 infrastructure, see: [streamdal](https://github.com/streamdal/streamdal).
 
-You can supply the necessary configs to the Streamdal Node SDK either as constructor args in code 
-or as env vars. Constructor args take precedence over env vars. For env vars you can start by 
-copying `example.env` -> `.env` and setting values there. For constructor args, see `configs` in 
-`/examples/src/index.ts`:
+You can supply the necessary configs to the Streamdal Node SDK either as constructor args in code
+or as env vars. Constructor args take precedence over env vars.
+
+For constructor args, see `configs` in `/examples/src/index.ts`:
 
 ```typescript
-import { Streamdal } from "./streamdal";
-
 const config: StreamdalConfigs = {
   streamdalUrl: "localhost:8082",
   streamdalToken: "1234",
@@ -23,6 +21,11 @@ const config: StreamdalConfigs = {
   dryRun: "false",
 };
 ```
+
+For information on how to pass env vars, depending on your version of node, see here:
+https://nodejs.org/en/learn/command-line/how-to-read-environment-variables-from-nodejs
+
+For env vars you can start by copying `example.env` -> `.env` and setting values there.
 
 See `.src/index.ts` for full example client.
 
