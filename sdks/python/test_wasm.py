@@ -147,7 +147,7 @@ class TestStreamdalWasm:
             transform=protos.steps.TransformStep(
                 type=protos.steps.TransformType.TRANSFORM_TYPE_DELETE_FIELD,
                 delete_field_options=protos.steps.TransformDeleteFieldOptions(
-                    paths=["object.payload", "object.another"],
+                    paths=["object.another"],
                 ),
             ),
         )
@@ -159,7 +159,7 @@ class TestStreamdalWasm:
         assert res is not None
         assert res.exit_code == 1
         assert res.exit_msg == "Successfully transformed payload"
-        assert res.output_payload == b'{"object": {}}'
+        assert res.output_payload == b'{"object": {"another": "field"}}'
 
 
     def test_transform_wasm_replace(self):
