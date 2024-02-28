@@ -45,7 +45,11 @@ export interface StreamdalRegistration {
 }
 
 const initConfigs = (configs?: StreamdalConfigs) => {
-  if (configs?.quiet || process.env.NODE_ENV === "production") {
+  if (
+    process.env.NODE_ENV === "production" ||
+    configs?.quiet ||
+    process.env.STREAMDAL_QUIET
+  ) {
     console.debug = () => null;
   }
 
