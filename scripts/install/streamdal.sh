@@ -94,18 +94,18 @@ check_requirements() {
   fi
 }
 
-info "Checking requirements..."
+info "Checking requirements ..."
 
 # Check if requirements are met
 check_requirements
 
-info "Fetching install files..."
+info "Fetching install files ..."
 
 # Fetch docker-compose.yml and write it to /tmp
 fetch
 
 # Work from install dir
-cd $INSTALL_DIR
+cd $INSTALL_DIR || fatal "Failed to cd to $INSTALL_DIR"
 
 # Grab versions
 CONSOLE_VERSION=$(grep 'image:' $DOCKER_COMPOSE_YML_FILE | grep 'console' | awk -F : {'print $3'})
@@ -120,7 +120,7 @@ if [ -z "$SERVER_VERSION" ]; then
   fatal "Unable to determine Streamdal server version"
 fi
 
-info "Starting streamdal components via docker-compose..."
+info "Starting streamdal components via docker-compose ..."
 
 # Attempt to start streamdal components
 docker-compose -f $DOCKER_COMPOSE_YML_FILE up -d --pull always --always-recreate-deps --force-recreate --quiet-pull || fatal "Failed to start streamdal"
