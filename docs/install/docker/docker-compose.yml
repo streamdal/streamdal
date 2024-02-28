@@ -24,7 +24,7 @@ services:
     depends_on:
       - streamdal-envoy
     environment:
-      - STREAMDAL_CONSOLE_GRPC_WEB_URL=http://envoy:8083
+      - STREAMDAL_CONSOLE_GRPC_WEB_URL=http://streamdal-envoy:8083
       - STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN=1234
       - STREAMDAL_CONSOLE_PORT=8080
       - STREAMDAL_CONSOLE_PRODUCTION=true
