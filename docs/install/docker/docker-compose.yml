@@ -10,7 +10,7 @@ services:
     environment:
       - STREAMDAL_SERVER_NODE_NAME=node1
       - STREAMDAL_SERVER_AUTH_TOKEN=1234
-      - STREAMDAL_SERVER_REDIS_URL=redis:6379
+      - STREAMDAL_SERVER_REDIS_URL=streamdal-redis:6379
     ports:
       - "8081:8081"
       - "8082:8082"
