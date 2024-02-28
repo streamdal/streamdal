@@ -50,7 +50,7 @@ fetch() {
     done
 
     # Fetch files
-    # curl -sSL $DOCKER_COMPOSE_URL -o $INSTALL_DIR/docker-compose.yml || fatal "Failed to fetch docker-compose.yml"
+    curl -sSL $DOCKER_COMPOSE_URL -o $INSTALL_DIR/docker-compose.yml || fatal "Failed to fetch docker-compose.yml"
     curl -sSL $ENV_SCRIPT_URL -o $INSTALL_DIR/assets/env/script.sh || fatal "Failed to fetch assets/env/script.sh"
     curl -sSL $DOT_ENV_URL -o $INSTALL_DIR/assets/env/.env || fatal "Failed to fetch assets/env/.env"
     curl -sSL $ENVOY_URL -o $INSTALL_DIR/assets/envoy/envoy.yaml || fatal "Failed to fetch assets/envoy/envoy.yaml"
