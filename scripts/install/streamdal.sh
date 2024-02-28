@@ -2,18 +2,20 @@
 #
 # This script is used for installing Streamdal.
 #
-# Usage #1: curl -sSL https://raw.githubusercontent.com/streamdal/streamdal/master/scripts/install/install.sh | bash
+# Usage 1: curl -sSL https://sh.streamdal.com | bash
+# Usage 2: curl -sSL https://raw.githubusercontent.com/streamdal/streamdal/master/scripts/install/install.sh | bash
 #
 # This script will:
 #
-# - Check that you have `git`, `docker` and `docker-compose` installed
-# - Look for previous install; if found, move it to a backup dir
-# - Clone the streamdal repo to $STREAMDAL_INSTALL_DIR (default: ~/streamdal)
+# - Check that you have `docker` and `docker-compose` installed
+# - Download docker-compose.yml + a few dependency assets into /tmp/.streamdal
 # - Start streamdal components via docker-compose
 #
-# Set $STREAMDAL_INSTALL_DIR to change the install dir.
+# Site: https://streamdal.com
+# Docs: https://docs.streamdal.com
+# Repo: https://github.com/streamdal/streamdal
 #
-# github.com/streamdal/streamdal
+# This script can be found here: https://github.com/streamdal/streamdal/blob/main/scripts/install/streamdal.sh
 #
 
 REPO_URL="https://github.com/streamdal/streamdal"
