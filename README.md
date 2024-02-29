@@ -56,28 +56,16 @@ any of your apps to see Streamdal in action. We've got a live demo :)
 
 ### [DEMO.STREAMDAL.COM](https://demo.streamdal.com)
 
-_The demo showcases:_
+While the demo is read-only, it will give you a good idea about the capabilities
+of Streamdal.
 
-1. **Real-time Data Transformation**
-   * View how the `Mask dot com emails` pipeline for `welcome service` 
-     obfuscates `recipient` field if the field contains `.com`
-2. **Real-time Masking & Obfuscation**
-   * Observe the `Scrub ICMP` pipeline mask `object.ipv4_address` if 
-     `object.protocol` equals "ICMP"
-3. **Improved Debug Via "tail-like" UI**
-    * Select any Component and start `Tail` request to watch live output
-4. **Real-time Performance Insights**
-    * Watch the read/write-per-second throughput for any component
-5. **See All Services in Your Stack**
-    * Use the service map (data graph) UI to get a bird's eye view of all
-      services and components and how they relate to each other.
-    * The [data graph](https://docs.streamdal.com/en/resources-support/glossary/#data-graph) is the "node map" of all services and components
-6. **Real-time Schema Inference**
-    * All consumers and producers automatically infer the schemas of the payloads
-      they read and write.
-    * View the inferred schema to catch any unexpected changes, ensure data 
-      quality or just get a better understanding of the data your services are
-      reading and writing.
+The demo showcases **real-time**:
+
+1. PII detection & masking
+1. Schema inference/detection & validation
+1. Data extraction & truncation
+1. Stream debugging & monitoring
+1. Data source and destination visualization & exploration
 
 <sub>_You can read more about how this is achieved in the ["how does it work?"](https://docs.streamdal.com/en/getting-started/how-streamdal-works/) docs._</sub>
 
