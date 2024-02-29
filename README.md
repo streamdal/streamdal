@@ -99,97 +99,23 @@ we will need to instrument some code. _Onto the next section!_
 
 ### Instrument
 
-Once you've installed the server and console, you can instrument your code using
-one of our SDKs:
+Once you have installed the server and console, you can begin instrumenting your
+code.
 
-- [Go](https://github.com/streamdal/streamdal/tree/main/sdks/go) ━ [ꜜExample](#go)
-- [Python](https://github.com/streamdal/streamdal/tree/main/sdks/python) ━ [ꜜExample](#python)
-- [Node](https://github.com/streamdal/streamdal/tree/main/sdks/node) ━ [ꜜExample](#nodejs)
+_Instrumentation_ involves calling our SDKs `.Process()` method either **after**
+your application reads data from somewhere _OR_ **before** your app is about to
+write data somewhere.
 
-> To see an example of a _complete_ instrumentation, take a look at the
-[Go demo client](./apps/server/test-utils/demo-client/) 
-> that is bundled with the [./apps/server](./apps/server/test-utils/demo-client/).
+#### SDKs
 
-#### [Go](https://github.com/streamdal/streamdal/tree/main/sdks/go)
-```go
-package main
+- [Go](https://github.com/streamdal/streamdal/tree/main/sdks/go) ━ [Example](https://github.com/streamdal/streamdal/tree/main/sdks/go#example-usage)
+- [Python](https://github.com/streamdal/streamdal/tree/main/sdks/python) ━ [Example](https://github.com/streamdal/streamdal/tree/main/sdks/python#example-usage)
+- [Node](https://github.com/streamdal/streamdal/tree/main/sdks/node) ━ [Example](https://github.com/streamdal/streamdal/tree/main/sdks/node#getting-started)
 
-import (
-   "context"
-
-   "github.com/streamdal/go-sdk"
-)
-
-func main() {
-   sc, _ := streamdal.New(&streamdal.Config{
-      ServerURL:       "streamdal-server.svc.cluster.local:8082",
-      ServerToken:     "1234",
-      ServiceName:     "billing-svc",
-      ShutdownCtx:     context.Background(),
-   })
-
-   resp, _ := sc.Process(context.Background(), &streamdal.ProcessRequest{
-      OperationType: streamdal.OperationTypeConsumer,
-      OperationName: "new-order-topic",
-      ComponentName: "kafka",
-      Data:          []byte(`{"object": {"field": true}}`),
-   })
-}
-```
-
-#### [Python](https://github.com/streamdal/streamdal/tree/main/sdks/python)
-```python
-from streamdal import (OPERATION_TYPE_CONSUMER, ProcessRequest, StreamdalClient, StreamdalConfig)
-
-client = StreamdalClient(
-   cfg=StreamdalConfig(
-      service_name="order-ingest",
-      streamdal_url="streamdal-server.svc.cluster.local:8082",
-      streamdal_token="1234",
-   )
-)
-
-res = client.process(
-   ProcessRequest(
-      operation_type=OPERATION_TYPE_CONSUMER,
-      operation_name="new-order-topic",
-      component_name="kafka",
-      data=b'{"object": {"field": true}}',
-   )
-)
-```
-
-#### [Node.js](https://github.com/streamdal/streamdal/tree/main/sdks/node)
-```typescript
-import { OperationType, Streamdal } from "@streamdal/node-sdk";
-
-export const example = async () => {
-  const streamdal = new Streamdal({
-    streamdalUrl: "localhost:8082",
-    streamdalToken: "1234",
-    serviceName: "test-service-name",
-    pipelineTimeout: "100",
-    stepTimeout: "10",
-  });
-
-  const result = await streamdal.processPipeline({
-    audience: {
-      serviceName: "test-service",
-      componentName: "kafka",
-      operationType: OperationType.PRODUCER,
-      operationName: "kafka-producer",
-    },
-    data: new TextEncoder().encode(JSON.stringify({ key: "value" })),
-  });
-};
-
-```  
-
-  
-> [!IMPORTANT]
-> **These are _basic, minimal_ examples and should NOT be used in production code.**
-> 
-> Refer to the [instrumentation docs](https://docs.streamdal.com/en/guides/instrumentation/) for more thorough directions.
+> To see an example of a _complete_ instrumentation, take a look at one of our
+> [shim examples](https://docs.streamdal.com/en/core-components/libraries-shims/) 
+> or the [Go demo client](./apps/server/test-utils/demo-client/) that is bundled
+> with the [./apps/server](./apps/server/test-utils/demo-client/).
 
 # How Does It Work?
 
