@@ -44,7 +44,7 @@ npm install @streamdal/node-sdk
 Here's a basic example to help you get started with Streamdal Node SDK:
 
 ```bash
-import { Streamdal, StreamdalConfigs, Audience, OperationType } from "@streamdal/node-sdk";
+import { registerStreamdal, StreamdalConfigs, Audience, OperationType } from "@streamdal/node-sdk";
 
 const config: StreamdalConfigs = {
   streamdalUrl: "localhost:8082",
@@ -63,7 +63,7 @@ const audience: Audience = {
 };
 
 export const example = async () => {
-  const streamdal = new Streamdal(config);
+  const streamdal = await registerStreamdal(config);
   const result = await streamdal.processPipeline({
     audience,
     data: new TextEncoder().encode(JSON.stringify(exampleData)),
@@ -106,3 +106,4 @@ Examples available for the following:
  Here are the current list of Go libraries/wrappers/shims:
 
  - [prisma-extension-streamdal](https://github.com/streamdal/prisma-extension-streamdal)
+ - [streamdal/kafkajs](https://github.com/streamdal/kafkajs)
