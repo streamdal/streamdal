@@ -14,6 +14,7 @@ import {
 } from "streamdal-protos/protos/sp_notify.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
+import { FormBoolean } from "../components/form/formBoolean.tsx";
 
 const NotificationTypeEnum = z.nativeEnum(NotificationType);
 const EmailNotificationTypeEnum = z.nativeEnum(NotificationEmail_Type);
@@ -103,7 +104,6 @@ const NotificationDetail = ({
     setErrors(errors || {});
 
     if (errors) {
-      console.error("submit errors", errors);
       e.preventDefault();
       return;
     }
@@ -302,24 +302,10 @@ const NotificationDetail = ({
                           wrapperClass="w-[49%]"
                         />
                       </div>
-                      <FormSelect
+                      <FormBoolean
                         name={"config.email.config.smtp.useTls"}
                         data={data}
-                        setData={setData}
-                        label="Use TLS?"
-                        errors={errors}
-                        children={[
-                          <option
-                            key={`option-type-key-true`}
-                            value={true}
-                            label={"true"}
-                          />,
-                          <option
-                            key={`option-type-key-false`}
-                            value={false}
-                            label={"false"}
-                          />,
-                        ]}
+                        display="Use TLS?"
                       />
                     </>
                   )}
