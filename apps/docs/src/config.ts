@@ -147,7 +147,7 @@ export const SIDEBAR: Sidebar = {
           },
           {
             text: "Libraries/Shims",
-            slug: "libraries-shiums",
+            slug: "libraries-shims",
             link: "en/core-components/libraries-shims",
           },
         ],
