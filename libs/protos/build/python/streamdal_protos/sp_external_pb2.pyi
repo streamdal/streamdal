@@ -66,6 +66,12 @@ class CreateNotificationRequest(_message.Message):
     notification: _sp_notify_pb2.NotificationConfig
     def __init__(self, notification: _Optional[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
+class CreateNotificationResponse(_message.Message):
+    __slots__ = ["notification"]
+    NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
+    notification: _sp_notify_pb2.NotificationConfig
+    def __init__(self, notification: _Optional[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
+
 class CreatePipelineRequest(_message.Message):
     __slots__ = ["pipeline"]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]

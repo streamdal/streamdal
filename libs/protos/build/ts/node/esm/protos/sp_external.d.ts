@@ -204,6 +204,15 @@ export interface CreateNotificationRequest {
     notification?: NotificationConfig;
 }
 /**
+ * @generated from protobuf message protos.CreateNotificationResponse
+ */
+export interface CreateNotificationResponse {
+    /**
+     * @generated from protobuf field: protos.NotificationConfig notification = 1;
+     */
+    notification?: NotificationConfig;
+}
+/**
  * @generated from protobuf message protos.UpdateNotificationRequest
  */
 export interface UpdateNotificationRequest {
@@ -645,6 +654,16 @@ declare class CreateNotificationRequest$Type extends MessageType<CreateNotificat
  * @generated MessageType for protobuf message protos.CreateNotificationRequest
  */
 export declare const CreateNotificationRequest: CreateNotificationRequest$Type;
+declare class CreateNotificationResponse$Type extends MessageType<CreateNotificationResponse> {
+    constructor();
+    create(value?: PartialMessage<CreateNotificationResponse>): CreateNotificationResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateNotificationResponse): CreateNotificationResponse;
+    internalBinaryWrite(message: CreateNotificationResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateNotificationResponse
+ */
+export declare const CreateNotificationResponse: CreateNotificationResponse$Type;
 declare class UpdateNotificationRequest$Type extends MessageType<UpdateNotificationRequest> {
     constructor();
     create(value?: PartialMessage<UpdateNotificationRequest>): UpdateNotificationRequest;

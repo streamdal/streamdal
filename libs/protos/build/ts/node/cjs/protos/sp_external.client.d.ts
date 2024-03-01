@@ -27,6 +27,7 @@ import type { GetNotificationsResponse } from "./sp_external";
 import type { GetNotificationsRequest } from "./sp_external";
 import type { DeleteNotificationRequest } from "./sp_external";
 import type { UpdateNotificationRequest } from "./sp_external";
+import type { CreateNotificationResponse } from "./sp_external";
 import type { CreateNotificationRequest } from "./sp_external";
 import type { ResumePipelineRequest } from "./sp_external";
 import type { PausePipelineRequest } from "./sp_external";
@@ -110,9 +111,9 @@ export interface IExternalClient {
     /**
      * Create a new notification config
      *
-     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.CreateNotificationResponse);
      */
-    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, StandardResponse>;
+    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, CreateNotificationResponse>;
     /**
      * Update an existing notification config
      *
@@ -284,9 +285,9 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
     /**
      * Create a new notification config
      *
-     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.CreateNotificationResponse);
      */
-    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, StandardResponse>;
+    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, CreateNotificationResponse>;
     /**
      * Update an existing notification config
      *

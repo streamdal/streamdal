@@ -75,7 +75,7 @@ type ExternalClient interface {
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(ctx context.Context, in *ResumePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Create a new notification config
-	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*CreateNotificationResponse, error)
 	// Update an existing notification config
 	UpdateNotification(ctx context.Context, in *UpdateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete a notification config
@@ -230,8 +230,8 @@ func (c *externalClient) ResumePipeline(ctx context.Context, in *ResumePipelineR
 	return out, nil
 }
 
-func (c *externalClient) CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	out := new(StandardResponse)
+func (c *externalClient) CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*CreateNotificationResponse, error) {
+	out := new(CreateNotificationResponse)
 	err := c.cc.Invoke(ctx, External_CreateNotification_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -505,7 +505,7 @@ type ExternalServer interface {
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error)
 	// Create a new notification config
-	CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error)
+	CreateNotification(context.Context, *CreateNotificationRequest) (*CreateNotificationResponse, error)
 	// Update an existing notification config
 	UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error)
 	// Delete a notification config
@@ -574,7 +574,7 @@ func (UnimplementedExternalServer) PausePipeline(context.Context, *PausePipeline
 func (UnimplementedExternalServer) ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResumePipeline not implemented")
 }
-func (UnimplementedExternalServer) CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error) {
+func (UnimplementedExternalServer) CreateNotification(context.Context, *CreateNotificationRequest) (*CreateNotificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNotification not implemented")
 }
 func (UnimplementedExternalServer) UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error) {

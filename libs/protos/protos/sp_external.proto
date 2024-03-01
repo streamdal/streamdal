@@ -40,7 +40,7 @@ service External {
   rpc ResumePipeline(ResumePipelineRequest) returns (protos.StandardResponse);
 
   // Create a new notification config
-  rpc CreateNotification(CreateNotificationRequest) returns (protos.StandardResponse);
+  rpc CreateNotification(CreateNotificationRequest) returns (CreateNotificationResponse);
 
   // Update an existing notification config
   rpc UpdateNotification(UpdateNotificationRequest) returns (protos.StandardResponse);
@@ -182,6 +182,11 @@ message ResumePipelineRequest {
 message CreateNotificationRequest {
   protos.NotificationConfig notification = 1;
 }
+
+message CreateNotificationResponse {
+  protos.NotificationConfig notification = 1;
+}
+
 
 message UpdateNotificationRequest {
   protos.NotificationConfig notification = 1;

@@ -31,6 +31,7 @@ import type { GetNotificationsResponse } from "./sp_external.js";
 import type { GetNotificationsRequest } from "./sp_external.js";
 import type { DeleteNotificationRequest } from "./sp_external.js";
 import type { UpdateNotificationRequest } from "./sp_external.js";
+import type { CreateNotificationResponse } from "./sp_external.js";
 import type { CreateNotificationRequest } from "./sp_external.js";
 import type { ResumePipelineRequest } from "./sp_external.js";
 import type { PausePipelineRequest } from "./sp_external.js";
@@ -115,9 +116,9 @@ export interface IExternalClient {
     /**
      * Create a new notification config
      *
-     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.CreateNotificationResponse);
      */
-    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, StandardResponse>;
+    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, CreateNotificationResponse>;
     /**
      * Update an existing notification config
      *
@@ -317,11 +318,11 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
     /**
      * Create a new notification config
      *
-     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.CreateNotificationResponse);
      */
-    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, StandardResponse> {
+    createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, CreateNotificationResponse> {
         const method = this.methods[10], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<CreateNotificationRequest, CreateNotificationResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * Update an existing notification config

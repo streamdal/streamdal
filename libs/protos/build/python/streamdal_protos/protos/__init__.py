@@ -687,6 +687,11 @@ class CreateNotificationRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class CreateNotificationResponse(betterproto.Message):
+    notification: "NotificationConfig" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class UpdateNotificationRequest(betterproto.Message):
     notification: "NotificationConfig" = betterproto.message_field(1)
 
@@ -1512,11 +1517,11 @@ class ExternalStub(betterproto.ServiceStub):
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "StandardResponse":
+    ) -> "CreateNotificationResponse":
         return await self._unary_unary(
             "/protos.External/CreateNotification",
             create_notification_request,
-            StandardResponse,
+            CreateNotificationResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -2043,7 +2048,7 @@ class ExternalBase(ServiceBase):
 
     async def create_notification(
         self, create_notification_request: "CreateNotificationRequest"
-    ) -> "StandardResponse":
+    ) -> "CreateNotificationResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def update_notification(
@@ -2216,7 +2221,7 @@ class ExternalBase(ServiceBase):
 
     async def __rpc_create_notification(
         self,
-        stream: "grpclib.server.Stream[CreateNotificationRequest, StandardResponse]",
+        stream: "grpclib.server.Stream[CreateNotificationRequest, CreateNotificationResponse]",
     ) -> None:
         request = await stream.recv_message()
         response = await self.create_notification(request)
@@ -2440,7 +2445,7 @@ class ExternalBase(ServiceBase):
                 self.__rpc_create_notification,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 CreateNotificationRequest,
-                StandardResponse,
+                CreateNotificationResponse,
             ),
             "/protos.External/UpdateNotification": grpclib.const.Handler(
                 self.__rpc_update_notification,
