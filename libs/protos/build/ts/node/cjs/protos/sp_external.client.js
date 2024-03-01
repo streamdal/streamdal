@@ -104,7 +104,7 @@ class ExternalClient {
     /**
      * Create a new notification config
      *
-     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.CreateNotificationResponse);
      */
     createNotification(input, options) {
         const method = this.methods[10], opt = this._transport.mergeOptions(options);

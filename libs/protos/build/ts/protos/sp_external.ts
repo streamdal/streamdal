@@ -214,6 +214,15 @@ export interface CreateNotificationRequest {
     notification?: NotificationConfig;
 }
 /**
+ * @generated from protobuf message protos.CreateNotificationResponse
+ */
+export interface CreateNotificationResponse {
+    /**
+     * @generated from protobuf field: protos.NotificationConfig notification = 1;
+     */
+    notification?: NotificationConfig;
+}
+/**
  * @generated from protobuf message protos.UpdateNotificationRequest
  */
 export interface UpdateNotificationRequest {
@@ -1239,6 +1248,53 @@ class CreateNotificationRequest$Type extends MessageType<CreateNotificationReque
  * @generated MessageType for protobuf message protos.CreateNotificationRequest
  */
 export const CreateNotificationRequest = new CreateNotificationRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CreateNotificationResponse$Type extends MessageType<CreateNotificationResponse> {
+    constructor() {
+        super("protos.CreateNotificationResponse", [
+            { no: 1, name: "notification", kind: "message", T: () => NotificationConfig }
+        ]);
+    }
+    create(value?: PartialMessage<CreateNotificationResponse>): CreateNotificationResponse {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CreateNotificationResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateNotificationResponse): CreateNotificationResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.NotificationConfig notification */ 1:
+                    message.notification = NotificationConfig.internalBinaryRead(reader, reader.uint32(), options, message.notification);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CreateNotificationResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.NotificationConfig notification = 1; */
+        if (message.notification)
+            NotificationConfig.internalBinaryWrite(message.notification, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateNotificationResponse
+ */
+export const CreateNotificationResponse = new CreateNotificationResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class UpdateNotificationRequest$Type extends MessageType<UpdateNotificationRequest> {
     constructor() {
@@ -2490,7 +2546,7 @@ export const External = new ServiceType("protos.External", [
     { name: "SetPipelines", options: {}, I: SetPipelinesRequest, O: StandardResponse },
     { name: "PausePipeline", options: {}, I: PausePipelineRequest, O: StandardResponse },
     { name: "ResumePipeline", options: {}, I: ResumePipelineRequest, O: StandardResponse },
-    { name: "CreateNotification", options: {}, I: CreateNotificationRequest, O: StandardResponse },
+    { name: "CreateNotification", options: {}, I: CreateNotificationRequest, O: CreateNotificationResponse },
     { name: "UpdateNotification", options: {}, I: UpdateNotificationRequest, O: StandardResponse },
     { name: "DeleteNotification", options: {}, I: DeleteNotificationRequest, O: StandardResponse },
     { name: "GetNotifications", options: {}, I: GetNotificationsRequest, O: GetNotificationsResponse },
