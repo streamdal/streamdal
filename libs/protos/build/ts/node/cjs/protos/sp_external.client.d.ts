@@ -19,6 +19,7 @@ import type { GetMetricsResponse } from "./sp_external";
 import type { GetMetricsRequest } from "./sp_external";
 import type { DeleteServiceRequest } from "./sp_external";
 import type { DeleteAudienceRequest } from "./sp_external";
+import type { CreateAudienceRequest } from "./sp_external";
 import type { DetachNotificationRequest } from "./sp_external";
 import type { AttachNotificationRequest } from "./sp_external";
 import type { GetNotificationResponse } from "./sp_external";
@@ -152,6 +153,12 @@ export interface IExternalClient {
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
+    /**
+     * Create an audience. Used for terraform purposes
+     *
+     * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
+     */
+    createAudience(input: CreateAudienceRequest, options?: RpcOptions): UnaryCall<CreateAudienceRequest, StandardResponse>;
     /**
      * Delete an audience
      *
@@ -326,6 +333,12 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
+    /**
+     * Create an audience. Used for terraform purposes
+     *
+     * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
+     */
+    createAudience(input: CreateAudienceRequest, options?: RpcOptions): UnaryCall<CreateAudienceRequest, StandardResponse>;
     /**
      * Delete an audience
      *

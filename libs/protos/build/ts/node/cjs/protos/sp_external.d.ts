@@ -297,6 +297,15 @@ export interface DetachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.CreateAudienceRequest
+ */
+export interface CreateAudienceRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+}
+/**
  * @generated from protobuf message protos.DeleteAudienceRequest
  */
 export interface DeleteAudienceRequest {
@@ -747,6 +756,16 @@ declare class DetachNotificationRequest$Type extends MessageType<DetachNotificat
  * @generated MessageType for protobuf message protos.DetachNotificationRequest
  */
 export declare const DetachNotificationRequest: DetachNotificationRequest$Type;
+declare class CreateAudienceRequest$Type extends MessageType<CreateAudienceRequest> {
+    constructor();
+    create(value?: PartialMessage<CreateAudienceRequest>): CreateAudienceRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateAudienceRequest): CreateAudienceRequest;
+    internalBinaryWrite(message: CreateAudienceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateAudienceRequest
+ */
+export declare const CreateAudienceRequest: CreateAudienceRequest$Type;
 declare class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
     constructor();
     create(value?: PartialMessage<DeleteAudienceRequest>): DeleteAudienceRequest;
