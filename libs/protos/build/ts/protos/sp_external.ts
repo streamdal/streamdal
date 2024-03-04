@@ -307,6 +307,15 @@ export interface DetachNotificationRequest {
     pipelineId: string;
 }
 /**
+ * @generated from protobuf message protos.CreateAudienceRequest
+ */
+export interface CreateAudienceRequest {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+}
+/**
  * @generated from protobuf message protos.DeleteAudienceRequest
  */
 export interface DeleteAudienceRequest {
@@ -1687,6 +1696,53 @@ class DetachNotificationRequest$Type extends MessageType<DetachNotificationReque
  */
 export const DetachNotificationRequest = new DetachNotificationRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class CreateAudienceRequest$Type extends MessageType<CreateAudienceRequest> {
+    constructor() {
+        super("protos.CreateAudienceRequest", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value?: PartialMessage<CreateAudienceRequest>): CreateAudienceRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CreateAudienceRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateAudienceRequest): CreateAudienceRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CreateAudienceRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateAudienceRequest
+ */
+export const CreateAudienceRequest = new CreateAudienceRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class DeleteAudienceRequest$Type extends MessageType<DeleteAudienceRequest> {
     constructor() {
         super("protos.DeleteAudienceRequest", [
@@ -2553,6 +2609,7 @@ export const External = new ServiceType("protos.External", [
     { name: "GetNotification", options: {}, I: GetNotificationRequest, O: GetNotificationResponse },
     { name: "AttachNotification", options: {}, I: AttachNotificationRequest, O: StandardResponse },
     { name: "DetachNotification", options: {}, I: DetachNotificationRequest, O: StandardResponse },
+    { name: "CreateAudience", options: {}, I: CreateAudienceRequest, O: StandardResponse },
     { name: "DeleteAudience", options: {}, I: DeleteAudienceRequest, O: StandardResponse },
     { name: "DeleteService", options: {}, I: DeleteServiceRequest, O: StandardResponse },
     { name: "GetMetrics", serverStreaming: true, options: {}, I: GetMetricsRequest, O: GetMetricsResponse },

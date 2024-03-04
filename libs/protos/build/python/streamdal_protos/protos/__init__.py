@@ -745,6 +745,11 @@ class DetachNotificationRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class CreateAudienceRequest(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class DeleteAudienceRequest(betterproto.Message):
     audience: "Audience" = betterproto.message_field(1)
     force: Optional[bool] = betterproto.bool_field(2, optional=True, group="_force")
@@ -1629,6 +1634,23 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def create_audience(
+        self,
+        create_audience_request: "CreateAudienceRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/CreateAudience",
+            create_audience_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def delete_audience(
         self,
         delete_audience_request: "DeleteAudienceRequest",
@@ -2081,6 +2103,11 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def create_audience(
+        self, create_audience_request: "CreateAudienceRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def delete_audience(
         self, delete_audience_request: "DeleteAudienceRequest"
     ) -> "StandardResponse":
@@ -2273,6 +2300,13 @@ class ExternalBase(ServiceBase):
     ) -> None:
         request = await stream.recv_message()
         response = await self.detach_notification(request)
+        await stream.send_message(response)
+
+    async def __rpc_create_audience(
+        self, stream: "grpclib.server.Stream[CreateAudienceRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.create_audience(request)
         await stream.send_message(response)
 
     async def __rpc_delete_audience(
@@ -2481,6 +2515,12 @@ class ExternalBase(ServiceBase):
                 self.__rpc_detach_notification,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 DetachNotificationRequest,
+                StandardResponse,
+            ),
+            "/protos.External/CreateAudience": grpclib.const.Handler(
+                self.__rpc_create_audience,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                CreateAudienceRequest,
                 StandardResponse,
             ),
             "/protos.External/DeleteAudience": grpclib.const.Handler(

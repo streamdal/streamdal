@@ -66,6 +66,9 @@ service External {
     option deprecated = true;
   }
 
+  // Create an audience. Used for terraform purposes
+  rpc CreateAudience(CreateAudienceRequest) returns (protos.StandardResponse);
+
   // Delete an audience
   rpc DeleteAudience(DeleteAudienceRequest) returns (protos.StandardResponse);
 
@@ -223,6 +226,10 @@ message DetachNotificationRequest {
   option deprecated = true;
   string notification_id = 1;
   string pipeline_id = 2;
+}
+
+message CreateAudienceRequest {
+  protos.Audience audience = 1;
 }
 
 message DeleteAudienceRequest {

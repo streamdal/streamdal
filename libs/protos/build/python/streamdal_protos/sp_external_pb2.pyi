@@ -60,6 +60,12 @@ class AttachNotificationRequest(_message.Message):
     pipeline_id: str
     def __init__(self, notification_id: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
 
+class CreateAudienceRequest(_message.Message):
+    __slots__ = ["audience"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+
 class CreateNotificationRequest(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
