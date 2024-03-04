@@ -677,25 +677,30 @@ func (s *ExternalServer) ResumePipeline(ctx context.Context, req *protos.ResumeP
 	return s.setPausePipeline(ctx, req.Audience, req.PipelineId, false)
 }
 
-func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.CreateNotificationRequest) (*protos.StandardResponse, error) {
+func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.CreateNotificationRequest) (*protos.CreateNotificationResponse, error) {
 	if err := validate.CreateNotificationRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST, err.Error()), nil
+		return nil, errors.Wrap(err, "invalid create notification request")
 	}
 
 	if s.Options.DemoMode {
-		return demoResponse(ctx)
+		return &protos.CreateNotificationResponse{
+			Notification: req.Notification,
+		}, nil
 	}
 
 	req.Notification.Id = util.Pointer(util.GenerateUUID())
 
 	if err := s.Options.StoreService.CreateNotificationConfig(ctx, req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+		return nil, errors.Wrap(err, "unable to create notification config")
 	}
 
-	return &protos.StandardResponse{
-		Id:      util.CtxRequestId(ctx),
-		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: "Notification config created",
+	notification, err := s.Options.StoreService.GetNotificationConfig(ctx, &protos.GetNotificationRequest{NotificationId: *req.Notification.Id})
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get notification config")
+	}
+
+	return &protos.CreateNotificationResponse{
+		Notification: notification,
 	}, nil
 }
 func (s *ExternalServer) UpdateNotification(ctx context.Context, req *protos.UpdateNotificationRequest) (*protos.StandardResponse, error) {
