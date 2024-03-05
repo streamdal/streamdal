@@ -808,6 +808,33 @@ func (s *ExternalServer) DetachNotification(ctx context.Context, _ *protos.Detac
 	}, nil
 }
 
+func (s *ExternalServer) CreateAudience(ctx context.Context, req *protos.CreateAudienceRequest) (*protos.StandardResponse, error) {
+	if req.Audience == nil {
+		return nil, errors.New("audience cannot be nil")
+	}
+	if err := validate.Audience(req.Audience); err != nil {
+		return nil, errors.Wrap(err, "invalid create audience request")
+	}
+
+	if s.Options.DemoMode {
+		return &protos.StandardResponse{
+			Id:      util.CtxRequestId(ctx),
+			Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+			Message: "Audience create)",
+		}, nil
+	}
+
+	if err := s.Options.StoreService.CreateAudience(ctx, req.Audience); err != nil {
+		return nil, errors.Wrap(err, "unable to create audience")
+	}
+
+	return &protos.StandardResponse{
+		Id:      util.CtxRequestId(ctx),
+		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
+		Message: "Audience created",
+	}, nil
+}
+
 // DeleteAudience will delete an audience. It will error if the audience has a
 // pipeline attached to it. To get around the error, you can set the "force"
 // bool in the request to true. This will delete the audience and emit a
