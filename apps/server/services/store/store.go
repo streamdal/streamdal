@@ -75,6 +75,10 @@ type IStore interface {
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
 	AddAudience(ctx context.Context, req *protos.NewAudienceRequest) error
+
+	// CreateAudience creates a new audience in the store. This method differs
+	// from AddAudience() in that it does not create any live entry.
+	CreateAudience(ctx context.Context, aud *protos.Audience) error
 	DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRequest) error
 	DeletePipeline(ctx context.Context, pipelineID string) error
 	UpdatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
@@ -705,6 +709,34 @@ func (s *Store) AddAudience(ctx context.Context, req *protos.NewAudienceRequest)
 	s.log.Debugf("successfully setnx for aud '%s'", util.AudienceToStr(req.Audience))
 
 	s.sendAudienceTelemetry(ctx, req.Audience, 1)
+
+	return nil
+}
+
+func (s *Store) CreateAudience(ctx context.Context, aud *protos.Audience) error {
+	pipelineConfigs := &protos.PipelineConfigs{}
+	data, err := proto.Marshal(pipelineConfigs)
+	if err != nil {
+		return errors.Wrap(err, "error marshaling pipeline config")
+	}
+
+	if err := s.options.RedisBackend.SetArgs(
+		ctx,
+		RedisAudienceKey(util.AudienceToStr(aud)),
+		data,
+		redis.SetArgs{
+			Mode: "NX",
+		},
+	).Err(); err != nil {
+		if errors.Is(err, redis.Nil) {
+			// Key already exists, nothing to do
+			return nil
+		}
+
+		return errors.Wrap(err, "error saving audience to store")
+	}
+
+	s.sendAudienceTelemetry(ctx, aud, 1)
 
 	return nil
 }
