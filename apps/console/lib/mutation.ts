@@ -169,25 +169,45 @@ export const deleteNotification = async (
   return response;
 };
 
-export const upsertNotification = async (
+export const updateNotification = async (
   notificationConfig: NotificationConfig,
 ) => {
   try {
-    const request = notificationConfig.id
-      ? UpdateNotificationRequest.create({ notification: notificationConfig })
-      : CreateNotificationRequest.create({
-        notification: notificationConfig,
-      });
+    const request = UpdateNotificationRequest.create({
+      notification: notificationConfig,
+    });
 
-    const { response } = notificationConfig.id
-      ? await client.updateNotification(request, meta)
-      : await client.createNotification(request, meta);
+    const { response } = await client.updateNotification(request, meta);
+    return response;
+  } catch (error) {
+    console.error("error updating notification", error);
+    return {
+      id: "updateNotification",
+      code: ResponseCode.INTERNAL_SERVER_ERROR,
+      error,
+    };
+  }
+};
+
+export const createNotification = async (
+  notificationConfig: NotificationConfig,
+) => {
+  try {
+    const request = CreateNotificationRequest.create({
+      notification: notificationConfig,
+    });
+
+    const { response } = await client.createNotification(request, meta);
+    //
+    // monkey patch a success code in here so we can check for success
+    // downstream just like we do for udpates
+    response.code = ResponseCode.OK;
 
     return response;
   } catch (error) {
-    console.error("error configuring notifications", error);
+    console.error("error creating notification", error);
     return {
-      id: "configNotificationRequest",
+      id: "createNotification",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
       error,
     };
