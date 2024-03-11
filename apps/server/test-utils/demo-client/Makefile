@@ -85,13 +85,13 @@ run5: description = Run welcome-service
 run5:
 	go run *.go -d \
 	--quiet \
-	--message-rate 40,50 \
+	--message-rate 1,5 \
 	--service-name "welcome-service" \
 	--operation-type 1 \
 	--operation-name  "reader" \
 	--component-name "kafka" \
 	--data-source-type file \
-	--data-source-file ./assets/sample-signup-producer.json
+	--data-source-file ./assets/sample-welcome-consumer.json
 
 .PHONY: run6
 run6: description = Run welcome-service
