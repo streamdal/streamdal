@@ -7,7 +7,7 @@
 
 </div>  
 
-Streamdal is an open-source _**'Code Native Data Pipeline'**_ solution for 
+Streamdal is an open-source _**'Code-Native Data Privacy**_ solution for 
 running data tasks _directly_ in your application code.
 
 <sub>Think of it as a "workflow engine" or a "pre/post data processor" that
