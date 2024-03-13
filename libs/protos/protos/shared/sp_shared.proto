@@ -4,6 +4,7 @@ syntax = "proto3";
 package protos.shared;
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/shared";
+option java_package = "com.streamdal.protos.shared";
 
 // KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
 // Note that only a subset of actions are used for protos.KVCommand (CREATE,

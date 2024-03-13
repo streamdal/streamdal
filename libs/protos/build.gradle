@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'com.streamdal.protos'
+version '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Add dependencies here if your Kotlin files depend on other libraries
+}
+
+task packageJar(type: Jar) {
+    from fileTree(dir: 'libs/protos/kotlin', include: ['*.kt']) // Adjust the directory path as needed
+    archiveClassifier = 'protos' // You can change the classifier if you want
+}
+
+artifacts {
+    archives packageJar
+}

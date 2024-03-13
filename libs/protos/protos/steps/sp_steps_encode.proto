@@ -3,6 +3,7 @@ syntax = "proto3";
 package protos.steps;
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/steps";
+option java_package = "com.streamdal.protos.steps";
 
 // WIP
 message EncodeStep {

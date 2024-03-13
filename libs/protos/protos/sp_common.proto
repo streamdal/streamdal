@@ -3,6 +3,7 @@ syntax = "proto3";
 package protos;
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option java_package = "com.streamdal.protos";
 
 // Common response message for many gRPC methods
 message StandardResponse {

@@ -6,6 +6,7 @@ package protos.steps;
 import "shared/sp_shared.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/steps";
+option java_package = "com.streamdal.protos.steps";
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //

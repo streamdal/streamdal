@@ -96,6 +96,22 @@ generate/python:
 
 	@echo Successfully compiled protos
 
+
+# Kotlin plugin used by the protocol compiler
+.PHONY: generate/kotlin
+generate/kotlin: description = Compile protobuf schemas for Kotlin
+generate/kotlin: clean/kotlin
+generate/kotlin:
+	mkdir -p build/kotlin/protos
+
+	docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
+ 		--proto_path=protos \
+ 		--kotlin_out=./build/kotlin \
+ 		--java_out=./build/kotlin \
+		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
+
+	@echo Successfully compiled protos
+
 # Protoset files contain binary encoded google.protobuf.FileDescriptorSet protos
 .PHONY: generate/protoset
 generate/protoset: description = Generate protoset for services
@@ -134,6 +150,11 @@ clean/python:
 clean/protoset: description = Remove protoset artifacts
 clean/protoset:
 	rm -rf ./build/protos.protoset
+
+.PHONY: clean/kotlin
+clean/kotlin: description = Remove kotlin artifacts
+clean/kotlin:
+	rm -rf ./build/kotlin/protos/*
 
 .PHONY: clean/ts
 clean/ts: description = Remove all TS build artifacts

@@ -7,6 +7,7 @@ import "sp_kv.proto";
 import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option java_package = "com.streamdal.protos";
 
 // Command is used by streamdal server for sending commands to SDKs
 message Command {
