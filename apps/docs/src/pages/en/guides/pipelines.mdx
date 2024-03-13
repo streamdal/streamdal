@@ -8,6 +8,7 @@ layout: ../../../layouts/MainLayout.astro
 import tip from "@images/icons/tip.png";
 import pipelinesInfo from '@images/guides/pipelines_info.png';
 import flowControl from '@images/guides/flow_control.png';
+import flowControlOptions from '@images/guides/flow_control_options.png';
 import RichImg from "@components/Misc/RichImg.astro";
 import Notification  from "@components/Callouts/Notification.astro";
 import Changes from "@components/Misc/Changes.astro";
@@ -21,12 +22,14 @@ are what you will be attaching pipelines to.
 
 ## What are Pipelines?
 
-Pipelines are logical checks and rules data must pass through and clear so it 
-can continue to be processed by your applications, and subsequently sent 
-"downstream" (i.e. written to a database, or passed to another application or 
-service). Pipelines are put together in the form of steps (which we refer 
-to interchangeably as rules), and each step has a type which determine the 
-kinds of actions to take on data.
+In simple words, it's a workflow for data.
+
+Pipelines are logical checks and rules data must adhere to so it can continue 
+to be processed by your applications, and subsequently sent "downstream" 
+(i.e. written to a database, or passed to another application or service). 
+Pipelines are put together in the form of steps (which we refer to 
+interchangeably as rules), and each step has a type which determine the kinds 
+of actions to take on data.
 
 <RichImg src={pipelinesInfo} alt="Pipelines informative image" />
 
@@ -213,13 +216,19 @@ to include these in production environments)._
 
 ## Pipeline Flow control
 
-When a pipeline executes, the resulting flow will either be `TRUE`, `FALSE`, or 
-`ERROR`. Each result will allow all of the same options:
+As pipelines execute, the resulting flow is determined via boolean or 
+`ERROR` results. When configuring pipelines, you can tailor each step to 
+control the execution of pipelines or optimize the flow of data at every step:
 
-<img src={flowControl} alt="Pipelines informative image" />
+<img src={flowControl} alt="Pipeline Flow Control UI screenshot" />
 
-Metadata are arbitrary keys and values that will be emitted to the calling code. 
-This is also a method to enrich or categorize data for downstream usage.
+You can define how each pipeline should proceed by `Don't Abort`, 
+`Abort Current Pipeline`, `Abort All Pipelines`, adding `Metadata` (which 
+could be arbitrary keys and values that will be emitted to the calling code; 
+i.e. to enrich, categorize, or label data for downstream usage), or sending 
+`Notifications`:
+
+<img src={flowControlOptions} alt="Pipeline Flow Control UI screenshot" />
 
 <Notification type="tip">
   <img src={tip} alt="tip" width="30px" height="30px" />
@@ -228,9 +237,29 @@ This is also a method to enrich or categorize data for downstream usage.
   </div>
 </Notification>
 
+## Example Pipeline
 
+There are many workflows you might normally configure in a traditional data 
+pipeline. You might want to:
 
+- Ensure no PII or sensitive data is in logs
+- Route data
+- Clean and reshape data
+- Verify data consistency
+- Handle errors
+- Add automation
+- Scale services or data platform
 
+Below is an example of how you would set up a similar workflow as a Streamdal 
+pipeline in the [Console UI](/en/core-components/console-ui/). In this example, 
+you'll see how you could use pipelines to truncate developer logs:
 
-
-
+<iframe 
+width="560" 
+height="315" 
+src="https://www.youtube.com/embed/5RQAvkPWONg?si=AQPvYOdBWK6v_DQi" 
+title="YouTube video player" 
+frameborder="0" 
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+allowfullscreen>
+</iframe>
