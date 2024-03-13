@@ -3,13 +3,14 @@ import { ProducerIcon } from "../../components/icons/producer.tsx";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { useState } from "preact/hooks";
-import { tailEnabledSignal, tailSamplingSignal } from "./tail.tsx";
+import { tailEnabledSignal, tailSamplingSignal, tailSignal } from "./tail.tsx";
 import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
 import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
 import { Schema } from "./schema.tsx";
 import IconEdit from "tabler-icons/tsx/edit.tsx";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
+import { effect } from "@preact/signals";
 
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },
@@ -21,6 +22,12 @@ export default function Operation(
 
   const audience = opModal.value.audience;
   const clients = opModal.value.clients;
+
+  effect(() => {
+    if (!tailEnabledSignal.value) {
+      tailSignal.value = [];
+    }
+  });
 
   return (
     audience

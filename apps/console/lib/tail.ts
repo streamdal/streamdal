@@ -12,6 +12,7 @@ import { client } from "./grpc.ts";
 import { GRPC_TOKEN } from "./configs.ts";
 import { TailSampleRate } from "../islands/drawer/tail.tsx";
 import { defaultTailSampleRate } from "../components/modals/tailRateModal.tsx";
+import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 
 export const tailAbortSignal = signal<boolean>(false);
 
@@ -48,6 +49,8 @@ export const tail = async (
     sampling: TailSampleRate;
   },
 ) => {
+  const abortController = new AbortController();
+
   const sendResponse = (response: TailResponse) => {
     try {
       socket.send(
@@ -61,10 +64,11 @@ export const tail = async (
       );
     } catch {
       console.debug("failed to send tail over socket");
+      //
+      // Extra defense against long running tails
+      abortController.abort();
     }
   };
-
-  const abortController = new AbortController();
 
   effect(() => {
     if (tailAbortSignal.value) {
@@ -74,7 +78,7 @@ export const tail = async (
 
   try {
     const tailRequest = TailRequest.create({
-      id: uuid.v1.generate(),
+      id: uuid.v1.generate() as string,
       audience: audience,
       type: TailRequestType.START,
       sampleOptions: {
@@ -83,15 +87,22 @@ export const tail = async (
       },
     });
 
-    const tailCall: any = client.tail(
-      tailRequest,
-      {
-        meta: { "auth-token": GRPC_TOKEN },
-        abort: abortController.signal,
-      },
-    );
+    const tailCall: ServerStreamingCall<TailRequest, TailResponse> = client
+      .tail(
+        tailRequest,
+        {
+          meta: { "auth-token": GRPC_TOKEN },
+          abort: abortController.signal,
+        },
+      );
 
     for await (const response of tailCall?.responses) {
+      //
+      // aborting does not always work on high throughput tails
+      if (tailAbortSignal.value) {
+        return;
+      }
+
       if (response?.Keepalive) {
         continue;
       }

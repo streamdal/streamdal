@@ -11,8 +11,9 @@ import { opModal } from "../serviceMap/opModalSignal.ts";
 import { validate } from "../form/validate.ts";
 
 export const defaultTailSampleRate = {
-  rate: 25,
+  rate: 1,
   intervalSeconds: 1,
+  maxRate: 25,
 };
 
 export const SampleRateSchema = zfd.formData({
@@ -21,10 +22,10 @@ export const SampleRateSchema = zfd.formData({
 }).refine(
   (data) => {
     return data.rate / data.intervalSeconds <=
-      defaultTailSampleRate.rate;
+      defaultTailSampleRate.maxRate;
   },
   {
-    message: `Max rate is ${defaultTailSampleRate.rate}/second`,
+    message: `Max rate is ${defaultTailSampleRate.maxRate}/second`,
     path: ["rate"],
   },
 );
