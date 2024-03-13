@@ -116,6 +116,11 @@ export const SIDEBAR: Sidebar = {
             link: "en/guides/tail",
           },
           {
+            text: "Terraform",
+            slug: "terraform",
+            link: "en/guides/terraform",
+          },
+          {
             text: "Notifications",
             slug: "notifications",
             link: "en/guides/notifications",

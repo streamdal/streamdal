@@ -216,6 +216,11 @@ a {
   color: var(--theme-hypertext);
 }
 
+hr {
+  border: 1px solid;
+  border-color: var(--theme-divider-hr);
+}
+
 a:hover,
 a:focus {
   text-decoration: underline;

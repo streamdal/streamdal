@@ -1,0 +1,61 @@
+---
+title: Terraform
+metaTitle: "Streamdal Terraform Provider"
+description: Information on Streamdal Terraform Provider
+layout: ../../../layouts/MainLayout.astro
+---
+
+Alternatively to configuring pipelines via the UI, and to enhance pipeline 
+portability, we offer a [Terraform provider](https://registry.terraform.io/providers/streamdal/streamdal/latest). 
+This allows you to define pipelines, steps, audiences and assignments 
+programmatically.
+
+[Terraform](https://www.terraform.io/) is an open-source infrastructure as code 
+software tool created by HashiCorp. It allows users to define and provision 
+resources and infrastructure using a high-level configuration language known as 
+HashiCorp Configuration Language (HCL), or optionally JSON.
+
+## Streamdal Terraform Provider
+
+- [Github Source Code](https://github.com/streamdal/terraform-provider-streamdal)
+- [Terraform Registry](https://registry.terraform.io/providers/streamdal/streamdal/latest)
+
+### Example Provider Setup
+
+```hcl
+terraform {
+  required_providers {
+    streamdal = {
+      source = "streamdal/streamdal"
+      version = "0.1.1"
+    }
+  }
+}
+
+provider "streamdal" {
+  # Change this to your token or add secret-management envars
+  token              = "1234"
+  address            = "localhost:8082"
+  connection_timeout = 10
+}
+```
+
+You can reference pipeline examples in the [example](https://github.com/streamdal/terraform-provider-streamdal/tree/main/examples) 
+folder of the provider source code. While we recommend using a versioned 
+provider, you may optionally leave `version` out to always pull the `latest`.
+
+## Troubleshooting
+
+### Doubled Audiences
+
+When using Terraform to provision pipelines, your `streamdal_audience` 
+resources must match what is configured in your application code. If these do 
+not match, then you might see multiple distinct audiences or audiences without 
+pipelines.
+
+To ensure proper provisioning of pipelines, you should ensure the following 
+terraform provisioning and code implementation match:
+
+- Service Name
+- Operation Name
+- Component Name
