@@ -39,10 +39,6 @@ jobs:
           fetch_all_tags: true
           tag_prefix: "apps/console/v"
 
-      - name: Update console VERSION file
-        run: |
-          echo ${{ steps.get_new_version.outputs.new_version }} > VERSION
-
       # We do this because other jobs might have written to the repo while this
       # job was running and making local changes; without this pull step, we
       # might run into an error during auto-commit.
@@ -50,7 +46,11 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git pull --depth=10
+          git pull --depth=10          
+
+      - name: Update console VERSION file
+        run: |
+          echo ${{ steps.get_new_version.outputs.new_version }} > VERSION
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         id: auto_commit
