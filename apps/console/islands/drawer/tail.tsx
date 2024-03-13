@@ -15,7 +15,7 @@ import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { defaultTailSampleRate } from "../../components/modals/tailRateModal.tsx";
 
-export const MAX_TAIL_SIZE = 200;
+export const MAX_TAIL_SIZE = 100;
 
 export type TailSampleRate = {
   rate: number;
