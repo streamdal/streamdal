@@ -161,6 +161,8 @@ func (s *Streamdal) register(looper director.Looper) error {
 		)
 	}
 
+	s.config.Logger.Debug("register() exit")
+
 	return nil
 }
 

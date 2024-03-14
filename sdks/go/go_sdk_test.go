@@ -307,6 +307,25 @@ var _ = Describe("Streamdal", func() {
 			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
 		})
 
+		It("fails to process when closed property is set", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			s := &Streamdal{cancelFunc: cancel}
+			s.Close()
+
+			resp := s.Process(ctx, &ProcessRequest{
+				ComponentName: "test-component-name",
+				OperationType: OperationTypeConsumer,
+				OperationName: "test-operation-name",
+				Data:          []byte(`{"foo":"bar"}`),
+			})
+
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Status).To(Equal(ExecStatusError))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			Expect(*resp.StatusMessage).To(Equal(ErrClosedClient.Error()))
+		})
+
 		It("fails on a detective match and aborts entire pipeline", func() {
 			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
