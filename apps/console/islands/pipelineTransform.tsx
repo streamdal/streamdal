@@ -57,14 +57,27 @@ const TransformPath = (
         )}
       {!dynamic &&
         (
-          <FormInput
-            name={`steps.${stepNumber}.step.transform.options.${optionPath}.path`}
-            data={data}
-            setData={setData}
-            label="Path"
-            placeHolder="ex: object.field"
-            errors={errors}
-          />
+          optionPath === "deleteFieldOptions"
+            ? (
+              <FormNInput
+                name={`steps.${stepNumber}.step.transform.options.${optionPath}.paths`}
+                data={data}
+                setData={setData}
+                label="Path"
+                placeHolder="ex: object.field"
+                errors={errors}
+              />
+            )
+            : (
+              <FormInput
+                name={`steps.${stepNumber}.step.transform.options.${optionPath}.path`}
+                data={data}
+                setData={setData}
+                label="Path"
+                placeHolder="ex: object.field"
+                errors={errors}
+              />
+            )
         )}
     </>
   );
