@@ -65,12 +65,6 @@ const detective = {
   args: [""],
 };
 
-const transform = {
-  type: TransformType.MASK_VALUE,
-  path: "",
-  value: "",
-};
-
 export const newStep = {
   name: "",
   onSuccess: [],
@@ -121,7 +115,7 @@ const transformOptions = z.discriminatedUnion("oneofKind", [
     oneofKind: z.literal("deleteFieldOptions"),
     deleteFieldOptions: z
       .object({
-        path: z.string().optional(),
+        paths: zfd.repeatable(z.array(zfd.text())),
       })
       .default({}),
   }),
@@ -361,11 +355,17 @@ const stepSchema = z
       !step.dynamic &&
       step?.step?.transform?.options?.oneofKind !== "extractOptions" &&
       !step?.step?.transform?.options[step?.step?.transform?.options?.oneofKind]
-        ?.path
+        ?.path &&
+      !step?.step?.transform?.options[step?.step?.transform?.options?.oneofKind]
+        ?.paths
     ) {
       ctx.addIssue({
         path: [
-          `step.transform.options.${step?.step?.transform?.options?.oneofKind}.path`,
+          `step.transform.options.${step?.step?.transform?.options?.oneofKind}.${
+            step?.step?.transform?.options?.oneofKind !== "deleteFieldOptions"
+              ? "paths"
+              : "path"
+          }`,
         ],
         code: z.ZodIssueCode.custom,
         message: "Required",
