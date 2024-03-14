@@ -20,7 +20,7 @@ services:
 
   # UI component that talks to server
   streamdal-console:
-    image: streamdal/console:0.0.37
+    image: streamdal/console:0.0.40
     depends_on:
       - streamdal-envoy
     environment:
