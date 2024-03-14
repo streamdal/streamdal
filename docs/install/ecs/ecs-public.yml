@@ -177,7 +177,7 @@ Resources:
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: streamdal-console-container
-          Image: streamdal/console:0.0.40
+          Image: streamdal/console:0.0.43
           Environment:
             - Name: STREAMDAL_CONSOLE_GRPC_WEB_URL
               Value: http://streamdal-server.local:8083
