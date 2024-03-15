@@ -1,6 +1,6 @@
 use conv::prelude::*;
 use protos::sp_steps_detective::DetectiveStepResultMatch;
-use serde_json::{Map, Number, Value};
+use serde_json::{Map, Value};
 use streamdal_gjson as gjson;
 use streamdal_gjson::Kind;
 
@@ -48,7 +48,7 @@ fn extract_array(value: &streamdal_gjson::Value) -> Result<serde_json::Value, Tr
                 array
                     .as_array_mut()
                     .unwrap()
-                    .push(Value::Number(Number::from_f64(element.f64()).unwrap()));
+                    .push(element.to_string().parse().unwrap());
             }
             Kind::True => {
                 array.as_array_mut().unwrap().push(Value::Bool(true));
@@ -121,12 +121,6 @@ fn extract_key(value: &streamdal_gjson::Value) -> Result<serde_json::Value, Tran
     }
 }
 
-pub struct CurrentElement {
-    pub kind: Kind,
-    pub map: Map<String, Value>,
-    pub arr: Vec<Value>,
-}
-
 pub fn extract(req: &Request) -> Result<String, TransformError> {
     validate_extract_request(req)?;
 
@@ -141,11 +135,19 @@ pub fn extract(req: &Request) -> Result<String, TransformError> {
 
     let data_as_str = convert_bytes_to_string(&req.data)?;
 
-    // For each path in extract_options.paths, get the value and add it to a map
-    let mut extracted_data = Map::new();
+    if extract_options.flatten {
+        extract_and_flatten(data_as_str, &req.paths)
+    } else {
+        extract_with_layout(data_as_str, &req.paths)
+    }
+}
 
-    for dr in &req.paths {
-        let value = gjson::get(data_as_str, dr.path.as_str());
+pub fn extract_with_layout(data: &str, paths: &Vec<DetectiveStepResultMatch>) -> Result<String, TransformError> {
+    let mut root = Value::Object(Map::new());
+
+    let mut current_element = &mut root;
+    for dr in paths {
+        let value = gjson::get(data, dr.path.as_str());
         if !value.exists() {
             continue;
         }
@@ -155,84 +157,99 @@ pub fn extract(req: &Request) -> Result<String, TransformError> {
         // inserting the value.
         let path_elements: Vec<&str> = dr.path.split('.').collect();
 
-        if extract_options.flatten {
-            let parsed_value = match extract_key(&value) {
-                Ok(key) => key,
-                Err(e) => return Err(e),
-            };
-
-            extracted_data.insert(path_elements.last().unwrap().to_string(), parsed_value);
-        } else {
-            let mut current_map = &mut extracted_data;
-            for (i, path_element) in path_elements.iter().enumerate() {
-                // Check if we're in the last element of the path, if so, we're inserting the value
-                if i == path_elements.len() - 1 {
-                    let parsed_value = match extract_key(&value) {
-                        Ok(key) => key,
-                        Err(e) => return Err(e),
-                    };
-
-                    current_map.insert(path_element.to_string(), parsed_value);
-
-                    continue;
-                }
-
-                // Exclude gjson array syntax from path
-                if path_element.ends_with('#') {
-                    continue;
-                }
-
-                // We're not at the last element, so we need to insert a new map for this element
-                // Get the key if it exists, otherwise create the key and set it's value to serde_json::Map::new()
-                // On subsequent iterations, we'll get the key and set current_map to the value of that key
-                if current_map.contains_key(*path_element) {
-                    let current_map_value = match current_map.get_mut(*path_element) {
-                        Some(value) => value,
-                        None => {
-                            return Err(TransformError::Generic(
-                                "unable to extract data: unable to get current map value"
-                                    .to_string(),
-                            ))
-                        }
-                    };
-
-                    current_map = match current_map_value.as_object_mut() {
-                        Some(value) => value,
-                        None => {
-                            return Err(TransformError::Generic(
-                                "unable to extract data: unable to get current map as object"
-                                    .to_string(),
-                            ))
-                        }
-                    };
-                }
-
-                current_map.insert(path_element.to_string(), Value::Object(Map::new()));
-
-                let current_map_value = match current_map.get_mut(*path_element) {
-                    Some(value) => value,
-                    None => {
-                        return Err(TransformError::Generic(
-                            "unable to extract data: unable to get current map value".to_string(),
-                        ))
-                    }
+        for (i, path_element) in path_elements.iter().enumerate() {
+            // Check if we're in the last element of the path, if so, we're inserting the value
+            if i == path_elements.len() - 1 {
+                let parsed_value = match extract_key(&value) {
+                    Ok(key) => key,
+                    Err(e) => return Err(e),
                 };
+                if current_element.is_array() {
+                    if !path_element.ends_with('#') {
+                        // We need to create the object and insert it into the array
+                        if parsed_value.is_array() {
+                            for v in parsed_value.as_array().unwrap() {
+                                let mut new_obj = Value::Object(Map::new());
+                                new_obj.as_object_mut().unwrap().insert(path_element.to_string(), v.clone());
 
-                current_map = match current_map_value.as_object_mut() {
-                    Some(value) => value,
-                    None => {
-                        return Err(TransformError::Generic(
-                            "unable to extract data: unable to get current map as object"
-                                .to_string(),
-                        ))
+                                let current_array = current_element.as_array_mut().unwrap();
+                                current_array.push(new_obj);
+                            }
+                        }
+                    } else {
+                        // TODO: how to handle this case?
                     }
-                };
+                } else {
+                    current_element.as_object_mut().unwrap().insert(path_element.to_string(), parsed_value);
+                }
+                continue;
+            }
+
+            // Check if the next element in the path is an array, if so, we need to create a new array object
+            if let Some(next_element) = path_elements.get(i + 1) {
+                if next_element.ends_with('#') {
+                    if !current_element.as_object().unwrap().contains_key(*path_element) {
+                        current_element
+                            .as_object_mut()
+                            .unwrap()
+                            .insert(path_element.to_string(), Value::Array(Vec::new()));
+                    }
+
+                    // Set current element to be the new array object
+                    current_element = current_element.as_object_mut().unwrap().get_mut(*path_element).unwrap();
+                    continue
+                }
+            }
+
+            // This level doesn't have the value we're looking for, so we need to create a new map object
+            // and assign it to the key of the current_element
+            if let Some(existing_key) = current_element.as_object() {
+                if !existing_key.contains_key(*path_element) {
+                    current_element
+                        .as_object_mut()
+                        .unwrap()
+                        .insert(path_element.to_string(), Value::Object(Map::new()));
+                }
+
+                // Set current element to be the new map object
+                current_element = current_element.as_object_mut().unwrap().get_mut(*path_element).unwrap();
             }
         }
     }
 
     // Convert serde map to json string
-    if let Ok(res) = serde_json::to_string(&extracted_data) {
+    if let Ok(res) = serde_json::to_string(root.as_object().unwrap()) {
+        Ok(res)
+    } else {
+        Err(TransformError::Generic(
+            "unable to extract data: unable to serialize data".to_string(),
+        ))
+    }
+}
+
+pub fn extract_and_flatten(data: &str, paths: &Vec<DetectiveStepResultMatch>) -> Result<String, TransformError> {
+    let mut root = Map::new();
+    for dr in paths {
+        let value = gjson::get(data, dr.path.as_str());
+        if !value.exists() {
+            continue;
+        }
+
+        // Split path by ".". If we're flattening it, just get last element and insert into hashmap
+        // Otherwise, we need to recursively create sub-hashmaps for each element in the path before
+        // inserting the value.
+        let path_elements: Vec<&str> = dr.path.split('.').collect();
+
+        let parsed_value = match extract_key(&value) {
+            Ok(key) => key,
+            Err(e) => return Err(e),
+        };
+
+        root.insert(path_elements.last().unwrap().to_string(), parsed_value);
+    }
+
+    // Convert serde map to json string
+    if let Ok(res) = serde_json::to_string(&root) {
         Ok(res)
     } else {
         Err(TransformError::Generic(
@@ -524,6 +541,7 @@ fn convert_bytes_to_string(bytes: &Vec<u8>) -> Result<&str, TransformError> {
 
 #[cfg(test)]
 mod tests {
+    use crate::test_utils::SAMPLE_JSON_BYTES;
     use super::*;
 
     const TEST_DATA: &str = r#"{
@@ -936,7 +954,28 @@ mod tests {
 
         let result = extract(&req).unwrap();
 
-        let expected = r#"{"users":{"name":["Alice","Bob"]}}"#;
+        let expected = r#"{"users":[{"name":"Alice"},{"name":"Bob"}]}"#;
+
+        assert!(gjson::valid(result.as_str()));
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_extract_k8s_field() {
+        let req = Request {
+            data: SAMPLE_JSON_BYTES.clone(),
+            value: "".to_string(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "status.containerStatuses.#.restartCount".to_string(),
+                ..Default::default()
+            }],
+            truncate_options: None,
+            extract_options: Some(ExtractOptions { flatten: false }),
+        };
+
+        let result = extract(&req).unwrap();
+
+        let expected = r#"{"status":{"containerStatuses":[{"restartCount":0}]}}"#;
 
         assert!(gjson::valid(result.as_str()));
         assert_eq!(result, expected);
