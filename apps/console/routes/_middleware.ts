@@ -21,6 +21,7 @@ const sessionExcludes = [
 const emailExcludes = [
   ...sessionExcludes,
   "/email",
+  "/api",
 ];
 
 export type SessionState = WithSession;
