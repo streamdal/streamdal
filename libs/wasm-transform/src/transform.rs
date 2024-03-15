@@ -121,6 +121,12 @@ fn extract_key(value: &streamdal_gjson::Value) -> Result<serde_json::Value, Tran
     }
 }
 
+pub struct CurrentElement {
+    pub kind: Kind,
+    pub map: Map<String, Value>,
+    pub arr: Vec<Value>,
+}
+
 pub fn extract(req: &Request) -> Result<String, TransformError> {
     validate_extract_request(req)?;
 
