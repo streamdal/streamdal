@@ -300,6 +300,7 @@ export const sendEmail = async (email: string) => {
   try {
     const request = AppRegistrationRequest.create({ email });
     const { response } = await client.appRegister(request, meta);
+    console.log("email response", response);
     return response;
   } catch (error) {
     console.error("error registering app", error);
