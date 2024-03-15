@@ -158,27 +158,22 @@ pub const SAMPLE_JSON_K8S: &str = r#"{
           },
           "f:spec": {
             "f:containers": {
-              "k:{\"name\":\"plumber-cluster\"}": {
+              "k:{\"name\":\"streamdal-cluster\"}": {
                 ".": {},
                 "f:command": {},
                 "f:env": {
                   ".": {},
-                  "k:{\"name\":\"PLUMBER_SERVER_CLUSTER_ID\"}": {
+                  "k:{\"name\":\"STREAMDAL_CLUSTER_ID\"}": {
                     ".": {},
                     "f:name": {},
                     "f:value": {}
                   },
-                  "k:{\"name\":\"PLUMBER_SERVER_ENABLE_CLUSTER\"}": {
+                  "k:{\"name\":\"STREAMDAL_ENABLE_CLUSTER\"}": {
                     ".": {},
                     "f:name": {},
                     "f:value": {}
                   },
-                  "k:{\"name\":\"PLUMBER_SERVER_NATS_URL\"}": {
-                    ".": {},
-                    "f:name": {},
-                    "f:value": {}
-                  },
-                  "k:{\"name\":\"PLUMBER_SERVER_NODE_ID\"}": {
+                  "k:{\"name\":\"STREAMDAL_NODE_ID\"}": {
                     ".": {},
                     "f:name": {},
                     "f:valueFrom": {
@@ -186,7 +181,7 @@ pub const SAMPLE_JSON_K8S: &str = r#"{
                       "f:fieldRef": {}
                     }
                   },
-                  "k:{\"name\":\"PLUMBER_SERVER_USE_TLS\"}": {
+                  "k:{\"name\":\"STREAMDAL_USE_TLS\"}": {
                     ".": {},
                     "f:name": {},
                     "f:value": {}
@@ -312,10 +307,10 @@ pub const SAMPLE_JSON_K8S: &str = r#"{
     ],
     "containers": [
       {
-        "name": "plumber-cluster",
-        "image": "batchcorp/plumber:v2.1.3",
+        "name": "streamdal-cluster",
+        "image": "streamdal/streamdal:v1.0.0",
         "command": [
-          "/plumber-linux",
+          "/streamdal-linux",
           "server"
         ],
         "ports": [
@@ -326,23 +321,19 @@ pub const SAMPLE_JSON_K8S: &str = r#"{
         ],
         "env": [
           {
-            "name": "PLUMBER_SERVER_CLUSTER_ID",
+            "name": "STREAMDAL_CLUSTER_ID",
             "value": "7EB6C7FB-9053-41B4-B456-78E64CF9D393"
           },
           {
-            "name": "PLUMBER_SERVER_ENABLE_CLUSTER",
+            "name": "STREAMDAL_ENABLE_CLUSTER",
             "value": "true"
           },
           {
-            "name": "PLUMBER_SERVER_NATS_URL",
-            "value": "nats://plumber-nats.default.svc.cluster.local:4222"
-          },
-          {
-            "name": "PLUMBER_SERVER_USE_TLS",
+            "name": "STREAMDAL_USE_TLS",
             "value": "false"
           },
           {
-            "name": "PLUMBER_SERVER_NODE_ID",
+            "name": "STREAMDAL_NODE_ID",
             "valueFrom": {
               "fieldRef": {
                 "apiVersion": "v1",
