@@ -7,7 +7,16 @@ export const config: RouteConfig = {
 };
 
 export const handler: Handlers<SuccessType> = {
-  async POST(req: Request) {
+  async POST(req: Request, ctx) {
+    const headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Allow-Headers":
+        "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With",
+      "Access-Control-Allow-Methods": "POST, OPTIONS, GET, PUT, DELETE",
+    };
+
     let data = null;
     try {
       data = await req.json();
@@ -18,15 +27,14 @@ export const handler: Handlers<SuccessType> = {
     if (!data?.email) {
       return new Response("email required", {
         status: 400,
+        headers,
       });
     }
 
     void sendEmail(data.email);
 
     return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       status: 200,
     });
   },
