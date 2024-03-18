@@ -17,3 +17,4 @@ streamdal-gjson = "0.8.4-delete-path-fix"
 streamdal-protos = { path="../protos/build/rust/protos" }
 serde_json = "1.0.110"
 protobuf = "3.4.0"
+lazy_static = "1.4.0"

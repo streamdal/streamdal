@@ -5,6 +5,7 @@ use protos::sp_steps_detective::DetectiveType;
 #[test]
 fn test_numeric() {
     let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+    let sample_json_k8s = &crate::test_utils::SAMPLE_JSON_K8S.as_bytes().to_vec();
 
     let test_cases = vec![
         // Equal
@@ -30,6 +31,18 @@ fn test_numeric() {
             },
             expected_matches: 1,
             text: "equal number_float".to_string(),
+            should_error: false,
+        },
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
+                data: sample_json_k8s,
+                path: "status.containerStatuses.#.restartCount".to_string(),
+                args: vec!["0".to_string()],
+                negate: false,
+            },
+            expected_matches: 1,
+            text: "equal restart_count".to_string(),
             should_error: false,
         },
         // Greater than
