@@ -1,6 +1,8 @@
-use protobuf::{EnumOrUnknown, Message};
+use protobuf::{EnumOrUnknown, Message, MessageField};
+use protos::sp_pipeline::PipelineStep;
+use protos::sp_pipeline::pipeline_step::Step;
 use protos::sp_steps_httprequest::HttpRequestMethod::HTTP_REQUEST_METHOD_UNSET;
-use protos::sp_steps_httprequest::HttpResponse;
+use protos::sp_steps_httprequest::{HttpRequest, HttpRequestStep, HttpResponse};
 use protos::sp_wsm::{WASMExitCode, WASMRequest};
 
 extern "C" {
@@ -10,7 +12,7 @@ extern "C" {
 #[no_mangle]
 pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
     // Read request
-    let wasm_request = match common::read_request(ptr, length) {
+    let mut wasm_request = match common::read_request(ptr, length) {
         Ok(req) => req,
         Err(e) => {
             return common::write_response(
@@ -30,10 +32,53 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_ERROR,
-            format!("invalid wasm request: {}", err.to_string()),
+            format!("invalid wasm request: {}", err),
         );
     }
 
+    // If dynamic == true, use input_payload as the request body
+    if wasm_request.step.dynamic {
+        let new_http_step = HttpRequestStep{
+            request: MessageField(
+                Some(
+                    Box::new(
+                        HttpRequest{
+                            url: wasm_request.step.http_request().request.url.clone(),
+                            method: wasm_request.step.http_request().request.method,
+                            headers: wasm_request.step.http_request().request.headers.clone(),
+                            body: wasm_request.input_payload.clone(),
+                            ..Default::default()
+                        }
+                    )
+                )
+            ),
+            ..Default::default()
+        };
+
+        let new_wasm_request = WASMRequest {
+            input_payload: wasm_request.input_payload.clone(),
+            inter_step_result: wasm_request.inter_step_result.clone(),
+            step: MessageField(
+                Some(
+                    Box::new(
+                        PipelineStep {
+                            name: wasm_request.step.name.clone(),
+                            on_error: wasm_request.step.on_error.clone(),
+                            on_true: wasm_request.step.on_true.clone(),
+                            on_false: wasm_request.step.on_false.clone(),
+                            dynamic: true,
+                            step: Some(Step::HttpRequest(new_http_step)),
+                            ..Default::default()
+                        }
+                    )
+                )
+            ),
+            ..Default::default()
+        };
+
+        wasm_request = new_wasm_request;
+    }
+    
     // Serialize request
     let mut bytes = match wasm_request.step.http_request().request.write_to_bytes() {
         Ok(bytes) => bytes,
@@ -43,7 +88,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                 None,
                 None,
                 WASMExitCode::WASM_EXIT_CODE_ERROR,
-                format!("unable to serialize request: {}", e.to_string()),
+                format!("unable to serialize request: {}", e),
             );
         }
     };
@@ -92,7 +137,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FALSE,
-            format!("unable to parse response: {}", e.to_string()),
+            format!("unable to parse response: {}", e),
         ),
     };
 }
@@ -110,7 +155,7 @@ fn validate_wasm_request(req: &WASMRequest) -> Result<(), String> {
         return Err("httprequest is required".to_string());
     }
 
-    if req.step.http_request().request.url == "".to_string() {
+    if req.step.http_request().request.url == *"" {
         return Err("http request url cannot be empty".to_string());
     }
 
