@@ -78,7 +78,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
             "Successfully transformed payload".to_string(),
         ),
         Err(err) => common::write_response(
-            None,
+            Some(&wasm_request.input_payload),
             None,
             None,
             WASMExitCode::WASM_EXIT_CODE_FALSE,
