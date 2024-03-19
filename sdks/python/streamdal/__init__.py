@@ -76,9 +76,9 @@ class Audience:
 class StreamdalConfig:
     """StreamdalConfig is a dataclass that holds configuration for the StreamdalClient"""
 
-    streamdal_url: str = os.getenv("STREAMDAL_SERVER_URL", DEFAULT_SERVER_URL)
-    streamdal_token: str = os.getenv("STREAMDAL_SERVER_TOKEN", DEFAULT_SERVER_TOKEN)
-    grpc_timeout: int = os.getenv("STREAMDAL_SERVER_GRPC_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
+    streamdal_url: str = os.getenv("STREAMDAL_URL", DEFAULT_SERVER_URL)
+    streamdal_token: str = os.getenv("STREAMDAL_TOKEN", DEFAULT_SERVER_TOKEN)
+    grpc_timeout: int = os.getenv("STREAMDAL_GRPC_TIMEOUT", DEFAULT_GRPC_TIMEOUT)
     pipeline_timeout: int = os.getenv(
         "STREAMDAL_PIPELINE_TIMEOUT", DEFAULT_PIPELINE_TIMEOUT
     )
