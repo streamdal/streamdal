@@ -25,7 +25,7 @@ helm repo update
 ### Install
 
 ```bash
-helm install streamdal streamdal/streamdal-server -f streamdal-server/values.yaml
+helm install streamdal streamdal/streamdal-server
 
 ```
 
