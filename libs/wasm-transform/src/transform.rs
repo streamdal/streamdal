@@ -35,6 +35,7 @@ pub struct Request {
 }
 
 fn extract_array(value: &streamdal_gjson::Value) -> Result<serde_json::Value, TransformError> {
+    
     let mut array = Value::Array(Vec::new());
     for element in value.array() {
         match element.kind() {
