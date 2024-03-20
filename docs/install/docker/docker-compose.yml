@@ -3,7 +3,7 @@ version: "3.8"
 services:
   # Used by console and SDKs
   streamdal-server:
-    image: streamdal/server:0.0.36-aa09c25
+    image: streamdal/server:0.0.37-b70ce00
     depends_on:
       - streamdal-aes-gen
       - streamdal-redis
