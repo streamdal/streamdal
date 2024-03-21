@@ -1,7 +1,8 @@
+{{- $fullName := include "streamdal.fullname" . -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: streamdal-console
+  name: {{ $fullName }}-console
   {{- if .Values.consoleService.loadBalancer.enabled }}
   annotations:
     {{- range $key, $value := .Values.consoleService.loadBalancer.annotations }}
