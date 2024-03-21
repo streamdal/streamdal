@@ -83,9 +83,30 @@ pub const SAMPLE_JSON: &str = r#"{
     "cloud": {
         "aws": {
             "key_id": "AKIAIOSFODNN7EXAMPLE"
+            "mws_auth_token": "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c",
         },
         "github": {
-            "pat": "ghp_qr7jU0ItnCxyvstfROjpYVngNWGidT0SOtwD"
+            "pat": "ghp_qr7jU0ItnCxyvstfROjpYVngNWGidT0SOtwD",
+            "fine_grained": "github_pat_11ACDYWHY02q7NV2SZtkr0_CCUemYtLFNSDF0al1gSuLx0drIYZhzlxT2yfsKD6qR9M"
+        }
+        "docker": {
+            "swarm_join_token": "SWMTKN-1-3pu6hszjas19xyp7ghgosyx9k8atbfcr8p2is99znpy26u2lkl-1awxwuwd3z9j1z3puu7rcgdbx",
+            "swarm_unlock_token": "SWMKEY-1-7c37Cc8654o6p38HnroywCi19pllOnGtbdZEgtKxZu8"
+        },
+        "paypal": {
+            "braintree_access_token": "access_token$sandbox$3g3w"
+        },
+        "databricks": {
+            "pat": "dapi0a1b2c3d4e5f678901234567890123456a7b"
+        },
+        "sendgrid": {
+            "api_key": "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"
+        },
+        "stripe": {
+            "secret_key": "sk_test_4eC39HqLyjWDarjtT1zdp7dc",
+        },
+        "azure": {
+            "sql_connection_string": "Server=tcp:myserver.database.windows.net,1433;Initial Catalog=mydb;Persist Security Info=False;User ID=mylogin;Password=mypassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
         }
     },
     "payments": {
@@ -109,7 +130,9 @@ pub const SAMPLE_JSON: &str = r#"{
         "religion": "Buddhism",
         "phone": "+13215781234",
     },
-    "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----"
+    "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----",
+    "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+    "bearer_token": "Authorization: Bearer testToken123"
 }"#;
 
 pub const SAMPLE_JSON_K8S: &str = r#"{

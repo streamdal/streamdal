@@ -691,3 +691,24 @@ fn test_postal_code() {
     crate::test_utils::run_tests(&test_cases);
 }
 
+#[test]
+fn test_jwt() {
+    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_JWT,
+                data: sample_json,
+                path: "jwt".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected_matches: 1,
+            text: "equal jwt".to_string(),
+            should_error: false,
+        }
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}
