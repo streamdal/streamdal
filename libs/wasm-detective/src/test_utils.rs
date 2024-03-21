@@ -103,7 +103,7 @@ pub const SAMPLE_JSON: &str = r#"{
             "api_key": "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"
         },
         "stripe": {
-            "secret_key": "sk_test_4eC39HqLyjWDarjtT1zdp7dc",
+            "secret_key": "sk_live_4eC39HqLyjWDarjtT1zdp7dc",
         },
         "azure": {
             "sql_connection_string": "Server=tcp:myserver.database.windows.net,1433;Initial Catalog=mydb;Persist Security Info=False;User ID=mylogin;Password=mypassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",

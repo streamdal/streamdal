@@ -44,7 +44,7 @@ pub fn slack_token(_request: &Request, field: Value) -> Result<bool, CustomError
 pub fn stripe_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let val: String = field.str().to_lowercase();
 
-    let valid = val.starts_with("pk_") && val.len() == 32;
+    let valid = val.starts_with("sk_live_");
 
     Ok(valid)
 }
