@@ -589,6 +589,24 @@ pub enum DetectiveType {
     DETECTIVE_TYPE_PII_CRYPTO_ADDRESS = 2026,
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_GITHUB_PAT)
     DETECTIVE_TYPE_PII_GITHUB_PAT = 2027,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN)
+    DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN = 2028,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN)
+    DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN = 2029,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_DATABRICKS_PAT)
+    DETECTIVE_TYPE_PII_DATABRICKS_PAT = 2030,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_SENDGRID_KEY)
+    DETECTIVE_TYPE_PII_SENDGRID_KEY = 2031,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_STRIPE_SECRET)
+    DETECTIVE_TYPE_PII_STRIPE_SECRET = 2032,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING)
+    DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING = 2033,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_JWT)
+    DETECTIVE_TYPE_PII_JWT = 2034,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN)
+    DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN = 2035,
+    // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_PII_BEARER_TOKEN)
+    DETECTIVE_TYPE_PII_BEARER_TOKEN = 2036,
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_NUMERIC_EQUAL_TO)
     DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000,
     // @@protoc_insertion_point(enum_value:protos.steps.DetectiveType.DETECTIVE_TYPE_NUMERIC_GREATER_THAN)
@@ -667,6 +685,15 @@ impl ::protobuf::Enum for DetectiveType {
             2025 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER),
             2026 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_CRYPTO_ADDRESS),
             2027 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT),
+            2028 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN),
+            2029 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN),
+            2030 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_DATABRICKS_PAT),
+            2031 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_SENDGRID_KEY),
+            2032 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_STRIPE_SECRET),
+            2033 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING),
+            2034 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_JWT),
+            2035 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN),
+            2036 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN),
             3000 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO),
             3001 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN),
             3002 => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL),
@@ -732,6 +759,15 @@ impl ::protobuf::Enum for DetectiveType {
             "DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER),
             "DETECTIVE_TYPE_PII_CRYPTO_ADDRESS" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_CRYPTO_ADDRESS),
             "DETECTIVE_TYPE_PII_GITHUB_PAT" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT),
+            "DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN),
+            "DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN),
+            "DETECTIVE_TYPE_PII_DATABRICKS_PAT" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_DATABRICKS_PAT),
+            "DETECTIVE_TYPE_PII_SENDGRID_KEY" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_SENDGRID_KEY),
+            "DETECTIVE_TYPE_PII_STRIPE_SECRET" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_STRIPE_SECRET),
+            "DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING),
+            "DETECTIVE_TYPE_PII_JWT" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_JWT),
+            "DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN),
+            "DETECTIVE_TYPE_PII_BEARER_TOKEN" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN),
             "DETECTIVE_TYPE_NUMERIC_EQUAL_TO" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO),
             "DETECTIVE_TYPE_NUMERIC_GREATER_THAN" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN),
             "DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL" => ::std::option::Option::Some(DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL),
@@ -796,6 +832,15 @@ impl ::protobuf::Enum for DetectiveType {
         DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER,
         DetectiveType::DETECTIVE_TYPE_PII_CRYPTO_ADDRESS,
         DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT,
+        DetectiveType::DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN,
+        DetectiveType::DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN,
+        DetectiveType::DETECTIVE_TYPE_PII_DATABRICKS_PAT,
+        DetectiveType::DETECTIVE_TYPE_PII_SENDGRID_KEY,
+        DetectiveType::DETECTIVE_TYPE_PII_STRIPE_SECRET,
+        DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING,
+        DetectiveType::DETECTIVE_TYPE_PII_JWT,
+        DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN,
+        DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN,
         DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO,
         DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN,
         DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL,
@@ -866,14 +911,23 @@ impl ::protobuf::EnumFull for DetectiveType {
             DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER => 48,
             DetectiveType::DETECTIVE_TYPE_PII_CRYPTO_ADDRESS => 49,
             DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT => 50,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO => 51,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN => 52,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL => 53,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN => 54,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL => 55,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE => 56,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_MIN => 57,
-            DetectiveType::DETECTIVE_TYPE_NUMERIC_MAX => 58,
+            DetectiveType::DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN => 51,
+            DetectiveType::DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN => 52,
+            DetectiveType::DETECTIVE_TYPE_PII_DATABRICKS_PAT => 53,
+            DetectiveType::DETECTIVE_TYPE_PII_SENDGRID_KEY => 54,
+            DetectiveType::DETECTIVE_TYPE_PII_STRIPE_SECRET => 55,
+            DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING => 56,
+            DetectiveType::DETECTIVE_TYPE_PII_JWT => 57,
+            DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN => 58,
+            DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN => 59,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_EQUAL_TO => 60,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_THAN => 61,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL => 62,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_THAN => 63,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_LESS_EQUAL => 64,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_RANGE => 65,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_MIN => 66,
+            DetectiveType::DETECTIVE_TYPE_NUMERIC_MAX => 67,
         };
         Self::enum_descriptor().value_by_index(index)
     }
@@ -901,7 +955,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01(\x0e2\x1b.protos.steps.DetectiveTypeR\x04type\x12\x12\n\x04path\x18\
     \x02\x20\x01(\tR\x04path\x12\x14\n\x05value\x18\x05\x20\x01(\x0cR\x05val\
     ue\"W\n\x13DetectiveStepResult\x12@\n\x07matches\x18\x01\x20\x03(\x0b2&.\
-    protos.steps.DetectiveStepResultMatchR\x07matches*\x96\x10\n\rDetectiveT\
+    protos.steps.DetectiveStepResultMatchR\x07matches*\x85\x13\n\rDetectiveT\
     ype\x12\x1a\n\x16DETECTIVE_TYPE_UNKNOWN\x10\0\x12\x1c\n\x17DETECTIVE_TYP\
     E_IS_EMPTY\x10\xe8\x07\x12\x1d\n\x18DETECTIVE_TYPE_HAS_FIELD\x10\xe9\x07\
     \x12\x1b\n\x16DETECTIVE_TYPE_IS_TYPE\x10\xea\x07\x12'\n\"DETECTIVE_TYPE_\
@@ -938,18 +992,25 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \xe6\x0f\x12\x1c\n\x17DETECTIVE_TYPE_PII_IBAN\x10\xe7\x0f\x12!\n\x1cDETE\
     CTIVE_TYPE_PII_SWIFT_BIC\x10\xe8\x0f\x12+\n&DETECTIVE_TYPE_PII_BANK_ROUT\
     ING_NUMBER\x10\xe9\x0f\x12&\n!DETECTIVE_TYPE_PII_CRYPTO_ADDRESS\x10\xea\
-    \x0f\x12\"\n\x1dDETECTIVE_TYPE_PII_GITHUB_PAT\x10\xeb\x0f\x12$\n\x1fDETE\
-    CTIVE_TYPE_NUMERIC_EQUAL_TO\x10\xb8\x17\x12(\n#DETECTIVE_TYPE_NUMERIC_GR\
-    EATER_THAN\x10\xb9\x17\x12)\n$DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL\x10\
-    \xba\x17\x12%\n\x20DETECTIVE_TYPE_NUMERIC_LESS_THAN\x10\xbb\x17\x12&\n!D\
-    ETECTIVE_TYPE_NUMERIC_LESS_EQUAL\x10\xbc\x17\x12!\n\x1cDETECTIVE_TYPE_NU\
-    MERIC_RANGE\x10\xbd\x17\x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MIN\x10\xbe\
-    \x17\x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MAX\x10\xbf\x17BBZ@github.com/s\
-    treamdal/streamdal/libs/protos/build/go/protos/stepsJ\x9a%\n\x06\x12\x04\
-    \0\0w\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\
-    \x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n5\
-    \n\x02\x05\0\x12\x04\x06\0]\x01\")\x201000-1999\x20reserved\x20for\x20co\
-    re\x20match\x20types\n\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\
+    \x0f\x12\"\n\x1dDETECTIVE_TYPE_PII_GITHUB_PAT\x10\xeb\x0f\x12.\n)DETECTI\
+    VE_TYPE_PII_BRAINTREE_ACCESS_TOKEN\x10\xec\x0f\x12*\n%DETECTIVE_TYPE_PII\
+    _AWS_MWS_AUTH_TOKEN\x10\xed\x0f\x12&\n!DETECTIVE_TYPE_PII_DATABRICKS_PAT\
+    \x10\xee\x0f\x12$\n\x1fDETECTIVE_TYPE_PII_SENDGRID_KEY\x10\xef\x0f\x12%\
+    \n\x20DETECTIVE_TYPE_PII_STRIPE_SECRET\x10\xf0\x0f\x12-\n(DETECTIVE_TYPE\
+    _PII_AZURE_SQL_CONN_STRING\x10\xf1\x0f\x12\x1b\n\x16DETECTIVE_TYPE_PII_J\
+    WT\x10\xf2\x0f\x12*\n%DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN\x10\xf3\x0f\
+    \x12$\n\x1fDETECTIVE_TYPE_PII_BEARER_TOKEN\x10\xf4\x0f\x12$\n\x1fDETECTI\
+    VE_TYPE_NUMERIC_EQUAL_TO\x10\xb8\x17\x12(\n#DETECTIVE_TYPE_NUMERIC_GREAT\
+    ER_THAN\x10\xb9\x17\x12)\n$DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL\x10\xba\
+    \x17\x12%\n\x20DETECTIVE_TYPE_NUMERIC_LESS_THAN\x10\xbb\x17\x12&\n!DETEC\
+    TIVE_TYPE_NUMERIC_LESS_EQUAL\x10\xbc\x17\x12!\n\x1cDETECTIVE_TYPE_NUMERI\
+    C_RANGE\x10\xbd\x17\x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MIN\x10\xbe\x17\
+    \x12\x1f\n\x1aDETECTIVE_TYPE_NUMERIC_MAX\x10\xbf\x17BBZ@github.com/strea\
+    mdal/streamdal/libs/protos/build/go/protos/stepsJ\x8d(\n\x07\x12\x05\0\0\
+    \x80\x01\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\
+    \0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n\
+    5\n\x02\x05\0\x12\x04\x06\0f\x01\")\x201000-1999\x20reserved\x20for\x20c\
+    ore\x20match\x20types\n\n\n\n\x03\x05\0\x01\x12\x03\x06\x05\x12\n\x0b\n\
     \x04\x05\0\x02\0\x12\x03\t\x02\x1d\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\t\
     \x02\x18\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\t\x1b\x1c\n\x0b\n\x04\x05\0\
     \x02\x01\x12\x03\n\x02!\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\n\x02\x19\
@@ -1071,53 +1132,68 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0b\n\x04\x05\0\x021\x12\x03O\x02+\n\x0c\n\x05\x05\0\x021\x01\x12\x03\
     O\x02#\n\x0c\n\x05\x05\0\x021\x02\x12\x03O&*\n\x0b\n\x04\x05\0\x022\x12\
     \x03P\x02'\n\x0c\n\x05\x05\0\x022\x01\x12\x03P\x02\x1f\n\x0c\n\x05\x05\0\
-    \x022\x02\x12\x03P\"&\n+\n\x04\x05\0\x023\x12\x03U\x02)2\x1e\x20Numeric\
-    \x20matchers\x20(3000-3999)\n\n\x0c\n\x05\x05\0\x023\x01\x12\x03U\x02!\n\
-    \x0c\n\x05\x05\0\x023\x02\x12\x03U$(\n\x0b\n\x04\x05\0\x024\x12\x03V\x02\
-    -\n\x0c\n\x05\x05\0\x024\x01\x12\x03V\x02%\n\x0c\n\x05\x05\0\x024\x02\
-    \x12\x03V(,\n\x0b\n\x04\x05\0\x025\x12\x03W\x02.\n\x0c\n\x05\x05\0\x025\
-    \x01\x12\x03W\x02&\n\x0c\n\x05\x05\0\x025\x02\x12\x03W)-\n\x0b\n\x04\x05\
-    \0\x026\x12\x03X\x02*\n\x0c\n\x05\x05\0\x026\x01\x12\x03X\x02\"\n\x0c\n\
-    \x05\x05\0\x026\x02\x12\x03X%)\n\x0b\n\x04\x05\0\x027\x12\x03Y\x02+\n\
-    \x0c\n\x05\x05\0\x027\x01\x12\x03Y\x02#\n\x0c\n\x05\x05\0\x027\x02\x12\
-    \x03Y&*\n\x0b\n\x04\x05\0\x028\x12\x03Z\x02&\n\x0c\n\x05\x05\0\x028\x01\
-    \x12\x03Z\x02\x1e\n\x0c\n\x05\x05\0\x028\x02\x12\x03Z!%\n\x0b\n\x04\x05\
-    \0\x029\x12\x03[\x02$\n\x0c\n\x05\x05\0\x029\x01\x12\x03[\x02\x1c\n\x0c\
-    \n\x05\x05\0\x029\x02\x12\x03[\x1f#\n\x0b\n\x04\x05\0\x02:\x12\x03\\\x02\
-    $\n\x0c\n\x05\x05\0\x02:\x01\x12\x03\\\x02\x1c\n\x0c\n\x05\x05\0\x02:\
-    \x02\x12\x03\\\x1f#\n\n\n\x02\x04\0\x12\x04_\0d\x01\n\n\n\x03\x04\0\x01\
-    \x12\x03_\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03`\x02\x1b\n\x0c\n\x05\
-    \x04\0\x02\0\x04\x12\x03`\x02\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03`\x0b\
-    \x11\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03`\x12\x16\n\x0c\n\x05\x04\0\x02\
-    \0\x03\x12\x03`\x19\x1a\n,\n\x04\x04\0\x02\x01\x12\x03a\x02\x1b\"\x1f\
-    \x20args\x20determined\x20by\x20match_type\n\n\x0c\n\x05\x04\0\x02\x01\
-    \x04\x12\x03a\x02\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03a\x0b\x11\n\x0c\
-    \n\x05\x04\0\x02\x01\x01\x12\x03a\x12\x16\n\x0c\n\x05\x04\0\x02\x01\x03\
-    \x12\x03a\x19\x1a\n\x0b\n\x04\x04\0\x02\x02\x12\x03b\x02\x1b\n\x0c\n\x05\
-    \x04\0\x02\x02\x04\x12\x03b\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03b\
-    \x0b\x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03b\x10\x16\n\x0c\n\x05\x04\
-    \0\x02\x02\x03\x12\x03b\x19\x1a\n\x0b\n\x04\x04\0\x02\x03\x12\x03c\x02\
-    \x19\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03c\x02\x0f\n\x0c\n\x05\x04\0\
-    \x02\x03\x01\x12\x03c\x10\x14\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03c\x17\
-    \x18\n\n\n\x02\x04\x01\x12\x04f\0s\x01\n\n\n\x03\x04\x01\x01\x12\x03f\
-    \x08\x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03g\x02\x19\n\x0c\n\x05\x04\x01\
-    \x02\0\x06\x12\x03g\x02\x0f\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03g\x10\
-    \x14\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03g\x17\x18\n7\n\x04\x04\x01\x02\
-    \x01\x12\x03j\x02\x12\x1a*\x20For\x20JSON\x20payloads,\x20the\x20path\
-    \x20to\x20the\x20match\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03j\x02\
-    \x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03j\t\r\n\x0c\n\x05\x04\x01\
-    \x02\x01\x03\x12\x03j\x10\x11\n\xcd\x01\n\x04\x04\x01\x02\x02\x12\x03r\
-    \x02\x12\x1a\x14\x20Value\x20of\x20the\x20match\n2\xa9\x01\x20For\x20str\
-    ing\x20payloads,\x20the\x20start\x20and\x20end\x20characters\x20of\x20th\
-    e\x20match\n\x20Placeholder\x20for\x20now,\x20will\x20implement\x20in\
-    \x20the\x20future\nint32\x20char_index_start\x20=\x203;\nint32\x20char_i\
-    ndex_end\x20=\x204;\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03r\x02\x07\n\
-    \x0c\n\x05\x04\x01\x02\x02\x01\x12\x03r\x08\r\n\x0c\n\x05\x04\x01\x02\
-    \x02\x03\x12\x03r\x10\x11\n\n\n\x02\x04\x02\x12\x04u\0w\x01\n\n\n\x03\
-    \x04\x02\x01\x12\x03u\x08\x1b\n\x0b\n\x04\x04\x02\x02\0\x12\x03v\x020\n\
-    \x0c\n\x05\x04\x02\x02\0\x04\x12\x03v\x02\n\n\x0c\n\x05\x04\x02\x02\0\
-    \x06\x12\x03v\x0b#\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03v$+\n\x0c\n\x05\
-    \x04\x02\x02\0\x03\x12\x03v./b\x06proto3\
+    \x022\x02\x12\x03P\"&\n\x0b\n\x04\x05\0\x023\x12\x03Q\x023\n\x0c\n\x05\
+    \x05\0\x023\x01\x12\x03Q\x02+\n\x0c\n\x05\x05\0\x023\x02\x12\x03Q.2\n\
+    \x0b\n\x04\x05\0\x024\x12\x03R\x02/\n\x0c\n\x05\x05\0\x024\x01\x12\x03R\
+    \x02'\n\x0c\n\x05\x05\0\x024\x02\x12\x03R*.\n\x0b\n\x04\x05\0\x025\x12\
+    \x03S\x02+\n\x0c\n\x05\x05\0\x025\x01\x12\x03S\x02#\n\x0c\n\x05\x05\0\
+    \x025\x02\x12\x03S&*\n\x0b\n\x04\x05\0\x026\x12\x03T\x02)\n\x0c\n\x05\
+    \x05\0\x026\x01\x12\x03T\x02!\n\x0c\n\x05\x05\0\x026\x02\x12\x03T$(\n\
+    \x0b\n\x04\x05\0\x027\x12\x03U\x02*\n\x0c\n\x05\x05\0\x027\x01\x12\x03U\
+    \x02\"\n\x0c\n\x05\x05\0\x027\x02\x12\x03U%)\n\x0b\n\x04\x05\0\x028\x12\
+    \x03V\x022\n\x0c\n\x05\x05\0\x028\x01\x12\x03V\x02*\n\x0c\n\x05\x05\0\
+    \x028\x02\x12\x03V-1\n\x0b\n\x04\x05\0\x029\x12\x03W\x02\x20\n\x0c\n\x05\
+    \x05\0\x029\x01\x12\x03W\x02\x18\n\x0c\n\x05\x05\0\x029\x02\x12\x03W\x1b\
+    \x1f\n\x0b\n\x04\x05\0\x02:\x12\x03X\x02/\n\x0c\n\x05\x05\0\x02:\x01\x12\
+    \x03X\x02'\n\x0c\n\x05\x05\0\x02:\x02\x12\x03X*.\n\x0b\n\x04\x05\0\x02;\
+    \x12\x03Y\x02)\n\x0c\n\x05\x05\0\x02;\x01\x12\x03Y\x02!\n\x0c\n\x05\x05\
+    \0\x02;\x02\x12\x03Y$(\n+\n\x04\x05\0\x02<\x12\x03^\x02)2\x1e\x20Numeric\
+    \x20matchers\x20(3000-3999)\n\n\x0c\n\x05\x05\0\x02<\x01\x12\x03^\x02!\n\
+    \x0c\n\x05\x05\0\x02<\x02\x12\x03^$(\n\x0b\n\x04\x05\0\x02=\x12\x03_\x02\
+    -\n\x0c\n\x05\x05\0\x02=\x01\x12\x03_\x02%\n\x0c\n\x05\x05\0\x02=\x02\
+    \x12\x03_(,\n\x0b\n\x04\x05\0\x02>\x12\x03`\x02.\n\x0c\n\x05\x05\0\x02>\
+    \x01\x12\x03`\x02&\n\x0c\n\x05\x05\0\x02>\x02\x12\x03`)-\n\x0b\n\x04\x05\
+    \0\x02?\x12\x03a\x02*\n\x0c\n\x05\x05\0\x02?\x01\x12\x03a\x02\"\n\x0c\n\
+    \x05\x05\0\x02?\x02\x12\x03a%)\n\x0b\n\x04\x05\0\x02@\x12\x03b\x02+\n\
+    \x0c\n\x05\x05\0\x02@\x01\x12\x03b\x02#\n\x0c\n\x05\x05\0\x02@\x02\x12\
+    \x03b&*\n\x0b\n\x04\x05\0\x02A\x12\x03c\x02&\n\x0c\n\x05\x05\0\x02A\x01\
+    \x12\x03c\x02\x1e\n\x0c\n\x05\x05\0\x02A\x02\x12\x03c!%\n\x0b\n\x04\x05\
+    \0\x02B\x12\x03d\x02$\n\x0c\n\x05\x05\0\x02B\x01\x12\x03d\x02\x1c\n\x0c\
+    \n\x05\x05\0\x02B\x02\x12\x03d\x1f#\n\x0b\n\x04\x05\0\x02C\x12\x03e\x02$\
+    \n\x0c\n\x05\x05\0\x02C\x01\x12\x03e\x02\x1c\n\x0c\n\x05\x05\0\x02C\x02\
+    \x12\x03e\x1f#\n\n\n\x02\x04\0\x12\x04h\0m\x01\n\n\n\x03\x04\0\x01\x12\
+    \x03h\x08\x15\n\x0b\n\x04\x04\0\x02\0\x12\x03i\x02\x1b\n\x0c\n\x05\x04\0\
+    \x02\0\x04\x12\x03i\x02\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03i\x0b\x11\n\
+    \x0c\n\x05\x04\0\x02\0\x01\x12\x03i\x12\x16\n\x0c\n\x05\x04\0\x02\0\x03\
+    \x12\x03i\x19\x1a\n,\n\x04\x04\0\x02\x01\x12\x03j\x02\x1b\"\x1f\x20args\
+    \x20determined\x20by\x20match_type\n\n\x0c\n\x05\x04\0\x02\x01\x04\x12\
+    \x03j\x02\n\n\x0c\n\x05\x04\0\x02\x01\x05\x12\x03j\x0b\x11\n\x0c\n\x05\
+    \x04\0\x02\x01\x01\x12\x03j\x12\x16\n\x0c\n\x05\x04\0\x02\x01\x03\x12\
+    \x03j\x19\x1a\n\x0b\n\x04\x04\0\x02\x02\x12\x03k\x02\x1b\n\x0c\n\x05\x04\
+    \0\x02\x02\x04\x12\x03k\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03k\x0b\
+    \x0f\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03k\x10\x16\n\x0c\n\x05\x04\0\
+    \x02\x02\x03\x12\x03k\x19\x1a\n\x0b\n\x04\x04\0\x02\x03\x12\x03l\x02\x19\
+    \n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03l\x02\x0f\n\x0c\n\x05\x04\0\x02\
+    \x03\x01\x12\x03l\x10\x14\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03l\x17\x18\
+    \n\n\n\x02\x04\x01\x12\x04o\0|\x01\n\n\n\x03\x04\x01\x01\x12\x03o\x08\
+    \x20\n\x0b\n\x04\x04\x01\x02\0\x12\x03p\x02\x19\n\x0c\n\x05\x04\x01\x02\
+    \0\x06\x12\x03p\x02\x0f\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03p\x10\x14\n\
+    \x0c\n\x05\x04\x01\x02\0\x03\x12\x03p\x17\x18\n7\n\x04\x04\x01\x02\x01\
+    \x12\x03s\x02\x12\x1a*\x20For\x20JSON\x20payloads,\x20the\x20path\x20to\
+    \x20the\x20match\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03s\x02\x08\n\
+    \x0c\n\x05\x04\x01\x02\x01\x01\x12\x03s\t\r\n\x0c\n\x05\x04\x01\x02\x01\
+    \x03\x12\x03s\x10\x11\n\xcd\x01\n\x04\x04\x01\x02\x02\x12\x03{\x02\x12\
+    \x1a\x14\x20Value\x20of\x20the\x20match\n2\xa9\x01\x20For\x20string\x20p\
+    ayloads,\x20the\x20start\x20and\x20end\x20characters\x20of\x20the\x20mat\
+    ch\n\x20Placeholder\x20for\x20now,\x20will\x20implement\x20in\x20the\x20\
+    future\nint32\x20char_index_start\x20=\x203;\nint32\x20char_index_end\
+    \x20=\x204;\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03{\x02\x07\n\x0c\n\
+    \x05\x04\x01\x02\x02\x01\x12\x03{\x08\r\n\x0c\n\x05\x04\x01\x02\x02\x03\
+    \x12\x03{\x10\x11\n\x0b\n\x02\x04\x02\x12\x05~\0\x80\x01\x01\n\n\n\x03\
+    \x04\x02\x01\x12\x03~\x08\x1b\n\x0b\n\x04\x04\x02\x02\0\x12\x03\x7f\x020\
+    \n\x0c\n\x05\x04\x02\x02\0\x04\x12\x03\x7f\x02\n\n\x0c\n\x05\x04\x02\x02\
+    \0\x06\x12\x03\x7f\x0b#\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03\x7f$+\n\
+    \x0c\n\x05\x04\x02\x02\0\x03\x12\x03\x7f./b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

@@ -312,6 +312,42 @@ export enum DetectiveType {
      */
     PII_GITHUB_PAT = 2027,
     /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN = 2028;
+     */
+    PII_BRAINTREE_ACCESS_TOKEN = 2028,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN = 2029;
+     */
+    PII_AWS_MWS_AUTH_TOKEN = 2029,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_DATABRICKS_PAT = 2030;
+     */
+    PII_DATABRICKS_PAT = 2030,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_SENDGRID_KEY = 2031;
+     */
+    PII_SENDGRID_KEY = 2031,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_STRIPE_SECRET = 2032;
+     */
+    PII_STRIPE_SECRET = 2032,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING = 2033;
+     */
+    PII_AZURE_SQL_CONN_STRING = 2033,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_JWT = 2034;
+     */
+    PII_JWT = 2034,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN = 2035;
+     */
+    PII_DOCKER_SWARM_TOKEN = 2035,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BEARER_TOKEN = 2036;
+     */
+    PII_BEARER_TOKEN = 2036,
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     NUMERIC_EQUAL_TO = 3000,
