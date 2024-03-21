@@ -59,6 +59,8 @@ spec:
             - name: envoy
               containerPort: 8083
               protocol: TCP
+          resources:
+            {{- toYaml .Values.envoy.resources | nindent 12}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

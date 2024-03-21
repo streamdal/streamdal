@@ -41,6 +41,8 @@ spec:
           volumeMounts:
           - mountPath: /root/.cache
             name: esbuild-cache
+          resources:
+            {{- toYaml .Values.console.resources | nindent 12 }}
       volumes:
       - name: esbuild-cache
         emptyDir: {}
