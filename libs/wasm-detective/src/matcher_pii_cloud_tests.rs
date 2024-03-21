@@ -97,7 +97,7 @@ pub fn test_docker_swarm_token() {
     let test_cases = vec![
         crate::test_utils::TestCase {
             request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_DOCKER_SWARM_TOKEN,
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN,
                 data: sample_json,
                 path: "cloud.docker.swarm_join_token".to_string(),
                 args: vec![],
@@ -109,7 +109,7 @@ pub fn test_docker_swarm_token() {
         },
         crate::test_utils::TestCase {
             request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_DOCKER_SWARM_TOKEN,
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN,
                 data: sample_json,
                 path: "cloud.docker.swarm_unlock_token".to_string(),
                 args: vec![],
