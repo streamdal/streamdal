@@ -58,7 +58,7 @@ pub fn github_pat(_request: &Request, field: Value) -> Result<bool, CustomError>
     }
 
     let new_format = val.len() == 78 && val.starts_with("github_pat_");
-    return Ok(new_format);
+    Ok(new_format)
 }
 
 pub fn braintree_access_token(_request: &Request, field: Value) -> Result<bool, CustomError> {
