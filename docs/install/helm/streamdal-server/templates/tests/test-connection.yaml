@@ -12,4 +12,11 @@ spec:
       image: busybox
       command: ['wget']
       args: ['{{ include "streamdal.fullname" . }}:{{ .Values.service.port }}']
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
   restartPolicy: Never
