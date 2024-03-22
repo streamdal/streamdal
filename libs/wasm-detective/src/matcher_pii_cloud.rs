@@ -41,14 +41,6 @@ pub fn slack_token(_request: &Request, field: Value) -> Result<bool, CustomError
     Ok(false)
 }
 
-pub fn stripe_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let val: String = field.str().to_lowercase();
-
-    let valid = val.starts_with("sk_live_");
-
-    Ok(valid)
-}
-
 pub fn github_pat(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let val: String = field.str().to_lowercase();
 
@@ -90,12 +82,7 @@ pub fn sendgrid_api_key(_request: &Request, field: Value) -> Result<bool, Custom
     Ok(valid)
 }
 
-pub fn stripe_secret_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let val: String = field.str().to_lowercase();
 
-    let valid = val.len() == 32 && val.starts_with("sk_");
-    Ok(valid)
-}
 
 pub fn azure_sql_connection_string(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let val: String = field.str().trim().to_lowercase();

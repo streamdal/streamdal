@@ -96,3 +96,10 @@ pub fn crypto_currency_address(_request: &Request, _field: Value) -> Result<bool
     // TODO: can't find a reliable lib for handling these
     Err(CustomError::Error("Not implemented".to_string()))
 }
+pub fn stripe_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().to_lowercase();
+
+    let valid = val.starts_with("sk_live_");
+
+    Ok(valid)
+}
