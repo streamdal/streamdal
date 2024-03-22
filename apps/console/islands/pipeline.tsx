@@ -625,7 +625,6 @@ const PipelineDetail = ({
                             data={data}
                             setData={setData}
                             errors={errors}
-                            inputClass="w-64"
                             children={optionsFromEnum(DetectiveType)}
                           />
                           <div>
