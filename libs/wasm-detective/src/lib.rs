@@ -36,6 +36,10 @@ mod test_bench;
 #[path = "matcher_pii_cloud_tests.rs"]
 mod matcher_pii_cloud_tests;
 
+#[cfg(test)]
+#[path = "matcher_pii_payments_tests.rs"]
+mod matcher_pii_payments_tests;
+
 pub trait FromValue<'a>
 where
     Self: Sized,
