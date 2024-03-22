@@ -399,8 +399,39 @@ export const exampleStaggeredMultipleComponentsPerServiceAndPerGroup =
     runPipeline(streamdalC, audienceCProducer, exampleData, 2000);
   };
 
+export const openAIExample = async () => {
+  const openAIPromptConfig: StreamdalConfigs = {
+    streamdalUrl: "localhost:8082",
+    streamdalToken: "1234",
+    serviceName: "chat-gpt",
+    pipelineTimeout: "100",
+    stepTimeout: "10",
+    dryRun: false,
+  };
+
+  const openAIProducer: Audience = {
+    serviceName: "chat-gpt",
+    componentName: "chat-gpt",
+    operationType: OperationType.PRODUCER,
+    operationName: "customer-service-prompt",
+  };
+
+  const openAI = await registerStreamdal(openAIPromptConfig);
+
+  runPipeline(
+    openAI,
+    openAIProducer,
+    {
+      role: "user",
+      content: `Can you write an email for me to a customer to apologize for a lost order. Customer email is jacob@streamdal.com?`,
+    },
+    1000
+  );
+};
+
 //
 // void kvExample();
 // void singleWelcomeExample();
 // void singleSignupExample();
+// void openAIExample();
 onboardingExample();

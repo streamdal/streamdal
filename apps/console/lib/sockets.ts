@@ -10,11 +10,20 @@ import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { demoHttpRequestSignal } from "../routes/demo/http/index.tsx";
 
+const SOCKET_KEEPALIVE = 30000;
+const socketPing = (webSocket: WebSocket) =>
+  setInterval(
+    () => webSocket.readyState === WebSocket.OPEN && webSocket.send("ping"),
+    SOCKET_KEEPALIVE,
+  );
+
 export const getSocket = (path: string) => {
   const url = new URL(path, location.href);
   url.protocol = url.protocol.replace("http", "ws");
   url.pathname = path;
-  return new WebSocket(url);
+  const webSocket = new WebSocket(url);
+  socketPing(webSocket);
+  return webSocket;
 };
 
 export const demoHttpRequestSocket = (path: string) => {
