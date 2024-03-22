@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/gofrs/uuid v4.4.0+incompatible
-	github.com/streamdal/streamdal/libs/protos v0.1.29
+	github.com/streamdal/streamdal/libs/protos v0.1.32
 	google.golang.org/grpc v1.60.1
 )
 

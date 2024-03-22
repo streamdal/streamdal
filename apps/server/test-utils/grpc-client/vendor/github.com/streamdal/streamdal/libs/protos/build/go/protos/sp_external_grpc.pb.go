@@ -36,6 +36,7 @@ const (
 	External_GetNotification_FullMethodName       = "/protos.External/GetNotification"
 	External_AttachNotification_FullMethodName    = "/protos.External/AttachNotification"
 	External_DetachNotification_FullMethodName    = "/protos.External/DetachNotification"
+	External_CreateAudience_FullMethodName        = "/protos.External/CreateAudience"
 	External_DeleteAudience_FullMethodName        = "/protos.External/DeleteAudience"
 	External_DeleteService_FullMethodName         = "/protos.External/DeleteService"
 	External_GetMetrics_FullMethodName            = "/protos.External/GetMetrics"
@@ -75,7 +76,7 @@ type ExternalClient interface {
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(ctx context.Context, in *ResumePipelineRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Create a new notification config
-	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*CreateNotificationResponse, error)
 	// Update an existing notification config
 	UpdateNotification(ctx context.Context, in *UpdateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete a notification config
@@ -90,6 +91,8 @@ type ExternalClient interface {
 	// Deprecated: Do not use.
 	// Detach a notification config from a pipeline
 	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// Create an audience. Used for terraform purposes
+	CreateAudience(ctx context.Context, in *CreateAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete an audience
 	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete a service and all associated audiences
@@ -230,8 +233,8 @@ func (c *externalClient) ResumePipeline(ctx context.Context, in *ResumePipelineR
 	return out, nil
 }
 
-func (c *externalClient) CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	out := new(StandardResponse)
+func (c *externalClient) CreateNotification(ctx context.Context, in *CreateNotificationRequest, opts ...grpc.CallOption) (*CreateNotificationResponse, error) {
+	out := new(CreateNotificationResponse)
 	err := c.cc.Invoke(ctx, External_CreateNotification_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -289,6 +292,15 @@ func (c *externalClient) AttachNotification(ctx context.Context, in *AttachNotif
 func (c *externalClient) DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
 	out := new(StandardResponse)
 	err := c.cc.Invoke(ctx, External_DetachNotification_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) CreateAudience(ctx context.Context, in *CreateAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_CreateAudience_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -505,7 +517,7 @@ type ExternalServer interface {
 	// Resume a pipeline; noop if pipeline is not paused
 	ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error)
 	// Create a new notification config
-	CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error)
+	CreateNotification(context.Context, *CreateNotificationRequest) (*CreateNotificationResponse, error)
 	// Update an existing notification config
 	UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error)
 	// Delete a notification config
@@ -520,6 +532,8 @@ type ExternalServer interface {
 	// Deprecated: Do not use.
 	// Detach a notification config from a pipeline
 	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
+	// Create an audience. Used for terraform purposes
+	CreateAudience(context.Context, *CreateAudienceRequest) (*StandardResponse, error)
 	// Delete an audience
 	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)
 	// Delete a service and all associated audiences
@@ -574,7 +588,7 @@ func (UnimplementedExternalServer) PausePipeline(context.Context, *PausePipeline
 func (UnimplementedExternalServer) ResumePipeline(context.Context, *ResumePipelineRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResumePipeline not implemented")
 }
-func (UnimplementedExternalServer) CreateNotification(context.Context, *CreateNotificationRequest) (*StandardResponse, error) {
+func (UnimplementedExternalServer) CreateNotification(context.Context, *CreateNotificationRequest) (*CreateNotificationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNotification not implemented")
 }
 func (UnimplementedExternalServer) UpdateNotification(context.Context, *UpdateNotificationRequest) (*StandardResponse, error) {
@@ -594,6 +608,9 @@ func (UnimplementedExternalServer) AttachNotification(context.Context, *AttachNo
 }
 func (UnimplementedExternalServer) DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DetachNotification not implemented")
+}
+func (UnimplementedExternalServer) CreateAudience(context.Context, *CreateAudienceRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAudience not implemented")
 }
 func (UnimplementedExternalServer) DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAudience not implemented")
@@ -956,6 +973,24 @@ func _External_DetachNotification_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_CreateAudience_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAudienceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).CreateAudience(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_CreateAudience_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).CreateAudience(ctx, req.(*CreateAudienceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_DeleteAudience_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteAudienceRequest)
 	if err := dec(in); err != nil {
@@ -1269,6 +1304,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DetachNotification",
 			Handler:    _External_DetachNotification_Handler,
+		},
+		{
+			MethodName: "CreateAudience",
+			Handler:    _External_CreateAudience_Handler,
 		},
 		{
 			MethodName: "DeleteAudience",
