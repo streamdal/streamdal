@@ -328,25 +328,21 @@ export enum DetectiveType {
      */
     PII_SENDGRID_KEY = 2031,
     /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_STRIPE_SECRET = 2032;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING = 2032;
      */
-    PII_STRIPE_SECRET = 2032,
+    PII_AZURE_SQL_CONN_STRING = 2032,
     /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING = 2033;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_JWT = 2033;
      */
-    PII_AZURE_SQL_CONN_STRING = 2033,
+    PII_JWT = 2033,
     /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_JWT = 2034;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN = 2034;
      */
-    PII_JWT = 2034,
+    PII_DOCKER_SWARM_TOKEN = 2034,
     /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN = 2035;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BEARER_TOKEN = 2035;
      */
-    PII_DOCKER_SWARM_TOKEN = 2035,
-    /**
-     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BEARER_TOKEN = 2036;
-     */
-    PII_BEARER_TOKEN = 2036,
+    PII_BEARER_TOKEN = 2035,
     /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
