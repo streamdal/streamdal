@@ -319,3 +319,44 @@ pub fn rsa_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
 
     Ok(false)
 }
+
+// Intentionally verbose and dumb implementation to avoid hit
+// from base64 decode and JSON parse.
+const JWT_HEADERS: [&str; 12] = [
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9", // HS256
+    "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9", // HS384
+    "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9", // HS512
+    "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9", // RS256
+    "eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9", // RS384
+    "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9", // RS512
+    "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9", // ES256
+    "eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9", // ES384
+    "eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9", // ES512
+    "eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9", // PS256
+    "eyJhbGciOiJQUzM4NCIsInR5cCI6IkpXVCJ9", // PS384
+    "eyJhbGciOiJQUzUxMiIsInR5cCI6IkpXVCJ9", // PS512
+];
+
+pub fn jwt(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().trim().to_string();
+
+    // Check if the token has three parts.
+    let parts: Vec<&str> = val.split('.').collect();
+    if parts.len() != 3 {
+        return Ok(false);
+    }
+
+    // Check if the token has a valid header.
+    if JWT_HEADERS.contains(&parts[0]) {
+        return Ok(true);
+    }
+
+    Ok(false)
+}
+
+pub fn bearer_token(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let field = field.str().trim();
+
+    let valid = field.starts_with("Bearer ") || field.starts_with("Authorization: Bearer");
+    Ok(valid)
+}

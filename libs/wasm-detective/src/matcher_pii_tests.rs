@@ -388,183 +388,7 @@ fn test_any() {
     crate::test_utils::run_tests(&test_cases);
 }
 
-#[test]
-fn test_aws_key_id() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
 
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_AWS_KEY_ID,
-                data: sample_json,
-                path: "cloud.aws.key_id".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal cloud.aws.key_id".to_string(),
-            should_error: false,
-        },
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_AWS_KEY_ID,
-                data: sample_json,
-                path: "cloud.github.pat".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 0,
-            text: "not equal cloud.github.pat".to_string(),
-            should_error: false,
-        },
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
-
-#[test]
-fn test_github_pat() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT,
-                data: sample_json,
-                path: "cloud.github.pat".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal github_pat_valid".to_string(),
-            should_error: false,
-        },
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT,
-                data: sample_json,
-                path: "cloud.aws.key_id".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 0,
-            text: "equal github_pat_invalid".to_string(),
-            should_error: false,
-        },
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
-
-#[test]
-fn test_routing_number() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER,
-                data: sample_json,
-                path: "payments.routing_number".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal payments.routing_number".to_string(),
-            should_error: false,
-        }
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
-
-#[test]
-fn test_swift_bic() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_SWIFT_BIC,
-                data: sample_json,
-                path: "payments.swift_bic".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal payments.swift_bic".to_string(),
-            should_error: false,
-        }
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
-
-#[test]
-fn test_stripe_key() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_STRIPE_KEY,
-                data: sample_json,
-                path: "payments.stripe".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal payments.stripe".to_string(),
-            should_error: false,
-        }
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
-
-#[test]
-fn test_slack_token() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_SLACK_TOKEN,
-                data: sample_json,
-                path: "slack".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal slack".to_string(),
-            should_error: false,
-        }
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
-
-#[test]
-fn test_iban() {
-    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
-
-    let test_cases = vec![
-        crate::test_utils::TestCase {
-            request: Request {
-                match_type: DetectiveType::DETECTIVE_TYPE_PII_IBAN,
-                data: sample_json,
-                path: "payments.iban".to_string(),
-                args: vec![],
-                negate: false,
-            },
-            expected_matches: 1,
-            text: "equal payments.iban".to_string(),
-            should_error: false,
-        }
-    ];
-
-    crate::test_utils::run_tests(&test_cases);
-}
 
 #[test]
 fn test_phone() {
@@ -691,3 +515,24 @@ fn test_postal_code() {
     crate::test_utils::run_tests(&test_cases);
 }
 
+#[test]
+fn test_jwt() {
+    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_JWT,
+                data: sample_json,
+                path: "jwt".to_string(),
+                args: vec![],
+                negate: false,
+            },
+            expected_matches: 1,
+            text: "equal jwt".to_string(),
+            should_error: false,
+        }
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}

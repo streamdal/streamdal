@@ -19,7 +19,7 @@ pub const SAMPLE_JSON: &str = r#"{
         "empty_array": [],
         "semver": "1.2.3",
         "valid_hostname": "example.com",
-        "invalid_hostname": "-example.com."
+        "invalid_hostname": "-example.com.",
         "email_plain_valid": "test@example.com",
         "email_plain_invalid": "test@example",
         "email_unicode_domain_valid": "test@日本.com",
@@ -29,31 +29,31 @@ pub const SAMPLE_JSON: &str = r#"{
         "credit_card": {
             "visa": {
                 "valid": "4111-1111-1111-1111",
-                "invalid": "4111111111111112",
+                "invalid": "4111111111111112"
             },
             "mastercard": {
                 "valid": "5555 5555 5555 4444",
-                "invalid": "5555555555554445",
+                "invalid": "5555555555554445"
             },
             "amex": {
                 "valid": "378282246310005",
-                "invalid": "378282246310006",
+                "invalid": "378282246310006"
             },
             "discover": {
                 "valid": "6011111111111117",
-                "invalid": "6011111111111118",
+                "invalid": "6011111111111118"
             },
             "diners_club": {
                 "valid": "30569309025904",
-                "invalid": "30569309025905",
+                "invalid": "30569309025905"
             },
             "jcb": {
                 "valid": "3530111333300000",
-                "invalid": "3530111333300001",
+                "invalid": "3530111333300001"
             },
             "unionpay": {
                 "valid": "6200000000000005",
-                "invalid": "6200000000000006",
+                "invalid": "6200000000000006"
             }
         },
         "ssn_valid": "111-22-3456",
@@ -82,10 +82,28 @@ pub const SAMPLE_JSON: &str = r#"{
     "timestamp_rfc3339": "2023-06-29T12:34:56Z",
     "cloud": {
         "aws": {
-            "key_id": "AKIAIOSFODNN7EXAMPLE"
+            "key_id": "AKIAIOSFODNN7EXAMPLE",
+            "mws_auth_token": "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c"
         },
         "github": {
-            "pat": "ghp_qr7jU0ItnCxyvstfROjpYVngNWGidT0SOtwD"
+            "pat": "ghp_qr7jU0ItnCxyvstfROjpYVngNWGidT0SOtwD",
+            "fine_grained": "github_pat_11ACDYWHY02q7NV2SZtkr0_CCUemYtLFNSDF0al1gSuLx0drIYZhzlxT2yfsKD6qR9M"
+        },
+        "docker": {
+            "swarm_join_token": "SWMTKN-1-3pu6hszjas19xyp7ghgosyx9k8atbfcr8p2is99znpy26u2lkl-1awxwuwd3z9j1z3puu7rcgdbx",
+            "swarm_unlock_token": "SWMKEY-1-7c37Cc8654o6p38HnroywCi19pllOnGtbdZEgtKxZu8"
+        },
+        "paypal": {
+            "braintree_access_token": "access_token$sandbox$3g3w"
+        },
+        "databricks": {
+            "pat": "dapi0a1b2c3d4e5f678901234567890123456a7b"
+        },
+        "sendgrid": {
+            "api_key": "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"
+        },
+        "azure": {
+            "sql_connection_string": "Server=tcp:myserver.database.windows.net,1433;Initial Catalog=mydb;Persist Security Info=False;User ID=mylogin;Password=mypassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
         }
     },
     "payments": {
@@ -94,8 +112,10 @@ pub const SAMPLE_JSON: &str = r#"{
         },
         "routing_number": "122105155",
         "swift_bic": "AAAA-BB-CC-123",
-        "stripe": "pk_test_4eC39HqLyjWDarjtT1zdp7dc",
         "iban": "GB82WEST12345698765432",
+        "stripe": {
+            "secret_key": "sk_live_4eC39HqLyjWDarjtT1zdp7dc"
+        }
     },
     "slack": "xoxb-263594206564-FGqddMF8t08v8N7Oq4i57vs1",
     "address": {
@@ -107,9 +127,11 @@ pub const SAMPLE_JSON: &str = r#"{
     "personal": {
         "title": "Mr.",
         "religion": "Buddhism",
-        "phone": "+13215781234",
+        "phone": "+13215781234"
     },
-    "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----"
+    "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----",
+    "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+    "bearer_token": "Authorization: Bearer testToken123"
 }"#;
 
 pub const SAMPLE_JSON_K8S: &str = r#"{

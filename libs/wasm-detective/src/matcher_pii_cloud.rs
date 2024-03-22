@@ -25,6 +25,10 @@ pub fn aws_key_id(_request: &Request, field: Value) -> Result<bool, CustomError>
     Ok(false)
 }
 
+pub fn aws_mws_token(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    return Ok(field.str().to_lowercase().starts_with("amzn.mws."))
+}
+
 pub fn slack_token(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let val: String = field.str().trim().to_lowercase();
 
@@ -37,18 +41,55 @@ pub fn slack_token(_request: &Request, field: Value) -> Result<bool, CustomError
     Ok(false)
 }
 
-pub fn stripe_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let val: String = field.str().to_lowercase();
-
-    let valid = val.starts_with("pk_") && val.len() == 32;
-
-    Ok(valid)
-}
-
 pub fn github_pat(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let val: String = field.str().to_lowercase();
 
-    let valid = val.starts_with("ghp_") && val.len() == 40;
+    let old_format = val.len() == 40 && val.starts_with("ghp_");
+    if old_format {
+        return Ok(true);
+    }
+
+    let new_format = val.len() == 78 && val.starts_with("github_pat_");
+    Ok(new_format)
+}
+
+pub fn braintree_access_token(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().to_lowercase();
+
+    let valid = val.starts_with("access_token$");
+    Ok(valid)
+}
+
+pub fn docker_swarm_token(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().to_uppercase();
+
+    // If val starts with SWMTKN- or SWMKEY-, it's a Docker Swarm token
+    let valid = val.starts_with("SWMTKN-") || val.starts_with("SWMKEY-");
+    Ok(valid)
+}
+
+pub fn databricks_pat(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().to_lowercase();
+
+    let valid = val.len() == 40 && val.starts_with("dapi");
+    Ok(valid)
+}
+
+pub fn sendgrid_api_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().to_lowercase();
+
+    let valid = val.len() == 69 && val.starts_with("sg.");
+    Ok(valid)
+}
+
+
+
+pub fn azure_sql_connection_string(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val: String = field.str().trim().to_lowercase();
+
+    let valid = val.starts_with("server=")
+        && val.contains("user id=")
+        && val.contains("password=");
 
     Ok(valid)
 }

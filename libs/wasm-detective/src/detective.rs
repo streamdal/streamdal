@@ -221,7 +221,7 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_AWS_KEY_ID => pii_cloud::aws_key_id,
             DetectiveType::DETECTIVE_TYPE_PII_GITHUB_PAT => pii_cloud::github_pat,
             DetectiveType::DETECTIVE_TYPE_PII_SLACK_TOKEN => pii_cloud::slack_token,
-            DetectiveType::DETECTIVE_TYPE_PII_STRIPE_KEY => pii_cloud::stripe_key,
+            DetectiveType::DETECTIVE_TYPE_PII_STRIPE_KEY => pii_payments::stripe_key,
             DetectiveType::DETECTIVE_TYPE_PII_RSA_KEY => pii::rsa_key,
             DetectiveType::DETECTIVE_TYPE_PII_TITLE => pii::title,
             DetectiveType::DETECTIVE_TYPE_PII_RELIGION => pii::religion,
@@ -229,7 +229,14 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_SWIFT_BIC => pii_payments::swift_bic,
             DetectiveType::DETECTIVE_TYPE_PII_BANK_ROUTING_NUMBER => pii_payments::usa_bank_routing_number,
             DetectiveType::DETECTIVE_TYPE_PII_CRYPTO_ADDRESS => pii_payments::crypto_currency_address,
-
+            DetectiveType::DETECTIVE_TYPE_PII_BRAINTREE_ACCESS_TOKEN => pii_cloud::braintree_access_token,
+            DetectiveType::DETECTIVE_TYPE_PII_AWS_MWS_AUTH_TOKEN => pii_cloud::aws_mws_token,
+            DetectiveType::DETECTIVE_TYPE_PII_DATABRICKS_PAT => pii_cloud::databricks_pat,
+            DetectiveType::DETECTIVE_TYPE_PII_SENDGRID_KEY => pii_cloud::sendgrid_api_key,
+            DetectiveType::DETECTIVE_TYPE_PII_JWT => pii::jwt,
+            DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN => pii_cloud::docker_swarm_token,
+            DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN => pii::bearer_token,
+            DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING => pii_cloud::azure_sql_connection_string,
             DetectiveType::DETECTIVE_TYPE_UNKNOWN => {
                 return Err(CustomError::Error(
                     "match type cannot be unknown".to_string(),
