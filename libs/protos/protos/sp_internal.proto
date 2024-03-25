@@ -8,6 +8,7 @@ import "sp_info.proto";
 import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option ruby_package = "Streamdal";
 
 service Internal {
   // Initial method that an SDK should call to register itself with the server.

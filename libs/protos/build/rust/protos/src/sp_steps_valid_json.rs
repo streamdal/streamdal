@@ -130,11 +130,12 @@ impl ::protobuf::reflect::ProtobufValue for ValidJSONStep {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x1fsteps/sp_steps_valid_json.proto\x12\x0cprotos.steps\"\x0f\n\rValid\
-    JSONStepBBZ@github.com/streamdal/streamdal/libs/protos/build/go/protos/s\
-    tepsJI\n\x06\x12\x04\0\0\x07\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
-    \x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\
-    \x0b\x12\x03\x04\0W\n\n\n\x02\x04\0\x12\x04\x06\0\x07\x01\n\n\n\x03\x04\
-    \0\x01\x12\x03\x06\x08\x15b\x06proto3\
+    JSONStepBNZ@github.com/streamdal/streamdal/libs/protos/build/go/protos/s\
+    teps\xea\x02\tStreamdalJ^\n\x06\x12\x04\0\0\x08\x01\n\x08\n\x01\x0c\x12\
+    \x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\
+    \x04\0W\n\t\n\x02\x08\x0b\x12\x03\x04\0W\n\x08\n\x01\x08\x12\x03\x05\0\"\
+    \n\t\n\x02\x08-\x12\x03\x05\0\"\n\n\n\x02\x04\0\x12\x04\x07\0\x08\x01\n\
+    \n\n\x03\x04\0\x01\x12\x03\x07\x08\x15b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

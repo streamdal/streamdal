@@ -8,6 +8,7 @@ import "sp_notify.proto";
 import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option ruby_package = "Streamdal";
 
 service External {
   // Returns all data needed for UI; called on initial console load
