@@ -90,6 +90,7 @@ generate/ruby:
 	docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
  		--proto_path=protos \
  		--ruby_out=./build/ruby/lib \
+ 		--grpc-ruby_out=./build/ruby/lib \
 		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
 
 	@echo Successfully compiled protos
