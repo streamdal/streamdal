@@ -5,7 +5,7 @@ package protos;
 import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
-option ruby_package = "Streamdal";
+option ruby_package = "Streamdal::Protos";
 
 enum ExecStatus {
   // Unset status. This should never be returned by the SDK. If it does, it is
