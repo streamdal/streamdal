@@ -2,6 +2,7 @@
 # sources: sp_bus.proto, sp_command.proto, sp_common.proto, sp_external.proto, sp_info.proto, sp_internal.proto, sp_kv.proto, sp_notify.proto, sp_pipeline.proto, sp_sdk.proto, sp_wsm.proto
 # plugin: python-betterproto
 # This file has been @generated
+import builtins
 import warnings
 from dataclasses import dataclass
 from typing import (
@@ -1184,7 +1185,7 @@ class Payload(betterproto.Message):
     interface for this type (ie. Stringer interface for Go SDK).
     """
 
-    data: bytes = betterproto.bytes_field(1)
+    bytes: builtins.bytes = betterproto.bytes_field(1)
 
 
 @dataclass(eq=False, repr=False)

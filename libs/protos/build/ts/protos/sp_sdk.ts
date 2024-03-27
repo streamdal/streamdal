@@ -20,9 +20,9 @@ import { AbortCondition } from "./sp_pipeline.js";
  */
 export interface Payload {
     /**
-     * @generated from protobuf field: bytes data = 1;
+     * @generated from protobuf field: bytes bytes = 1;
      */
-    data: Uint8Array;
+    bytes: Uint8Array;
 }
 /**
  * Common return response used by all SDKs
@@ -162,11 +162,11 @@ export enum ExecStatus {
 class Payload$Type extends MessageType<Payload> {
     constructor() {
         super("protos.Payload", [
-            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value?: PartialMessage<Payload>): Payload {
-        const message = { data: new Uint8Array(0) };
+        const message = { bytes: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<Payload>(this, message, value);
@@ -177,8 +177,8 @@ class Payload$Type extends MessageType<Payload> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bytes data */ 1:
-                    message.data = reader.bytes();
+                case /* bytes bytes */ 1:
+                    message.bytes = reader.bytes();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -192,9 +192,9 @@ class Payload$Type extends MessageType<Payload> {
         return message;
     }
     internalBinaryWrite(message: Payload, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes data = 1; */
-        if (message.data.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.data);
+        /* bytes bytes = 1; */
+        if (message.bytes.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.bytes);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
