@@ -533,7 +533,7 @@ var _ = Describe("Streamdal", func() {
 					Expect(resp.PipelineStatus[0].StepStatus[1].Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 					Expect(resp.PipelineStatus[0].StepStatus[0].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 					Expect(resp.PipelineStatus[0].StepStatus[1].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
-					Expect(string(resp.Data)).To(Equal(`{"object":{"payload":"stre***************"}}`))
+					Expect(string(resp.Data.Bytes)).To(Equal(`{"object":{"payload":"stre***************"}}`))
 				}()
 			}
 
