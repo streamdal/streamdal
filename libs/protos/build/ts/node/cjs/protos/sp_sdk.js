@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StepStatus = exports.PipelineStatus = exports.SDKResponse = exports.ExecStatus = void 0;
+exports.StepStatus = exports.PipelineStatus = exports.SDKResponse = exports.Payload = exports.ExecStatus = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -41,18 +41,14 @@ var ExecStatus;
     ExecStatus[ExecStatus["ERROR"] = 3] = "ERROR";
 })(ExecStatus || (exports.ExecStatus = ExecStatus = {}));
 // @generated message type with reflection information, may provide speed optimized methods
-class SDKResponse$Type extends runtime_5.MessageType {
+class Payload$Type extends runtime_5.MessageType {
     constructor() {
-        super("protos.SDKResponse", [
-            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
-            { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineStatus },
-            { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        super("protos.Payload", [
+            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value) {
-        const message = { data: new Uint8Array(0), status: 0, pipelineStatus: [], metadata: {} };
+        const message = { data: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -65,6 +61,57 @@ class SDKResponse$Type extends runtime_5.MessageType {
             switch (fieldNo) {
                 case /* bytes data */ 1:
                     message.data = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? runtime_2.UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bytes data = 1; */
+        if (message.data.length)
+            writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.data);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Payload
+ */
+exports.Payload = new Payload$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SDKResponse$Type extends runtime_5.MessageType {
+    constructor() {
+        super("protos.SDKResponse", [
+            { no: 1, name: "data", kind: "message", T: () => exports.Payload },
+            { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
+            { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.PipelineStatus },
+            { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+        ]);
+    }
+    create(value) {
+        const message = { status: 0, pipelineStatus: [], metadata: {} };
+        globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            (0, runtime_3.reflectionMergePartial)(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Payload data */ 1:
+                    message.data = exports.Payload.internalBinaryRead(reader, reader.uint32(), options, message.data);
                     break;
                 case /* protos.ExecStatus status */ 2:
                     message.status = reader.int32();
@@ -106,9 +153,9 @@ class SDKResponse$Type extends runtime_5.MessageType {
         map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : "";
     }
     internalBinaryWrite(message, writer, options) {
-        /* bytes data = 1; */
-        if (message.data.length)
-            writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.data);
+        /* protos.Payload data = 1; */
+        if (message.data)
+            exports.Payload.internalBinaryWrite(message.data, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* protos.ExecStatus status = 2; */
         if (message.status !== 0)
             writer.tag(2, runtime_1.WireType.Varint).int32(message.status);
