@@ -277,6 +277,18 @@ func (s *Streamdal) setPipelines(_ context.Context, cmd *protos.Command) error {
 		return errors.Wrap(err, "failed to validate set pipelines command")
 	}
 
+	for _, p := range cmd.GetSetPipelines().Pipelines {
+		// Fill in WASM data from the deduplication map
+		for _, step := range p.Steps {
+			wasmData, ok := cmd.GetSetPipelines().WasmModules[step.GetXWasmId()]
+			if !ok {
+				return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
+			}
+
+			step.XWasmBytes = wasmData.Bytes
+		}
+	}
+
 	s.pipelinesMtx.Lock()
 	defer s.pipelinesMtx.Unlock()
 
