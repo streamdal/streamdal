@@ -26,7 +26,7 @@ enum ExecStatus {
 // This is a separate type because some SDKs may want to implement some interface
 // for this type (ie. Stringer interface for Go SDK).
 message Payload {
-  bytes data = 1;
+  bytes bytes = 1;
 }
 
 // Common return response used by all SDKs

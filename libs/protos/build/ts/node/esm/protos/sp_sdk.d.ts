@@ -13,9 +13,9 @@ import { AbortCondition } from "./sp_pipeline.js";
  */
 export interface Payload {
     /**
-     * @generated from protobuf field: bytes data = 1;
+     * @generated from protobuf field: bytes bytes = 1;
      */
-    data: Uint8Array;
+    bytes: Uint8Array;
 }
 /**
  * Common return response used by all SDKs

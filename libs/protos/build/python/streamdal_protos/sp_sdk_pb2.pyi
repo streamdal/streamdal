@@ -12,10 +12,10 @@ EXEC_STATUS_TRUE: ExecStatus
 EXEC_STATUS_UNSET: ExecStatus
 
 class Payload(_message.Message):
-    __slots__ = ["data"]
-    DATA_FIELD_NUMBER: _ClassVar[int]
-    data: bytes
-    def __init__(self, data: _Optional[bytes] = ...) -> None: ...
+    __slots__ = ["bytes"]
+    BYTES_FIELD_NUMBER: _ClassVar[int]
+    bytes: bytes
+    def __init__(self, bytes: _Optional[bytes] = ...) -> None: ...
 
 class PipelineStatus(_message.Message):
     __slots__ = ["id", "name", "step_status"]

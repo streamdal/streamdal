@@ -44,11 +44,11 @@ var ExecStatus;
 class Payload$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.Payload", [
-            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value) {
-        const message = { data: new Uint8Array(0) };
+        const message = { bytes: new Uint8Array(0) };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -59,8 +59,8 @@ class Payload$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bytes data */ 1:
-                    message.data = reader.bytes();
+                case /* bytes bytes */ 1:
+                    message.bytes = reader.bytes();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -74,9 +74,9 @@ class Payload$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bytes data = 1; */
-        if (message.data.length)
-            writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.data);
+        /* bytes bytes = 1; */
+        if (message.bytes.length)
+            writer.tag(1, runtime_1.WireType.LengthDelimited).bytes(message.bytes);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
