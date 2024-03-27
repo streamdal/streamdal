@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "shared/sp_shared.proto";
 import "sp_command.proto";
 import "sp_common.proto";
 import "sp_info.proto";
@@ -145,21 +146,7 @@ message GetSetPipelinesCommandsByServiceResponse {
   repeated protos.Command set_pipeline_commands = 1;
 
   // ID = wasm ID
-  map<string,WasmModule> wasm_modules = 3;
-}
-
-// WasmModule is used to ensure we only send the wasm module once per request
-// instead of duplicated in every pipeline where it is used. This prevents
-// over-sized payloads on SDK startup
-message WasmModule {
-  // ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
-  string id = 1;
-
-  // WASM module bytes (set by server)
-  bytes bytes = 2;
-
-  // WASM function name to execute (set by server)
-  string function = 3;
+  map<string,protos.shared.WasmModule> wasm_modules = 3;
 }
 
 message SendSchemaRequest {

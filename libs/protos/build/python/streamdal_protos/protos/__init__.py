@@ -2,7 +2,6 @@
 # sources: sp_bus.proto, sp_command.proto, sp_common.proto, sp_external.proto, sp_info.proto, sp_internal.proto, sp_kv.proto, sp_notify.proto, sp_pipeline.proto, sp_sdk.proto, sp_wsm.proto
 # plugin: python-betterproto
 # This file has been @generated
-import builtins
 import warnings
 from dataclasses import dataclass
 from typing import (
@@ -970,6 +969,10 @@ class Command(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class SetPipelinesCommand(betterproto.Message):
     pipelines: List["Pipeline"] = betterproto.message_field(1)
+    wasm_modules: Dict[str, "shared.WasmModule"] = betterproto.map_field(
+        2, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+    """ID = wasm ID"""
 
 
 @dataclass(eq=False, repr=False)
@@ -1111,28 +1114,10 @@ class GetSetPipelinesCommandsByServiceResponse(betterproto.Message):
     set_pipeline_commands: List["Command"] = betterproto.message_field(1)
     """SetPipelinesCommands for all active pipelines"""
 
-    wasm_modules: Dict[str, "WasmModule"] = betterproto.map_field(
+    wasm_modules: Dict[str, "shared.WasmModule"] = betterproto.map_field(
         3, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
     """ID = wasm ID"""
-
-
-@dataclass(eq=False, repr=False)
-class WasmModule(betterproto.Message):
-    """
-    WasmModule is used to ensure we only send the wasm module once per request
-    instead of duplicated in every pipeline where it is used. This prevents
-    over-sized payloads on SDK startup
-    """
-
-    id: str = betterproto.string_field(1)
-    """ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server"""
-
-    bytes: builtins.bytes = betterproto.bytes_field(2)
-    """WASM module bytes (set by server)"""
-
-    function: str = betterproto.string_field(3)
-    """WASM function name to execute (set by server)"""
 
 
 @dataclass(eq=False, repr=False)

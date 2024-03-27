@@ -1,3 +1,4 @@
+from shared import sp_shared_pb2 as _sp_shared_pb2
 import sp_common_pb2 as _sp_common_pb2
 import sp_kv_pb2 as _sp_kv_pb2
 import sp_pipeline_pb2 as _sp_pipeline_pb2
@@ -35,10 +36,19 @@ class KeepAliveCommand(_message.Message):
     def __init__(self) -> None: ...
 
 class SetPipelinesCommand(_message.Message):
-    __slots__ = ["pipelines"]
+    __slots__ = ["pipelines", "wasm_modules"]
+    class WasmModulesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: _sp_shared_pb2.WasmModule
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...
     PIPELINES_FIELD_NUMBER: _ClassVar[int]
+    WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
     pipelines: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
-    def __init__(self, pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ...) -> None: ...
+    wasm_modules: _containers.MessageMap[str, _sp_shared_pb2.WasmModule]
+    def __init__(self, pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, _sp_shared_pb2.WasmModule]] = ...) -> None: ...
 
 class TailCommand(_message.Message):
     __slots__ = ["request"]
