@@ -1178,10 +1178,20 @@ class BusEvent(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class Payload(betterproto.Message):
+    """
+    This is a separate type because some SDKs may want to implement some
+    interface for this type (ie. Stringer interface for Go SDK).
+    """
+
+    data: bytes = betterproto.bytes_field(1)
+
+
+@dataclass(eq=False, repr=False)
 class SdkResponse(betterproto.Message):
     """Common return response used by all SDKs"""
 
-    data: bytes = betterproto.bytes_field(1)
+    data: "Payload" = betterproto.message_field(1)
     """Contains (potentially) modified input data"""
 
     status: "ExecStatus" = betterproto.enum_field(2)
