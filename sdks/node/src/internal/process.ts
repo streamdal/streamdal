@@ -8,9 +8,9 @@ import {
 import {
   ExecStatus,
   PipelineStatus,
-  SDKResponse,
   StepStatus,
 } from "@streamdal/protos/protos/sp_sdk";
+import { SDKResponse } from "../index.js";
 import { InterStepResult, WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
 import { InternalConfigs, StreamdalRequest } from "../index.js";
@@ -211,6 +211,7 @@ export const processPipelines = async ({
 
   const response: SDKResponse = {
     data,
+    decodedData: new TextDecoder().decode(data),
     pipelineStatus: [],
     status: ExecStatus.TRUE,
     statusMessage: "",
