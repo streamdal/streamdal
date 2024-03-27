@@ -6,7 +6,7 @@ import {
 } from "@streamdal/protos/protos/sp_internal.client";
 
 export const GRPC_KEEPALIVE = 2000;
-export const GRPC_MAX_MESSAGE_LENGTH = 10 * 1024 * 1024; // 10MB;
+export const GRPC_MAX_MESSAGE_LENGTH = 100 * 1024 * 1024; // 100MB;
 
 export const client = (url: string): IInternalClient => {
   const transport = new GrpcTransport({
