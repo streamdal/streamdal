@@ -6,6 +6,7 @@ require "securerandom"
 require "wasmtime"
 require "google/protobuf"
 require "base64"
+require 'logger'
 
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5 # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10 # 100 milliseconds
@@ -42,27 +43,31 @@ module Streamdal
       @pipelines = {}
       @audiences = {}
       @schemas = {}
+      @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
 
       # TODO: kv
       # TODO: metrics
       # TODO: host funcs
 
       # # Connect to Streamdal External gRPC API
-      # @stub = Streamdal::Protos::Internal::Stub.new('localhost:8082', :this_channel_is_insecure)
+      @stub = Streamdal::Protos::Internal::Stub.new('localhost:8082', :this_channel_is_insecure)
 
+      Thread.new do
+        _register
+      end
     end
 
     def validate_cfg(cfg)
       # Validate configuration
-      if cfg["service_name"] == ""
+      if cfg[:service_name] == ""
         raise "service_name is required"
       end
 
-      if cfg["streamdal_url"] == ""
+      if cfg[:streamdal_url] == ""
         raise "streamdal_url is required"
       end
 
-      if cfg["streamdal_token"] == ""
+      if cfg[:streamdal_token] == ""
         raise "streamdal_token is required"
       end
     end
@@ -109,19 +114,27 @@ module Streamdal
       req.client_info.language = "ruby"
       req.client_info.arch = arch
       req.client_info.os = os
-      puts req.inspect.gsub(",", "\n")
+      req
+    end
+
+    def _metadata
+      puts @cfg.inspect
+      { "auth-token" => @cfg[:streamdal_token].to_s }
     end
 
     def _register
+      @logger.info("REGISTER ENTERED")
       req = _gen_register_request
 
       puts @stub.inspect
 
       # Register with Streamdal External gRPC API
-      resps = @stub.register(req)
+      resps = @stub.register(req, metadata: _metadata)
       resps.each do |r|
         puts r.inspect.gsub(",", "\n")
       end
+
+      @logger.info("REGISTER EXITED")
     end
 
     def process(data)
