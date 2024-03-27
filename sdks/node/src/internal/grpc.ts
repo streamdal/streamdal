@@ -6,6 +6,7 @@ import {
 } from "@streamdal/protos/protos/sp_internal.client";
 
 export const GRPC_KEEPALIVE = 2000;
+export const GRPC_MAX_MESSAGE_LENGTH = 10 * 1024 * 1024; // 10MB;
 
 export const client = (url: string): IInternalClient => {
   const transport = new GrpcTransport({
@@ -13,6 +14,7 @@ export const client = (url: string): IInternalClient => {
     channelCredentials: ChannelCredentials.createInsecure(),
     clientOptions: {
       "grpc.keepalive_time_ms": GRPC_KEEPALIVE,
+      "grpc.max_receive_message_length": GRPC_MAX_MESSAGE_LENGTH,
     },
   });
 
