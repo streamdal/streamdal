@@ -468,17 +468,6 @@ func (b *Bus) sendSetPipelinesCommand(
 		return 0, errors.Wrap(err, "error injecting schema inference pipeline")
 	}
 
-	// Populate WASM
-	for _, p := range updatedPipelines {
-		// NOTE: Command_SetPipelines does not have a WasmModules field (like
-		// the internal.GetSetPipelinesCommandsByServiceResponse), so we need
-		// to fill out all of the wasm fields.
-		if err := util.PopulateWASMFields(p, b.options.WASMDir); err != nil {
-			llog.Errorf("error populating WASM fields: %s", err)
-			return 0, errors.Wrap(err, "error populating WASM fields")
-		}
-	}
-
 	var sent int
 
 	for _, sessionID := range sessionIDs {
@@ -493,7 +482,7 @@ func (b *Bus) sendSetPipelinesCommand(
 		// TODO: Need to investigate and determine if this could panic as a
 		// result an SDK disconnecting and having the channel get closed. If so,
 		// need to implement a more reliable way to push the command.
-		ch <- &protos.Command{
+		cmd := &protos.Command{
 			Audience: aud,
 			Command: &protos.Command_SetPipelines{
 				SetPipelines: &protos.SetPipelinesCommand{
@@ -501,6 +490,10 @@ func (b *Bus) sendSetPipelinesCommand(
 				},
 			},
 		}
+
+		cmd.GetSetPipelines().WasmModules = util.GenerateWasmMapping(cmd)
+
+		ch <- cmd
 
 		sent += 1
 	}
