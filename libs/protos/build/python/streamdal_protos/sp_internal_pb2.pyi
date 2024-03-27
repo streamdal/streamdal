@@ -1,3 +1,4 @@
+from shared import sp_shared_pb2 as _sp_shared_pb2
 import sp_command_pb2 as _sp_command_pb2
 import sp_common_pb2 as _sp_common_pb2
 import sp_info_pb2 as _sp_info_pb2
@@ -31,13 +32,13 @@ class GetSetPipelinesCommandsByServiceResponse(_message.Message):
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
-        value: WasmModule
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[WasmModule, _Mapping]] = ...) -> None: ...
+        value: _sp_shared_pb2.WasmModule
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...
     SET_PIPELINE_COMMANDS_FIELD_NUMBER: _ClassVar[int]
     WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
     set_pipeline_commands: _containers.RepeatedCompositeFieldContainer[_sp_command_pb2.Command]
-    wasm_modules: _containers.MessageMap[str, WasmModule]
-    def __init__(self, set_pipeline_commands: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, WasmModule]] = ...) -> None: ...
+    wasm_modules: _containers.MessageMap[str, _sp_shared_pb2.WasmModule]
+    def __init__(self, set_pipeline_commands: _Optional[_Iterable[_Union[_sp_command_pb2.Command, _Mapping]]] = ..., wasm_modules: _Optional[_Mapping[str, _sp_shared_pb2.WasmModule]] = ...) -> None: ...
 
 class HeartbeatRequest(_message.Message):
     __slots__ = ["audiences", "client_info", "service_name", "session_id"]
@@ -108,13 +109,3 @@ class SendSchemaRequest(_message.Message):
     audience: _sp_common_pb2.Audience
     schema: _sp_common_pb2.Schema
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., schema: _Optional[_Union[_sp_common_pb2.Schema, _Mapping]] = ...) -> None: ...
-
-class WasmModule(_message.Message):
-    __slots__ = ["bytes", "function", "id"]
-    BYTES_FIELD_NUMBER: _ClassVar[int]
-    FUNCTION_FIELD_NUMBER: _ClassVar[int]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    bytes: bytes
-    function: str
-    id: str
-    def __init__(self, id: _Optional[str] = ..., bytes: _Optional[bytes] = ..., function: _Optional[str] = ...) -> None: ...
