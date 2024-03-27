@@ -704,7 +704,7 @@ var _ = Describe("WASM Modules", func() {
 
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Transform Email' returned true: Successfully transformed payload (no abort condition)"))
-			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
+			Expect(resp.Data.Bytes).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
 		})
 
 	})
