@@ -175,8 +175,8 @@ func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
 // This is used _specifically_ for the initial GetSetPipelinesByService() that
 // SDKs call on startup (but if the SDK does not have any audiences, this will
 // be empty).
-func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmModule {
-	wasmModules := make(map[string]*protos.WasmModule)
+func GenerateWasmMapping(commands ...*protos.Command) map[string]*shared.WasmModule {
+	wasmModules := make(map[string]*shared.WasmModule)
 
 	for _, cmd := range commands {
 		if cmd.GetSetPipelines() == nil {
@@ -198,7 +198,7 @@ func GenerateWasmMapping(commands ...*protos.Command) map[string]*protos.WasmMod
 					continue
 				}
 
-				wasmModules[step.GetXWasmId()] = &protos.WasmModule{
+				wasmModules[step.GetXWasmId()] = &shared.WasmModule{
 					Id:       step.GetXWasmId(),
 					Bytes:    step.GetXWasmBytes(),
 					Function: step.GetXWasmFunction(),

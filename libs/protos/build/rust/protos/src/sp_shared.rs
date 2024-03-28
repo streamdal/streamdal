@@ -25,6 +25,170 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_4_0;
 
+///  WasmModule is used to ensure we only send the wasm module once per request
+///  instead of duplicated in every pipeline where it is used. This prevents
+///  over-sized payloads on SDK startup
+// @@protoc_insertion_point(message:protos.shared.WasmModule)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct WasmModule {
+    // message fields
+    ///  ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.id)
+    pub id: ::std::string::String,
+    ///  WASM module bytes (set by server)
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.bytes)
+    pub bytes: ::std::vec::Vec<u8>,
+    ///  WASM function name to execute (set by server)
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.function)
+    pub function: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.shared.WasmModule.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a WasmModule {
+    fn default() -> &'a WasmModule {
+        <WasmModule as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl WasmModule {
+    pub fn new() -> WasmModule {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &WasmModule| { &m.id },
+            |m: &mut WasmModule| { &mut m.id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "bytes",
+            |m: &WasmModule| { &m.bytes },
+            |m: &mut WasmModule| { &mut m.bytes },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "function",
+            |m: &WasmModule| { &m.function },
+            |m: &mut WasmModule| { &mut m.function },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WasmModule>(
+            "WasmModule",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for WasmModule {
+    const NAME: &'static str = "WasmModule";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.id = is.read_string()?;
+                },
+                18 => {
+                    self.bytes = is.read_bytes()?;
+                },
+                26 => {
+                    self.function = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.id);
+        }
+        if !self.bytes.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(2, &self.bytes);
+        }
+        if !self.function.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.function);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.id.is_empty() {
+            os.write_string(1, &self.id)?;
+        }
+        if !self.bytes.is_empty() {
+            os.write_bytes(2, &self.bytes)?;
+        }
+        if !self.function.is_empty() {
+            os.write_string(3, &self.function)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> WasmModule {
+        WasmModule::new()
+    }
+
+    fn clear(&mut self) {
+        self.id.clear();
+        self.bytes.clear();
+        self.function.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static WasmModule {
+        static instance: WasmModule = WasmModule {
+            id: ::std::string::String::new(),
+            bytes: ::std::vec::Vec::new(),
+            function: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for WasmModule {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("WasmModule").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for WasmModule {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for WasmModule {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
 ///  Note that only a subset of actions are used for protos.KVCommand (CREATE,
 ///  UPDATE, DELETE, DELETE_ALL) while protos.KVStep uses most of them.
@@ -118,38 +282,57 @@ impl KVAction {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x16shared/sp_shared.proto\x12\rprotos.shared*\xa4\x01\n\x08KVAction\
-    \x12\x13\n\x0fKV_ACTION_UNSET\x10\0\x12\x11\n\rKV_ACTION_GET\x10\x01\x12\
-    \x14\n\x10KV_ACTION_CREATE\x10\x02\x12\x14\n\x10KV_ACTION_UPDATE\x10\x03\
-    \x12\x14\n\x10KV_ACTION_EXISTS\x10\x04\x12\x14\n\x10KV_ACTION_DELETE\x10\
-    \x05\x12\x18\n\x14KV_ACTION_DELETE_ALL\x10\x06BOZAgithub.com/streamdal/s\
-    treamdal/libs/protos/build/go/protos/shared\xea\x02\tStreamdalJ\xdd\x05\
-    \n\x06\x12\x04\x01\0\x15\x01\nT\n\x01\x0c\x12\x03\x01\0\x12\x1aJ\x20This\
-    \x20has\x20to\x20be\x20a\x20separate\x20pkg\x20to\x20avoid\x20circular\
-    \x20import\x20problems\x20with\x20Go.\n\n\x08\n\x01\x02\x12\x03\x03\0\
-    \x16\n\x08\n\x01\x08\x12\x03\x05\0X\n\t\n\x02\x08\x0b\x12\x03\x05\0X\n\
-    \x08\n\x01\x08\x12\x03\x06\0\"\n\t\n\x02\x08-\x12\x03\x06\0\"\n\x9d\x02\
-    \n\x02\x05\0\x12\x04\r\0\x15\x01\x1a\x90\x02\x20KVAction\x20is\x20a\x20s\
-    hared\x20type\x20that\x20is\x20used\x20for\x20protos.KVCommand\x20and\
-    \x20protos.KVStep.\n\x20Note\x20that\x20only\x20a\x20subset\x20of\x20act\
-    ions\x20are\x20used\x20for\x20protos.KVCommand\x20(CREATE,\n\x20UPDATE,\
-    \x20DELETE,\x20DELETE_ALL)\x20while\x20protos.KVStep\x20uses\x20most\x20\
-    of\x20them.\n\n\x20protolint:disable:next\x20ENUM_FIELD_NAMES_PREFIX\n\n\
-    \n\n\x03\x05\0\x01\x12\x03\r\x05\r\n\x0b\n\x04\x05\0\x02\0\x12\x03\x0e\
-    \x02\x16\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x0e\x02\x11\n\x0c\n\x05\x05\
-    \0\x02\0\x02\x12\x03\x0e\x14\x15\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x0f\
-    \x02\x14\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x0f\n\x0c\n\x05\
-    \x05\0\x02\x01\x02\x12\x03\x0f\x12\x13\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
-    \x10\x02\x17\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x10\x02\x12\n\x0c\n\
-    \x05\x05\0\x02\x02\x02\x12\x03\x10\x15\x16\n\x0b\n\x04\x05\0\x02\x03\x12\
-    \x03\x11\x02\x17\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x11\x02\x12\n\x0c\
-    \n\x05\x05\0\x02\x03\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x04\
-    \x12\x03\x12\x02\x17\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x12\x02\x12\n\
-    \x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x12\x15\x16\n\x0b\n\x04\x05\0\x02\
-    \x05\x12\x03\x13\x02\x17\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x13\x02\
-    \x12\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\x13\x15\x16\n\x0b\n\x04\x05\0\
-    \x02\x06\x12\x03\x14\x02\x1b\n\x0c\n\x05\x05\0\x02\x06\x01\x12\x03\x14\
-    \x02\x16\n\x0c\n\x05\x05\0\x02\x06\x02\x12\x03\x14\x19\x1ab\x06proto3\
+    \n\x16shared/sp_shared.proto\x12\rprotos.shared\"N\n\nWasmModule\x12\x0e\
+    \n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x14\n\x05bytes\x18\x02\x20\x01(\
+    \x0cR\x05bytes\x12\x1a\n\x08function\x18\x03\x20\x01(\tR\x08function*\
+    \xa4\x01\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\0\x12\x11\n\rKV_\
+    ACTION_GET\x10\x01\x12\x14\n\x10KV_ACTION_CREATE\x10\x02\x12\x14\n\x10KV\
+    _ACTION_UPDATE\x10\x03\x12\x14\n\x10KV_ACTION_EXISTS\x10\x04\x12\x14\n\
+    \x10KV_ACTION_DELETE\x10\x05\x12\x18\n\x14KV_ACTION_DELETE_ALL\x10\x06BW\
+    ZAgithub.com/streamdal/streamdal/libs/protos/build/go/protos/shared\xea\
+    \x02\x11Streamdal::ProtosJ\xf2\t\n\x06\x12\x04\x01\0#\x01\nT\n\x01\x0c\
+    \x12\x03\x01\0\x12\x1aJ\x20This\x20has\x20to\x20be\x20a\x20separate\x20p\
+    kg\x20to\x20avoid\x20circular\x20import\x20problems\x20with\x20Go.\n\n\
+    \x08\n\x01\x02\x12\x03\x03\0\x16\n\x08\n\x01\x08\x12\x03\x05\0X\n\t\n\
+    \x02\x08\x0b\x12\x03\x05\0X\n\x08\n\x01\x08\x12\x03\x06\0*\n\t\n\x02\x08\
+    -\x12\x03\x06\0*\n\x9d\x02\n\x02\x05\0\x12\x04\r\0\x15\x01\x1a\x90\x02\
+    \x20KVAction\x20is\x20a\x20shared\x20type\x20that\x20is\x20used\x20for\
+    \x20protos.KVCommand\x20and\x20protos.KVStep.\n\x20Note\x20that\x20only\
+    \x20a\x20subset\x20of\x20actions\x20are\x20used\x20for\x20protos.KVComma\
+    nd\x20(CREATE,\n\x20UPDATE,\x20DELETE,\x20DELETE_ALL)\x20while\x20protos\
+    .KVStep\x20uses\x20most\x20of\x20them.\n\n\x20protolint:disable:next\x20\
+    ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\x01\x12\x03\r\x05\r\n\x0b\n\
+    \x04\x05\0\x02\0\x12\x03\x0e\x02\x16\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\
+    \x0e\x02\x11\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0e\x14\x15\n\x0b\n\x04\
+    \x05\0\x02\x01\x12\x03\x0f\x02\x14\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\
+    \x0f\x02\x0f\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x0f\x12\x13\n\x0b\n\
+    \x04\x05\0\x02\x02\x12\x03\x10\x02\x17\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
+    \x03\x10\x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x10\x15\x16\n\x0b\
+    \n\x04\x05\0\x02\x03\x12\x03\x11\x02\x17\n\x0c\n\x05\x05\0\x02\x03\x01\
+    \x12\x03\x11\x02\x12\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x11\x15\x16\n\
+    \x0b\n\x04\x05\0\x02\x04\x12\x03\x12\x02\x17\n\x0c\n\x05\x05\0\x02\x04\
+    \x01\x12\x03\x12\x02\x12\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x12\x15\
+    \x16\n\x0b\n\x04\x05\0\x02\x05\x12\x03\x13\x02\x17\n\x0c\n\x05\x05\0\x02\
+    \x05\x01\x12\x03\x13\x02\x12\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\x13\
+    \x15\x16\n\x0b\n\x04\x05\0\x02\x06\x12\x03\x14\x02\x1b\n\x0c\n\x05\x05\0\
+    \x02\x06\x01\x12\x03\x14\x02\x16\n\x0c\n\x05\x05\0\x02\x06\x02\x12\x03\
+    \x14\x19\x1a\n\xc6\x01\n\x02\x04\0\x12\x04\x1a\0#\x01\x1a\xb9\x01\x20Was\
+    mModule\x20is\x20used\x20to\x20ensure\x20we\x20only\x20send\x20the\x20wa\
+    sm\x20module\x20once\x20per\x20request\n\x20instead\x20of\x20duplicated\
+    \x20in\x20every\x20pipeline\x20where\x20it\x20is\x20used.\x20This\x20pre\
+    vents\n\x20over-sized\x20payloads\x20on\x20SDK\x20startup\n\n\n\n\x03\
+    \x04\0\x01\x12\x03\x1a\x08\x12\nP\n\x04\x04\0\x02\0\x12\x03\x1c\x02\x10\
+    \x1aC\x20ID\x20is\x20a\x20uuid(sha256(_wasm_bytes))\x20that\x20is\x20set\
+    \x20by\x20streamdal\x20server\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x1c\
+    \x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1c\t\x0b\n\x0c\n\x05\x04\0\
+    \x02\0\x03\x12\x03\x1c\x0e\x0f\n0\n\x04\x04\0\x02\x01\x12\x03\x1f\x02\
+    \x12\x1a#\x20WASM\x20module\x20bytes\x20(set\x20by\x20server)\n\n\x0c\n\
+    \x05\x04\0\x02\x01\x05\x12\x03\x1f\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\
+    \x12\x03\x1f\x08\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1f\x10\x11\n<\
+    \n\x04\x04\0\x02\x02\x12\x03\"\x02\x16\x1a/\x20WASM\x20function\x20name\
+    \x20to\x20execute\x20(set\x20by\x20server)\n\n\x0c\n\x05\x04\0\x02\x02\
+    \x05\x12\x03\"\x02\x08\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\"\t\x11\n\
+    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03\"\x14\x15b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -167,7 +350,8 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(0);
-            let mut messages = ::std::vec::Vec::with_capacity(0);
+            let mut messages = ::std::vec::Vec::with_capacity(1);
+            messages.push(WasmModule::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(KVAction::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

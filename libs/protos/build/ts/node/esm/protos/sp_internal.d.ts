@@ -6,6 +6,7 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Schema } from "./sp_common.js";
+import { WasmModule } from "./shared/sp_shared.js";
 import { Command } from "./sp_command.js";
 import { Metric } from "./sp_common.js";
 import { PipelineStep } from "./sp_pipeline.js";
@@ -219,38 +220,11 @@ export interface GetSetPipelinesCommandsByServiceResponse {
     /**
      * ID = wasm ID
      *
-     * @generated from protobuf field: map<string, protos.WasmModule> wasm_modules = 3;
+     * @generated from protobuf field: map<string, protos.shared.WasmModule> wasm_modules = 3;
      */
     wasmModules: {
         [key: string]: WasmModule;
     };
-}
-/**
- * WasmModule is used to ensure we only send the wasm module once per request
- * instead of duplicated in every pipeline where it is used. This prevents
- * over-sized payloads on SDK startup
- *
- * @generated from protobuf message protos.WasmModule
- */
-export interface WasmModule {
-    /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
-     *
-     * @generated from protobuf field: string id = 1;
-     */
-    id: string;
-    /**
-     * WASM module bytes (set by server)
-     *
-     * @generated from protobuf field: bytes bytes = 2;
-     */
-    bytes: Uint8Array;
-    /**
-     * WASM function name to execute (set by server)
-     *
-     * @generated from protobuf field: string function = 3;
-     */
-    function: string;
 }
 /**
  * @generated from protobuf message protos.SendSchemaRequest
@@ -346,16 +320,6 @@ declare class GetSetPipelinesCommandsByServiceResponse$Type extends MessageType<
  * @generated MessageType for protobuf message protos.GetSetPipelinesCommandsByServiceResponse
  */
 export declare const GetSetPipelinesCommandsByServiceResponse: GetSetPipelinesCommandsByServiceResponse$Type;
-declare class WasmModule$Type extends MessageType<WasmModule> {
-    constructor();
-    create(value?: PartialMessage<WasmModule>): WasmModule;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WasmModule): WasmModule;
-    internalBinaryWrite(message: WasmModule, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.WasmModule
- */
-export declare const WasmModule: WasmModule$Type;
 declare class SendSchemaRequest$Type extends MessageType<SendSchemaRequest> {
     constructor();
     create(value?: PartialMessage<SendSchemaRequest>): SendSchemaRequest;

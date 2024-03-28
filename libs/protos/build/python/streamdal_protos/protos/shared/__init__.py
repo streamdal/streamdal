@@ -2,7 +2,7 @@
 # sources: shared/sp_shared.proto
 # plugin: python-betterproto
 # This file has been @generated
-
+import builtins
 from dataclasses import dataclass
 
 import betterproto
@@ -23,3 +23,21 @@ class KvAction(betterproto.Enum):
     KV_ACTION_EXISTS = 4
     KV_ACTION_DELETE = 5
     KV_ACTION_DELETE_ALL = 6
+
+
+@dataclass(eq=False, repr=False)
+class WasmModule(betterproto.Message):
+    """
+    WasmModule is used to ensure we only send the wasm module once per request
+    instead of duplicated in every pipeline where it is used. This prevents
+    over-sized payloads on SDK startup
+    """
+
+    id: str = betterproto.string_field(1)
+    """ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server"""
+
+    bytes: builtins.bytes = betterproto.bytes_field(2)
+    """WASM module bytes (set by server)"""
+
+    function: str = betterproto.string_field(3)
+    """WASM function name to execute (set by server)"""
