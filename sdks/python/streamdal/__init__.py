@@ -439,14 +439,14 @@ class StreamdalClient:
                     step_status.status = protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
                     pipeline_status.step_status.append(step_status)
                     resp.pipeline_status.append(pipeline_status)
-                    self._send_tail(aud, pipeline.id, original_data, resp.data)
+                    self._send_tail(aud, pipeline.id, original_data, resp.data.bytes)
                     return resp
 
                 pipeline_status.step_status.append(step_status)
 
             resp.pipeline_status.append(pipeline_status)
 
-        self._send_tail(aud, "", original_data, resp.data)
+        self._send_tail(aud, "", original_data, resp.data.bytes)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.

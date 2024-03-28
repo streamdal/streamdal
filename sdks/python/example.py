@@ -44,7 +44,7 @@ def main():
         # Check that process() completed successfully
         if res.status == EXEC_STATUS_TRUE:
             print("Success processed payload")
-            data = json.loads(res.data)
+            data = json.loads(res.data.bytes)
             print("Response:", json.dumps(data, indent=2))
         else:
             print("Failed to process payload")
