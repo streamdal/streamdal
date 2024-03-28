@@ -15,6 +15,7 @@ from betterproto import which_one_of
 from copy import copy
 from dataclasses import dataclass, field
 from grpclib.client import Channel
+from streamdal import metrics
 from streamdal.metrics import Metrics, CounterEntry
 from streamdal.tail import Tail
 from streamdal.kv import KV
@@ -206,15 +207,12 @@ class StreamdalClient:
             )
 
             for cmd in cmds.set_pipeline_commands:
-                for pipelineIdx, pipeline in enumerate(cmd.set_pipelines.pipelines):
-                    for stepIdx, step in enumerate(pipeline.steps):
-                        if step.wasm_id in cmds.wasm_modules:
-                            step.wasm_bytes = cmds.wasm_modules[step.wasm_id].bytes
-                            cmd.set_pipelines.pipelines[pipelineIdx].steps[
-                                stepIdx
-                            ] = step
-                        else:
-                            self.log.error(f"BUG: missing wasm module {step.wasm_id}")
+                # Both GetSetPipelinesCommandsByServiceResponse and GetSetPipelinesCommand have the field WasmModules
+                # But in this case, the individual GetSetPipelinesCommand will not have WasmModules populated because
+                # this response will have multiple GetSetPipelinesCommand messages inside of it, and we don't want
+                # to duplicate the data. When Register() receives GetSetPipelinesCommand, it will be streaming, so
+                # each GetSetPipelinesCommand will have its own WasmModules field populated
+                cmd.set_pipelines.wasm_modules = cmds.wasm_modules
 
                 self._set_pipelines(cmd)
 
@@ -263,7 +261,7 @@ class StreamdalClient:
             raise ValueError("req is required")
 
         resp = protos.SdkResponse(
-            data=copy(req.data),
+            data=protos.Payload(bytes=copy(req.data)),
             status=protos.ExecStatus.EXEC_STATUS_TRUE,
             pipeline_status=[],
         )
@@ -362,13 +360,13 @@ class StreamdalClient:
                 )
 
                 # Exec wasm
-                wasm_resp = self._call_wasm(step, resp.data, isr)
+                wasm_resp = self._call_wasm(step, resp.data.bytes, isr)
 
                 if self.cfg.dry_run:
                     self.log.debug(f"Running step '{step.name}' in dry-run mode")
 
                 if len(wasm_resp.output_payload) > 0:
-                    resp.data = wasm_resp.output_payload
+                    resp.data.bytes = wasm_resp.output_payload
 
                 self._handle_schema(aud, step, wasm_resp)
 
@@ -390,7 +388,7 @@ class StreamdalClient:
                     isr = None  # avoid passing step result on error
 
                 # Send notification if necessary
-                self._notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
+                self._notify_condition(pipeline, step, aud, cond, resp.data.bytes, cond_type)
 
                 # Continue to next step, nothing needed
                 if self.cfg.dry_run:
@@ -441,19 +439,19 @@ class StreamdalClient:
                     step_status.status = protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
                     pipeline_status.step_status.append(step_status)
                     resp.pipeline_status.append(pipeline_status)
-                    self._send_tail(aud, pipeline.id, original_data, resp.data)
+                    self._send_tail(aud, pipeline.id, original_data, resp.data.bytes)
                     return resp
 
                 pipeline_status.step_status.append(step_status)
 
             resp.pipeline_status.append(pipeline_status)
 
-        self._send_tail(aud, "", original_data, resp.data)
+        self._send_tail(aud, "", original_data, resp.data.bytes)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
         if self.cfg.dry_run:
-            resp.data = copy(req.data)
+            resp.data.bytes = copy(req.data)
 
         return resp
 
@@ -735,6 +733,17 @@ class StreamdalClient:
         Put pipelines in internal map of pipelines
         """
         validation.set_pipelines(cmd)
+
+        # Wasm module data is excluded from the individual steps, so we need to populate it here
+        for pipelineIdx, pipeline in enumerate(cmd.set_pipelines.pipelines):
+            for stepIdx, step in enumerate(pipeline.steps):
+                if step.wasm_bytes == "" and step.wasm_id in cmd.set_pipelines.wasm_modules:
+                    step.wasm_bytes = cmd.wasm_modules[step.wasm_id].bytes
+                    cmd.set_pipelines.pipelines[pipelineIdx].steps[
+                        stepIdx
+                    ] = step
+                else:
+                    self.log.error(f"BUG: missing wasm module {step.wasm_id}")
 
         aud_str = common.aud_to_str(cmd.audience)
 

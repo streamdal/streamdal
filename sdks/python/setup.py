@@ -70,7 +70,7 @@ setup(
         "rfc3986==2.0.0",
         "rich==13.7.0",
         "six==1.16.0",
-        "streamdal-protos==0.1.32",
+        "streamdal-protos==0.1.35",
         "stringcase==1.2.0",
         "tf==1.0.0",
         "token-bucket==0.3.0",
