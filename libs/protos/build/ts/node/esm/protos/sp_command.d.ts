@@ -6,6 +6,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { TailRequest } from "./sp_common.js";
 import { KVInstruction } from "./sp_kv.js";
+import { WasmModule } from "./shared/sp_shared.js";
 import { Pipeline } from "./sp_pipeline.js";
 import { Audience } from "./sp_common.js";
 /**
@@ -72,6 +73,14 @@ export interface SetPipelinesCommand {
      * @generated from protobuf field: repeated protos.Pipeline pipelines = 1;
      */
     pipelines: Pipeline[];
+    /**
+     * ID = wasm ID
+     *
+     * @generated from protobuf field: map<string, protos.shared.WasmModule> wasm_modules = 2;
+     */
+    wasmModules: {
+        [key: string]: WasmModule;
+    };
 }
 /**
  * Nothing needed in here, just a ping from server to SDK
@@ -121,6 +130,7 @@ declare class SetPipelinesCommand$Type extends MessageType<SetPipelinesCommand> 
     constructor();
     create(value?: PartialMessage<SetPipelinesCommand>): SetPipelinesCommand;
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SetPipelinesCommand): SetPipelinesCommand;
+    private binaryReadMap2;
     internalBinaryWrite(message: SetPipelinesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**

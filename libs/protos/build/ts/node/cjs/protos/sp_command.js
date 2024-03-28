@@ -8,6 +8,7 @@ const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
 const sp_common_1 = require("./sp_common");
 const sp_kv_1 = require("./sp_kv");
+const sp_shared_1 = require("./shared/sp_shared");
 const sp_pipeline_1 = require("./sp_pipeline");
 const sp_common_2 = require("./sp_common");
 // @generated message type with reflection information, may provide speed optimized methods
@@ -101,11 +102,12 @@ exports.Command = new Command$Type();
 class SetPipelinesCommand$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.SetPipelinesCommand", [
-            { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_pipeline_1.Pipeline }
+            { no: 1, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_pipeline_1.Pipeline },
+            { no: 2, name: "wasm_modules", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_shared_1.WasmModule } }
         ]);
     }
     create(value) {
-        const message = { pipelines: [] };
+        const message = { pipelines: [], wasmModules: {} };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -119,6 +121,9 @@ class SetPipelinesCommand$Type extends runtime_5.MessageType {
                 case /* repeated protos.Pipeline pipelines */ 1:
                     message.pipelines.push(sp_pipeline_1.Pipeline.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* map<string, protos.shared.WasmModule> wasm_modules */ 2:
+                    this.binaryReadMap2(message.wasmModules, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -130,10 +135,33 @@ class SetPipelinesCommand$Type extends runtime_5.MessageType {
         }
         return message;
     }
+    binaryReadMap2(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = sp_shared_1.WasmModule.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.SetPipelinesCommand.wasm_modules");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : sp_shared_1.WasmModule.create();
+    }
     internalBinaryWrite(message, writer, options) {
         /* repeated protos.Pipeline pipelines = 1; */
         for (let i = 0; i < message.pipelines.length; i++)
             sp_pipeline_1.Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* map<string, protos.shared.WasmModule> wasm_modules = 2; */
+        for (let k of Object.keys(message.wasmModules)) {
+            writer.tag(2, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k);
+            writer.tag(2, runtime_1.WireType.LengthDelimited).fork();
+            sp_shared_1.WasmModule.internalBinaryWrite(message.wasmModules[k], writer, options);
+            writer.join().join();
+        }
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

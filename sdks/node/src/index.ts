@@ -1,6 +1,10 @@
 import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
-import { ExecStatus, SDKResponse } from "@streamdal/protos/protos/sp_sdk";
+import {
+  ExecStatus,
+  SDKResponse as InternalSDKResponse,
+} from "@streamdal/protos/protos/sp_sdk";
+
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudiences } from "./internal/audience.js";
@@ -10,7 +14,11 @@ import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { retryProcessPipelines } from "./internal/process.js";
 import { register as internalRegister } from "./internal/register.js";
 
-export { Audience, ExecStatus, OperationType, SDKResponse };
+export { Audience, ExecStatus, OperationType };
+
+export type SDKResponse = InternalSDKResponse & {
+  decodedData?: any;
+};
 
 export interface StreamdalConfigs {
   streamdalUrl?: string;
@@ -40,8 +48,20 @@ export interface StreamdalRequest {
   data: Uint8Array;
 }
 
+export interface StreamdalJSONRequest {
+  audience: Audience;
+  data: string;
+}
+
+export interface StreamdalAnyRequest {
+  audience: Audience;
+  data: any;
+}
+
 export interface StreamdalRegistration {
   process: (arg: StreamdalRequest) => Promise<SDKResponse>;
+  processJSON: (arg: StreamdalJSONRequest) => Promise<SDKResponse>;
+  processAny: (arg: StreamdalAnyRequest) => Promise<SDKResponse>;
 }
 
 const initConfigs = (configs?: StreamdalConfigs) => {
@@ -58,7 +78,7 @@ const initConfigs = (configs?: StreamdalConfigs) => {
   const name = configs?.serviceName ?? process.env.STREAMDAL_SERVICE_NAME;
 
   if (!url || !token || !name) {
-    throw new Error(`Required configs are missing. You must provide configs streamdalUrl, streamdalToken and serviceName 
+    throw new Error(`Required configs are missing. You must provide configs streamdalUrl, streamdalToken and serviceName
         either as constructor arguments to Streamdal() or as environment variables in the form of STREAMDAL_URL, STREAMDAL_TOKEN and STREAMDAL_SERVICE_NAME`);
   }
 
@@ -93,6 +113,17 @@ const initConfigs = (configs?: StreamdalConfigs) => {
   return internalConfigs;
 };
 
+const encodeJson = (data: string): Uint8Array => {
+  return new TextEncoder().encode(data);
+};
+
+const encodeAny = (data: any): Uint8Array => {
+  // Attempts to encode data into JSON string, then to Uint8Array
+  const jsonData = JSON.stringify(data);
+  const encodedData = new TextEncoder().encode(jsonData);
+  return encodedData;
+};
+
 /**
  * This is the recommended way to register with the Streamdal server
  * as you can await completion before processing pipelines.
@@ -115,6 +146,37 @@ export const registerStreamdal = async (
         audience,
         data,
       });
+    },
+    processJSON: async ({
+      audience,
+      data,
+    }: StreamdalJSONRequest): Promise<SDKResponse> => {
+      return retryProcessPipelines({
+        configs: internalConfigs,
+        audience,
+        data: encodeJson(data),
+      });
+    },
+    processAny: async ({
+      audience,
+      data,
+    }: StreamdalAnyRequest): Promise<SDKResponse> => {
+      try {
+        const encodedData = encodeAny(data);
+        return retryProcessPipelines({
+          configs: internalConfigs,
+          audience,
+          data: encodedData,
+        });
+      } catch (error) {
+        return Promise.resolve({
+          data,
+          status: ExecStatus.ERROR,
+          statusMessage: "Failed to parse JSON data. Not",
+          pipelineStatus: [],
+          metadata: {},
+        });
+      }
     },
   };
 };

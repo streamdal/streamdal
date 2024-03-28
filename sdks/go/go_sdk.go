@@ -416,7 +416,8 @@ func (s *Streamdal) watchForShutdown() {
 	defer s.tailsMtx.RUnlock()
 	for _, tails := range s.tails {
 		for reqID, tail := range tails {
-			s.config.Logger.Debugf("Shutting down tail '%s' for pipeline %s", reqID, tail.Request.GetTail().Request.PipelineId)
+			aud := audToStr(tail.Request.GetTail().Request.Audience)
+			s.config.Logger.Debugf("Shutting down tail '%s' for audience '%s'", reqID, aud)
 			tail.CancelFunc()
 		}
 	}
@@ -433,24 +434,16 @@ func (s *Streamdal) pullInitialPipelines(ctx context.Context) error {
 		return errors.Wrap(err, "unable to pull initial pipelines")
 	}
 
-	// Commands won't include paused pipelines but we can check just in case
 	for _, cmd := range cmds.SetPipelineCommands {
-		for _, p := range cmd.GetSetPipelines().Pipelines {
-			s.config.Logger.Debugf("saving pipeline '%s' for audience '%s' to internal map", p.Name, audToStr(cmd.Audience))
+		// Both GetSetPipelinesCommandsByServiceResponse and GetSetPipelinesCommand have the field WasmModules
+		// But in this case, the individual GetSetPipelinesCommand will not have WasmModules populated because
+		// this response will have multiple GetSetPipelinesCommand messages inside of it, and we don't want
+		// to duplicate the data. When Register() receives GetSetPipelinesCommand, it will be streaming, so
+		// each GetSetPipelinesCommand will have its own WasmModules field populated
+		cmd.GetSetPipelines().WasmModules = cmds.WasmModules
 
-			// Fill in WASM data from the deduplication map
-			for _, step := range p.Steps {
-				wasmData, ok := cmds.WasmModules[step.GetXWasmId()]
-				if !ok {
-					return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
-				}
-
-				step.XWasmBytes = wasmData.Bytes
-			}
-
-			if err := s.setPipelines(ctx, cmd); err != nil {
-				s.config.Logger.Errorf("failed to attach pipeline: %s", err)
-			}
+		if err := s.setPipelines(ctx, cmd); err != nil {
+			s.config.Logger.Errorf("failed to attach pipeline: %s", err)
 		}
 	}
 
@@ -591,7 +584,7 @@ func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
 	if s.closed {
 		return &ProcessResponse{
-			Data:          req.Data,
+			Data:          &protos.Payload{Bytes: req.Data},
 			Status:        ExecStatusError,
 			StatusMessage: proto.String(ErrClosedClient.Error()),
 		}
@@ -609,14 +602,14 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 		return resp
 	}
 
-	resp.Data = req.Data
+	resp.Data = &protos.Payload{Bytes: req.Data}
 
-	payloadSize := int64(len(resp.Data))
+	payloadSize := int64(len(resp.Data.Bytes))
 	aud := newAudience(req, s.config)
 
 	// Always send tail output
 	defer func() {
-		s.sendTail(aud, "", req.Data, resp.Data)
+		s.sendTail(aud, "", req.Data, resp.Data.Bytes)
 	}()
 
 	// TODO: DRY this up
@@ -740,7 +733,7 @@ PIPELINE:
 
 			// Pipeline timeout either has not occurred OR it occurred and execution was not aborted
 
-			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr)
+			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data.Bytes, isr)
 			if err != nil {
 				stepTimeoutCxl()
 
@@ -794,7 +787,7 @@ PIPELINE:
 
 			// Only update working payload if one is returned
 			if len(wasmResp.OutputPayload) > 0 {
-				resp.Data = wasmResp.OutputPayload
+				resp.Data = &protos.Payload{Bytes: wasmResp.OutputPayload}
 			}
 
 			isr = wasmResp.InterStepResult // Pass inter-step result to next step
@@ -810,7 +803,7 @@ PIPELINE:
 			switch wasmResp.ExitCode {
 			case protos.WASMExitCode_WASM_EXIT_CODE_TRUE:
 				// Data was potentially modified
-				resp.Data = wasmResp.OutputPayload
+				resp.Data = &protos.Payload{Bytes: wasmResp.OutputPayload}
 
 				stepCondStr = "true"
 				stepConds = step.OnTrue
@@ -818,7 +811,7 @@ PIPELINE:
 				condType = protos.NotifyRequest_CONDITION_TYPE_ON_TRUE
 			case protos.WASMExitCode_WASM_EXIT_CODE_FALSE:
 				// Data was potentially modified
-				resp.Data = wasmResp.OutputPayload
+				resp.Data = &protos.Payload{Bytes: wasmResp.OutputPayload}
 
 				stepCondStr = "false"
 				stepConds = step.OnFalse
@@ -826,7 +819,7 @@ PIPELINE:
 				condType = protos.NotifyRequest_CONDITION_TYPE_ON_FALSE
 			case protos.WASMExitCode_WASM_EXIT_CODE_ERROR:
 				// Ran into an error - return original data
-				resp.Data = req.Data
+				resp.Data = &protos.Payload{Bytes: wasmResp.OutputPayload}
 
 				stepCondStr = "error"
 				stepConds = step.OnError
@@ -905,7 +898,7 @@ PIPELINE:
 	// Dry run should not modify anything, but we must allow pipeline to
 	// mutate internal state in order to function properly
 	if s.config.DryRun {
-		resp.Data = req.Data
+		resp.Data = &protos.Payload{Bytes: req.Data}
 	}
 
 	return resp
@@ -941,7 +934,7 @@ func (s *Streamdal) handleCondition(
 	if stepCond.Notification != nil && !s.config.DryRun {
 		s.config.Logger.Debugf("Performing 'notify' condition for step '%s'", step.Name)
 
-		if err := s.serverClient.Notify(ctx, pipeline, step, aud, resp.Data, condType); err != nil {
+		if err := s.serverClient.Notify(ctx, pipeline, step, aud, resp.Data.Bytes, condType); err != nil {
 			s.config.Logger.Errorf("failed to notify condition: %s", err)
 		}
 

@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "shared/sp_shared.proto";
 import "sp_common.proto";
 import "sp_kv.proto";
 import "sp_pipeline.proto";
@@ -40,6 +41,9 @@ message Command {
 
 message SetPipelinesCommand {
   repeated protos.Pipeline pipelines = 1;
+
+  // ID = wasm ID
+  map<string,protos.shared.WasmModule> wasm_modules = 2;
 }
 
 message KeepAliveCommand {

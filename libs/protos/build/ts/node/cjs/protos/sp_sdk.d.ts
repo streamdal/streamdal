@@ -6,6 +6,18 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { AbortCondition } from "./sp_pipeline";
 /**
+ * This is a separate type because some SDKs may want to implement some interface
+ * for this type (ie. Stringer interface for Go SDK).
+ *
+ * @generated from protobuf message protos.Payload
+ */
+export interface Payload {
+    /**
+     * @generated from protobuf field: bytes bytes = 1;
+     */
+    bytes: Uint8Array;
+}
+/**
  * Common return response used by all SDKs
  *
  * @generated from protobuf message protos.SDKResponse
@@ -14,9 +26,9 @@ export interface SDKResponse {
     /**
      * Contains (potentially) modified input data
      *
-     * @generated from protobuf field: bytes data = 1;
+     * @generated from protobuf field: protos.Payload data = 1;
      */
-    data: Uint8Array;
+    data?: Payload;
     /**
      * Execution status of the last step
      *
@@ -139,6 +151,16 @@ export declare enum ExecStatus {
      */
     ERROR = 3
 }
+declare class Payload$Type extends MessageType<Payload> {
+    constructor();
+    create(value?: PartialMessage<Payload>): Payload;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Payload): Payload;
+    internalBinaryWrite(message: Payload, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.Payload
+ */
+export declare const Payload: Payload$Type;
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();
     create(value?: PartialMessage<SDKResponse>): SDKResponse;

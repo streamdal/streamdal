@@ -11,6 +11,12 @@ EXEC_STATUS_FALSE: ExecStatus
 EXEC_STATUS_TRUE: ExecStatus
 EXEC_STATUS_UNSET: ExecStatus
 
+class Payload(_message.Message):
+    __slots__ = ["bytes"]
+    BYTES_FIELD_NUMBER: _ClassVar[int]
+    bytes: bytes
+    def __init__(self, bytes: _Optional[bytes] = ...) -> None: ...
+
 class PipelineStatus(_message.Message):
     __slots__ = ["id", "name", "step_status"]
     ID_FIELD_NUMBER: _ClassVar[int]
@@ -35,12 +41,12 @@ class SDKResponse(_message.Message):
     PIPELINE_STATUS_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     STATUS_MESSAGE_FIELD_NUMBER: _ClassVar[int]
-    data: bytes
+    data: Payload
     metadata: _containers.ScalarMap[str, str]
     pipeline_status: _containers.RepeatedCompositeFieldContainer[PipelineStatus]
     status: ExecStatus
     status_message: str
-    def __init__(self, data: _Optional[bytes] = ..., status: _Optional[_Union[ExecStatus, str]] = ..., status_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, data: _Optional[_Union[Payload, _Mapping]] = ..., status: _Optional[_Union[ExecStatus, str]] = ..., status_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class StepStatus(_message.Message):
     __slots__ = ["abort_condition", "name", "status", "status_message"]
