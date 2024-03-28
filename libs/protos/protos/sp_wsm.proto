@@ -6,6 +6,7 @@ import "sp_pipeline.proto";
 import "steps/sp_steps_detective.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option ruby_package = "Streamdal::Protos";
 
 // Included in Wasm response; the SDK should use the WASMExitCode to determine
 // what to do next - should it execute next step, should it notify or should it

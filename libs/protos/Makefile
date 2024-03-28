@@ -81,6 +81,20 @@ generate/rust:
 
 	@echo Successfully compiled protos
 
+.PHONY: generate/ruby
+generate/ruby: description = Compile protobuf schemas for Ruby
+generate/ruby: clean/ruby
+generate/ruby:
+	mkdir -p build/ruby/lib
+
+	docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${PROTOC_IMAGE} \
+ 		--proto_path=protos \
+ 		--ruby_out=./build/ruby/lib \
+ 		--grpc-ruby_out=./build/ruby/lib \
+		protos/*.proto protos/steps/*.proto protos/shared/*.proto || (exit 1)
+
+	@echo Successfully compiled protos
+
 .PHONY: generate/python
 generate/python: description = Compile protobuf schema descriptor and generate types for python
 generate/python: clean/python
@@ -112,7 +126,7 @@ generate/protoset:
 
 .PHONY: generate
 generate: description = Run all generate/* targets
-generate: lint generate/go generate/rust generate/protoset generate/ts generate/python
+generate: lint generate/go generate/rust generate/protoset generate/ts generate/python generate/ruby
 
 .PHONY: clean/go
 clean/go: description = Remove all Go build artifacts
@@ -123,6 +137,11 @@ clean/go:
 clean/rust: description = Remove all Rust build artifacts
 clean/rust:
 	rm -rf ./build/rust/protos/src/*
+
+.PHONY: clean/ruby
+clean/ruby: description = Remove all Ruby build artifacts
+clean/ruby:
+	rm -rf ./build/ruby/lib
 
 .PHONY: clean/python
 clean/python: description = Remove all Python build artifacts

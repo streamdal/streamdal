@@ -27,3 +27,4 @@ jobs:
           make generate/ts
           make generate/protoset
           make generate/python
+          make generate/ruby
