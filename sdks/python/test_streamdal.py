@@ -58,7 +58,7 @@ class TestStreamdalClient:
         res = self.client.process(req)
 
         assert res is not None
-        assert res.data == payload_bytes
+        assert res.data.bytes == payload_bytes
         fake_metrics.incr.assert_called_once()
 
     def test_notify_condition(self):
@@ -93,6 +93,7 @@ class TestStreamdalClient:
             steps=[
                 protos.PipelineStep(
                     name="test",
+                    wasm_id=uuid.uuid4().__str__(),
                     on_false=protos.PipelineStepConditions(
                         abort=protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT
                     ),
@@ -105,13 +106,21 @@ class TestStreamdalClient:
             ],
         )
 
+        wasm_modules = {
+            pipeline.steps[0].wasm_id: protos.shared.WasmModule(
+                id=pipeline.steps[0].wasm_id,
+                bytes=b"{}",
+                function="f"
+            ),
+        }
+
         cmd = protos.Command(
             audience=protos.Audience(
                 component_name="test",
                 service_name="testing",
                 operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
-            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline]),
+            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline], wasm_modules=wasm_modules),
         )
 
         self.client._set_pipelines(cmd)
@@ -127,7 +136,7 @@ class TestStreamdalClient:
 
         assert resp is not None
         assert resp.status == protos.ExecStatus.EXEC_STATUS_TRUE
-        assert resp.data == b'{"object": {"type": "streamdal"}}'
+        assert resp.data.bytes == b'{"object": {"type": "streamdal"}}'
 
     def test_process_failure_and_abort(self):
         fake_stub = mock.AsyncMock()
@@ -198,7 +207,7 @@ class TestStreamdalClient:
         fake_stub.notify.assert_called_once()
         assert resp.status == protos.ExecStatus.EXEC_STATUS_FALSE
         assert resp.status_message == "Step returned: field not found"
-        assert resp.data == b"{}"
+        assert resp.data.bytes == b"{}"
         assert len(resp.pipeline_status) == 1
         assert len(resp.pipeline_status[0].step_status) == 1
         assert (
@@ -265,7 +274,7 @@ class TestStreamdalClient:
 
         assert resp is not None
         assert resp.status == protos.ExecStatus.EXEC_STATUS_TRUE
-        assert resp.data == b'{"object": {"type": "streamdal"}}'
+        assert resp.data.bytes == b'{"object": {"type": "streamdal"}}'
 
     def test_tail_request_start(self, mocker):
         m = mock.Mock()

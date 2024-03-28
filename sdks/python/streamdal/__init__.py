@@ -360,13 +360,13 @@ class StreamdalClient:
                 )
 
                 # Exec wasm
-                wasm_resp = self._call_wasm(step, resp.data, isr)
+                wasm_resp = self._call_wasm(step, resp.data.bytes, isr)
 
                 if self.cfg.dry_run:
                     self.log.debug(f"Running step '{step.name}' in dry-run mode")
 
                 if len(wasm_resp.output_payload) > 0:
-                    resp.data = wasm_resp.output_payload
+                    resp.data.bytes = wasm_resp.output_payload
 
                 self._handle_schema(aud, step, wasm_resp)
 
@@ -388,7 +388,7 @@ class StreamdalClient:
                     isr = None  # avoid passing step result on error
 
                 # Send notification if necessary
-                self._notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
+                self._notify_condition(pipeline, step, aud, cond, resp.data.bytes, cond_type)
 
                 # Continue to next step, nothing needed
                 if self.cfg.dry_run:
@@ -451,7 +451,7 @@ class StreamdalClient:
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
         if self.cfg.dry_run:
-            resp.data = copy(req.data)
+            resp.data.bytes = copy(req.data)
 
         return resp
 
@@ -737,7 +737,7 @@ class StreamdalClient:
         # Wasm module data is excluded from the individual steps, so we need to populate it here
         for pipelineIdx, pipeline in enumerate(cmd.set_pipelines.pipelines):
             for stepIdx, step in enumerate(pipeline.steps):
-                if step.wasm_id in cmd.wasm_modules:
+                if step.wasm_bytes == "" and step.wasm_id in cmd.set_pipelines.wasm_modules:
                     step.wasm_bytes = cmd.wasm_modules[step.wasm_id].bytes
                     cmd.set_pipelines.pipelines[pipelineIdx].steps[
                         stepIdx
