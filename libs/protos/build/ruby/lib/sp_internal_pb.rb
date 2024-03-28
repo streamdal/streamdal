@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'shared/sp_shared_pb'
 require 'sp_command_pb'
 require 'sp_common_pb'
 require 'sp_info_pb'
@@ -53,12 +54,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "protos.GetSetPipelinesCommandsByServiceResponse" do
       repeated :set_pipeline_commands, :message, 1, "protos.Command"
-      map :wasm_modules, :string, :message, 3, "protos.WasmModule"
-    end
-    add_message "protos.WasmModule" do
-      optional :id, :string, 1
-      optional :bytes, :bytes, 2
-      optional :function, :string, 3
+      map :wasm_modules, :string, :message, 3, "protos.shared.WasmModule"
     end
     add_message "protos.SendSchemaRequest" do
       optional :audience, :message, 1, "protos.Audience"
@@ -78,7 +74,6 @@ module Streamdal
     DeregisterRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.DeregisterRequest").msgclass
     GetSetPipelinesCommandsByServiceRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetSetPipelinesCommandsByServiceRequest").msgclass
     GetSetPipelinesCommandsByServiceResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetSetPipelinesCommandsByServiceResponse").msgclass
-    WasmModule = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.WasmModule").msgclass
     SendSchemaRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.SendSchemaRequest").msgclass
   end
 end
