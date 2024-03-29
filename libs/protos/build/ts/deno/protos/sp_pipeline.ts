@@ -63,6 +63,26 @@ export interface Pipeline {
      * @generated from protobuf field: optional bool _paused = 1000;
      */
     Paused?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: optional string _description = 1001;
+     */
+    Description?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: optional string _version = 1002;
+     */
+    Version?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: optional string _url = 1003;
+     */
+    Url?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: optional int64 _created_at_unix_ts_utc = 1004;
+     */
+    CreatedAtUnixTsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: optional int64 _updated_at_unix_ts_utc = 1005;
+     */
+    UpdatedAtUnixTsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
@@ -217,6 +237,8 @@ export interface PipelineStep {
     } | {
         oneofKind: "custom";
         /**
+         * If set, _wasm_id MUST  e filled out and MUST exist
+         *
          * @generated from protobuf field: protos.steps.CustomStep custom = 1004;
          */
         custom: CustomStep;
@@ -253,20 +275,28 @@ export interface PipelineStep {
     } | {
         oneofKind: undefined;
     };
+    // ///////////////////////////////////////////////////////////////////////
+    //                                                                     //
+    //    _wasm_* fields only need to be set IF the step is CustomStep.    //
+    //                                                                     //
+    // For all other steps, the server will fill these out automatically.  //
+    //                                                                     //
+    // ///////////////////////////////////////////////////////////////////////
+
     /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by server
+     * Set by server UNLESS step is CustomStep
      *
      * @generated from protobuf field: optional string _wasm_id = 10000;
      */
     WasmId?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
     /**
-     * WASM module bytes (set by server)
+     * Set by server
      *
      * @generated from protobuf field: optional bytes _wasm_bytes = 10001;
      */
     WasmBytes?: Uint8Array; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
     /**
-     * WASM function name to execute (set by server)
+     * Set by server
      *
      * @generated from protobuf field: optional string _wasm_function = 10002;
      */
@@ -342,7 +372,12 @@ class Pipeline$Type extends MessageType<Pipeline> {
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep },
             { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
-            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1001, name: "_description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1002, name: "_version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1003, name: "_url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1004, name: "_created_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
         ]);
     }
     create(value?: PartialMessage<Pipeline>): Pipeline {
@@ -372,6 +407,21 @@ class Pipeline$Type extends MessageType<Pipeline> {
                 case /* optional bool _paused */ 1000:
                     message.Paused = reader.bool();
                     break;
+                case /* optional string _description */ 1001:
+                    message.Description = reader.string();
+                    break;
+                case /* optional string _version */ 1002:
+                    message.Version = reader.string();
+                    break;
+                case /* optional string _url */ 1003:
+                    message.Url = reader.string();
+                    break;
+                case /* optional int64 _created_at_unix_ts_utc */ 1004:
+                    message.CreatedAtUnixTsUtc = reader.int64().toString();
+                    break;
+                case /* optional int64 _updated_at_unix_ts_utc */ 1005:
+                    message.UpdatedAtUnixTsUtc = reader.int64().toString();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -399,6 +449,21 @@ class Pipeline$Type extends MessageType<Pipeline> {
         /* optional bool _paused = 1000; */
         if (message.Paused !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.Paused);
+        /* optional string _description = 1001; */
+        if (message.Description !== undefined)
+            writer.tag(1001, WireType.LengthDelimited).string(message.Description);
+        /* optional string _version = 1002; */
+        if (message.Version !== undefined)
+            writer.tag(1002, WireType.LengthDelimited).string(message.Version);
+        /* optional string _url = 1003; */
+        if (message.Url !== undefined)
+            writer.tag(1003, WireType.LengthDelimited).string(message.Url);
+        /* optional int64 _created_at_unix_ts_utc = 1004; */
+        if (message.CreatedAtUnixTsUtc !== undefined)
+            writer.tag(1004, WireType.Varint).int64(message.CreatedAtUnixTsUtc);
+        /* optional int64 _updated_at_unix_ts_utc = 1005; */
+        if (message.UpdatedAtUnixTsUtc !== undefined)
+            writer.tag(1005, WireType.Varint).int64(message.UpdatedAtUnixTsUtc);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

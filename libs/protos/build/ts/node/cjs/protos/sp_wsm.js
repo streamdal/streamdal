@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CustomWasm = exports.InterStepResult = exports.WASMResponse = exports.WASMRequest = exports.WASMExitCode = void 0;
+exports.Wasm = exports.InterStepResult = exports.WASMResponse = exports.WASMRequest = exports.WASMExitCode = void 0;
 const runtime_1 = require("@protobuf-ts/runtime");
 const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
@@ -240,9 +240,9 @@ class InterStepResult$Type extends runtime_5.MessageType {
  */
 exports.InterStepResult = new InterStepResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class CustomWasm$Type extends runtime_5.MessageType {
+class Wasm$Type extends runtime_5.MessageType {
     constructor() {
-        super("protos.CustomWasm", [
+        super("protos.Wasm", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "wasm_bytes", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
@@ -332,6 +332,6 @@ class CustomWasm$Type extends runtime_5.MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.CustomWasm
+ * @generated MessageType for protobuf message protos.Wasm
  */
-exports.CustomWasm = new CustomWasm$Type();
+exports.Wasm = new Wasm$Type();

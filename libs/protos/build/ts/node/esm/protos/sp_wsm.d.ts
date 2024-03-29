@@ -109,9 +109,9 @@ export interface InterStepResult {
 /**
  * Used for defining a custom Wasm module that can be used in CustomStep
  *
- * @generated from protobuf message protos.CustomWasm
+ * @generated from protobuf message protos.Wasm
  */
-export interface CustomWasm {
+export interface Wasm {
     /**
      * @generated from protobuf field: string id = 1;
      */
@@ -218,14 +218,14 @@ declare class InterStepResult$Type extends MessageType<InterStepResult> {
  * @generated MessageType for protobuf message protos.InterStepResult
  */
 export declare const InterStepResult: InterStepResult$Type;
-declare class CustomWasm$Type extends MessageType<CustomWasm> {
+declare class Wasm$Type extends MessageType<Wasm> {
     constructor();
-    create(value?: PartialMessage<CustomWasm>): CustomWasm;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CustomWasm): CustomWasm;
-    internalBinaryWrite(message: CustomWasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<Wasm>): Wasm;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Wasm): Wasm;
+    internalBinaryWrite(message: Wasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.CustomWasm
+ * @generated MessageType for protobuf message protos.Wasm
  */
-export declare const CustomWasm: CustomWasm$Type;
+export declare const Wasm: Wasm$Type;
 export {};

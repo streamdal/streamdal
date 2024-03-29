@@ -83,7 +83,7 @@ message InterStepResult {
 }
 
 // Used for defining a custom Wasm module that can be used in CustomStep
-message CustomWasm {
+message Wasm {
   string id = 1;
   string name = 2;
   string wasm_bytes = 3;

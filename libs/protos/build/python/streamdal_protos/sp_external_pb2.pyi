@@ -67,12 +67,6 @@ class CreateAudienceRequest(_message.Message):
     audience: _sp_common_pb2.Audience
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
-class CreateCustomWasmRequest(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _sp_wsm_pb2.CustomWasm
-    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]] = ...) -> None: ...
-
 class CreateNotificationRequest(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
@@ -99,6 +93,12 @@ class CreatePipelineResponse(_message.Message):
     pipeline_id: str
     def __init__(self, message: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
 
+class CreateWasmRequest(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _sp_wsm_pb2.Wasm
+    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+
 class DeleteAudienceRequest(_message.Message):
     __slots__ = ["audience", "force"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
@@ -106,12 +106,6 @@ class DeleteAudienceRequest(_message.Message):
     audience: _sp_common_pb2.Audience
     force: bool
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., force: bool = ...) -> None: ...
-
-class DeleteCustomWasmRequest(_message.Message):
-    __slots__ = ["ids"]
-    IDS_FIELD_NUMBER: _ClassVar[int]
-    ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class DeleteNotificationRequest(_message.Message):
     __slots__ = ["notification_id"]
@@ -135,6 +129,12 @@ class DeleteServiceRequest(_message.Message):
     service_name: str
     def __init__(self, service_name: _Optional[str] = ..., force: bool = ...) -> None: ...
 
+class DeleteWasmRequest(_message.Message):
+    __slots__ = ["ids"]
+    IDS_FIELD_NUMBER: _ClassVar[int]
+    ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, ids: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class DetachNotificationRequest(_message.Message):
     __slots__ = ["notification_id", "pipeline_id"]
     NOTIFICATION_ID_FIELD_NUMBER: _ClassVar[int]
@@ -142,16 +142,6 @@ class DetachNotificationRequest(_message.Message):
     notification_id: str
     pipeline_id: str
     def __init__(self, notification_id: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
-
-class GetAllCustomWasmRequest(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
-
-class GetAllCustomWasmResponse(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _containers.RepeatedCompositeFieldContainer[_sp_wsm_pb2.CustomWasm]
-    def __init__(self, custom_wasm: _Optional[_Iterable[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]]] = ...) -> None: ...
 
 class GetAllRequest(_message.Message):
     __slots__ = []
@@ -187,6 +177,16 @@ class GetAllResponse(_message.Message):
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
     def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., configs: _Optional[_Mapping[str, _sp_pipeline_pb2.PipelineConfigs]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
 
+class GetAllWasmRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetAllWasmResponse(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _containers.RepeatedCompositeFieldContainer[_sp_wsm_pb2.Wasm]
+    def __init__(self, custom_wasm: _Optional[_Iterable[_Union[_sp_wsm_pb2.Wasm, _Mapping]]] = ...) -> None: ...
+
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
@@ -205,18 +205,6 @@ class GetAudienceRatesResponse(_message.Message):
     _keepalive: bool
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
     def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _keepalive: bool = ...) -> None: ...
-
-class GetCustomWasmRequest(_message.Message):
-    __slots__ = ["id"]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    id: str
-    def __init__(self, id: _Optional[str] = ...) -> None: ...
-
-class GetCustomWasmResponse(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _sp_wsm_pb2.CustomWasm
-    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]] = ...) -> None: ...
 
 class GetMetricsRequest(_message.Message):
     __slots__ = []
@@ -300,6 +288,18 @@ class GetSchemaResponse(_message.Message):
     schema: _sp_common_pb2.Schema
     def __init__(self, schema: _Optional[_Union[_sp_common_pb2.Schema, _Mapping]] = ...) -> None: ...
 
+class GetWasmRequest(_message.Message):
+    __slots__ = ["id"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    def __init__(self, id: _Optional[str] = ...) -> None: ...
+
+class GetWasmResponse(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _sp_wsm_pb2.Wasm
+    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+
 class PausePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
@@ -348,12 +348,6 @@ class TestResponse(_message.Message):
     output: str
     def __init__(self, output: _Optional[str] = ...) -> None: ...
 
-class UpdateCustomWasmRequest(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _sp_wsm_pb2.CustomWasm
-    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]] = ...) -> None: ...
-
 class UpdateNotificationRequest(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
@@ -365,3 +359,9 @@ class UpdatePipelineRequest(_message.Message):
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
     pipeline: _sp_pipeline_pb2.Pipeline
     def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
+
+class UpdateWasmRequest(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _sp_wsm_pb2.Wasm
+    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...

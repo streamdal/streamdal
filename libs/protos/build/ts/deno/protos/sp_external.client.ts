@@ -6,13 +6,13 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./sp_external.ts";
 import type { TestResponse } from "./sp_external.ts";
 import type { TestRequest } from "./sp_external.ts";
-import type { DeleteCustomWasmRequest } from "./sp_external.ts";
-import type { UpdateCustomWasmRequest } from "./sp_external.ts";
-import type { CreateCustomWasmRequest } from "./sp_external.ts";
-import type { GetAllCustomWasmResponse } from "./sp_external.ts";
-import type { GetAllCustomWasmRequest } from "./sp_external.ts";
-import type { GetCustomWasmResponse } from "./sp_external.ts";
-import type { GetCustomWasmRequest } from "./sp_external.ts";
+import type { DeleteWasmRequest } from "./sp_external.ts";
+import type { UpdateWasmRequest } from "./sp_external.ts";
+import type { CreateWasmRequest } from "./sp_external.ts";
+import type { GetAllWasmResponse } from "./sp_external.ts";
+import type { GetAllWasmRequest } from "./sp_external.ts";
+import type { GetWasmResponse } from "./sp_external.ts";
+import type { GetWasmRequest } from "./sp_external.ts";
 import type { AppRegisterRejectRequest } from "./sp_external.ts";
 import type { AppVerifyRegistrationRequest } from "./sp_external.ts";
 import type { AppRegistrationRequest } from "./sp_external.ts";
@@ -226,29 +226,29 @@ export interface IExternalClient {
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
     /**
-     * BEGIN Custom Wasm methods
+     * BEGIN Wasm methods
      *
-     * @generated from protobuf rpc: GetCustomWasm(protos.GetCustomWasmRequest) returns (protos.GetCustomWasmResponse);
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
      */
-    getCustomWasm(input: GetCustomWasmRequest, options?: RpcOptions): UnaryCall<GetCustomWasmRequest, GetCustomWasmResponse>;
+    getWasm(input: GetWasmRequest, options?: RpcOptions): UnaryCall<GetWasmRequest, GetWasmResponse>;
     /**
-     * @generated from protobuf rpc: GetAllCustomWasm(protos.GetAllCustomWasmRequest) returns (protos.GetAllCustomWasmResponse);
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
      */
-    getAllCustomWasm(input: GetAllCustomWasmRequest, options?: RpcOptions): UnaryCall<GetAllCustomWasmRequest, GetAllCustomWasmResponse>;
+    getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse>;
     /**
-     * @generated from protobuf rpc: CreateCustomWasm(protos.CreateCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.StandardResponse);
      */
-    createCustomWasm(input: CreateCustomWasmRequest, options?: RpcOptions): UnaryCall<CreateCustomWasmRequest, StandardResponse>;
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, StandardResponse>;
     /**
-     * @generated from protobuf rpc: UpdateCustomWasm(protos.UpdateCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
      */
-    updateCustomWasm(input: UpdateCustomWasmRequest, options?: RpcOptions): UnaryCall<UpdateCustomWasmRequest, StandardResponse>;
+    updateWasm(input: UpdateWasmRequest, options?: RpcOptions): UnaryCall<UpdateWasmRequest, StandardResponse>;
     /**
-     * END Custom Wasm methods
+     * END Wasm methods
      *
-     * @generated from protobuf rpc: DeleteCustomWasm(protos.DeleteCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
      */
-    deleteCustomWasm(input: DeleteCustomWasmRequest, options?: RpcOptions): UnaryCall<DeleteCustomWasmRequest, StandardResponse>;
+    deleteWasm(input: DeleteWasmRequest, options?: RpcOptions): UnaryCall<DeleteWasmRequest, StandardResponse>;
     /**
      * Test method
      *
@@ -518,43 +518,43 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<AppRegisterRejectRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * BEGIN Custom Wasm methods
+     * BEGIN Wasm methods
      *
-     * @generated from protobuf rpc: GetCustomWasm(protos.GetCustomWasmRequest) returns (protos.GetCustomWasmResponse);
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
      */
-    getCustomWasm(input: GetCustomWasmRequest, options?: RpcOptions): UnaryCall<GetCustomWasmRequest, GetCustomWasmResponse> {
+    getWasm(input: GetWasmRequest, options?: RpcOptions): UnaryCall<GetWasmRequest, GetWasmResponse> {
         const method = this.methods[30], opt = this._transport.mergeOptions(options);
-        return stackIntercept<GetCustomWasmRequest, GetCustomWasmResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<GetWasmRequest, GetWasmResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: GetAllCustomWasm(protos.GetAllCustomWasmRequest) returns (protos.GetAllCustomWasmResponse);
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
      */
-    getAllCustomWasm(input: GetAllCustomWasmRequest, options?: RpcOptions): UnaryCall<GetAllCustomWasmRequest, GetAllCustomWasmResponse> {
+    getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse> {
         const method = this.methods[31], opt = this._transport.mergeOptions(options);
-        return stackIntercept<GetAllCustomWasmRequest, GetAllCustomWasmResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<GetAllWasmRequest, GetAllWasmResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: CreateCustomWasm(protos.CreateCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.StandardResponse);
      */
-    createCustomWasm(input: CreateCustomWasmRequest, options?: RpcOptions): UnaryCall<CreateCustomWasmRequest, StandardResponse> {
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, StandardResponse> {
         const method = this.methods[32], opt = this._transport.mergeOptions(options);
-        return stackIntercept<CreateCustomWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<CreateWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: UpdateCustomWasm(protos.UpdateCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
      */
-    updateCustomWasm(input: UpdateCustomWasmRequest, options?: RpcOptions): UnaryCall<UpdateCustomWasmRequest, StandardResponse> {
+    updateWasm(input: UpdateWasmRequest, options?: RpcOptions): UnaryCall<UpdateWasmRequest, StandardResponse> {
         const method = this.methods[33], opt = this._transport.mergeOptions(options);
-        return stackIntercept<UpdateCustomWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<UpdateWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * END Custom Wasm methods
+     * END Wasm methods
      *
-     * @generated from protobuf rpc: DeleteCustomWasm(protos.DeleteCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
      */
-    deleteCustomWasm(input: DeleteCustomWasmRequest, options?: RpcOptions): UnaryCall<DeleteCustomWasmRequest, StandardResponse> {
+    deleteWasm(input: DeleteWasmRequest, options?: RpcOptions): UnaryCall<DeleteWasmRequest, StandardResponse> {
         const method = this.methods[34], opt = this._transport.mergeOptions(options);
-        return stackIntercept<DeleteCustomWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
+        return stackIntercept<DeleteWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * Test method

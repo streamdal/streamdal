@@ -384,6 +384,20 @@ class Pipeline(betterproto.Message):
     Indicates whether the pipeline is paused or not. Used internally by server.
     """
 
+    description: Optional[str] = betterproto.string_field(
+        1001, optional=True, group="X_description"
+    )
+    version: Optional[str] = betterproto.string_field(
+        1002, optional=True, group="X_version"
+    )
+    url: Optional[str] = betterproto.string_field(1003, optional=True, group="X_url")
+    created_at_unix_ts_utc: Optional[int] = betterproto.int64_field(
+        1004, optional=True, group="X_created_at_unix_ts_utc"
+    )
+    updated_at_unix_ts_utc: Optional[int] = betterproto.int64_field(
+        1005, optional=True, group="X_updated_at_unix_ts_utc"
+    )
+
     def __post_init__(self) -> None:
         super().__post_init__()
         if self.is_set("notification_configs"):
@@ -474,6 +488,8 @@ class PipelineStep(betterproto.Message):
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")
     decode: "steps.DecodeStep" = betterproto.message_field(1003, group="step")
     custom: "steps.CustomStep" = betterproto.message_field(1004, group="step")
+    """If set, _wasm_id MUST  e filled out and MUST exist"""
+
     http_request: "steps.HttpRequestStep" = betterproto.message_field(
         1005, group="step"
     )
@@ -488,17 +504,17 @@ class PipelineStep(betterproto.Message):
     wasm_id: Optional[str] = betterproto.string_field(
         10000, optional=True, group="X_wasm_id"
     )
-    """ID is a uuid(sha256(_wasm_bytes)) that is set by server"""
+    """Set by server UNLESS step is CustomStep"""
 
     wasm_bytes: Optional[bytes] = betterproto.bytes_field(
         10001, optional=True, group="X_wasm_bytes"
     )
-    """WASM module bytes (set by server)"""
+    """Set by server"""
 
     wasm_function: Optional[str] = betterproto.string_field(
         10002, optional=True, group="X_wasm_function"
     )
-    """WASM function name to execute (set by server)"""
+    """Set by server"""
 
 
 @dataclass(eq=False, repr=False)
@@ -657,7 +673,7 @@ class InterStepResult(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class CustomWasm(betterproto.Message):
+class Wasm(betterproto.Message):
     """
     Used for defining a custom Wasm module that can be used in CustomStep
     """
@@ -958,37 +974,37 @@ class ResumeTailRequest(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class GetCustomWasmRequest(betterproto.Message):
+class GetWasmRequest(betterproto.Message):
     id: str = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class GetCustomWasmResponse(betterproto.Message):
-    custom_wasm: "CustomWasm" = betterproto.message_field(1)
+class GetWasmResponse(betterproto.Message):
+    custom_wasm: "Wasm" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class GetAllCustomWasmRequest(betterproto.Message):
+class GetAllWasmRequest(betterproto.Message):
     pass
 
 
 @dataclass(eq=False, repr=False)
-class GetAllCustomWasmResponse(betterproto.Message):
-    custom_wasm: List["CustomWasm"] = betterproto.message_field(1)
+class GetAllWasmResponse(betterproto.Message):
+    custom_wasm: List["Wasm"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class CreateCustomWasmRequest(betterproto.Message):
-    custom_wasm: "CustomWasm" = betterproto.message_field(1)
+class CreateWasmRequest(betterproto.Message):
+    custom_wasm: "Wasm" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class UpdateCustomWasmRequest(betterproto.Message):
-    custom_wasm: "CustomWasm" = betterproto.message_field(1)
+class UpdateWasmRequest(betterproto.Message):
+    custom_wasm: "Wasm" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
-class DeleteCustomWasmRequest(betterproto.Message):
+class DeleteWasmRequest(betterproto.Message):
     ids: List[str] = betterproto.string_field(1)
 
 
@@ -1907,85 +1923,85 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
-    async def get_custom_wasm(
+    async def get_wasm(
         self,
-        get_custom_wasm_request: "GetCustomWasmRequest",
+        get_wasm_request: "GetWasmRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "GetCustomWasmResponse":
+    ) -> "GetWasmResponse":
         return await self._unary_unary(
-            "/protos.External/GetCustomWasm",
-            get_custom_wasm_request,
-            GetCustomWasmResponse,
+            "/protos.External/GetWasm",
+            get_wasm_request,
+            GetWasmResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
         )
 
-    async def get_all_custom_wasm(
+    async def get_all_wasm(
         self,
-        get_all_custom_wasm_request: "GetAllCustomWasmRequest",
+        get_all_wasm_request: "GetAllWasmRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "GetAllCustomWasmResponse":
+    ) -> "GetAllWasmResponse":
         return await self._unary_unary(
-            "/protos.External/GetAllCustomWasm",
-            get_all_custom_wasm_request,
-            GetAllCustomWasmResponse,
+            "/protos.External/GetAllWasm",
+            get_all_wasm_request,
+            GetAllWasmResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
         )
 
-    async def create_custom_wasm(
+    async def create_wasm(
         self,
-        create_custom_wasm_request: "CreateCustomWasmRequest",
+        create_wasm_request: "CreateWasmRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
     ) -> "StandardResponse":
         return await self._unary_unary(
-            "/protos.External/CreateCustomWasm",
-            create_custom_wasm_request,
+            "/protos.External/CreateWasm",
+            create_wasm_request,
             StandardResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
         )
 
-    async def update_custom_wasm(
+    async def update_wasm(
         self,
-        update_custom_wasm_request: "UpdateCustomWasmRequest",
+        update_wasm_request: "UpdateWasmRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
     ) -> "StandardResponse":
         return await self._unary_unary(
-            "/protos.External/UpdateCustomWasm",
-            update_custom_wasm_request,
+            "/protos.External/UpdateWasm",
+            update_wasm_request,
             StandardResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
         )
 
-    async def delete_custom_wasm(
+    async def delete_wasm(
         self,
-        delete_custom_wasm_request: "DeleteCustomWasmRequest",
+        delete_wasm_request: "DeleteWasmRequest",
         *,
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
     ) -> "StandardResponse":
         return await self._unary_unary(
-            "/protos.External/DeleteCustomWasm",
-            delete_custom_wasm_request,
+            "/protos.External/DeleteWasm",
+            delete_wasm_request,
             StandardResponse,
             timeout=timeout,
             deadline=deadline,
@@ -2303,28 +2319,26 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def get_custom_wasm(
-        self, get_custom_wasm_request: "GetCustomWasmRequest"
-    ) -> "GetCustomWasmResponse":
+    async def get_wasm(self, get_wasm_request: "GetWasmRequest") -> "GetWasmResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def get_all_custom_wasm(
-        self, get_all_custom_wasm_request: "GetAllCustomWasmRequest"
-    ) -> "GetAllCustomWasmResponse":
+    async def get_all_wasm(
+        self, get_all_wasm_request: "GetAllWasmRequest"
+    ) -> "GetAllWasmResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def create_custom_wasm(
-        self, create_custom_wasm_request: "CreateCustomWasmRequest"
+    async def create_wasm(
+        self, create_wasm_request: "CreateWasmRequest"
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def update_custom_wasm(
-        self, update_custom_wasm_request: "UpdateCustomWasmRequest"
+    async def update_wasm(
+        self, update_wasm_request: "UpdateWasmRequest"
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def delete_custom_wasm(
-        self, delete_custom_wasm_request: "DeleteCustomWasmRequest"
+    async def delete_wasm(
+        self, delete_wasm_request: "DeleteWasmRequest"
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -2565,41 +2579,39 @@ class ExternalBase(ServiceBase):
         response = await self.app_register_reject(request)
         await stream.send_message(response)
 
-    async def __rpc_get_custom_wasm(
-        self,
-        stream: "grpclib.server.Stream[GetCustomWasmRequest, GetCustomWasmResponse]",
+    async def __rpc_get_wasm(
+        self, stream: "grpclib.server.Stream[GetWasmRequest, GetWasmResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.get_custom_wasm(request)
+        response = await self.get_wasm(request)
         await stream.send_message(response)
 
-    async def __rpc_get_all_custom_wasm(
-        self,
-        stream: "grpclib.server.Stream[GetAllCustomWasmRequest, GetAllCustomWasmResponse]",
+    async def __rpc_get_all_wasm(
+        self, stream: "grpclib.server.Stream[GetAllWasmRequest, GetAllWasmResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.get_all_custom_wasm(request)
+        response = await self.get_all_wasm(request)
         await stream.send_message(response)
 
-    async def __rpc_create_custom_wasm(
-        self, stream: "grpclib.server.Stream[CreateCustomWasmRequest, StandardResponse]"
+    async def __rpc_create_wasm(
+        self, stream: "grpclib.server.Stream[CreateWasmRequest, StandardResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.create_custom_wasm(request)
+        response = await self.create_wasm(request)
         await stream.send_message(response)
 
-    async def __rpc_update_custom_wasm(
-        self, stream: "grpclib.server.Stream[UpdateCustomWasmRequest, StandardResponse]"
+    async def __rpc_update_wasm(
+        self, stream: "grpclib.server.Stream[UpdateWasmRequest, StandardResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.update_custom_wasm(request)
+        response = await self.update_wasm(request)
         await stream.send_message(response)
 
-    async def __rpc_delete_custom_wasm(
-        self, stream: "grpclib.server.Stream[DeleteCustomWasmRequest, StandardResponse]"
+    async def __rpc_delete_wasm(
+        self, stream: "grpclib.server.Stream[DeleteWasmRequest, StandardResponse]"
     ) -> None:
         request = await stream.recv_message()
-        response = await self.delete_custom_wasm(request)
+        response = await self.delete_wasm(request)
         await stream.send_message(response)
 
     async def __rpc_test(
@@ -2791,34 +2803,34 @@ class ExternalBase(ServiceBase):
                 AppRegisterRejectRequest,
                 StandardResponse,
             ),
-            "/protos.External/GetCustomWasm": grpclib.const.Handler(
-                self.__rpc_get_custom_wasm,
+            "/protos.External/GetWasm": grpclib.const.Handler(
+                self.__rpc_get_wasm,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                GetCustomWasmRequest,
-                GetCustomWasmResponse,
+                GetWasmRequest,
+                GetWasmResponse,
             ),
-            "/protos.External/GetAllCustomWasm": grpclib.const.Handler(
-                self.__rpc_get_all_custom_wasm,
+            "/protos.External/GetAllWasm": grpclib.const.Handler(
+                self.__rpc_get_all_wasm,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                GetAllCustomWasmRequest,
-                GetAllCustomWasmResponse,
+                GetAllWasmRequest,
+                GetAllWasmResponse,
             ),
-            "/protos.External/CreateCustomWasm": grpclib.const.Handler(
-                self.__rpc_create_custom_wasm,
+            "/protos.External/CreateWasm": grpclib.const.Handler(
+                self.__rpc_create_wasm,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                CreateCustomWasmRequest,
+                CreateWasmRequest,
                 StandardResponse,
             ),
-            "/protos.External/UpdateCustomWasm": grpclib.const.Handler(
-                self.__rpc_update_custom_wasm,
+            "/protos.External/UpdateWasm": grpclib.const.Handler(
+                self.__rpc_update_wasm,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                UpdateCustomWasmRequest,
+                UpdateWasmRequest,
                 StandardResponse,
             ),
-            "/protos.External/DeleteCustomWasm": grpclib.const.Handler(
-                self.__rpc_delete_custom_wasm,
+            "/protos.External/DeleteWasm": grpclib.const.Handler(
+                self.__rpc_delete_wasm,
                 grpclib.const.Cardinality.UNARY_UNARY,
-                DeleteCustomWasmRequest,
+                DeleteWasmRequest,
                 StandardResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
