@@ -49,6 +49,11 @@ const (
 	External_AppRegister_FullMethodName           = "/protos.External/AppRegister"
 	External_AppVerifyRegistration_FullMethodName = "/protos.External/AppVerifyRegistration"
 	External_AppRegisterReject_FullMethodName     = "/protos.External/AppRegisterReject"
+	External_GetCustomWasm_FullMethodName         = "/protos.External/GetCustomWasm"
+	External_GetAllCustomWasm_FullMethodName      = "/protos.External/GetAllCustomWasm"
+	External_CreateCustomWasm_FullMethodName      = "/protos.External/CreateCustomWasm"
+	External_UpdateCustomWasm_FullMethodName      = "/protos.External/UpdateCustomWasm"
+	External_DeleteCustomWasm_FullMethodName      = "/protos.External/DeleteCustomWasm"
 	External_Test_FullMethodName                  = "/protos.External/Test"
 )
 
@@ -108,6 +113,12 @@ type ExternalClient interface {
 	AppRegister(ctx context.Context, in *AppRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	AppVerifyRegistration(ctx context.Context, in *AppVerifyRegistrationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	AppRegisterReject(ctx context.Context, in *AppRegisterRejectRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	// BEGIN Custom Wasm methods
+	GetCustomWasm(ctx context.Context, in *GetCustomWasmRequest, opts ...grpc.CallOption) (*GetCustomWasmResponse, error)
+	GetAllCustomWasm(ctx context.Context, in *GetAllCustomWasmRequest, opts ...grpc.CallOption) (*GetAllCustomWasmResponse, error)
+	CreateCustomWasm(ctx context.Context, in *CreateCustomWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	UpdateCustomWasm(ctx context.Context, in *UpdateCustomWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	DeleteCustomWasm(ctx context.Context, in *DeleteCustomWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
 	Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -484,6 +495,51 @@ func (c *externalClient) AppRegisterReject(ctx context.Context, in *AppRegisterR
 	return out, nil
 }
 
+func (c *externalClient) GetCustomWasm(ctx context.Context, in *GetCustomWasmRequest, opts ...grpc.CallOption) (*GetCustomWasmResponse, error) {
+	out := new(GetCustomWasmResponse)
+	err := c.cc.Invoke(ctx, External_GetCustomWasm_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) GetAllCustomWasm(ctx context.Context, in *GetAllCustomWasmRequest, opts ...grpc.CallOption) (*GetAllCustomWasmResponse, error) {
+	out := new(GetAllCustomWasmResponse)
+	err := c.cc.Invoke(ctx, External_GetAllCustomWasm_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) CreateCustomWasm(ctx context.Context, in *CreateCustomWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_CreateCustomWasm_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) UpdateCustomWasm(ctx context.Context, in *UpdateCustomWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_UpdateCustomWasm_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) DeleteCustomWasm(ctx context.Context, in *DeleteCustomWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
+	out := new(StandardResponse)
+	err := c.cc.Invoke(ctx, External_DeleteCustomWasm_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	out := new(TestResponse)
 	err := c.cc.Invoke(ctx, External_Test_FullMethodName, in, out, opts...)
@@ -549,6 +605,12 @@ type ExternalServer interface {
 	AppRegister(context.Context, *AppRegistrationRequest) (*StandardResponse, error)
 	AppVerifyRegistration(context.Context, *AppVerifyRegistrationRequest) (*StandardResponse, error)
 	AppRegisterReject(context.Context, *AppRegisterRejectRequest) (*StandardResponse, error)
+	// BEGIN Custom Wasm methods
+	GetCustomWasm(context.Context, *GetCustomWasmRequest) (*GetCustomWasmResponse, error)
+	GetAllCustomWasm(context.Context, *GetAllCustomWasmRequest) (*GetAllCustomWasmResponse, error)
+	CreateCustomWasm(context.Context, *CreateCustomWasmRequest) (*StandardResponse, error)
+	UpdateCustomWasm(context.Context, *UpdateCustomWasmRequest) (*StandardResponse, error)
+	DeleteCustomWasm(context.Context, *DeleteCustomWasmRequest) (*StandardResponse, error)
 	// Test method
 	Test(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedExternalServer()
@@ -647,6 +709,21 @@ func (UnimplementedExternalServer) AppVerifyRegistration(context.Context, *AppVe
 }
 func (UnimplementedExternalServer) AppRegisterReject(context.Context, *AppRegisterRejectRequest) (*StandardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AppRegisterReject not implemented")
+}
+func (UnimplementedExternalServer) GetCustomWasm(context.Context, *GetCustomWasmRequest) (*GetCustomWasmResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomWasm not implemented")
+}
+func (UnimplementedExternalServer) GetAllCustomWasm(context.Context, *GetAllCustomWasmRequest) (*GetAllCustomWasmResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllCustomWasm not implemented")
+}
+func (UnimplementedExternalServer) CreateCustomWasm(context.Context, *CreateCustomWasmRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCustomWasm not implemented")
+}
+func (UnimplementedExternalServer) UpdateCustomWasm(context.Context, *UpdateCustomWasmRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCustomWasm not implemented")
+}
+func (UnimplementedExternalServer) DeleteCustomWasm(context.Context, *DeleteCustomWasmRequest) (*StandardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCustomWasm not implemented")
 }
 func (UnimplementedExternalServer) Test(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Test not implemented")
@@ -1216,6 +1293,96 @@ func _External_AppRegisterReject_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _External_GetCustomWasm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomWasmRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).GetCustomWasm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_GetCustomWasm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).GetCustomWasm(ctx, req.(*GetCustomWasmRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_GetAllCustomWasm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllCustomWasmRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).GetAllCustomWasm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_GetAllCustomWasm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).GetAllCustomWasm(ctx, req.(*GetAllCustomWasmRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_CreateCustomWasm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCustomWasmRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).CreateCustomWasm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_CreateCustomWasm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).CreateCustomWasm(ctx, req.(*CreateCustomWasmRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_UpdateCustomWasm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCustomWasmRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).UpdateCustomWasm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_UpdateCustomWasm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).UpdateCustomWasm(ctx, req.(*UpdateCustomWasmRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_DeleteCustomWasm_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCustomWasmRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).DeleteCustomWasm(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_DeleteCustomWasm_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).DeleteCustomWasm(ctx, req.(*DeleteCustomWasmRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _External_Test_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -1344,6 +1511,26 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AppRegisterReject",
 			Handler:    _External_AppRegisterReject_Handler,
+		},
+		{
+			MethodName: "GetCustomWasm",
+			Handler:    _External_GetCustomWasm_Handler,
+		},
+		{
+			MethodName: "GetAllCustomWasm",
+			Handler:    _External_GetAllCustomWasm_Handler,
+		},
+		{
+			MethodName: "CreateCustomWasm",
+			Handler:    _External_CreateCustomWasm_Handler,
+		},
+		{
+			MethodName: "UpdateCustomWasm",
+			Handler:    _External_UpdateCustomWasm_Handler,
+		},
+		{
+			MethodName: "DeleteCustomWasm",
+			Handler:    _External_DeleteCustomWasm_Handler,
 		},
 		{
 			MethodName: "Test",

@@ -2,6 +2,7 @@ import sp_common_pb2 as _sp_common_pb2
 import sp_info_pb2 as _sp_info_pb2
 import sp_notify_pb2 as _sp_notify_pb2
 import sp_pipeline_pb2 as _sp_pipeline_pb2
+import sp_wsm_pb2 as _sp_wsm_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -66,6 +67,12 @@ class CreateAudienceRequest(_message.Message):
     audience: _sp_common_pb2.Audience
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
+class CreateCustomWasmRequest(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _sp_wsm_pb2.CustomWasm
+    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]] = ...) -> None: ...
+
 class CreateNotificationRequest(_message.Message):
     __slots__ = ["notification"]
     NOTIFICATION_FIELD_NUMBER: _ClassVar[int]
@@ -100,6 +107,12 @@ class DeleteAudienceRequest(_message.Message):
     force: bool
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., force: bool = ...) -> None: ...
 
+class DeleteCustomWasmRequest(_message.Message):
+    __slots__ = ["ids"]
+    IDS_FIELD_NUMBER: _ClassVar[int]
+    ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, ids: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class DeleteNotificationRequest(_message.Message):
     __slots__ = ["notification_id"]
     NOTIFICATION_ID_FIELD_NUMBER: _ClassVar[int]
@@ -129,6 +142,16 @@ class DetachNotificationRequest(_message.Message):
     notification_id: str
     pipeline_id: str
     def __init__(self, notification_id: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
+
+class GetAllCustomWasmRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetAllCustomWasmResponse(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _containers.RepeatedCompositeFieldContainer[_sp_wsm_pb2.CustomWasm]
+    def __init__(self, custom_wasm: _Optional[_Iterable[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]]] = ...) -> None: ...
 
 class GetAllRequest(_message.Message):
     __slots__ = []
@@ -182,6 +205,18 @@ class GetAudienceRatesResponse(_message.Message):
     _keepalive: bool
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
     def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _keepalive: bool = ...) -> None: ...
+
+class GetCustomWasmRequest(_message.Message):
+    __slots__ = ["id"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    def __init__(self, id: _Optional[str] = ...) -> None: ...
+
+class GetCustomWasmResponse(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _sp_wsm_pb2.CustomWasm
+    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]] = ...) -> None: ...
 
 class GetMetricsRequest(_message.Message):
     __slots__ = []
@@ -312,6 +347,12 @@ class TestResponse(_message.Message):
     OUTPUT_FIELD_NUMBER: _ClassVar[int]
     output: str
     def __init__(self, output: _Optional[str] = ...) -> None: ...
+
+class UpdateCustomWasmRequest(_message.Message):
+    __slots__ = ["custom_wasm"]
+    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
+    custom_wasm: _sp_wsm_pb2.CustomWasm
+    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.CustomWasm, _Mapping]] = ...) -> None: ...
 
 class UpdateNotificationRequest(_message.Message):
     __slots__ = ["notification"]

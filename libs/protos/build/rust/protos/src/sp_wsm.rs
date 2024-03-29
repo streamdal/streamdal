@@ -633,6 +633,258 @@ pub mod inter_step_result {
     }
 }
 
+///  Used for defining a custom Wasm module that can be used in CustomStep
+// @@protoc_insertion_point(message:protos.CustomWasm)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct CustomWasm {
+    // message fields
+    // @@protoc_insertion_point(field:protos.CustomWasm.id)
+    pub id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.CustomWasm.name)
+    pub name: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.CustomWasm.wasm_bytes)
+    pub wasm_bytes: ::std::string::String,
+    ///  Informative/debug fields
+    // @@protoc_insertion_point(field:protos.CustomWasm.description)
+    pub description: ::std::option::Option<::std::string::String>,
+    // @@protoc_insertion_point(field:protos.CustomWasm.version)
+    pub version: ::std::option::Option<::std::string::String>,
+    // @@protoc_insertion_point(field:protos.CustomWasm.url)
+    pub url: ::std::option::Option<::std::string::String>,
+    ///  Set by server on create
+    // @@protoc_insertion_point(field:protos.CustomWasm._created_at_unix_ts_ns_utc)
+    pub _created_at_unix_ts_ns_utc: ::std::option::Option<i64>,
+    ///  Set by server on update
+    // @@protoc_insertion_point(field:protos.CustomWasm._updated_at_unix_ts_ns_utc)
+    pub _updated_at_unix_ts_ns_utc: ::std::option::Option<i64>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.CustomWasm.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a CustomWasm {
+    fn default() -> &'a CustomWasm {
+        <CustomWasm as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl CustomWasm {
+    pub fn new() -> CustomWasm {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(8);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &CustomWasm| { &m.id },
+            |m: &mut CustomWasm| { &mut m.id },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "name",
+            |m: &CustomWasm| { &m.name },
+            |m: &mut CustomWasm| { &mut m.name },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "wasm_bytes",
+            |m: &CustomWasm| { &m.wasm_bytes },
+            |m: &mut CustomWasm| { &mut m.wasm_bytes },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "description",
+            |m: &CustomWasm| { &m.description },
+            |m: &mut CustomWasm| { &mut m.description },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "version",
+            |m: &CustomWasm| { &m.version },
+            |m: &mut CustomWasm| { &mut m.version },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "url",
+            |m: &CustomWasm| { &m.url },
+            |m: &mut CustomWasm| { &mut m.url },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "_created_at_unix_ts_ns_utc",
+            |m: &CustomWasm| { &m._created_at_unix_ts_ns_utc },
+            |m: &mut CustomWasm| { &mut m._created_at_unix_ts_ns_utc },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "_updated_at_unix_ts_ns_utc",
+            |m: &CustomWasm| { &m._updated_at_unix_ts_ns_utc },
+            |m: &mut CustomWasm| { &mut m._updated_at_unix_ts_ns_utc },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CustomWasm>(
+            "CustomWasm",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for CustomWasm {
+    const NAME: &'static str = "CustomWasm";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.id = is.read_string()?;
+                },
+                18 => {
+                    self.name = is.read_string()?;
+                },
+                26 => {
+                    self.wasm_bytes = is.read_string()?;
+                },
+                802 => {
+                    self.description = ::std::option::Option::Some(is.read_string()?);
+                },
+                810 => {
+                    self.version = ::std::option::Option::Some(is.read_string()?);
+                },
+                818 => {
+                    self.url = ::std::option::Option::Some(is.read_string()?);
+                },
+                8000 => {
+                    self._created_at_unix_ts_ns_utc = ::std::option::Option::Some(is.read_int64()?);
+                },
+                8008 => {
+                    self._updated_at_unix_ts_ns_utc = ::std::option::Option::Some(is.read_int64()?);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.id);
+        }
+        if !self.name.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.name);
+        }
+        if !self.wasm_bytes.is_empty() {
+            my_size += ::protobuf::rt::string_size(3, &self.wasm_bytes);
+        }
+        if let Some(v) = self.description.as_ref() {
+            my_size += ::protobuf::rt::string_size(100, &v);
+        }
+        if let Some(v) = self.version.as_ref() {
+            my_size += ::protobuf::rt::string_size(101, &v);
+        }
+        if let Some(v) = self.url.as_ref() {
+            my_size += ::protobuf::rt::string_size(102, &v);
+        }
+        if let Some(v) = self._created_at_unix_ts_ns_utc {
+            my_size += ::protobuf::rt::int64_size(1000, v);
+        }
+        if let Some(v) = self._updated_at_unix_ts_ns_utc {
+            my_size += ::protobuf::rt::int64_size(1001, v);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.id.is_empty() {
+            os.write_string(1, &self.id)?;
+        }
+        if !self.name.is_empty() {
+            os.write_string(2, &self.name)?;
+        }
+        if !self.wasm_bytes.is_empty() {
+            os.write_string(3, &self.wasm_bytes)?;
+        }
+        if let Some(v) = self.description.as_ref() {
+            os.write_string(100, v)?;
+        }
+        if let Some(v) = self.version.as_ref() {
+            os.write_string(101, v)?;
+        }
+        if let Some(v) = self.url.as_ref() {
+            os.write_string(102, v)?;
+        }
+        if let Some(v) = self._created_at_unix_ts_ns_utc {
+            os.write_int64(1000, v)?;
+        }
+        if let Some(v) = self._updated_at_unix_ts_ns_utc {
+            os.write_int64(1001, v)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> CustomWasm {
+        CustomWasm::new()
+    }
+
+    fn clear(&mut self) {
+        self.id.clear();
+        self.name.clear();
+        self.wasm_bytes.clear();
+        self.description = ::std::option::Option::None;
+        self.version = ::std::option::Option::None;
+        self.url = ::std::option::Option::None;
+        self._created_at_unix_ts_ns_utc = ::std::option::Option::None;
+        self._updated_at_unix_ts_ns_utc = ::std::option::Option::None;
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static CustomWasm {
+        static instance: CustomWasm = CustomWasm {
+            id: ::std::string::String::new(),
+            name: ::std::string::String::new(),
+            wasm_bytes: ::std::string::String::new(),
+            description: ::std::option::Option::None,
+            version: ::std::option::Option::None,
+            url: ::std::option::Option::None,
+            _created_at_unix_ts_ns_utc: ::std::option::Option::None,
+            _updated_at_unix_ts_ns_utc: ::std::option::Option::None,
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for CustomWasm {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("CustomWasm").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for CustomWasm {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CustomWasm {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 ///  Included in Wasm response; the SDK should use the WASMExitCode to determine
 ///  what to do next - should it execute next step, should it notify or should it
 ///  stop execution/abort the rest of the steps in current or all pipelines.
@@ -736,103 +988,144 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01R\x0finterStepResult\x88\x01\x01B\x0e\n\x0c_output_stepB\x14\n\x12_i\
     nter_step_result\"o\n\x0fInterStepResult\x12N\n\x10detective_result\x18\
     \x01\x20\x01(\x0b2!.protos.steps.DetectiveStepResultH\0R\x0fdetectiveRes\
-    ultB\x0c\n\ninput_from*u\n\x0cWASMExitCode\x12\x18\n\x14WASM_EXIT_CODE_U\
-    NSET\x10\0\x12\x17\n\x13WASM_EXIT_CODE_TRUE\x10\x01\x12\x18\n\x14WASM_EX\
-    IT_CODE_FALSE\x10\x02\x12\x18\n\x14WASM_EXIT_CODE_ERROR\x10\x03B<Z:githu\
-    b.com/streamdal/streamdal/libs/protos/build/go/protosJ\xe5\x18\n\x06\x12\
-    \x04\0\0R\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
-    \x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\x12\x03\
-    \x05\0(\n\x08\n\x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\x0b\x12\x03\x07\0Q\
-    \n\xea\x04\n\x02\x05\0\x12\x04\x18\0\x1d\x01\x1a\xdd\x04\x20Included\x20\
-    in\x20Wasm\x20response;\x20the\x20SDK\x20should\x20use\x20the\x20WASMExi\
-    tCode\x20to\x20determine\n\x20what\x20to\x20do\x20next\x20-\x20should\
-    \x20it\x20execute\x20next\x20step,\x20should\x20it\x20notify\x20or\x20sh\
-    ould\x20it\n\x20stop\x20execution/abort\x20the\x20rest\x20of\x20the\x20s\
-    teps\x20in\x20current\x20or\x20all\x20pipelines.\n\n\x20Example:\n\n\x20\
-    a.\x20Wasm\x20func\x20returns\x20WASM_EXIT_CODE_FALSE\x20-\x20read\x20Pi\
-    pelineStep.on_false\n\x20conditions\x20to\x20determine\x20what\x20to\x20\
-    do\x20next.\n\n\x20b.\x20Wasm\x20func\x20returns\x20WASM_EXIT_CODE_TRUE\
-    \x20-\x20read\x20PipelineStep.on_true\n\x20conditions\x20to\x20determine\
-    \x20what\x20to\x20do\x20next.\n\n\x20..\x20and\x20so\x20on.\n\x20TODO:\
-    \x20This\x20might\x20be\x20a\x20dupe\x20-\x20should\x20Wasm\x20use\x20Ex\
-    ecStatus\x20instead\x20of\x20this?\n\x20protolint:disable:next\x20ENUM_F\
-    IELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\x01\x12\x03\x18\x05\x11\n\x0b\n\x04\
-    \x05\0\x02\0\x12\x03\x19\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x19\
-    \x02\x16\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x19\x19\x1a\n\x0b\n\x04\x05\
-    \0\x02\x01\x12\x03\x1a\x02\x1a\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x1a\
-    \x02\x15\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x1a\x18\x19\n\x0b\n\x04\
-    \x05\0\x02\x02\x12\x03\x1b\x02\x1b\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\
-    \x1b\x02\x16\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x1b\x19\x1a\n\x0b\n\
-    \x04\x05\0\x02\x03\x12\x03\x1c\x02\x1b\n\x0c\n\x05\x05\0\x02\x03\x01\x12\
-    \x03\x1c\x02\x16\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x1c\x19\x1a\nK\n\
-    \x02\x04\0\x12\x04\x20\01\x01\x1a?\x20SDK\x20generates\x20a\x20WASM\x20r\
-    equest\x20and\x20passes\x20this\x20to\x20the\x20WASM\x20func\n\n\n\n\x03\
-    \x04\0\x01\x12\x03\x20\x08\x13\n~\n\x04\x04\0\x02\0\x12\x03#\x02\x1f\x1a\
-    q\x20The\x20actual\x20step\x20that\x20the\x20WASM\x20func\x20will\x20ope\
-    rate\x20on.\x20This\x20is\x20the\x20same\x20step\n\x20that\x20is\x20decl\
-    ared\x20in\x20protos.Pipeline.\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03#\
-    \x02\x15\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03#\x16\x1a\n\x0c\n\x05\x04\0\
-    \x02\0\x03\x12\x03#\x1d\x1e\n:\n\x04\x04\0\x02\x01\x12\x03&\x02\x1a\x1a-\
-    \x20Payload\x20data\x20that\x20WASM\x20func\x20will\x20operate\x20on\n\n\
-    \x0c\n\x05\x04\0\x02\x01\x05\x12\x03&\x02\x07\n\x0c\n\x05\x04\0\x02\x01\
-    \x01\x12\x03&\x08\x15\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03&\x18\x19\nz\
-    \n\x04\x04\0\x02\x02\x12\x03*\x02\x20\x1am\x20Potentially\x20filled\x20o\
-    ut\x20result\x20from\x20previous\x20step.\x20If\x20this\x20is\x20first\
-    \x20step\x20in\n\x20the\x20pipeline,\x20it\x20will\x20be\x20empty.\n\n\
-    \x0c\n\x05\x04\0\x02\x02\x04\x12\x03*\x02\n\n\x0c\n\x05\x04\0\x02\x02\
-    \x05\x12\x03*\x0b\x10\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03*\x11\x1b\n\
-    \x0c\n\x05\x04\0\x02\x02\x03\x12\x03*\x1e\x1f\n\x88\x02\n\x04\x04\0\x02\
-    \x03\x12\x030\x021\x1a\xfa\x01\x20Potential\x20input\x20from\x20a\x20pre\
-    vious\x20step\x20if\x20`Step.Dynamic\x20==\x20true`\n\x20This\x20is\x20u\
-    sed\x20for\x20communicating\x20data\x20between\x20steps.\n\x20For\x20exa\
-    mple,\x20when\x20trying\x20to\x20find\x20email\x20addresses\x20in\x20a\
-    \x20payload\x20and\n\x20then\x20passing\x20on\x20the\x20results\x20to\
-    \x20a\x20transform\x20step\x20to\x20obfuscate\x20them\n\n\x0c\n\x05\x04\
-    \0\x02\x03\x04\x12\x030\x02\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x030\x0b\
-    \x1a\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x030\x1b,\n\x0c\n\x05\x04\0\x02\
-    \x03\x03\x12\x030/0\n,\n\x02\x04\x01\x12\x044\0J\x01\x1a\x20\x20Returned\
-    \x20by\x20all\x20WASM\x20functions\n\n\n\n\x03\x04\x01\x01\x12\x034\x08\
-    \x14\n\xd2\x01\n\x04\x04\x01\x02\0\x12\x038\x02\x1b\x1a\xc4\x01\x20Poten\
-    tially\x20modified\x20input\x20payload.\x20Concept:\x20All\x20WASM\x20fu\
-    ncs\x20accept\x20an\n\x20input_payload\x20in\x20WASMRequest,\x20WASM\x20\
-    func\x20reads\x20input\x20payload,\x20modifies\x20it\n\x20and\x20writes\
-    \x20the\x20modified\x20output\x20to\x20output_payload.\n\n\x0c\n\x05\x04\
-    \x01\x02\0\x05\x12\x038\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x038\
-    \x08\x16\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x038\x19\x1a\n\\\n\x04\x04\
-    \x01\x02\x01\x12\x03;\x02\x1d\x1aO\x20Exit\x20code\x20that\x20the\x20WAS\
-    M\x20func\x20exited\x20with;\x20more\x20info\x20in\x20WASMExitCode's\x20\
-    comment\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03;\x02\x0e\n\x0c\n\x05\
-    \x04\x01\x02\x01\x01\x12\x03;\x0f\x18\n\x0c\n\x05\x04\x01\x02\x01\x03\
-    \x12\x03;\x1b\x1c\nQ\n\x04\x04\x01\x02\x02\x12\x03>\x02\x16\x1aD\x20Addi\
-    tional\x20info\x20about\x20the\x20reason\x20a\x20specific\x20exit\x20cod\
-    e\x20was\x20returned\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03>\x02\x08\
-    \n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03>\t\x11\n\x0c\n\x05\x04\x01\x02\
-    \x02\x03\x12\x03>\x14\x15\n\xdc\x01\n\x04\x04\x01\x02\x03\x12\x03C\x02!\
-    \x1a\xce\x01\x20Potential\x20additional\x20step\x20output\x20-\x20ie.\
-    \x20if\x20a\x20WASM\x20func\x20is\x20an\x20HTTPGet,\n\x20output_step\x20\
-    would\x20contain\x20the\x20HTTP\x20response\x20body;\x20if\x20the\x20WAS\
-    M\x20func\x20is\x20a\n\x20KVGet,\x20the\x20output_step\x20would\x20be\
-    \x20the\x20value\x20of\x20the\x20fetched\x20key.\n\n\x0c\n\x05\x04\x01\
-    \x02\x03\x04\x12\x03C\x02\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03C\x0b\
-    \x10\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03C\x11\x1c\n\x0c\n\x05\x04\
-    \x01\x02\x03\x03\x12\x03C\x1f\x20\n\x97\x02\n\x04\x04\x01\x02\x04\x12\
-    \x03I\x021\x1a\x89\x02\x20If\x20`Step.Dynamic\x20==\x20true`,\x20this\
-    \x20field\x20should\x20be\x20filled\x20out\x20by\x20the\x20WASM\x20modul\
-    e\n\x20This\x20is\x20used\x20for\x20communicating\x20data\x20between\x20\
-    steps.\n\x20For\x20example,\x20when\x20trying\x20to\x20find\x20email\x20\
-    addresses\x20in\x20a\x20payload\x20and\n\x20then\x20passing\x20on\x20the\
-    \x20results\x20to\x20a\x20transform\x20step\x20to\x20obfuscate\x20them\n\
-    \n\x0c\n\x05\x04\x01\x02\x04\x04\x12\x03I\x02\n\n\x0c\n\x05\x04\x01\x02\
-    \x04\x06\x12\x03I\x0b\x1a\n\x0c\n\x05\x04\x01\x02\x04\x01\x12\x03I\x1b,\
-    \n\x0c\n\x05\x04\x01\x02\x04\x03\x12\x03I/0\n\x98\x01\n\x02\x04\x02\x12\
-    \x04N\0R\x01\x1a\x8b\x01\x20Intended\x20for\x20communicating\x20wasm\x20\
-    results\x20between\x20steps.\n\x20Currently\x20only\x20used\x20for\x20pa\
-    ssing\x20results\x20from\x20a\x20Detective\x20Step\x20to\x20a\x20Transfo\
-    rm\x20step\n\n\n\n\x03\x04\x02\x01\x12\x03N\x08\x17\n\x0c\n\x04\x04\x02\
+    ultB\x0c\n\ninput_from\"\x8e\x03\n\nCustomWasm\x12\x0e\n\x02id\x18\x01\
+    \x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12\x1d\
+    \n\nwasm_bytes\x18\x03\x20\x01(\tR\twasmBytes\x12%\n\x0bdescription\x18d\
+    \x20\x01(\tH\0R\x0bdescription\x88\x01\x01\x12\x1d\n\x07version\x18e\x20\
+    \x01(\tH\x01R\x07version\x88\x01\x01\x12\x15\n\x03url\x18f\x20\x01(\tH\
+    \x02R\x03url\x88\x01\x01\x12>\n\x1a_created_at_unix_ts_ns_utc\x18\xe8\
+    \x07\x20\x01(\x03H\x03R\x14CreatedAtUnixTsNsUtc\x88\x01\x01\x12>\n\x1a_u\
+    pdated_at_unix_ts_ns_utc\x18\xe9\x07\x20\x01(\x03H\x04R\x14UpdatedAtUnix\
+    TsNsUtc\x88\x01\x01B\x0e\n\x0c_descriptionB\n\n\x08_versionB\x06\n\x04_u\
+    rlB\x1d\n\x1bX_created_at_unix_ts_ns_utcB\x1d\n\x1bX_updated_at_unix_ts_\
+    ns_utc*u\n\x0cWASMExitCode\x12\x18\n\x14WASM_EXIT_CODE_UNSET\x10\0\x12\
+    \x17\n\x13WASM_EXIT_CODE_TRUE\x10\x01\x12\x18\n\x14WASM_EXIT_CODE_FALSE\
+    \x10\x02\x12\x18\n\x14WASM_EXIT_CODE_ERROR\x10\x03B<Z:github.com/streamd\
+    al/streamdal/libs/protos/build/go/protosJ\x84\x1f\n\x06\x12\x04\0\0d\x01\
+    \n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
+    \x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\x12\x03\x05\0(\n\x08\n\
+    \x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\x0b\x12\x03\x07\0Q\n\xea\x04\n\x02\
+    \x05\0\x12\x04\x18\0\x1d\x01\x1a\xdd\x04\x20Included\x20in\x20Wasm\x20re\
+    sponse;\x20the\x20SDK\x20should\x20use\x20the\x20WASMExitCode\x20to\x20d\
+    etermine\n\x20what\x20to\x20do\x20next\x20-\x20should\x20it\x20execute\
+    \x20next\x20step,\x20should\x20it\x20notify\x20or\x20should\x20it\n\x20s\
+    top\x20execution/abort\x20the\x20rest\x20of\x20the\x20steps\x20in\x20cur\
+    rent\x20or\x20all\x20pipelines.\n\n\x20Example:\n\n\x20a.\x20Wasm\x20fun\
+    c\x20returns\x20WASM_EXIT_CODE_FALSE\x20-\x20read\x20PipelineStep.on_fal\
+    se\n\x20conditions\x20to\x20determine\x20what\x20to\x20do\x20next.\n\n\
+    \x20b.\x20Wasm\x20func\x20returns\x20WASM_EXIT_CODE_TRUE\x20-\x20read\
+    \x20PipelineStep.on_true\n\x20conditions\x20to\x20determine\x20what\x20t\
+    o\x20do\x20next.\n\n\x20..\x20and\x20so\x20on.\n\x20TODO:\x20This\x20mig\
+    ht\x20be\x20a\x20dupe\x20-\x20should\x20Wasm\x20use\x20ExecStatus\x20ins\
+    tead\x20of\x20this?\n\x20protolint:disable:next\x20ENUM_FIELD_NAMES_PREF\
+    IX\n\n\n\n\x03\x05\0\x01\x12\x03\x18\x05\x11\n\x0b\n\x04\x05\0\x02\0\x12\
+    \x03\x19\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x19\x02\x16\n\x0c\n\
+    \x05\x05\0\x02\0\x02\x12\x03\x19\x19\x1a\n\x0b\n\x04\x05\0\x02\x01\x12\
+    \x03\x1a\x02\x1a\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x1a\x02\x15\n\x0c\
+    \n\x05\x05\0\x02\x01\x02\x12\x03\x1a\x18\x19\n\x0b\n\x04\x05\0\x02\x02\
+    \x12\x03\x1b\x02\x1b\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x1b\x02\x16\n\
+    \x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x1b\x19\x1a\n\x0b\n\x04\x05\0\x02\
+    \x03\x12\x03\x1c\x02\x1b\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x1c\x02\
+    \x16\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x1c\x19\x1a\nK\n\x02\x04\0\
+    \x12\x04\x20\01\x01\x1a?\x20SDK\x20generates\x20a\x20WASM\x20request\x20\
+    and\x20passes\x20this\x20to\x20the\x20WASM\x20func\n\n\n\n\x03\x04\0\x01\
+    \x12\x03\x20\x08\x13\n~\n\x04\x04\0\x02\0\x12\x03#\x02\x1f\x1aq\x20The\
+    \x20actual\x20step\x20that\x20the\x20WASM\x20func\x20will\x20operate\x20\
+    on.\x20This\x20is\x20the\x20same\x20step\n\x20that\x20is\x20declared\x20\
+    in\x20protos.Pipeline.\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03#\x02\x15\n\
+    \x0c\n\x05\x04\0\x02\0\x01\x12\x03#\x16\x1a\n\x0c\n\x05\x04\0\x02\0\x03\
+    \x12\x03#\x1d\x1e\n:\n\x04\x04\0\x02\x01\x12\x03&\x02\x1a\x1a-\x20Payloa\
+    d\x20data\x20that\x20WASM\x20func\x20will\x20operate\x20on\n\n\x0c\n\x05\
+    \x04\0\x02\x01\x05\x12\x03&\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\
+    \x03&\x08\x15\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03&\x18\x19\nz\n\x04\
+    \x04\0\x02\x02\x12\x03*\x02\x20\x1am\x20Potentially\x20filled\x20out\x20\
+    result\x20from\x20previous\x20step.\x20If\x20this\x20is\x20first\x20step\
+    \x20in\n\x20the\x20pipeline,\x20it\x20will\x20be\x20empty.\n\n\x0c\n\x05\
+    \x04\0\x02\x02\x04\x12\x03*\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03*\
+    \x0b\x10\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03*\x11\x1b\n\x0c\n\x05\x04\
+    \0\x02\x02\x03\x12\x03*\x1e\x1f\n\x88\x02\n\x04\x04\0\x02\x03\x12\x030\
+    \x021\x1a\xfa\x01\x20Potential\x20input\x20from\x20a\x20previous\x20step\
+    \x20if\x20`Step.Dynamic\x20==\x20true`\n\x20This\x20is\x20used\x20for\
+    \x20communicating\x20data\x20between\x20steps.\n\x20For\x20example,\x20w\
+    hen\x20trying\x20to\x20find\x20email\x20addresses\x20in\x20a\x20payload\
+    \x20and\n\x20then\x20passing\x20on\x20the\x20results\x20to\x20a\x20trans\
+    form\x20step\x20to\x20obfuscate\x20them\n\n\x0c\n\x05\x04\0\x02\x03\x04\
+    \x12\x030\x02\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x030\x0b\x1a\n\x0c\n\
+    \x05\x04\0\x02\x03\x01\x12\x030\x1b,\n\x0c\n\x05\x04\0\x02\x03\x03\x12\
+    \x030/0\n,\n\x02\x04\x01\x12\x044\0J\x01\x1a\x20\x20Returned\x20by\x20al\
+    l\x20WASM\x20functions\n\n\n\n\x03\x04\x01\x01\x12\x034\x08\x14\n\xd2\
+    \x01\n\x04\x04\x01\x02\0\x12\x038\x02\x1b\x1a\xc4\x01\x20Potentially\x20\
+    modified\x20input\x20payload.\x20Concept:\x20All\x20WASM\x20funcs\x20acc\
+    ept\x20an\n\x20input_payload\x20in\x20WASMRequest,\x20WASM\x20func\x20re\
+    ads\x20input\x20payload,\x20modifies\x20it\n\x20and\x20writes\x20the\x20\
+    modified\x20output\x20to\x20output_payload.\n\n\x0c\n\x05\x04\x01\x02\0\
+    \x05\x12\x038\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x038\x08\x16\n\
+    \x0c\n\x05\x04\x01\x02\0\x03\x12\x038\x19\x1a\n\\\n\x04\x04\x01\x02\x01\
+    \x12\x03;\x02\x1d\x1aO\x20Exit\x20code\x20that\x20the\x20WASM\x20func\
+    \x20exited\x20with;\x20more\x20info\x20in\x20WASMExitCode's\x20comment\n\
+    \n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03;\x02\x0e\n\x0c\n\x05\x04\x01\
+    \x02\x01\x01\x12\x03;\x0f\x18\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03;\
+    \x1b\x1c\nQ\n\x04\x04\x01\x02\x02\x12\x03>\x02\x16\x1aD\x20Additional\
+    \x20info\x20about\x20the\x20reason\x20a\x20specific\x20exit\x20code\x20w\
+    as\x20returned\n\n\x0c\n\x05\x04\x01\x02\x02\x05\x12\x03>\x02\x08\n\x0c\
+    \n\x05\x04\x01\x02\x02\x01\x12\x03>\t\x11\n\x0c\n\x05\x04\x01\x02\x02\
+    \x03\x12\x03>\x14\x15\n\xdc\x01\n\x04\x04\x01\x02\x03\x12\x03C\x02!\x1a\
+    \xce\x01\x20Potential\x20additional\x20step\x20output\x20-\x20ie.\x20if\
+    \x20a\x20WASM\x20func\x20is\x20an\x20HTTPGet,\n\x20output_step\x20would\
+    \x20contain\x20the\x20HTTP\x20response\x20body;\x20if\x20the\x20WASM\x20\
+    func\x20is\x20a\n\x20KVGet,\x20the\x20output_step\x20would\x20be\x20the\
+    \x20value\x20of\x20the\x20fetched\x20key.\n\n\x0c\n\x05\x04\x01\x02\x03\
+    \x04\x12\x03C\x02\n\n\x0c\n\x05\x04\x01\x02\x03\x05\x12\x03C\x0b\x10\n\
+    \x0c\n\x05\x04\x01\x02\x03\x01\x12\x03C\x11\x1c\n\x0c\n\x05\x04\x01\x02\
+    \x03\x03\x12\x03C\x1f\x20\n\x97\x02\n\x04\x04\x01\x02\x04\x12\x03I\x021\
+    \x1a\x89\x02\x20If\x20`Step.Dynamic\x20==\x20true`,\x20this\x20field\x20\
+    should\x20be\x20filled\x20out\x20by\x20the\x20WASM\x20module\n\x20This\
+    \x20is\x20used\x20for\x20communicating\x20data\x20between\x20steps.\n\
+    \x20For\x20example,\x20when\x20trying\x20to\x20find\x20email\x20addresse\
+    s\x20in\x20a\x20payload\x20and\n\x20then\x20passing\x20on\x20the\x20resu\
+    lts\x20to\x20a\x20transform\x20step\x20to\x20obfuscate\x20them\n\n\x0c\n\
+    \x05\x04\x01\x02\x04\x04\x12\x03I\x02\n\n\x0c\n\x05\x04\x01\x02\x04\x06\
+    \x12\x03I\x0b\x1a\n\x0c\n\x05\x04\x01\x02\x04\x01\x12\x03I\x1b,\n\x0c\n\
+    \x05\x04\x01\x02\x04\x03\x12\x03I/0\n\x98\x01\n\x02\x04\x02\x12\x04N\0R\
+    \x01\x1a\x8b\x01\x20Intended\x20for\x20communicating\x20wasm\x20results\
+    \x20between\x20steps.\n\x20Currently\x20only\x20used\x20for\x20passing\
+    \x20results\x20from\x20a\x20Detective\x20Step\x20to\x20a\x20Transform\
+    \x20step\n\n\n\n\x03\x04\x02\x01\x12\x03N\x08\x17\n\x0c\n\x04\x04\x02\
     \x08\0\x12\x04O\x02Q\x03\n\x0c\n\x05\x04\x02\x08\0\x01\x12\x03O\x08\x12\
     \n\x0b\n\x04\x04\x02\x02\0\x12\x03P\x043\n\x0c\n\x05\x04\x02\x02\0\x06\
     \x12\x03P\x04\x1d\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03P\x1e.\n\x0c\n\
-    \x05\x04\x02\x02\0\x03\x12\x03P12b\x06proto3\
+    \x05\x04\x02\x02\0\x03\x12\x03P12\nS\n\x02\x04\x03\x12\x04U\0d\x01\x1aG\
+    \x20Used\x20for\x20defining\x20a\x20custom\x20Wasm\x20module\x20that\x20\
+    can\x20be\x20used\x20in\x20CustomStep\n\n\n\n\x03\x04\x03\x01\x12\x03U\
+    \x08\x12\n\x0b\n\x04\x04\x03\x02\0\x12\x03V\x02\x10\n\x0c\n\x05\x04\x03\
+    \x02\0\x05\x12\x03V\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03V\t\x0b\
+    \n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03V\x0e\x0f\n\x0b\n\x04\x04\x03\x02\
+    \x01\x12\x03W\x02\x12\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03W\x02\x08\n\
+    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x03W\t\r\n\x0c\n\x05\x04\x03\x02\x01\
+    \x03\x12\x03W\x10\x11\n\x0b\n\x04\x04\x03\x02\x02\x12\x03X\x02\x18\n\x0c\
+    \n\x05\x04\x03\x02\x02\x05\x12\x03X\x02\x08\n\x0c\n\x05\x04\x03\x02\x02\
+    \x01\x12\x03X\t\x13\n\x0c\n\x05\x04\x03\x02\x02\x03\x12\x03X\x16\x17\n'\
+    \n\x04\x04\x03\x02\x03\x12\x03[\x02$\x1a\x1a\x20Informative/debug\x20fie\
+    lds\n\n\x0c\n\x05\x04\x03\x02\x03\x04\x12\x03[\x02\n\n\x0c\n\x05\x04\x03\
+    \x02\x03\x05\x12\x03[\x0b\x11\n\x0c\n\x05\x04\x03\x02\x03\x01\x12\x03[\
+    \x12\x1d\n\x0c\n\x05\x04\x03\x02\x03\x03\x12\x03[\x20#\n\x0b\n\x04\x04\
+    \x03\x02\x04\x12\x03\\\x02\x20\n\x0c\n\x05\x04\x03\x02\x04\x04\x12\x03\\\
+    \x02\n\n\x0c\n\x05\x04\x03\x02\x04\x05\x12\x03\\\x0b\x11\n\x0c\n\x05\x04\
+    \x03\x02\x04\x01\x12\x03\\\x12\x19\n\x0c\n\x05\x04\x03\x02\x04\x03\x12\
+    \x03\\\x1c\x1f\n\x0b\n\x04\x04\x03\x02\x05\x12\x03]\x02\x1c\n\x0c\n\x05\
+    \x04\x03\x02\x05\x04\x12\x03]\x02\n\n\x0c\n\x05\x04\x03\x02\x05\x05\x12\
+    \x03]\x0b\x11\n\x0c\n\x05\x04\x03\x02\x05\x01\x12\x03]\x12\x15\n\x0c\n\
+    \x05\x04\x03\x02\x05\x03\x12\x03]\x18\x1b\n]\n\x04\x04\x03\x02\x06\x12\
+    \x03`\x023\x1a\x19\x20Set\x20by\x20server\x20on\x20create\n\"5\x20protol\
+    int:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x03\
+    \x02\x06\x04\x12\x03`\x02\n\n\x0c\n\x05\x04\x03\x02\x06\x05\x12\x03`\x0b\
+    \x10\n\x0c\n\x05\x04\x03\x02\x06\x01\x12\x03`\x11+\n\x0c\n\x05\x04\x03\
+    \x02\x06\x03\x12\x03`.2\n]\n\x04\x04\x03\x02\x07\x12\x03c\x023\x1a\x19\
+    \x20Set\x20by\x20server\x20on\x20update\n\"5\x20protolint:disable:this\
+    \x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x03\x02\x07\x04\x12\
+    \x03c\x02\n\n\x0c\n\x05\x04\x03\x02\x07\x05\x12\x03c\x0b\x10\n\x0c\n\x05\
+    \x04\x03\x02\x07\x01\x12\x03c\x11+\n\x0c\n\x05\x04\x03\x02\x07\x03\x12\
+    \x03c.2b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -852,10 +1145,11 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             let mut deps = ::std::vec::Vec::with_capacity(2);
             deps.push(super::sp_pipeline::file_descriptor().clone());
             deps.push(super::sp_steps_detective::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(3);
+            let mut messages = ::std::vec::Vec::with_capacity(4);
             messages.push(WASMRequest::generated_message_descriptor_data());
             messages.push(WASMResponse::generated_message_descriptor_data());
             messages.push(InterStepResult::generated_message_descriptor_data());
+            messages.push(CustomWasm::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(WASMExitCode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
