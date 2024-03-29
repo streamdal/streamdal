@@ -2,6 +2,13 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { TestResponse } from "./sp_external";
 import type { TestRequest } from "./sp_external";
+import type { DeleteCustomWasmRequest } from "./sp_external";
+import type { UpdateCustomWasmRequest } from "./sp_external";
+import type { CreateCustomWasmRequest } from "./sp_external";
+import type { GetAllCustomWasmResponse } from "./sp_external";
+import type { GetAllCustomWasmRequest } from "./sp_external";
+import type { GetCustomWasmResponse } from "./sp_external";
+import type { GetCustomWasmRequest } from "./sp_external";
 import type { AppRegisterRejectRequest } from "./sp_external";
 import type { AppVerifyRegistrationRequest } from "./sp_external";
 import type { AppRegistrationRequest } from "./sp_external";
@@ -214,6 +221,30 @@ export interface IExternalClient {
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
     /**
+     * BEGIN Custom Wasm methods
+     *
+     * @generated from protobuf rpc: GetCustomWasm(protos.GetCustomWasmRequest) returns (protos.GetCustomWasmResponse);
+     */
+    getCustomWasm(input: GetCustomWasmRequest, options?: RpcOptions): UnaryCall<GetCustomWasmRequest, GetCustomWasmResponse>;
+    /**
+     * @generated from protobuf rpc: GetAllCustomWasm(protos.GetAllCustomWasmRequest) returns (protos.GetAllCustomWasmResponse);
+     */
+    getAllCustomWasm(input: GetAllCustomWasmRequest, options?: RpcOptions): UnaryCall<GetAllCustomWasmRequest, GetAllCustomWasmResponse>;
+    /**
+     * @generated from protobuf rpc: CreateCustomWasm(protos.CreateCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    createCustomWasm(input: CreateCustomWasmRequest, options?: RpcOptions): UnaryCall<CreateCustomWasmRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: UpdateCustomWasm(protos.UpdateCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    updateCustomWasm(input: UpdateCustomWasmRequest, options?: RpcOptions): UnaryCall<UpdateCustomWasmRequest, StandardResponse>;
+    /**
+     * END Custom Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteCustomWasm(protos.DeleteCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteCustomWasm(input: DeleteCustomWasmRequest, options?: RpcOptions): UnaryCall<DeleteCustomWasmRequest, StandardResponse>;
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
@@ -393,6 +424,30 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
+    /**
+     * BEGIN Custom Wasm methods
+     *
+     * @generated from protobuf rpc: GetCustomWasm(protos.GetCustomWasmRequest) returns (protos.GetCustomWasmResponse);
+     */
+    getCustomWasm(input: GetCustomWasmRequest, options?: RpcOptions): UnaryCall<GetCustomWasmRequest, GetCustomWasmResponse>;
+    /**
+     * @generated from protobuf rpc: GetAllCustomWasm(protos.GetAllCustomWasmRequest) returns (protos.GetAllCustomWasmResponse);
+     */
+    getAllCustomWasm(input: GetAllCustomWasmRequest, options?: RpcOptions): UnaryCall<GetAllCustomWasmRequest, GetAllCustomWasmResponse>;
+    /**
+     * @generated from protobuf rpc: CreateCustomWasm(protos.CreateCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    createCustomWasm(input: CreateCustomWasmRequest, options?: RpcOptions): UnaryCall<CreateCustomWasmRequest, StandardResponse>;
+    /**
+     * @generated from protobuf rpc: UpdateCustomWasm(protos.UpdateCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    updateCustomWasm(input: UpdateCustomWasmRequest, options?: RpcOptions): UnaryCall<UpdateCustomWasmRequest, StandardResponse>;
+    /**
+     * END Custom Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteCustomWasm(protos.DeleteCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteCustomWasm(input: DeleteCustomWasmRequest, options?: RpcOptions): UnaryCall<DeleteCustomWasmRequest, StandardResponse>;
     /**
      * Test method
      *

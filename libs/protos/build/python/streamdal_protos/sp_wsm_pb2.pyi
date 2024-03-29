@@ -11,6 +11,26 @@ WASM_EXIT_CODE_FALSE: WASMExitCode
 WASM_EXIT_CODE_TRUE: WASMExitCode
 WASM_EXIT_CODE_UNSET: WASMExitCode
 
+class CustomWasm(_message.Message):
+    __slots__ = ["_created_at_unix_ts_ns_utc", "_updated_at_unix_ts_ns_utc", "description", "id", "name", "url", "version", "wasm_bytes"]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    URL_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    WASM_BYTES_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_AT_UNIX_TS_NS_UTC_FIELD_NUMBER: _ClassVar[int]
+    _UPDATED_AT_UNIX_TS_NS_UTC_FIELD_NUMBER: _ClassVar[int]
+    _created_at_unix_ts_ns_utc: int
+    _updated_at_unix_ts_ns_utc: int
+    description: str
+    id: str
+    name: str
+    url: str
+    version: str
+    wasm_bytes: str
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., wasm_bytes: _Optional[str] = ..., description: _Optional[str] = ..., version: _Optional[str] = ..., url: _Optional[str] = ..., _created_at_unix_ts_ns_utc: _Optional[int] = ..., _updated_at_unix_ts_ns_utc: _Optional[int] = ...) -> None: ...
+
 class InterStepResult(_message.Message):
     __slots__ = ["detective_result"]
     DETECTIVE_RESULT_FIELD_NUMBER: _ClassVar[int]

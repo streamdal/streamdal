@@ -107,6 +107,51 @@ export interface InterStepResult {
     };
 }
 /**
+ * Used for defining a custom Wasm module that can be used in CustomStep
+ *
+ * @generated from protobuf message protos.CustomWasm
+ */
+export interface CustomWasm {
+    /**
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string name = 2;
+     */
+    name: string;
+    /**
+     * @generated from protobuf field: string wasm_bytes = 3;
+     */
+    wasmBytes: string;
+    /**
+     * Informative/debug fields
+     *
+     * @generated from protobuf field: optional string description = 100;
+     */
+    description?: string;
+    /**
+     * @generated from protobuf field: optional string version = 101;
+     */
+    version?: string;
+    /**
+     * @generated from protobuf field: optional string url = 102;
+     */
+    url?: string;
+    /**
+     * Set by server on create
+     *
+     * @generated from protobuf field: optional int64 _created_at_unix_ts_ns_utc = 1000;
+     */
+    CreatedAtUnixTsNsUtc?: string;
+    /**
+     * Set by server on update
+     *
+     * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
+     */
+    UpdatedAtUnixTsNsUtc?: string;
+}
+/**
  * Included in Wasm response; the SDK should use the WASMExitCode to determine
  * what to do next - should it execute next step, should it notify or should it
  * stop execution/abort the rest of the steps in current or all pipelines.
@@ -173,4 +218,14 @@ declare class InterStepResult$Type extends MessageType<InterStepResult> {
  * @generated MessageType for protobuf message protos.InterStepResult
  */
 export declare const InterStepResult: InterStepResult$Type;
+declare class CustomWasm$Type extends MessageType<CustomWasm> {
+    constructor();
+    create(value?: PartialMessage<CustomWasm>): CustomWasm;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CustomWasm): CustomWasm;
+    internalBinaryWrite(message: CustomWasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.CustomWasm
+ */
+export declare const CustomWasm: CustomWasm$Type;
 export {};

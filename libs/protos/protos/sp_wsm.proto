@@ -94,9 +94,9 @@ message CustomWasm {
   optional string url = 102;
 
   // Set by server on create
-  optional int64 created_at_unix_ts_ns_utc = 103;
+  optional int64 _created_at_unix_ts_ns_utc = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   // Set by server on update
-  optional int64 updated_at_unix_ts_ns_utc = 104;
+  optional int64 _updated_at_unix_ts_ns_utc = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 

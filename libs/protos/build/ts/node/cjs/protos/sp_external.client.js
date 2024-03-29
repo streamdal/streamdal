@@ -266,12 +266,51 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
+     * BEGIN Custom Wasm methods
+     *
+     * @generated from protobuf rpc: GetCustomWasm(protos.GetCustomWasmRequest) returns (protos.GetCustomWasmResponse);
+     */
+    getCustomWasm(input, options) {
+        const method = this.methods[30], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: GetAllCustomWasm(protos.GetAllCustomWasmRequest) returns (protos.GetAllCustomWasmResponse);
+     */
+    getAllCustomWasm(input, options) {
+        const method = this.methods[31], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: CreateCustomWasm(protos.CreateCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    createCustomWasm(input, options) {
+        const method = this.methods[32], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: UpdateCustomWasm(protos.UpdateCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    updateCustomWasm(input, options) {
+        const method = this.methods[33], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
+     * END Custom Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteCustomWasm(protos.DeleteCustomWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteCustomWasm(input, options) {
+        const method = this.methods[34], opt = this._transport.mergeOptions(options);
+        return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
+    }
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input, options) {
-        const method = this.methods[30], opt = this._transport.mergeOptions(options);
+        const method = this.methods[35], opt = this._transport.mergeOptions(options);
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
 }

@@ -97,7 +97,7 @@ service External {
 
   rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
 
-  // Custom Wasm methods
+  // BEGIN Custom Wasm methods
   rpc GetCustomWasm(GetCustomWasmRequest) returns (GetCustomWasmResponse);
 
   rpc GetAllCustomWasm(GetAllCustomWasmRequest) returns (GetAllCustomWasmResponse);
@@ -107,6 +107,7 @@ service External {
   rpc UpdateCustomWasm(UpdateCustomWasmRequest) returns (StandardResponse);
 
   rpc DeleteCustomWasm(DeleteCustomWasmRequest) returns (StandardResponse);
+  // END Custom Wasm methods
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -343,7 +344,9 @@ message GetCustomWasmResponse {
   protos.CustomWasm custom_wasm = 1;
 }
 
-message GetAllCustomWasmRequest {}
+message GetAllCustomWasmRequest {
+  // Nothing needed here
+}
 
 message GetAllCustomWasmResponse {
   repeated protos.CustomWasm custom_wasm = 1;

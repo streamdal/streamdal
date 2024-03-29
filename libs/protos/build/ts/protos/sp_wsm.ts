@@ -114,6 +114,51 @@ export interface InterStepResult {
     };
 }
 /**
+ * Used for defining a custom Wasm module that can be used in CustomStep
+ *
+ * @generated from protobuf message protos.CustomWasm
+ */
+export interface CustomWasm {
+    /**
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+    /**
+     * @generated from protobuf field: string name = 2;
+     */
+    name: string;
+    /**
+     * @generated from protobuf field: string wasm_bytes = 3;
+     */
+    wasmBytes: string;
+    /**
+     * Informative/debug fields
+     *
+     * @generated from protobuf field: optional string description = 100;
+     */
+    description?: string;
+    /**
+     * @generated from protobuf field: optional string version = 101;
+     */
+    version?: string;
+    /**
+     * @generated from protobuf field: optional string url = 102;
+     */
+    url?: string;
+    /**
+     * Set by server on create
+     *
+     * @generated from protobuf field: optional int64 _created_at_unix_ts_ns_utc = 1000;
+     */
+    CreatedAtUnixTsNsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Set by server on update
+     *
+     * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
+     */
+    UpdatedAtUnixTsNsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+}
+/**
  * Included in Wasm response; the SDK should use the WASMExitCode to determine
  * what to do next - should it execute next step, should it notify or should it
  * stop execution/abort the rest of the steps in current or all pipelines.
@@ -343,3 +388,99 @@ class InterStepResult$Type extends MessageType<InterStepResult> {
  * @generated MessageType for protobuf message protos.InterStepResult
  */
 export const InterStepResult = new InterStepResult$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CustomWasm$Type extends MessageType<CustomWasm> {
+    constructor() {
+        super("protos.CustomWasm", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "wasm_bytes", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 100, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 101, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 102, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_created_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
+        ]);
+    }
+    create(value?: PartialMessage<CustomWasm>): CustomWasm {
+        const message = { id: "", name: "", wasmBytes: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CustomWasm>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CustomWasm): CustomWasm {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                case /* string name */ 2:
+                    message.name = reader.string();
+                    break;
+                case /* string wasm_bytes */ 3:
+                    message.wasmBytes = reader.string();
+                    break;
+                case /* optional string description */ 100:
+                    message.description = reader.string();
+                    break;
+                case /* optional string version */ 101:
+                    message.version = reader.string();
+                    break;
+                case /* optional string url */ 102:
+                    message.url = reader.string();
+                    break;
+                case /* optional int64 _created_at_unix_ts_ns_utc */ 1000:
+                    message.CreatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                case /* optional int64 _updated_at_unix_ts_ns_utc */ 1001:
+                    message.UpdatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CustomWasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* string name = 2; */
+        if (message.name !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* string wasm_bytes = 3; */
+        if (message.wasmBytes !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.wasmBytes);
+        /* optional string description = 100; */
+        if (message.description !== undefined)
+            writer.tag(100, WireType.LengthDelimited).string(message.description);
+        /* optional string version = 101; */
+        if (message.version !== undefined)
+            writer.tag(101, WireType.LengthDelimited).string(message.version);
+        /* optional string url = 102; */
+        if (message.url !== undefined)
+            writer.tag(102, WireType.LengthDelimited).string(message.url);
+        /* optional int64 _created_at_unix_ts_ns_utc = 1000; */
+        if (message.CreatedAtUnixTsNsUtc !== undefined)
+            writer.tag(1000, WireType.Varint).int64(message.CreatedAtUnixTsNsUtc);
+        /* optional int64 _updated_at_unix_ts_ns_utc = 1001; */
+        if (message.UpdatedAtUnixTsNsUtc !== undefined)
+            writer.tag(1001, WireType.Varint).int64(message.UpdatedAtUnixTsNsUtc);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CustomWasm
+ */
+export const CustomWasm = new CustomWasm$Type();

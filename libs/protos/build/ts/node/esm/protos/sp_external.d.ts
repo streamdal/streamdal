@@ -5,6 +5,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { CustomWasm } from "./sp_wsm.js";
 import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
@@ -504,6 +505,67 @@ export interface ResumeTailRequest {
     tailId: string;
 }
 /**
+ * @generated from protobuf message protos.GetCustomWasmRequest
+ */
+export interface GetCustomWasmRequest {
+    /**
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+}
+/**
+ * @generated from protobuf message protos.GetCustomWasmResponse
+ */
+export interface GetCustomWasmResponse {
+    /**
+     * @generated from protobuf field: protos.CustomWasm custom_wasm = 1;
+     */
+    customWasm?: CustomWasm;
+}
+/**
+ * Nothing needed here
+ *
+ * @generated from protobuf message protos.GetAllCustomWasmRequest
+ */
+export interface GetAllCustomWasmRequest {
+}
+/**
+ * @generated from protobuf message protos.GetAllCustomWasmResponse
+ */
+export interface GetAllCustomWasmResponse {
+    /**
+     * @generated from protobuf field: repeated protos.CustomWasm custom_wasm = 1;
+     */
+    customWasm: CustomWasm[];
+}
+/**
+ * @generated from protobuf message protos.CreateCustomWasmRequest
+ */
+export interface CreateCustomWasmRequest {
+    /**
+     * @generated from protobuf field: protos.CustomWasm custom_wasm = 1;
+     */
+    customWasm?: CustomWasm;
+}
+/**
+ * @generated from protobuf message protos.UpdateCustomWasmRequest
+ */
+export interface UpdateCustomWasmRequest {
+    /**
+     * @generated from protobuf field: protos.CustomWasm custom_wasm = 1;
+     */
+    customWasm?: CustomWasm;
+}
+/**
+ * @generated from protobuf message protos.DeleteCustomWasmRequest
+ */
+export interface DeleteCustomWasmRequest {
+    /**
+     * @generated from protobuf field: repeated string ids = 1;
+     */
+    ids: string[];
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -918,6 +980,76 @@ declare class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
  * @generated MessageType for protobuf message protos.ResumeTailRequest
  */
 export declare const ResumeTailRequest: ResumeTailRequest$Type;
+declare class GetCustomWasmRequest$Type extends MessageType<GetCustomWasmRequest> {
+    constructor();
+    create(value?: PartialMessage<GetCustomWasmRequest>): GetCustomWasmRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetCustomWasmRequest): GetCustomWasmRequest;
+    internalBinaryWrite(message: GetCustomWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetCustomWasmRequest
+ */
+export declare const GetCustomWasmRequest: GetCustomWasmRequest$Type;
+declare class GetCustomWasmResponse$Type extends MessageType<GetCustomWasmResponse> {
+    constructor();
+    create(value?: PartialMessage<GetCustomWasmResponse>): GetCustomWasmResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetCustomWasmResponse): GetCustomWasmResponse;
+    internalBinaryWrite(message: GetCustomWasmResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetCustomWasmResponse
+ */
+export declare const GetCustomWasmResponse: GetCustomWasmResponse$Type;
+declare class GetAllCustomWasmRequest$Type extends MessageType<GetAllCustomWasmRequest> {
+    constructor();
+    create(value?: PartialMessage<GetAllCustomWasmRequest>): GetAllCustomWasmRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllCustomWasmRequest): GetAllCustomWasmRequest;
+    internalBinaryWrite(message: GetAllCustomWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllCustomWasmRequest
+ */
+export declare const GetAllCustomWasmRequest: GetAllCustomWasmRequest$Type;
+declare class GetAllCustomWasmResponse$Type extends MessageType<GetAllCustomWasmResponse> {
+    constructor();
+    create(value?: PartialMessage<GetAllCustomWasmResponse>): GetAllCustomWasmResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllCustomWasmResponse): GetAllCustomWasmResponse;
+    internalBinaryWrite(message: GetAllCustomWasmResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllCustomWasmResponse
+ */
+export declare const GetAllCustomWasmResponse: GetAllCustomWasmResponse$Type;
+declare class CreateCustomWasmRequest$Type extends MessageType<CreateCustomWasmRequest> {
+    constructor();
+    create(value?: PartialMessage<CreateCustomWasmRequest>): CreateCustomWasmRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateCustomWasmRequest): CreateCustomWasmRequest;
+    internalBinaryWrite(message: CreateCustomWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateCustomWasmRequest
+ */
+export declare const CreateCustomWasmRequest: CreateCustomWasmRequest$Type;
+declare class UpdateCustomWasmRequest$Type extends MessageType<UpdateCustomWasmRequest> {
+    constructor();
+    create(value?: PartialMessage<UpdateCustomWasmRequest>): UpdateCustomWasmRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdateCustomWasmRequest): UpdateCustomWasmRequest;
+    internalBinaryWrite(message: UpdateCustomWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.UpdateCustomWasmRequest
+ */
+export declare const UpdateCustomWasmRequest: UpdateCustomWasmRequest$Type;
+declare class DeleteCustomWasmRequest$Type extends MessageType<DeleteCustomWasmRequest> {
+    constructor();
+    create(value?: PartialMessage<DeleteCustomWasmRequest>): DeleteCustomWasmRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteCustomWasmRequest): DeleteCustomWasmRequest;
+    internalBinaryWrite(message: DeleteCustomWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteCustomWasmRequest
+ */
+export declare const DeleteCustomWasmRequest: DeleteCustomWasmRequest$Type;
 declare class TestRequest$Type extends MessageType<TestRequest> {
     constructor();
     create(value?: PartialMessage<TestRequest>): TestRequest;

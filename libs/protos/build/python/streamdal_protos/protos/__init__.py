@@ -114,6 +114,25 @@ class ClientType(betterproto.Enum):
     CLIENT_TYPE_SHIM = 2
 
 
+class WasmExitCode(betterproto.Enum):
+    """
+    Included in Wasm response; the SDK should use the WASMExitCode to determine
+    what to do next - should it execute next step, should it notify or should
+    it stop execution/abort the rest of the steps in current or all pipelines.
+    Example: a. Wasm func returns WASM_EXIT_CODE_FALSE - read
+    PipelineStep.on_false conditions to determine what to do next. b. Wasm func
+    returns WASM_EXIT_CODE_TRUE - read PipelineStep.on_true conditions to
+    determine what to do next. .. and so on. TODO: This might be a dupe -
+    should Wasm use ExecStatus instead of this? protolint:disable:next
+    ENUM_FIELD_NAMES_PREFIX
+    """
+
+    WASM_EXIT_CODE_UNSET = 0
+    WASM_EXIT_CODE_TRUE = 1
+    WASM_EXIT_CODE_FALSE = 2
+    WASM_EXIT_CODE_ERROR = 3
+
+
 class AppRegistrationStatusResponseStatus(betterproto.Enum):
     STATUS_UNSET = 0
     STATUS_SUBMIT = 1
@@ -159,25 +178,6 @@ class ExecStatus(betterproto.Enum):
     request. Example error cases: SDK can't find the appropriate Wasm module,
     Wasm function cannot alloc or dealloc memory, etc.
     """
-
-
-class WasmExitCode(betterproto.Enum):
-    """
-    Included in Wasm response; the SDK should use the WASMExitCode to determine
-    what to do next - should it execute next step, should it notify or should
-    it stop execution/abort the rest of the steps in current or all pipelines.
-    Example: a. Wasm func returns WASM_EXIT_CODE_FALSE - read
-    PipelineStep.on_false conditions to determine what to do next. b. Wasm func
-    returns WASM_EXIT_CODE_TRUE - read PipelineStep.on_true conditions to
-    determine what to do next. .. and so on. TODO: This might be a dupe -
-    should Wasm use ExecStatus instead of this? protolint:disable:next
-    ENUM_FIELD_NAMES_PREFIX
-    """
-
-    WASM_EXIT_CODE_UNSET = 0
-    WASM_EXIT_CODE_TRUE = 1
-    WASM_EXIT_CODE_FALSE = 2
-    WASM_EXIT_CODE_ERROR = 3
 
 
 @dataclass(eq=False, repr=False)
@@ -573,6 +573,119 @@ class ClientInfo(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
+class WasmRequest(betterproto.Message):
+    """SDK generates a WASM request and passes this to the WASM func"""
+
+    step: "PipelineStep" = betterproto.message_field(1)
+    """
+    The actual step that the WASM func will operate on. This is the same step
+    that is declared in protos.Pipeline.
+    """
+
+    input_payload: bytes = betterproto.bytes_field(2)
+    """Payload data that WASM func will operate on"""
+
+    input_step: Optional[bytes] = betterproto.bytes_field(
+        3, optional=True, group="_input_step"
+    )
+    """
+    Potentially filled out result from previous step. If this is first step in
+    the pipeline, it will be empty.
+    """
+
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        4, optional=True, group="_inter_step_result"
+    )
+    """
+    Potential input from a previous step if `Step.Dynamic == true` This is used
+    for communicating data between steps. For example, when trying to find
+    email addresses in a payload and then passing on the results to a transform
+    step to obfuscate them
+    """
+
+
+@dataclass(eq=False, repr=False)
+class WasmResponse(betterproto.Message):
+    """Returned by all WASM functions"""
+
+    output_payload: bytes = betterproto.bytes_field(1)
+    """
+    Potentially modified input payload. Concept: All WASM funcs accept an
+    input_payload in WASMRequest, WASM func reads input payload, modifies it
+    and writes the modified output to output_payload.
+    """
+
+    exit_code: "WasmExitCode" = betterproto.enum_field(2)
+    """
+    Exit code that the WASM func exited with; more info in WASMExitCode's
+    comment
+    """
+
+    exit_msg: str = betterproto.string_field(3)
+    """Additional info about the reason a specific exit code was returned"""
+
+    output_step: Optional[bytes] = betterproto.bytes_field(
+        4, optional=True, group="_output_step"
+    )
+    """
+    Potential additional step output - ie. if a WASM func is an HTTPGet,
+    output_step would contain the HTTP response body; if the WASM func is a
+    KVGet, the output_step would be the value of the fetched key.
+    """
+
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        5, optional=True, group="_inter_step_result"
+    )
+    """
+    If `Step.Dynamic == true`, this field should be filled out by the WASM
+    module This is used for communicating data between steps. For example, when
+    trying to find email addresses in a payload and then passing on the results
+    to a transform step to obfuscate them
+    """
+
+
+@dataclass(eq=False, repr=False)
+class InterStepResult(betterproto.Message):
+    """
+    Intended for communicating wasm results between steps. Currently only used
+    for passing results from a Detective Step to a Transform step
+    """
+
+    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
+        1, group="input_from"
+    )
+
+
+@dataclass(eq=False, repr=False)
+class CustomWasm(betterproto.Message):
+    """
+    Used for defining a custom Wasm module that can be used in CustomStep
+    """
+
+    id: str = betterproto.string_field(1)
+    name: str = betterproto.string_field(2)
+    wasm_bytes: str = betterproto.string_field(3)
+    description: Optional[str] = betterproto.string_field(
+        100, optional=True, group="_description"
+    )
+    """Informative/debug fields"""
+
+    version: Optional[str] = betterproto.string_field(
+        101, optional=True, group="_version"
+    )
+    url: Optional[str] = betterproto.string_field(102, optional=True, group="_url")
+    created_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
+        1000, optional=True, group="X_created_at_unix_ts_ns_utc"
+    )
+    """Set by server on create"""
+
+    updated_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
+        1001, optional=True, group="X_updated_at_unix_ts_ns_utc"
+    )
+    """Set by server on update"""
+
+
+@dataclass(eq=False, repr=False)
 class GetAllRequest(betterproto.Message):
     pass
 
@@ -842,6 +955,41 @@ class PauseTailRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class ResumeTailRequest(betterproto.Message):
     tail_id: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetCustomWasmRequest(betterproto.Message):
+    id: str = betterproto.string_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetCustomWasmResponse(betterproto.Message):
+    custom_wasm: "CustomWasm" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class GetAllCustomWasmRequest(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class GetAllCustomWasmResponse(betterproto.Message):
+    custom_wasm: List["CustomWasm"] = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class CreateCustomWasmRequest(betterproto.Message):
+    custom_wasm: "CustomWasm" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class UpdateCustomWasmRequest(betterproto.Message):
+    custom_wasm: "CustomWasm" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class DeleteCustomWasmRequest(betterproto.Message):
+    ids: List[str] = betterproto.string_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1242,90 +1390,6 @@ class StepStatus(betterproto.Message):
     future pipelines - the user must define the abort conditions for
     "on_error".
     """
-
-
-@dataclass(eq=False, repr=False)
-class WasmRequest(betterproto.Message):
-    """SDK generates a WASM request and passes this to the WASM func"""
-
-    step: "PipelineStep" = betterproto.message_field(1)
-    """
-    The actual step that the WASM func will operate on. This is the same step
-    that is declared in protos.Pipeline.
-    """
-
-    input_payload: bytes = betterproto.bytes_field(2)
-    """Payload data that WASM func will operate on"""
-
-    input_step: Optional[bytes] = betterproto.bytes_field(
-        3, optional=True, group="_input_step"
-    )
-    """
-    Potentially filled out result from previous step. If this is first step in
-    the pipeline, it will be empty.
-    """
-
-    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
-        4, optional=True, group="_inter_step_result"
-    )
-    """
-    Potential input from a previous step if `Step.Dynamic == true` This is used
-    for communicating data between steps. For example, when trying to find
-    email addresses in a payload and then passing on the results to a transform
-    step to obfuscate them
-    """
-
-
-@dataclass(eq=False, repr=False)
-class WasmResponse(betterproto.Message):
-    """Returned by all WASM functions"""
-
-    output_payload: bytes = betterproto.bytes_field(1)
-    """
-    Potentially modified input payload. Concept: All WASM funcs accept an
-    input_payload in WASMRequest, WASM func reads input payload, modifies it
-    and writes the modified output to output_payload.
-    """
-
-    exit_code: "WasmExitCode" = betterproto.enum_field(2)
-    """
-    Exit code that the WASM func exited with; more info in WASMExitCode's
-    comment
-    """
-
-    exit_msg: str = betterproto.string_field(3)
-    """Additional info about the reason a specific exit code was returned"""
-
-    output_step: Optional[bytes] = betterproto.bytes_field(
-        4, optional=True, group="_output_step"
-    )
-    """
-    Potential additional step output - ie. if a WASM func is an HTTPGet,
-    output_step would contain the HTTP response body; if the WASM func is a
-    KVGet, the output_step would be the value of the fetched key.
-    """
-
-    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
-        5, optional=True, group="_inter_step_result"
-    )
-    """
-    If `Step.Dynamic == true`, this field should be filled out by the WASM
-    module This is used for communicating data between steps. For example, when
-    trying to find email addresses in a payload and then passing on the results
-    to a transform step to obfuscate them
-    """
-
-
-@dataclass(eq=False, repr=False)
-class InterStepResult(betterproto.Message):
-    """
-    Intended for communicating wasm results between steps. Currently only used
-    for passing results from a Detective Step to a Transform step
-    """
-
-    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
-        1, group="input_from"
-    )
 
 
 class ExternalStub(betterproto.ServiceStub):
@@ -1843,6 +1907,91 @@ class ExternalStub(betterproto.ServiceStub):
             metadata=metadata,
         )
 
+    async def get_custom_wasm(
+        self,
+        get_custom_wasm_request: "GetCustomWasmRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetCustomWasmResponse":
+        return await self._unary_unary(
+            "/protos.External/GetCustomWasm",
+            get_custom_wasm_request,
+            GetCustomWasmResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def get_all_custom_wasm(
+        self,
+        get_all_custom_wasm_request: "GetAllCustomWasmRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetAllCustomWasmResponse":
+        return await self._unary_unary(
+            "/protos.External/GetAllCustomWasm",
+            get_all_custom_wasm_request,
+            GetAllCustomWasmResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def create_custom_wasm(
+        self,
+        create_custom_wasm_request: "CreateCustomWasmRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/CreateCustomWasm",
+            create_custom_wasm_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def update_custom_wasm(
+        self,
+        update_custom_wasm_request: "UpdateCustomWasmRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/UpdateCustomWasm",
+            update_custom_wasm_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def delete_custom_wasm(
+        self,
+        delete_custom_wasm_request: "DeleteCustomWasmRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "StandardResponse":
+        return await self._unary_unary(
+            "/protos.External/DeleteCustomWasm",
+            delete_custom_wasm_request,
+            StandardResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
     async def test(
         self,
         test_request: "TestRequest",
@@ -2154,6 +2303,31 @@ class ExternalBase(ServiceBase):
     ) -> "StandardResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def get_custom_wasm(
+        self, get_custom_wasm_request: "GetCustomWasmRequest"
+    ) -> "GetCustomWasmResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def get_all_custom_wasm(
+        self, get_all_custom_wasm_request: "GetAllCustomWasmRequest"
+    ) -> "GetAllCustomWasmResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def create_custom_wasm(
+        self, create_custom_wasm_request: "CreateCustomWasmRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def update_custom_wasm(
+        self, update_custom_wasm_request: "UpdateCustomWasmRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
+    async def delete_custom_wasm(
+        self, delete_custom_wasm_request: "DeleteCustomWasmRequest"
+    ) -> "StandardResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def test(self, test_request: "TestRequest") -> "TestResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
@@ -2391,6 +2565,43 @@ class ExternalBase(ServiceBase):
         response = await self.app_register_reject(request)
         await stream.send_message(response)
 
+    async def __rpc_get_custom_wasm(
+        self,
+        stream: "grpclib.server.Stream[GetCustomWasmRequest, GetCustomWasmResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_custom_wasm(request)
+        await stream.send_message(response)
+
+    async def __rpc_get_all_custom_wasm(
+        self,
+        stream: "grpclib.server.Stream[GetAllCustomWasmRequest, GetAllCustomWasmResponse]",
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_all_custom_wasm(request)
+        await stream.send_message(response)
+
+    async def __rpc_create_custom_wasm(
+        self, stream: "grpclib.server.Stream[CreateCustomWasmRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.create_custom_wasm(request)
+        await stream.send_message(response)
+
+    async def __rpc_update_custom_wasm(
+        self, stream: "grpclib.server.Stream[UpdateCustomWasmRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.update_custom_wasm(request)
+        await stream.send_message(response)
+
+    async def __rpc_delete_custom_wasm(
+        self, stream: "grpclib.server.Stream[DeleteCustomWasmRequest, StandardResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.delete_custom_wasm(request)
+        await stream.send_message(response)
+
     async def __rpc_test(
         self, stream: "grpclib.server.Stream[TestRequest, TestResponse]"
     ) -> None:
@@ -2578,6 +2789,36 @@ class ExternalBase(ServiceBase):
                 self.__rpc_app_register_reject,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 AppRegisterRejectRequest,
+                StandardResponse,
+            ),
+            "/protos.External/GetCustomWasm": grpclib.const.Handler(
+                self.__rpc_get_custom_wasm,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetCustomWasmRequest,
+                GetCustomWasmResponse,
+            ),
+            "/protos.External/GetAllCustomWasm": grpclib.const.Handler(
+                self.__rpc_get_all_custom_wasm,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetAllCustomWasmRequest,
+                GetAllCustomWasmResponse,
+            ),
+            "/protos.External/CreateCustomWasm": grpclib.const.Handler(
+                self.__rpc_create_custom_wasm,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                CreateCustomWasmRequest,
+                StandardResponse,
+            ),
+            "/protos.External/UpdateCustomWasm": grpclib.const.Handler(
+                self.__rpc_update_custom_wasm,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                UpdateCustomWasmRequest,
+                StandardResponse,
+            ),
+            "/protos.External/DeleteCustomWasm": grpclib.const.Handler(
+                self.__rpc_delete_custom_wasm,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                DeleteCustomWasmRequest,
                 StandardResponse,
             ),
             "/protos.External/Test": grpclib.const.Handler(
