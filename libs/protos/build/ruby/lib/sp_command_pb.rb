@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'shared/sp_shared_pb'
 require 'sp_common_pb'
 require 'sp_kv_pb'
 require 'sp_pipeline_pb'
@@ -20,6 +21,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "protos.SetPipelinesCommand" do
       repeated :pipelines, :message, 1, "protos.Pipeline"
+      map :wasm_modules, :string, :message, 2, "protos.shared.WasmModule"
     end
     add_message "protos.KeepAliveCommand" do
     end

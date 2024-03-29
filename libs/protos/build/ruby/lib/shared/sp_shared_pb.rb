@@ -5,6 +5,11 @@ require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("shared/sp_shared.proto", :syntax => :proto3) do
+    add_message "protos.shared.WasmModule" do
+      optional :id, :string, 1
+      optional :bytes, :bytes, 2
+      optional :function, :string, 3
+    end
     add_enum "protos.shared.KVAction" do
       value :KV_ACTION_UNSET, 0
       value :KV_ACTION_GET, 1
@@ -19,6 +24,7 @@ end
 
 module Streamdal
   module Protos
+    WasmModule = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.shared.WasmModule").msgclass
     KVAction = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.shared.KVAction").enummodule
   end
 end
