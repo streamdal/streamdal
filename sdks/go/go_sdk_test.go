@@ -224,7 +224,7 @@ var _ = Describe("Streamdal", func() {
 				},
 			}
 
-			cond := s.handleCondition(context.Background(), req, &ProcessResponse{Data: &protos.Payload{}}, condition, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_TRUE)
+			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_TRUE)
 
 			Expect(cond.abortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 			Expect(cond.abortCurrent).To(BeFalse())
@@ -237,7 +237,7 @@ var _ = Describe("Streamdal", func() {
 				Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
 			}
 
-			cond := s.handleCondition(context.Background(), req, &ProcessResponse{Data: &protos.Payload{}}, condition, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_TRUE)
+			cond := s.handleCondition(context.Background(), req, &ProcessResponse{}, condition, step, pipeline, aud, protos.NotifyRequest_CONDITION_TYPE_ON_TRUE)
 			Expect(cond.abortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT))
 			Expect(cond.abortCurrent).To(BeTrue())
 		})
@@ -525,7 +525,7 @@ var _ = Describe("Streamdal", func() {
 						Data:          payload,
 					})
 
-					Expect(resp).To(BeAssignableToTypeOf(&ProcessResponse{Data: &protos.Payload{}}))
+					Expect(resp).To(BeAssignableToTypeOf(&ProcessResponse{}))
 					Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 					Expect(len(resp.PipelineStatus)).To(Equal(1))
 					Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(2))
@@ -533,7 +533,7 @@ var _ = Describe("Streamdal", func() {
 					Expect(resp.PipelineStatus[0].StepStatus[1].Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 					Expect(resp.PipelineStatus[0].StepStatus[0].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 					Expect(resp.PipelineStatus[0].StepStatus[1].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
-					Expect(string(resp.Data.Bytes)).To(Equal(`{"object":{"payload":"stre***************"}}`))
+					Expect(string(resp.Data)).To(Equal(`{"object":{"payload":"stre***************"}}`))
 				}()
 			}
 

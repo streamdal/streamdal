@@ -2,7 +2,6 @@
 # sources: sp_bus.proto, sp_command.proto, sp_common.proto, sp_external.proto, sp_info.proto, sp_internal.proto, sp_kv.proto, sp_notify.proto, sp_pipeline.proto, sp_sdk.proto, sp_wsm.proto
 # plugin: python-betterproto
 # This file has been @generated
-import builtins
 import warnings
 from dataclasses import dataclass
 from typing import (
@@ -1179,20 +1178,10 @@ class BusEvent(betterproto.Message):
 
 
 @dataclass(eq=False, repr=False)
-class Payload(betterproto.Message):
-    """
-    This is a separate type because some SDKs may want to implement some
-    interface for this type (ie. Stringer interface for Go SDK).
-    """
-
-    bytes: builtins.bytes = betterproto.bytes_field(1)
-
-
-@dataclass(eq=False, repr=False)
 class SdkResponse(betterproto.Message):
     """Common return response used by all SDKs"""
 
-    data: "Payload" = betterproto.message_field(1)
+    data: bytes = betterproto.bytes_field(1)
     """Contains (potentially) modified input data"""
 
     status: "ExecStatus" = betterproto.enum_field(2)
