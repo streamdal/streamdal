@@ -97,17 +97,17 @@ service External {
 
   rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
 
-  // BEGIN Custom Wasm methods
-  rpc GetCustomWasm(GetCustomWasmRequest) returns (GetCustomWasmResponse);
+  // BEGIN Wasm methods
+  rpc GetWasm(GetWasmRequest) returns (GetWasmResponse);
 
-  rpc GetAllCustomWasm(GetAllCustomWasmRequest) returns (GetAllCustomWasmResponse);
+  rpc GetAllWasm(GetAllWasmRequest) returns (GetAllWasmResponse);
 
-  rpc CreateCustomWasm(CreateCustomWasmRequest) returns (StandardResponse);
+  rpc CreateWasm(CreateWasmRequest) returns (StandardResponse);
 
-  rpc UpdateCustomWasm(UpdateCustomWasmRequest) returns (StandardResponse);
+  rpc UpdateWasm(UpdateWasmRequest) returns (StandardResponse);
 
-  rpc DeleteCustomWasm(DeleteCustomWasmRequest) returns (StandardResponse);
-  // END Custom Wasm methods
+  rpc DeleteWasm(DeleteWasmRequest) returns (StandardResponse);
+  // END Wasm methods
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -336,31 +336,31 @@ message ResumeTailRequest {
   string tail_id = 1;
 }
 
-message GetCustomWasmRequest {
+message GetWasmRequest {
   string id = 1;
 }
 
-message GetCustomWasmResponse {
-  protos.CustomWasm custom_wasm = 1;
+message GetWasmResponse {
+  protos.Wasm custom_wasm = 1;
 }
 
-message GetAllCustomWasmRequest {
+message GetAllWasmRequest {
   // Nothing needed here
 }
 
-message GetAllCustomWasmResponse {
-  repeated protos.CustomWasm custom_wasm = 1;
+message GetAllWasmResponse {
+  repeated protos.Wasm custom_wasm = 1;
 }
 
-message CreateCustomWasmRequest {
-  protos.CustomWasm custom_wasm = 1;
+message CreateWasmRequest {
+  protos.Wasm custom_wasm = 1;
 }
 
-message UpdateCustomWasmRequest {
-  protos.CustomWasm custom_wasm = 1;
+message UpdateWasmRequest {
+  protos.Wasm custom_wasm = 1;
 }
 
-message DeleteCustomWasmRequest {
+message DeleteWasmRequest {
   repeated string ids = 1;
 }
 

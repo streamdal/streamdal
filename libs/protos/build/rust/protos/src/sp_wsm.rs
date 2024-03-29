@@ -634,42 +634,42 @@ pub mod inter_step_result {
 }
 
 ///  Used for defining a custom Wasm module that can be used in CustomStep
-// @@protoc_insertion_point(message:protos.CustomWasm)
+// @@protoc_insertion_point(message:protos.Wasm)
 #[derive(PartialEq,Clone,Default,Debug)]
-pub struct CustomWasm {
+pub struct Wasm {
     // message fields
-    // @@protoc_insertion_point(field:protos.CustomWasm.id)
+    // @@protoc_insertion_point(field:protos.Wasm.id)
     pub id: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.CustomWasm.name)
+    // @@protoc_insertion_point(field:protos.Wasm.name)
     pub name: ::std::string::String,
-    // @@protoc_insertion_point(field:protos.CustomWasm.wasm_bytes)
+    // @@protoc_insertion_point(field:protos.Wasm.wasm_bytes)
     pub wasm_bytes: ::std::string::String,
     ///  Informative/debug fields
-    // @@protoc_insertion_point(field:protos.CustomWasm.description)
+    // @@protoc_insertion_point(field:protos.Wasm.description)
     pub description: ::std::option::Option<::std::string::String>,
-    // @@protoc_insertion_point(field:protos.CustomWasm.version)
+    // @@protoc_insertion_point(field:protos.Wasm.version)
     pub version: ::std::option::Option<::std::string::String>,
-    // @@protoc_insertion_point(field:protos.CustomWasm.url)
+    // @@protoc_insertion_point(field:protos.Wasm.url)
     pub url: ::std::option::Option<::std::string::String>,
     ///  Set by server on create
-    // @@protoc_insertion_point(field:protos.CustomWasm._created_at_unix_ts_ns_utc)
+    // @@protoc_insertion_point(field:protos.Wasm._created_at_unix_ts_ns_utc)
     pub _created_at_unix_ts_ns_utc: ::std::option::Option<i64>,
     ///  Set by server on update
-    // @@protoc_insertion_point(field:protos.CustomWasm._updated_at_unix_ts_ns_utc)
+    // @@protoc_insertion_point(field:protos.Wasm._updated_at_unix_ts_ns_utc)
     pub _updated_at_unix_ts_ns_utc: ::std::option::Option<i64>,
     // special fields
-    // @@protoc_insertion_point(special_field:protos.CustomWasm.special_fields)
+    // @@protoc_insertion_point(special_field:protos.Wasm.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
 }
 
-impl<'a> ::std::default::Default for &'a CustomWasm {
-    fn default() -> &'a CustomWasm {
-        <CustomWasm as ::protobuf::Message>::default_instance()
+impl<'a> ::std::default::Default for &'a Wasm {
+    fn default() -> &'a Wasm {
+        <Wasm as ::protobuf::Message>::default_instance()
     }
 }
 
-impl CustomWasm {
-    pub fn new() -> CustomWasm {
+impl Wasm {
+    pub fn new() -> Wasm {
         ::std::default::Default::default()
     }
 
@@ -678,54 +678,54 @@ impl CustomWasm {
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "id",
-            |m: &CustomWasm| { &m.id },
-            |m: &mut CustomWasm| { &mut m.id },
+            |m: &Wasm| { &m.id },
+            |m: &mut Wasm| { &mut m.id },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "name",
-            |m: &CustomWasm| { &m.name },
-            |m: &mut CustomWasm| { &mut m.name },
+            |m: &Wasm| { &m.name },
+            |m: &mut Wasm| { &mut m.name },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "wasm_bytes",
-            |m: &CustomWasm| { &m.wasm_bytes },
-            |m: &mut CustomWasm| { &mut m.wasm_bytes },
+            |m: &Wasm| { &m.wasm_bytes },
+            |m: &mut Wasm| { &mut m.wasm_bytes },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "description",
-            |m: &CustomWasm| { &m.description },
-            |m: &mut CustomWasm| { &mut m.description },
+            |m: &Wasm| { &m.description },
+            |m: &mut Wasm| { &mut m.description },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "version",
-            |m: &CustomWasm| { &m.version },
-            |m: &mut CustomWasm| { &mut m.version },
+            |m: &Wasm| { &m.version },
+            |m: &mut Wasm| { &mut m.version },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "url",
-            |m: &CustomWasm| { &m.url },
-            |m: &mut CustomWasm| { &mut m.url },
+            |m: &Wasm| { &m.url },
+            |m: &mut Wasm| { &mut m.url },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "_created_at_unix_ts_ns_utc",
-            |m: &CustomWasm| { &m._created_at_unix_ts_ns_utc },
-            |m: &mut CustomWasm| { &mut m._created_at_unix_ts_ns_utc },
+            |m: &Wasm| { &m._created_at_unix_ts_ns_utc },
+            |m: &mut Wasm| { &mut m._created_at_unix_ts_ns_utc },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
             "_updated_at_unix_ts_ns_utc",
-            |m: &CustomWasm| { &m._updated_at_unix_ts_ns_utc },
-            |m: &mut CustomWasm| { &mut m._updated_at_unix_ts_ns_utc },
+            |m: &Wasm| { &m._updated_at_unix_ts_ns_utc },
+            |m: &mut Wasm| { &mut m._updated_at_unix_ts_ns_utc },
         ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CustomWasm>(
-            "CustomWasm",
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Wasm>(
+            "Wasm",
             fields,
             oneofs,
         )
     }
 }
 
-impl ::protobuf::Message for CustomWasm {
-    const NAME: &'static str = "CustomWasm";
+impl ::protobuf::Message for Wasm {
+    const NAME: &'static str = "Wasm";
 
     fn is_initialized(&self) -> bool {
         true
@@ -836,8 +836,8 @@ impl ::protobuf::Message for CustomWasm {
         &mut self.special_fields
     }
 
-    fn new() -> CustomWasm {
-        CustomWasm::new()
+    fn new() -> Wasm {
+        Wasm::new()
     }
 
     fn clear(&mut self) {
@@ -852,8 +852,8 @@ impl ::protobuf::Message for CustomWasm {
         self.special_fields.clear();
     }
 
-    fn default_instance() -> &'static CustomWasm {
-        static instance: CustomWasm = CustomWasm {
+    fn default_instance() -> &'static Wasm {
+        static instance: Wasm = Wasm {
             id: ::std::string::String::new(),
             name: ::std::string::String::new(),
             wasm_bytes: ::std::string::String::new(),
@@ -868,20 +868,20 @@ impl ::protobuf::Message for CustomWasm {
     }
 }
 
-impl ::protobuf::MessageFull for CustomWasm {
+impl ::protobuf::MessageFull for Wasm {
     fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
         static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("CustomWasm").unwrap()).clone()
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("Wasm").unwrap()).clone()
     }
 }
 
-impl ::std::fmt::Display for CustomWasm {
+impl ::std::fmt::Display for Wasm {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         ::protobuf::text_format::fmt(self, f)
     }
 }
 
-impl ::protobuf::reflect::ProtobufValue for CustomWasm {
+impl ::protobuf::reflect::ProtobufValue for Wasm {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
@@ -988,21 +988,21 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x01R\x0finterStepResult\x88\x01\x01B\x0e\n\x0c_output_stepB\x14\n\x12_i\
     nter_step_result\"o\n\x0fInterStepResult\x12N\n\x10detective_result\x18\
     \x01\x20\x01(\x0b2!.protos.steps.DetectiveStepResultH\0R\x0fdetectiveRes\
-    ultB\x0c\n\ninput_from\"\x8e\x03\n\nCustomWasm\x12\x0e\n\x02id\x18\x01\
-    \x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12\x1d\
-    \n\nwasm_bytes\x18\x03\x20\x01(\tR\twasmBytes\x12%\n\x0bdescription\x18d\
-    \x20\x01(\tH\0R\x0bdescription\x88\x01\x01\x12\x1d\n\x07version\x18e\x20\
-    \x01(\tH\x01R\x07version\x88\x01\x01\x12\x15\n\x03url\x18f\x20\x01(\tH\
-    \x02R\x03url\x88\x01\x01\x12>\n\x1a_created_at_unix_ts_ns_utc\x18\xe8\
-    \x07\x20\x01(\x03H\x03R\x14CreatedAtUnixTsNsUtc\x88\x01\x01\x12>\n\x1a_u\
-    pdated_at_unix_ts_ns_utc\x18\xe9\x07\x20\x01(\x03H\x04R\x14UpdatedAtUnix\
-    TsNsUtc\x88\x01\x01B\x0e\n\x0c_descriptionB\n\n\x08_versionB\x06\n\x04_u\
-    rlB\x1d\n\x1bX_created_at_unix_ts_ns_utcB\x1d\n\x1bX_updated_at_unix_ts_\
-    ns_utc*u\n\x0cWASMExitCode\x12\x18\n\x14WASM_EXIT_CODE_UNSET\x10\0\x12\
-    \x17\n\x13WASM_EXIT_CODE_TRUE\x10\x01\x12\x18\n\x14WASM_EXIT_CODE_FALSE\
-    \x10\x02\x12\x18\n\x14WASM_EXIT_CODE_ERROR\x10\x03B<Z:github.com/streamd\
-    al/streamdal/libs/protos/build/go/protosJ\x84\x1f\n\x06\x12\x04\0\0d\x01\
-    \n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
+    ultB\x0c\n\ninput_from\"\x88\x03\n\x04Wasm\x12\x0e\n\x02id\x18\x01\x20\
+    \x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\x04name\x12\x1d\n\n\
+    wasm_bytes\x18\x03\x20\x01(\tR\twasmBytes\x12%\n\x0bdescription\x18d\x20\
+    \x01(\tH\0R\x0bdescription\x88\x01\x01\x12\x1d\n\x07version\x18e\x20\x01\
+    (\tH\x01R\x07version\x88\x01\x01\x12\x15\n\x03url\x18f\x20\x01(\tH\x02R\
+    \x03url\x88\x01\x01\x12>\n\x1a_created_at_unix_ts_ns_utc\x18\xe8\x07\x20\
+    \x01(\x03H\x03R\x14CreatedAtUnixTsNsUtc\x88\x01\x01\x12>\n\x1a_updated_a\
+    t_unix_ts_ns_utc\x18\xe9\x07\x20\x01(\x03H\x04R\x14UpdatedAtUnixTsNsUtc\
+    \x88\x01\x01B\x0e\n\x0c_descriptionB\n\n\x08_versionB\x06\n\x04_urlB\x1d\
+    \n\x1bX_created_at_unix_ts_ns_utcB\x1d\n\x1bX_updated_at_unix_ts_ns_utc*\
+    u\n\x0cWASMExitCode\x12\x18\n\x14WASM_EXIT_CODE_UNSET\x10\0\x12\x17\n\
+    \x13WASM_EXIT_CODE_TRUE\x10\x01\x12\x18\n\x14WASM_EXIT_CODE_FALSE\x10\
+    \x02\x12\x18\n\x14WASM_EXIT_CODE_ERROR\x10\x03B<Z:github.com/streamdal/s\
+    treamdal/libs/protos/build/go/protosJ\x84\x1f\n\x06\x12\x04\0\0d\x01\n\
+    \x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
     \x02\x03\0\x12\x03\x04\0\x1b\n\t\n\x02\x03\x01\x12\x03\x05\0(\n\x08\n\
     \x01\x08\x12\x03\x07\0Q\n\t\n\x02\x08\x0b\x12\x03\x07\0Q\n\xea\x04\n\x02\
     \x05\0\x12\x04\x18\0\x1d\x01\x1a\xdd\x04\x20Included\x20in\x20Wasm\x20re\
@@ -1097,7 +1097,7 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x05\x04\x02\x02\0\x03\x12\x03P12\nS\n\x02\x04\x03\x12\x04U\0d\x01\x1aG\
     \x20Used\x20for\x20defining\x20a\x20custom\x20Wasm\x20module\x20that\x20\
     can\x20be\x20used\x20in\x20CustomStep\n\n\n\n\x03\x04\x03\x01\x12\x03U\
-    \x08\x12\n\x0b\n\x04\x04\x03\x02\0\x12\x03V\x02\x10\n\x0c\n\x05\x04\x03\
+    \x08\x0c\n\x0b\n\x04\x04\x03\x02\0\x12\x03V\x02\x10\n\x0c\n\x05\x04\x03\
     \x02\0\x05\x12\x03V\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03V\t\x0b\
     \n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03V\x0e\x0f\n\x0b\n\x04\x04\x03\x02\
     \x01\x12\x03W\x02\x12\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03W\x02\x08\n\
@@ -1149,7 +1149,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(WASMRequest::generated_message_descriptor_data());
             messages.push(WASMResponse::generated_message_descriptor_data());
             messages.push(InterStepResult::generated_message_descriptor_data());
-            messages.push(CustomWasm::generated_message_descriptor_data());
+            messages.push(Wasm::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(WASMExitCode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

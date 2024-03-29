@@ -10,7 +10,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { CustomWasm } from "./sp_wsm.js";
+import { Wasm } from "./sp_wsm.js";
 import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
@@ -2012,9 +2012,9 @@ class ResumeTailRequest$Type extends MessageType {
  */
 export const ResumeTailRequest = new ResumeTailRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetCustomWasmRequest$Type extends MessageType {
+class GetWasmRequest$Type extends MessageType {
     constructor() {
-        super("protos.GetCustomWasmRequest", [
+        super("protos.GetWasmRequest", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
@@ -2055,14 +2055,14 @@ class GetCustomWasmRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetCustomWasmRequest
+ * @generated MessageType for protobuf message protos.GetWasmRequest
  */
-export const GetCustomWasmRequest = new GetCustomWasmRequest$Type();
+export const GetWasmRequest = new GetWasmRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetCustomWasmResponse$Type extends MessageType {
+class GetWasmResponse$Type extends MessageType {
     constructor() {
-        super("protos.GetCustomWasmResponse", [
-            { no: 1, name: "custom_wasm", kind: "message", T: () => CustomWasm }
+        super("protos.GetWasmResponse", [
+            { no: 1, name: "custom_wasm", kind: "message", T: () => Wasm }
         ]);
     }
     create(value) {
@@ -2077,8 +2077,8 @@ class GetCustomWasmResponse$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.CustomWasm custom_wasm */ 1:
-                    message.customWasm = CustomWasm.internalBinaryRead(reader, reader.uint32(), options, message.customWasm);
+                case /* protos.Wasm custom_wasm */ 1:
+                    message.customWasm = Wasm.internalBinaryRead(reader, reader.uint32(), options, message.customWasm);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2092,9 +2092,9 @@ class GetCustomWasmResponse$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.CustomWasm custom_wasm = 1; */
+        /* protos.Wasm custom_wasm = 1; */
         if (message.customWasm)
-            CustomWasm.internalBinaryWrite(message.customWasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            Wasm.internalBinaryWrite(message.customWasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2102,13 +2102,13 @@ class GetCustomWasmResponse$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetCustomWasmResponse
+ * @generated MessageType for protobuf message protos.GetWasmResponse
  */
-export const GetCustomWasmResponse = new GetCustomWasmResponse$Type();
+export const GetWasmResponse = new GetWasmResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetAllCustomWasmRequest$Type extends MessageType {
+class GetAllWasmRequest$Type extends MessageType {
     constructor() {
-        super("protos.GetAllCustomWasmRequest", []);
+        super("protos.GetAllWasmRequest", []);
     }
     create(value) {
         const message = {};
@@ -2128,14 +2128,14 @@ class GetAllCustomWasmRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetAllCustomWasmRequest
+ * @generated MessageType for protobuf message protos.GetAllWasmRequest
  */
-export const GetAllCustomWasmRequest = new GetAllCustomWasmRequest$Type();
+export const GetAllWasmRequest = new GetAllWasmRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class GetAllCustomWasmResponse$Type extends MessageType {
+class GetAllWasmResponse$Type extends MessageType {
     constructor() {
-        super("protos.GetAllCustomWasmResponse", [
-            { no: 1, name: "custom_wasm", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => CustomWasm }
+        super("protos.GetAllWasmResponse", [
+            { no: 1, name: "custom_wasm", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Wasm }
         ]);
     }
     create(value) {
@@ -2150,8 +2150,8 @@ class GetAllCustomWasmResponse$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.CustomWasm custom_wasm */ 1:
-                    message.customWasm.push(CustomWasm.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.Wasm custom_wasm */ 1:
+                    message.customWasm.push(Wasm.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2165,9 +2165,9 @@ class GetAllCustomWasmResponse$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.CustomWasm custom_wasm = 1; */
+        /* repeated protos.Wasm custom_wasm = 1; */
         for (let i = 0; i < message.customWasm.length; i++)
-            CustomWasm.internalBinaryWrite(message.customWasm[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            Wasm.internalBinaryWrite(message.customWasm[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2175,14 +2175,14 @@ class GetAllCustomWasmResponse$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.GetAllCustomWasmResponse
+ * @generated MessageType for protobuf message protos.GetAllWasmResponse
  */
-export const GetAllCustomWasmResponse = new GetAllCustomWasmResponse$Type();
+export const GetAllWasmResponse = new GetAllWasmResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class CreateCustomWasmRequest$Type extends MessageType {
+class CreateWasmRequest$Type extends MessageType {
     constructor() {
-        super("protos.CreateCustomWasmRequest", [
-            { no: 1, name: "custom_wasm", kind: "message", T: () => CustomWasm }
+        super("protos.CreateWasmRequest", [
+            { no: 1, name: "custom_wasm", kind: "message", T: () => Wasm }
         ]);
     }
     create(value) {
@@ -2197,8 +2197,8 @@ class CreateCustomWasmRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.CustomWasm custom_wasm */ 1:
-                    message.customWasm = CustomWasm.internalBinaryRead(reader, reader.uint32(), options, message.customWasm);
+                case /* protos.Wasm custom_wasm */ 1:
+                    message.customWasm = Wasm.internalBinaryRead(reader, reader.uint32(), options, message.customWasm);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2212,9 +2212,9 @@ class CreateCustomWasmRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.CustomWasm custom_wasm = 1; */
+        /* protos.Wasm custom_wasm = 1; */
         if (message.customWasm)
-            CustomWasm.internalBinaryWrite(message.customWasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            Wasm.internalBinaryWrite(message.customWasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2222,14 +2222,14 @@ class CreateCustomWasmRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.CreateCustomWasmRequest
+ * @generated MessageType for protobuf message protos.CreateWasmRequest
  */
-export const CreateCustomWasmRequest = new CreateCustomWasmRequest$Type();
+export const CreateWasmRequest = new CreateWasmRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class UpdateCustomWasmRequest$Type extends MessageType {
+class UpdateWasmRequest$Type extends MessageType {
     constructor() {
-        super("protos.UpdateCustomWasmRequest", [
-            { no: 1, name: "custom_wasm", kind: "message", T: () => CustomWasm }
+        super("protos.UpdateWasmRequest", [
+            { no: 1, name: "custom_wasm", kind: "message", T: () => Wasm }
         ]);
     }
     create(value) {
@@ -2244,8 +2244,8 @@ class UpdateCustomWasmRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.CustomWasm custom_wasm */ 1:
-                    message.customWasm = CustomWasm.internalBinaryRead(reader, reader.uint32(), options, message.customWasm);
+                case /* protos.Wasm custom_wasm */ 1:
+                    message.customWasm = Wasm.internalBinaryRead(reader, reader.uint32(), options, message.customWasm);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2259,9 +2259,9 @@ class UpdateCustomWasmRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* protos.CustomWasm custom_wasm = 1; */
+        /* protos.Wasm custom_wasm = 1; */
         if (message.customWasm)
-            CustomWasm.internalBinaryWrite(message.customWasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            Wasm.internalBinaryWrite(message.customWasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2269,13 +2269,13 @@ class UpdateCustomWasmRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.UpdateCustomWasmRequest
+ * @generated MessageType for protobuf message protos.UpdateWasmRequest
  */
-export const UpdateCustomWasmRequest = new UpdateCustomWasmRequest$Type();
+export const UpdateWasmRequest = new UpdateWasmRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class DeleteCustomWasmRequest$Type extends MessageType {
+class DeleteWasmRequest$Type extends MessageType {
     constructor() {
-        super("protos.DeleteCustomWasmRequest", [
+        super("protos.DeleteWasmRequest", [
             { no: 1, name: "ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
@@ -2316,9 +2316,9 @@ class DeleteCustomWasmRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.DeleteCustomWasmRequest
+ * @generated MessageType for protobuf message protos.DeleteWasmRequest
  */
-export const DeleteCustomWasmRequest = new DeleteCustomWasmRequest$Type();
+export const DeleteWasmRequest = new DeleteWasmRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType {
     constructor() {
@@ -2447,10 +2447,10 @@ export const External = new ServiceType("protos.External", [
     { name: "AppRegister", options: {}, I: AppRegistrationRequest, O: StandardResponse },
     { name: "AppVerifyRegistration", options: {}, I: AppVerifyRegistrationRequest, O: StandardResponse },
     { name: "AppRegisterReject", options: {}, I: AppRegisterRejectRequest, O: StandardResponse },
-    { name: "GetCustomWasm", options: {}, I: GetCustomWasmRequest, O: GetCustomWasmResponse },
-    { name: "GetAllCustomWasm", options: {}, I: GetAllCustomWasmRequest, O: GetAllCustomWasmResponse },
-    { name: "CreateCustomWasm", options: {}, I: CreateCustomWasmRequest, O: StandardResponse },
-    { name: "UpdateCustomWasm", options: {}, I: UpdateCustomWasmRequest, O: StandardResponse },
-    { name: "DeleteCustomWasm", options: {}, I: DeleteCustomWasmRequest, O: StandardResponse },
+    { name: "GetWasm", options: {}, I: GetWasmRequest, O: GetWasmResponse },
+    { name: "GetAllWasm", options: {}, I: GetAllWasmRequest, O: GetAllWasmResponse },
+    { name: "CreateWasm", options: {}, I: CreateWasmRequest, O: StandardResponse },
+    { name: "UpdateWasm", options: {}, I: UpdateWasmRequest, O: StandardResponse },
+    { name: "DeleteWasm", options: {}, I: DeleteWasmRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

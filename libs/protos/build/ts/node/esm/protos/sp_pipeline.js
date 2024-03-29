@@ -73,7 +73,12 @@ class Pipeline$Type extends MessageType {
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep },
             { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
-            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1001, name: "_description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1002, name: "_version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1003, name: "_url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1004, name: "_created_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
         ]);
     }
     create(value) {
@@ -103,6 +108,21 @@ class Pipeline$Type extends MessageType {
                 case /* optional bool _paused */ 1000:
                     message.Paused = reader.bool();
                     break;
+                case /* optional string _description */ 1001:
+                    message.Description = reader.string();
+                    break;
+                case /* optional string _version */ 1002:
+                    message.Version = reader.string();
+                    break;
+                case /* optional string _url */ 1003:
+                    message.Url = reader.string();
+                    break;
+                case /* optional int64 _created_at_unix_ts_utc */ 1004:
+                    message.CreatedAtUnixTsUtc = reader.int64().toString();
+                    break;
+                case /* optional int64 _updated_at_unix_ts_utc */ 1005:
+                    message.UpdatedAtUnixTsUtc = reader.int64().toString();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -130,6 +150,21 @@ class Pipeline$Type extends MessageType {
         /* optional bool _paused = 1000; */
         if (message.Paused !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.Paused);
+        /* optional string _description = 1001; */
+        if (message.Description !== undefined)
+            writer.tag(1001, WireType.LengthDelimited).string(message.Description);
+        /* optional string _version = 1002; */
+        if (message.Version !== undefined)
+            writer.tag(1002, WireType.LengthDelimited).string(message.Version);
+        /* optional string _url = 1003; */
+        if (message.Url !== undefined)
+            writer.tag(1003, WireType.LengthDelimited).string(message.Url);
+        /* optional int64 _created_at_unix_ts_utc = 1004; */
+        if (message.CreatedAtUnixTsUtc !== undefined)
+            writer.tag(1004, WireType.Varint).int64(message.CreatedAtUnixTsUtc);
+        /* optional int64 _updated_at_unix_ts_utc = 1005; */
+        if (message.UpdatedAtUnixTsUtc !== undefined)
+            writer.tag(1005, WireType.Varint).int64(message.UpdatedAtUnixTsUtc);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

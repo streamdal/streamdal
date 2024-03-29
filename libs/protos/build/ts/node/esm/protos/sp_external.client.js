@@ -263,41 +263,41 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * BEGIN Custom Wasm methods
+     * BEGIN Wasm methods
      *
-     * @generated from protobuf rpc: GetCustomWasm(protos.GetCustomWasmRequest) returns (protos.GetCustomWasmResponse);
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
      */
-    getCustomWasm(input, options) {
+    getWasm(input, options) {
         const method = this.methods[30], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: GetAllCustomWasm(protos.GetAllCustomWasmRequest) returns (protos.GetAllCustomWasmResponse);
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
      */
-    getAllCustomWasm(input, options) {
+    getAllWasm(input, options) {
         const method = this.methods[31], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: CreateCustomWasm(protos.CreateCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.StandardResponse);
      */
-    createCustomWasm(input, options) {
+    createWasm(input, options) {
         const method = this.methods[32], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: UpdateCustomWasm(protos.UpdateCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
      */
-    updateCustomWasm(input, options) {
+    updateWasm(input, options) {
         const method = this.methods[33], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * END Custom Wasm methods
+     * END Wasm methods
      *
-     * @generated from protobuf rpc: DeleteCustomWasm(protos.DeleteCustomWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
      */
-    deleteCustomWasm(input, options) {
+    deleteWasm(input, options) {
         const method = this.methods[34], opt = this._transport.mergeOptions(options);
         return stackIntercept("unary", this._transport, method, opt, input);
     }

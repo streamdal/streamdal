@@ -4,7 +4,6 @@ package protos.steps;
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/steps";
 
-// WIP -- Custom WASM exec?
 message CustomStep {
-  string id = 1;
+  map<string, bytes> args = 1;
 }

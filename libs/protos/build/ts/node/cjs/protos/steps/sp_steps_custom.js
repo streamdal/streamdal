@@ -10,11 +10,11 @@ const runtime_5 = require("@protobuf-ts/runtime");
 class CustomStep$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.steps.CustomStep", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "args", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } }
         ]);
     }
     create(value) {
-        const message = { id: "" };
+        const message = { args: {} };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -25,8 +25,8 @@ class CustomStep$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string id */ 1:
-                    message.id = reader.string();
+                case /* map<string, bytes> args */ 1:
+                    this.binaryReadMap1(message.args, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -39,10 +39,26 @@ class CustomStep$Type extends runtime_5.MessageType {
         }
         return message;
     }
+    binaryReadMap1(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.bytes();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.steps.CustomStep.args");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : new Uint8Array(0);
+    }
     internalBinaryWrite(message, writer, options) {
-        /* string id = 1; */
-        if (message.id !== "")
-            writer.tag(1, runtime_1.WireType.LengthDelimited).string(message.id);
+        /* map<string, bytes> args = 1; */
+        for (let k of Object.keys(message.args))
+            writer.tag(1, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k).tag(2, runtime_1.WireType.LengthDelimited).bytes(message.args[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

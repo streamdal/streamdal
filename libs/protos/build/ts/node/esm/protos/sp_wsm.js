@@ -237,9 +237,9 @@ class InterStepResult$Type extends MessageType {
  */
 export const InterStepResult = new InterStepResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class CustomWasm$Type extends MessageType {
+class Wasm$Type extends MessageType {
     constructor() {
-        super("protos.CustomWasm", [
+        super("protos.Wasm", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "wasm_bytes", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
@@ -329,6 +329,6 @@ class CustomWasm$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.CustomWasm
+ * @generated MessageType for protobuf message protos.Wasm
  */
-export const CustomWasm = new CustomWasm$Type();
+export const Wasm = new Wasm$Type();

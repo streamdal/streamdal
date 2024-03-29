@@ -116,9 +116,9 @@ export interface InterStepResult {
 /**
  * Used for defining a custom Wasm module that can be used in CustomStep
  *
- * @generated from protobuf message protos.CustomWasm
+ * @generated from protobuf message protos.Wasm
  */
-export interface CustomWasm {
+export interface Wasm {
     /**
      * @generated from protobuf field: string id = 1;
      */
@@ -389,9 +389,9 @@ class InterStepResult$Type extends MessageType<InterStepResult> {
  */
 export const InterStepResult = new InterStepResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class CustomWasm$Type extends MessageType<CustomWasm> {
+class Wasm$Type extends MessageType<Wasm> {
     constructor() {
-        super("protos.CustomWasm", [
+        super("protos.Wasm", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "wasm_bytes", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
@@ -402,14 +402,14 @@ class CustomWasm$Type extends MessageType<CustomWasm> {
             { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
         ]);
     }
-    create(value?: PartialMessage<CustomWasm>): CustomWasm {
+    create(value?: PartialMessage<Wasm>): Wasm {
         const message = { id: "", name: "", wasmBytes: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<CustomWasm>(this, message, value);
+            reflectionMergePartial<Wasm>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CustomWasm): CustomWasm {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Wasm): Wasm {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -449,7 +449,7 @@ class CustomWasm$Type extends MessageType<CustomWasm> {
         }
         return message;
     }
-    internalBinaryWrite(message: CustomWasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: Wasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string id = 1; */
         if (message.id !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.id);
@@ -481,6 +481,6 @@ class CustomWasm$Type extends MessageType<CustomWasm> {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.CustomWasm
+ * @generated MessageType for protobuf message protos.Wasm
  */
-export const CustomWasm = new CustomWasm$Type();
+export const Wasm = new Wasm$Type();
