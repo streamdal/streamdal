@@ -7,11 +7,8 @@ require 'sp_pipeline_pb'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("sp_sdk.proto", :syntax => :proto3) do
-    add_message "protos.Payload" do
-      optional :bytes, :bytes, 1
-    end
     add_message "protos.SDKResponse" do
-      optional :data, :message, 1, "protos.Payload"
+      optional :data, :bytes, 1
       optional :status, :enum, 2, "protos.ExecStatus"
       proto3_optional :status_message, :string, 3
       repeated :pipeline_status, :message, 4, "protos.PipelineStatus"
@@ -39,7 +36,6 @@ end
 
 module Streamdal
   module Protos
-    Payload = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.Payload").msgclass
     SDKResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.SDKResponse").msgclass
     PipelineStatus = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PipelineStatus").msgclass
     StepStatus = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.StepStatus").msgclass
