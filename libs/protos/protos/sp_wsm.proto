@@ -81,3 +81,22 @@ message InterStepResult {
     steps.DetectiveStepResult detective_result = 1;
   }
 }
+
+// Used for defining a custom Wasm module that can be used in CustomStep
+message CustomWasm {
+  string id = 1;
+  string name = 2;
+  string wasm_bytes = 3;
+
+  // Informative/debug fields
+  optional string description = 100;
+  optional string version = 101;
+  optional string url = 102;
+
+  // Set by server on create
+  optional int64 created_at_unix_ts_ns_utc = 103;
+
+  // Set by server on update
+  optional int64 updated_at_unix_ts_ns_utc = 104;
+}
+

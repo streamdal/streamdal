@@ -6,6 +6,7 @@ import "sp_common.proto";
 import "sp_info.proto";
 import "sp_notify.proto";
 import "sp_pipeline.proto";
+import "sp_wsm.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
@@ -95,6 +96,17 @@ service External {
   rpc AppVerifyRegistration(AppVerifyRegistrationRequest) returns (StandardResponse);
 
   rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
+
+  // Custom Wasm methods
+  rpc GetCustomWasm(GetCustomWasmRequest) returns (GetCustomWasmResponse);
+
+  rpc GetAllCustomWasm(GetAllCustomWasmRequest) returns (GetAllCustomWasmResponse);
+
+  rpc CreateCustomWasm(CreateCustomWasmRequest) returns (StandardResponse);
+
+  rpc UpdateCustomWasm(UpdateCustomWasmRequest) returns (StandardResponse);
+
+  rpc DeleteCustomWasm(DeleteCustomWasmRequest) returns (StandardResponse);
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -322,6 +334,33 @@ message PauseTailRequest {
 message ResumeTailRequest {
   string tail_id = 1;
 }
+
+message GetCustomWasmRequest {
+  string id = 1;
+}
+
+message GetCustomWasmResponse {
+  protos.CustomWasm custom_wasm = 1;
+}
+
+message GetAllCustomWasmRequest {}
+
+message GetAllCustomWasmResponse {
+  repeated protos.CustomWasm custom_wasm = 1;
+}
+
+message CreateCustomWasmRequest {
+  protos.CustomWasm custom_wasm = 1;
+}
+
+message UpdateCustomWasmRequest {
+  protos.CustomWasm custom_wasm = 1;
+}
+
+message DeleteCustomWasmRequest {
+  repeated string ids = 1;
+}
+
 
 message TestRequest {
   string input = 1;
