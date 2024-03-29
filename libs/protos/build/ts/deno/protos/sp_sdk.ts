@@ -13,18 +13,6 @@ import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { AbortCondition } from "./sp_pipeline.ts";
 /**
- * This is a separate type because some SDKs may want to implement some interface
- * for this type (ie. Stringer interface for Go SDK).
- *
- * @generated from protobuf message protos.Payload
- */
-export interface Payload {
-    /**
-     * @generated from protobuf field: bytes bytes = 1;
-     */
-    bytes: Uint8Array;
-}
-/**
  * Common return response used by all SDKs
  *
  * @generated from protobuf message protos.SDKResponse
@@ -33,9 +21,9 @@ export interface SDKResponse {
     /**
      * Contains (potentially) modified input data
      *
-     * @generated from protobuf field: protos.Payload data = 1;
+     * @generated from protobuf field: bytes data = 1;
      */
-    data?: Payload;
+    data: Uint8Array;
     /**
      * Execution status of the last step
      *
@@ -159,57 +147,10 @@ export enum ExecStatus {
     ERROR = 3
 }
 // @generated message type with reflection information, may provide speed optimized methods
-class Payload$Type extends MessageType<Payload> {
-    constructor() {
-        super("protos.Payload", [
-            { no: 1, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
-        ]);
-    }
-    create(value?: PartialMessage<Payload>): Payload {
-        const message = { bytes: new Uint8Array(0) };
-        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial<Payload>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Payload): Payload {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bytes bytes */ 1:
-                    message.bytes = reader.bytes();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: Payload, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bytes bytes = 1; */
-        if (message.bytes.length)
-            writer.tag(1, WireType.LengthDelimited).bytes(message.bytes);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message protos.Payload
- */
-export const Payload = new Payload$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor() {
         super("protos.SDKResponse", [
-            { no: 1, name: "data", kind: "message", T: () => Payload },
+            { no: 1, name: "data", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
             { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
@@ -217,7 +158,7 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
         ]);
     }
     create(value?: PartialMessage<SDKResponse>): SDKResponse {
-        const message = { status: 0, pipelineStatus: [], metadata: {} };
+        const message = { data: new Uint8Array(0), status: 0, pipelineStatus: [], metadata: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<SDKResponse>(this, message, value);
@@ -228,8 +169,8 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Payload data */ 1:
-                    message.data = Payload.internalBinaryRead(reader, reader.uint32(), options, message.data);
+                case /* bytes data */ 1:
+                    message.data = reader.bytes();
                     break;
                 case /* protos.ExecStatus status */ 2:
                     message.status = reader.int32();
@@ -271,9 +212,9 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
         map[key ?? ""] = val ?? "";
     }
     internalBinaryWrite(message: SDKResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* protos.Payload data = 1; */
-        if (message.data)
-            Payload.internalBinaryWrite(message.data, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* bytes data = 1; */
+        if (message.data.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.data);
         /* protos.ExecStatus status = 2; */
         if (message.status !== 0)
             writer.tag(2, WireType.Varint).int32(message.status);
