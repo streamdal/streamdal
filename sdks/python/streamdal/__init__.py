@@ -18,6 +18,7 @@ from grpclib.client import Channel
 from streamdal.metrics import Metrics, CounterEntry
 from streamdal.tail import Tail
 from streamdal.kv import KV
+import streamdal.metrics as metrics
 from streamdal_protos.protos import SdkResponse as ProcessResponse
 from threading import Thread, Event
 from wasmtime import (
