@@ -286,18 +286,18 @@ func generateDataDiff(tw gopretty.Writer, pre []byte, post *streamdal.ProcessRes
 	}
 
 	// Format post data
-	postFormatted, err := prettyjson.Format(post.Data.Bytes)
+	postFormatted, err := prettyjson.Format(post.Data)
 	if err != nil {
 		logrus.Debugf("failed to format data: %s (post: %s)", err, post.Data)
 
 		// Format failed, just print raw data
-		postFormatted = post.Data.Bytes
+		postFormatted = post.Data
 	}
 
 	// Determine post-title
 	postTitle := "After (unchanged)"
 
-	if string(pre) != string(post.Data.Bytes) {
+	if string(pre) != string(post.Data) {
 		postTitle = "After " + underline("(changed)")
 	}
 
