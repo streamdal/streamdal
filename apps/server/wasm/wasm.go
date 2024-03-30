@@ -5,40 +5,21 @@ import (
 	"os"
 
 	"github.com/gofrs/uuid"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
-
 	"github.com/pkg/errors"
-)
-
-type Mapping struct {
-	ID       string
-	Filename string // Only set for bundled wasm
-	FuncName string
-	Contents []byte // Filled out by Load
-	Bundled  bool
-}
-
-var (
-	foo = &protos.Wasm{
-		Id:                    "",
-		Name:                  "",
-		WasmBytes:             "",
-		Description:           nil,
-		Version:               nil,
-		Url:                   nil,
-		XCreatedAtUnixTsNsUtc: nil,
-		XUpdatedAtUnixTsNsUtc: nil,
-	}
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 var (
-	Config = map[string]Mapping{
+	Config = map[string]*protos.Wasm{
 		"detective": {
+			Name:     "detective",
 			Filename: "detective.wasm",
-			FuncName: "f",
+			Function: "f",
 			Bundled:  true,
 		},
 		"transform": {
+			Name:     "transform",
+			Filename: ""
 			Filename: "transform.wasm",
 			FuncName: "f",
 		},
@@ -64,6 +45,8 @@ var (
 		},
 	}
 )
+
+func New()
 
 // Load loads a WASM file from disk; you can pass an optional prefix
 func Load(name string, prefix ...string) (*Mapping, error) {
