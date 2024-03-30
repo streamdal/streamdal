@@ -137,10 +137,16 @@ export interface Wasm {
      */
     functionName: string;
     /**
+     * Filename of the Wasm module (used only for bundled wasm)
+     *
+     * @generated from protobuf field: string _filename = 5;
+     */
+    Filename: string;
+    /**
      * Indicates whether this wasm entry is for bundled wasm or for wasm added via
      * CreateWasm(); ignored in CreateWasm() and UpdateWasm().
      *
-     * @generated from protobuf field: bool _bundled = 5;
+     * @generated from protobuf field: bool _bundled = 6;
      */
     Bundled: boolean;
     /**

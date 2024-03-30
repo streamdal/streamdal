@@ -689,7 +689,10 @@ class Wasm(betterproto.Message):
     function_name: str = betterproto.string_field(4)
     """Entry point function name"""
 
-    bundled: bool = betterproto.bool_field(5)
+    filename: str = betterproto.string_field(5)
+    """Filename of the Wasm module (used only for bundled wasm)"""
+
+    bundled: bool = betterproto.bool_field(6)
     """
     Indicates whether this wasm entry is for bundled wasm or for wasm added via
     CreateWasm(); ignored in CreateWasm() and UpdateWasm().

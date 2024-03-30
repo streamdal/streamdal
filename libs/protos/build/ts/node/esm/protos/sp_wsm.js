@@ -244,7 +244,8 @@ class Wasm$Type extends MessageType {
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 4, name: "function_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "_bundled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "_filename", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "_bundled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 101, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 102, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 103, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
@@ -253,7 +254,7 @@ class Wasm$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: "", name: "", bytes: new Uint8Array(0), functionName: "", Bundled: false };
+        const message = { id: "", name: "", bytes: new Uint8Array(0), functionName: "", Filename: "", Bundled: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -276,7 +277,10 @@ class Wasm$Type extends MessageType {
                 case /* string function_name */ 4:
                     message.functionName = reader.string();
                     break;
-                case /* bool _bundled */ 5:
+                case /* string _filename */ 5:
+                    message.Filename = reader.string();
+                    break;
+                case /* bool _bundled */ 6:
                     message.Bundled = reader.bool();
                     break;
                 case /* optional string description */ 101:
@@ -318,9 +322,12 @@ class Wasm$Type extends MessageType {
         /* string function_name = 4; */
         if (message.functionName !== "")
             writer.tag(4, WireType.LengthDelimited).string(message.functionName);
-        /* bool _bundled = 5; */
+        /* string _filename = 5; */
+        if (message.Filename !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.Filename);
+        /* bool _bundled = 6; */
         if (message.Bundled !== false)
-            writer.tag(5, WireType.Varint).bool(message.Bundled);
+            writer.tag(6, WireType.Varint).bool(message.Bundled);
         /* optional string description = 101; */
         if (message.description !== undefined)
             writer.tag(101, WireType.LengthDelimited).string(message.description);
