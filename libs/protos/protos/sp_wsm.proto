@@ -96,9 +96,12 @@ message Wasm {
   // Entry point function name
   string function_name = 4;
 
+  // Filename of the Wasm module (used only for bundled wasm)
+  string _filename = 5; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
   // Indicates whether this wasm entry is for bundled wasm or for wasm added via
   // CreateWasm(); ignored in CreateWasm() and UpdateWasm().
-  bool _bundled = 5; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+  bool _bundled = 6; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   // Informative, debug fields
   optional string description = 101;
