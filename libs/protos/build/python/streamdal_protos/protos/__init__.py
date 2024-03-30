@@ -2,6 +2,7 @@
 # sources: sp_bus.proto, sp_command.proto, sp_common.proto, sp_external.proto, sp_info.proto, sp_internal.proto, sp_kv.proto, sp_notify.proto, sp_pipeline.proto, sp_sdk.proto, sp_wsm.proto
 # plugin: python-betterproto
 # This file has been @generated
+import builtins
 import warnings
 from dataclasses import dataclass
 from typing import (
@@ -674,31 +675,44 @@ class InterStepResult(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class Wasm(betterproto.Message):
-    """
-    Used for defining a custom Wasm module that can be used in CustomStep
-    """
+    """Used for referencing both bundled and custom wasm modules"""
 
     id: str = betterproto.string_field(1)
+    """ID used for referencing the Wasm module"""
+
     name: str = betterproto.string_field(2)
-    wasm_bytes: str = betterproto.string_field(3)
+    """Friendly name for the Wasm module"""
+
+    bytes: builtins.bytes = betterproto.bytes_field(3)
+    """Contents of the Wasm module"""
+
+    function_name: str = betterproto.string_field(4)
+    """Entry point function name"""
+
+    bundled: bool = betterproto.bool_field(5)
+    """
+    Indicates whether this wasm entry is for bundled wasm or for wasm added via
+    CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+    """
+
     description: Optional[str] = betterproto.string_field(
-        100, optional=True, group="_description"
+        101, optional=True, group="_description"
     )
-    """Informative/debug fields"""
+    """Informative, debug fields"""
 
     version: Optional[str] = betterproto.string_field(
-        101, optional=True, group="_version"
+        102, optional=True, group="_version"
     )
-    url: Optional[str] = betterproto.string_field(102, optional=True, group="_url")
+    url: Optional[str] = betterproto.string_field(103, optional=True, group="_url")
     created_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
         1000, optional=True, group="X_created_at_unix_ts_ns_utc"
     )
-    """Set by server on create"""
+    """Set by server"""
 
     updated_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
         1001, optional=True, group="X_updated_at_unix_ts_ns_utc"
     )
-    """Set by server on update"""
+    """Set by server"""
 
 
 @dataclass(eq=False, repr=False)
@@ -980,7 +994,7 @@ class GetWasmRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetWasmResponse(betterproto.Message):
-    custom_wasm: "Wasm" = betterproto.message_field(1)
+    wasm: "Wasm" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -990,17 +1004,17 @@ class GetAllWasmRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetAllWasmResponse(betterproto.Message):
-    custom_wasm: List["Wasm"] = betterproto.message_field(1)
+    wasm: List["Wasm"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class CreateWasmRequest(betterproto.Message):
-    custom_wasm: "Wasm" = betterproto.message_field(1)
+    wasm: "Wasm" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class UpdateWasmRequest(betterproto.Message):
-    custom_wasm: "Wasm" = betterproto.message_field(1)
+    wasm: "Wasm" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

@@ -94,10 +94,10 @@ class CreatePipelineResponse(_message.Message):
     def __init__(self, message: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
 
 class CreateWasmRequest(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _sp_wsm_pb2.Wasm
-    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _sp_wsm_pb2.Wasm
+    def __init__(self, wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
 
 class DeleteAudienceRequest(_message.Message):
     __slots__ = ["audience", "force"]
@@ -182,10 +182,10 @@ class GetAllWasmRequest(_message.Message):
     def __init__(self) -> None: ...
 
 class GetAllWasmResponse(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _containers.RepeatedCompositeFieldContainer[_sp_wsm_pb2.Wasm]
-    def __init__(self, custom_wasm: _Optional[_Iterable[_Union[_sp_wsm_pb2.Wasm, _Mapping]]] = ...) -> None: ...
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _containers.RepeatedCompositeFieldContainer[_sp_wsm_pb2.Wasm]
+    def __init__(self, wasm: _Optional[_Iterable[_Union[_sp_wsm_pb2.Wasm, _Mapping]]] = ...) -> None: ...
 
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []
@@ -295,10 +295,10 @@ class GetWasmRequest(_message.Message):
     def __init__(self, id: _Optional[str] = ...) -> None: ...
 
 class GetWasmResponse(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _sp_wsm_pb2.Wasm
-    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _sp_wsm_pb2.Wasm
+    def __init__(self, wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
 
 class PausePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]
@@ -361,7 +361,7 @@ class UpdatePipelineRequest(_message.Message):
     def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
 
 class UpdateWasmRequest(_message.Message):
-    __slots__ = ["custom_wasm"]
-    CUSTOM_WASM_FIELD_NUMBER: _ClassVar[int]
-    custom_wasm: _sp_wsm_pb2.Wasm
-    def __init__(self, custom_wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _sp_wsm_pb2.Wasm
+    def __init__(self, wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...

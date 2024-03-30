@@ -341,7 +341,7 @@ message GetWasmRequest {
 }
 
 message GetWasmResponse {
-  protos.Wasm custom_wasm = 1;
+  protos.Wasm wasm = 1;
 }
 
 message GetAllWasmRequest {
@@ -349,15 +349,15 @@ message GetAllWasmRequest {
 }
 
 message GetAllWasmResponse {
-  repeated protos.Wasm custom_wasm = 1;
+  repeated protos.Wasm wasm = 1;
 }
 
 message CreateWasmRequest {
-  protos.Wasm custom_wasm = 1;
+  protos.Wasm wasm = 1;
 }
 
 message UpdateWasmRequest {
-  protos.Wasm custom_wasm = 1;
+  protos.Wasm wasm = 1;
 }
 
 message DeleteWasmRequest {

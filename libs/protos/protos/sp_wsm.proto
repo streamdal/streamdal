@@ -82,21 +82,33 @@ message InterStepResult {
   }
 }
 
-// Used for defining a custom Wasm module that can be used in CustomStep
+// Used for referencing both bundled and custom wasm modules
 message Wasm {
+  // ID used for referencing the Wasm module
   string id = 1;
+
+  // Friendly name for the Wasm module
   string name = 2;
-  string wasm_bytes = 3;
 
-  // Informative/debug fields
-  optional string description = 100;
-  optional string version = 101;
-  optional string url = 102;
+  // Contents of the Wasm module
+  bytes bytes = 3;
 
-  // Set by server on create
+  // Entry point function name
+  string function_name = 4;
+
+  // Indicates whether this wasm entry is for bundled wasm or for wasm added via
+  // CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+  bool _bundled = 5; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Informative, debug fields
+  optional string description = 101;
+  optional string version = 102;
+  optional string url = 103;
+
+  // Set by server
   optional int64 _created_at_unix_ts_ns_utc = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
-  // Set by server on update
+  // Set by server
   optional int64 _updated_at_unix_ts_ns_utc = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 

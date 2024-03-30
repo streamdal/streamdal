@@ -518,9 +518,9 @@ export interface GetWasmRequest {
  */
 export interface GetWasmResponse {
     /**
-     * @generated from protobuf field: protos.Wasm custom_wasm = 1;
+     * @generated from protobuf field: protos.Wasm wasm = 1;
      */
-    customWasm?: Wasm;
+    wasm?: Wasm;
 }
 /**
  * Nothing needed here
@@ -534,27 +534,27 @@ export interface GetAllWasmRequest {
  */
 export interface GetAllWasmResponse {
     /**
-     * @generated from protobuf field: repeated protos.Wasm custom_wasm = 1;
+     * @generated from protobuf field: repeated protos.Wasm wasm = 1;
      */
-    customWasm: Wasm[];
+    wasm: Wasm[];
 }
 /**
  * @generated from protobuf message protos.CreateWasmRequest
  */
 export interface CreateWasmRequest {
     /**
-     * @generated from protobuf field: protos.Wasm custom_wasm = 1;
+     * @generated from protobuf field: protos.Wasm wasm = 1;
      */
-    customWasm?: Wasm;
+    wasm?: Wasm;
 }
 /**
  * @generated from protobuf message protos.UpdateWasmRequest
  */
 export interface UpdateWasmRequest {
     /**
-     * @generated from protobuf field: protos.Wasm custom_wasm = 1;
+     * @generated from protobuf field: protos.Wasm wasm = 1;
      */
-    customWasm?: Wasm;
+    wasm?: Wasm;
 }
 /**
  * @generated from protobuf message protos.DeleteWasmRequest
