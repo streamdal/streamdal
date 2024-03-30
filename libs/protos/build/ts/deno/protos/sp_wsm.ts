@@ -114,45 +114,64 @@ export interface InterStepResult {
     };
 }
 /**
- * Used for defining a custom Wasm module that can be used in CustomStep
+ * Used for referencing both bundled and custom wasm modules
  *
  * @generated from protobuf message protos.Wasm
  */
 export interface Wasm {
     /**
+     * ID used for referencing the Wasm module
+     *
      * @generated from protobuf field: string id = 1;
      */
     id: string;
     /**
+     * Friendly name for the Wasm module
+     *
      * @generated from protobuf field: string name = 2;
      */
     name: string;
     /**
-     * @generated from protobuf field: string wasm_bytes = 3;
-     */
-    wasmBytes: string;
-    /**
-     * Informative/debug fields
+     * Contents of the Wasm module
      *
-     * @generated from protobuf field: optional string description = 100;
+     * @generated from protobuf field: bytes bytes = 3;
+     */
+    bytes: Uint8Array;
+    /**
+     * Entry point function name
+     *
+     * @generated from protobuf field: string function_name = 4;
+     */
+    functionName: string;
+    /**
+     * Indicates whether this wasm entry is for bundled wasm or for wasm added via
+     * CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+     *
+     * @generated from protobuf field: bool _bundled = 5;
+     */
+    Bundled: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Informative, debug fields
+     *
+     * @generated from protobuf field: optional string description = 101;
      */
     description?: string;
     /**
-     * @generated from protobuf field: optional string version = 101;
+     * @generated from protobuf field: optional string version = 102;
      */
     version?: string;
     /**
-     * @generated from protobuf field: optional string url = 102;
+     * @generated from protobuf field: optional string url = 103;
      */
     url?: string;
     /**
-     * Set by server on create
+     * Set by server
      *
      * @generated from protobuf field: optional int64 _created_at_unix_ts_ns_utc = 1000;
      */
     CreatedAtUnixTsNsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
     /**
-     * Set by server on update
+     * Set by server
      *
      * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
      */
@@ -394,16 +413,18 @@ class Wasm$Type extends MessageType<Wasm> {
         super("protos.Wasm", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "wasm_bytes", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 100, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 101, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
-            { no: 102, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 4, name: "function_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "_bundled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 101, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 102, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 103, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "_created_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
             { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
         ]);
     }
     create(value?: PartialMessage<Wasm>): Wasm {
-        const message = { id: "", name: "", wasmBytes: "" };
+        const message = { id: "", name: "", bytes: new Uint8Array(0), functionName: "", Bundled: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<Wasm>(this, message, value);
@@ -420,16 +441,22 @@ class Wasm$Type extends MessageType<Wasm> {
                 case /* string name */ 2:
                     message.name = reader.string();
                     break;
-                case /* string wasm_bytes */ 3:
-                    message.wasmBytes = reader.string();
+                case /* bytes bytes */ 3:
+                    message.bytes = reader.bytes();
                     break;
-                case /* optional string description */ 100:
+                case /* string function_name */ 4:
+                    message.functionName = reader.string();
+                    break;
+                case /* bool _bundled */ 5:
+                    message.Bundled = reader.bool();
+                    break;
+                case /* optional string description */ 101:
                     message.description = reader.string();
                     break;
-                case /* optional string version */ 101:
+                case /* optional string version */ 102:
                     message.version = reader.string();
                     break;
-                case /* optional string url */ 102:
+                case /* optional string url */ 103:
                     message.url = reader.string();
                     break;
                 case /* optional int64 _created_at_unix_ts_ns_utc */ 1000:
@@ -456,18 +483,24 @@ class Wasm$Type extends MessageType<Wasm> {
         /* string name = 2; */
         if (message.name !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.name);
-        /* string wasm_bytes = 3; */
-        if (message.wasmBytes !== "")
-            writer.tag(3, WireType.LengthDelimited).string(message.wasmBytes);
-        /* optional string description = 100; */
+        /* bytes bytes = 3; */
+        if (message.bytes.length)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.bytes);
+        /* string function_name = 4; */
+        if (message.functionName !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.functionName);
+        /* bool _bundled = 5; */
+        if (message.Bundled !== false)
+            writer.tag(5, WireType.Varint).bool(message.Bundled);
+        /* optional string description = 101; */
         if (message.description !== undefined)
-            writer.tag(100, WireType.LengthDelimited).string(message.description);
-        /* optional string version = 101; */
+            writer.tag(101, WireType.LengthDelimited).string(message.description);
+        /* optional string version = 102; */
         if (message.version !== undefined)
-            writer.tag(101, WireType.LengthDelimited).string(message.version);
-        /* optional string url = 102; */
+            writer.tag(102, WireType.LengthDelimited).string(message.version);
+        /* optional string url = 103; */
         if (message.url !== undefined)
-            writer.tag(102, WireType.LengthDelimited).string(message.url);
+            writer.tag(103, WireType.LengthDelimited).string(message.url);
         /* optional int64 _created_at_unix_ts_ns_utc = 1000; */
         if (message.CreatedAtUnixTsNsUtc !== undefined)
             writer.tag(1000, WireType.Varint).int64(message.CreatedAtUnixTsNsUtc);
