@@ -15,8 +15,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/types"
@@ -1235,6 +1236,55 @@ func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppR
 	req.ClusterId = clusterID
 
 	return s.uibffPostRequest("/v1/app/register/reject", req)
+}
+
+func (s *ExternalServer) GetWasm(ctx context.Context, req *protos.GetWasmRequest) (*protos.GetWasmResponse, error) {
+	if err := validate.GetWasmRequest(req); err != nil {
+		return nil, errors.Wrap(err, "unable to validate GetWasm request")
+	}
+
+	// TODO: Attempt to fetch WasmEntry
+
+	return nil, status.Errorf(codes.Unimplemented, "method GetWasm not implemented")
+}
+
+func (s *ExternalServer) GetAllWasm(ctx context.Context, req *protos.GetAllWasmRequest) (*protos.GetAllWasmResponse, error) {
+	if err := validate.GetAllWasmRequest(req); err != nil {
+		return nil, errors.Wrap(err, "unable to validate GetAllWasm request")
+	}
+
+	// TODO: Attempt to get ALL Wasm entries
+
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllWasm not implemented")
+}
+
+func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.StandardResponse, error) {
+	if err := validate.CreateWasmRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			"unable to validate CreateWasm request: "+err.Error()), nil
+	}
+
+	// TODO: Try to save Wasm to store
+
+	return nil, status.Errorf(codes.Unimplemented, "method CreateWasm not implemented")
+}
+
+func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmRequest) (*protos.StandardResponse, error) {
+	if err := validate.UpdateWasmRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			"unable to validate UpdateWasm request: "+err.Error()), nil
+	}
+
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWasm not implemented")
+}
+
+func (s *ExternalServer) DeleteWasm(ctx context.Context, req *protos.DeleteWasmRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeleteWasmRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			"unable to validate DeleteWasm request: "+err.Error()), nil
+	}
+
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWasm not implemented")
 }
 
 func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*protos.StandardResponse, error) {

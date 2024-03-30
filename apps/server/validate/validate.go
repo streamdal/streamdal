@@ -2,6 +2,7 @@ package validate
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 
 	"github.com/pkg/errors"
@@ -9,6 +10,8 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
+
+	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 var (
@@ -821,6 +824,101 @@ func GetSchemaRequest(r *protos.GetSchemaRequest) error {
 
 	if err := Audience(r.Audience); err != nil {
 		return errors.Wrap(err, "invalid audience")
+	}
+
+	return nil
+}
+
+func GetWasmRequest(r *protos.GetWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.Id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	return nil
+}
+
+func GetAllWasmRequest(r *protos.GetAllWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	return nil
+}
+
+func CreateWasmRequest(r *protos.CreateWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if err := Wasm(r.CustomWasm, false); err != nil {
+		return errors.Wrap(err, "invalid custom wasm")
+	}
+
+	// Cannot use reserved wasm names
+	if _, ok := wasm.Config[r.CustomWasm.Name]; ok {
+		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.CustomWasm.Name)
+	}
+
+	return nil
+}
+
+func UpdateWasmRequest(r *protos.UpdateWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if err := Wasm(r.CustomWasm, true); err != nil {
+		return errors.Wrap(err, "invalid custom wasm")
+	}
+
+	// Cannot use reserved wasm names
+	if _, ok := wasm.Config[r.CustomWasm.Name]; ok {
+		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.CustomWasm.Name)
+	}
+
+	return nil
+}
+
+func DeleteWasmRequest(r *protos.DeleteWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if len(r.Ids) < 1 {
+		return errors.New("must specify at least one ID")
+	}
+
+	// Cannot delete ID's for bundled wasm
+	if wasm.IsBundled(r.Ids...) {
+		return errors.New("cannot delete bundled wasm")
+	}
+
+	return nil
+}
+
+func Wasm(w *protos.Wasm, mustContainID bool) error {
+	if w == nil {
+		return ErrNilInput
+	}
+
+	if mustContainID && w.Id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if w.Name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if w.WasmBytes == nil {
+		return ErrNilField("WasmBytes")
+	}
+
+	if len(w.WasmBytes) == 0 {
+		return errors.New("WasmBytes cannot be empty")
 	}
 
 	return nil

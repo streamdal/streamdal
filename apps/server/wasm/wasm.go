@@ -5,22 +5,38 @@ import (
 	"os"
 
 	"github.com/gofrs/uuid"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/pkg/errors"
 )
 
 type Mapping struct {
 	ID       string
-	Filename string
+	Filename string // Only set for bundled wasm
 	FuncName string
 	Contents []byte // Filled out by Load
+	Bundled  bool
 }
+
+var (
+	foo = &protos.Wasm{
+		Id:                    "",
+		Name:                  "",
+		WasmBytes:             "",
+		Description:           nil,
+		Version:               nil,
+		Url:                   nil,
+		XCreatedAtUnixTsNsUtc: nil,
+		XUpdatedAtUnixTsNsUtc: nil,
+	}
+)
 
 var (
 	Config = map[string]Mapping{
 		"detective": {
 			Filename: "detective.wasm",
 			FuncName: "f",
+			Bundled:  true,
 		},
 		"transform": {
 			Filename: "transform.wasm",
@@ -80,6 +96,13 @@ func Load(name string, prefix ...string) (*Mapping, error) {
 		FuncName: mapping.FuncName,
 		Contents: data,
 	}, nil
+}
+
+func IsBundled(id ...string) bool {
+	if len(id) == 0 {
+		return false
+	}
+
 }
 
 func determinativeUUID(data []byte) string {

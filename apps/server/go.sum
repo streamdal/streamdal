@@ -206,6 +206,8 @@ github.com/spaolacci/murmur3 v1.1.0 h1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0b
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/streamdal/streamdal/libs/protos v0.1.35 h1:DdEbhkjB/Y/+VruPAYnetBS1oLocDWNbDLuXNuiM8VY=
 github.com/streamdal/streamdal/libs/protos v0.1.35/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
+github.com/streamdal/streamdal/libs/protos v0.1.36-0.20240329221756-a63920556cb6 h1:kwhgIuTrRfDwKmX2HKsxOtDK6FBt2mNoaOHMtoxs5Do=
+github.com/streamdal/streamdal/libs/protos v0.1.36-0.20240329221756-a63920556cb6/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
