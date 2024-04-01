@@ -464,6 +464,8 @@ module Streamdal
             cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_ERROR
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
             isr = nil
+
+            @metrics.incr(errors_counter, 1, labels, aud)
           else
             cond = step.on_true
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
@@ -477,18 +479,56 @@ module Streamdal
             next
           end
 
+          # Whether we are aborting early, aborting current, or continuing, we need to set the step status
+          step_status.status = exec_status
+          step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+
           # Pull metadata from step into SDKResponse
           unless cond.nil?
             resp.metadata = cond.metadata
+
+            case cond.abort
+            when Streamdal::Protos::AbortCondition::ABORT_CONDITION_ABORT_CURRENT
+              step_status.status = exec_status
+              step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+              pipeline_status.step_status.push(step_status)
+              resp.pipeline_status.push(pipeline_status)
+              # Continue outer pipeline loop, there might be additional pipelines
+              break
+            when Streamdal::Protos::AbortCondition::ABORT_CONDITION_ABORT_ALL
+              # Set step status and push to pipeline status
+              step_status.status = exec_status
+              step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+              pipeline_status.step_status.push(step_status)
+              resp.pipeline_status.push(pipeline_status)
+
+              # Since we're returning early here, also need to set the response status
+              resp.status = exec_status
+              resp.status_message = "Step returned: #{wasm_resp.exit_msg}"
+
+              _send_tail(aud, pipeline.id, original_data, resp.data)
+              return resp
+            else
+              # Do nothing
+            end
           end
 
-          # Failure conditions
-          unless cond.nil?
-            
-          end
-
+          # Append step status to the current pipeline status' array
+          pipeline_status.step_status.push(step_status)
         end
+
+        # Append pipeline status to the response
+        resp.pipeline_status.push(pipeline_status)
       end
+
+      _send_tail(aud, "", original_data, resp.data)
+
+      if @cfg[:dry_run]
+        @logger.debug "Dry-run, setting response data to original data"
+        resp.data = original_data
+      end
+
+      resp
     end
 
     def _notify_condition(pipeline, step, aud, cond, data, cond_type)
@@ -496,7 +536,7 @@ module Streamdal
         nil
       end
 
-      unless cond.notify
+      if cond.notify.nil?
         nil
       end
 
