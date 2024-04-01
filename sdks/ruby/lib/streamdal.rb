@@ -54,7 +54,7 @@ module Streamdal
       @audiences = {}
       @schemas = {}
       @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
-      @tail = {}
+      @tails = {}
       @paused_tails = {}
       @metrics = Streamdal::Metrics.new
 
@@ -320,8 +320,8 @@ module Streamdal
 
     def _get_active_tails_for_audience(aud)
       aud_str = aud_to_str(aud)
-      if @tail.key?(aud_str)
-        @tail[aud_str]
+      if @tails.key?(aud_str)
+        @tails[aud_str]
       end
 
       []
@@ -568,39 +568,151 @@ module Streamdal
     end
 
     def _start_tail(cmd)
-      #
+      validate_tail_request(cmd)
+
+      req = cmd.tail.request
+
+      aud_str = aud_to_str(req)
+
+      # Do we already have a tail for this audience
+      if @tails.key?(aud_str) && if @tails[aud_str].key?(req.id)
+                                   @logger.error "Tail '#{req.id}' already exists, skipping TailCommand"
+                                   return
+                                 end
+
+        @logger.debug "Tailing audience: #{aud_str}"
+
+        t = Streamdal::Protos::Tail.new(
+          req,
+          @cfg[:streamdal_url],
+          @cfg[:streamdal_token],
+          @logger,
+          @metrics
+        )
+
+        t.start_tail_workers
+
+      end
     end
 
     def _set_active_tail(tail)
-      #
+      key = aud_to_str(tail.request.audience)
+
+      unless @tails.key?(key)
+        @tails[key] = {}
+      end
+
+      @tails[key][tail.request.id] = tail
     end
 
     def _set_paused_tail(tail)
-      #
+      key = aud_to_str(tail.request.aud)
+
+      unless @paused_tails.key?(key)
+        @paused_tails[key] = {}
+      end
+
+      @paused_tails[key][tail.request.id] = tail
     end
 
     def _stop_tail(tail)
-      #
+      key = aud_to_str(tail.request.audience)
+
+      if @tails.key?(key) && @tails[key].key?(tail.request.id)
+        @tails[key][tail.request.id].stop_tail
+
+        # Remove from active tails
+        @tails[key].delete(tail.request.id)
+
+        if @tails[key].length == 0
+          @tails.delete(key)
+        end
+      end
+
+      if @paused_tails.key?(key) && @paused_tails[key].key?(tail.request.id)
+        @paused_tails[key].delete(tail.request.id)
+
+        if @paused_tails[key].length == 0
+          @paused_tails.delete(key)
+        end
+      end
     end
 
     def _stop_all_tails
-      #
+      # TODO: does this modify the instances variables or copy them?
+      _stop_tails(@tails)
+      _stop_tails(@paused_tails)
+    end
+
+    def _stop_tails(tails = {})
+      # Helper method for _stop_all_tails
+      tails.each do |aud, aud_tails|
+        aud_tails.each do |t|
+          t.stop_tail
+          tails[aud].delete(tail.request.id)
+
+          if tails[aud].length == 0
+            tails.delete(aud)
+          end
+        end
+      end
     end
 
     def _pause_tail(cmd)
-      #
+      t = _remove_active_tail(cmd.tail.request.audience, cmd.tail.request.tail.id)
+      t.stop_tail
+
+      _set_paused_tail(t)
+
+      @logger.debug "Paused tail '#{cmd.tail.request.tail.id}'"
     end
 
     def _resume_tail(cmd)
-      #
+      t = _remove_paused_tail(cmd.tail.request.audience, cmd.tail.request.tail.id)
+      if t.nil?
+        @logger.error "Tail '#{cmd.tail.request.tail.id}' not found in paused tails"
+        nil
+      end
+
+      t.start_tail_workers
+
+      _set_active_tail(t)
+
+      @logger.debug "Resumed tail '#{cmd.tail.request.tail.id}'"
     end
 
     def _remove_active_tail(aud, tail_id)
-      #
+      key = aud_to_str(aud)
+
+      if @tails.key?(key) && @tails[key].key?(tail_id)
+        t = @tails[key][tail_id]
+        t.stop_tail
+
+        @tails[key].delete(tail_id)
+
+        if @tails[key].length == 0
+          @tails.delete(key)
+        end
+
+        t
+      end
     end
 
     def _remove_paused_tail(aud, tail_id)
-      #
+      key = aud_to_str(aud)
+
+      if @paused_tails.key?(key) && @paused_tails[key].key?(tail_id)
+        t = @paused_tails[key][tail_id]
+
+        @paused_tails[key].delete(tail_id)
+
+        if @paused_tails[key].length == 0
+          @paused_tails.delete(key)
+        end
+
+        t
+      end
     end
+
   end
 end

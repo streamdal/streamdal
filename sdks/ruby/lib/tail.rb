@@ -6,7 +6,7 @@ MIN_TAIL_RESPONSE_INTERVAL_MS = 100
 
 module Streamdal
   class Tail
-    attr_accessor :queue, :active
+    attr_accessor :queue, :active, :request
 
     def initialize(request, streamdal_url, auth_token, log, metrics, active = false)
       @request = request
@@ -34,15 +34,28 @@ module Streamdal
           start_tail_worker(worker_id + 1)
         end
       end
+      @active = true
     end
 
+    def stop_tail
+      @logger.debug("Stopping tail for '#{@request.id}'")
+      @active = false
+      @stub = nil # No close method, garbage collector handles it in ruby
+    end
+    
     def start_tail_worker(worker_id)
       @logger.debug("Starting tail worker #{worker_id}")
 
       # Create gRPC connection
-      @stub = Streamdal::Protos::Internal::Stub.new(@streamdal_url, :this_channel_is_insecure)
+      stub = Streamdal::Protos::Internal::Stub.new(@streamdal_url, :this_channel_is_insecure)
 
-      while @active && !@queue.empty?
+      while @active
+        # If the queue is empty, sleep for a bit and loop again
+        if @queue.empty?
+          sleep(0.1)
+          next
+        end
+
         if Time::now - @last_msg < MIN_TAIL_RESPONSE_INTERVAL_MS
           sleep(MIN_TAIL_RESPONSE_INTERVAL_MS)
 
@@ -51,19 +64,23 @@ module Streamdal
           next
         end
 
-        @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
-        tail_response = @queue.pop(non_block = false)
-        @stub.tail(tail_response, metadata: { "auth-token" => @auth_token })
-
-      end
-
-      def should_send
-        if @limiter.nil?
-          nil
+        unless @stub.nil?
+          @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
+          tail_response = @queue.pop(non_block = false)
+          @stub.tail(tail_response, metadata: { "auth-token" => @auth_token })
         end
-
-        @limiter.use_tokens(1)
       end
+
+      @logger.debug "Tail worker #{worker_id} exited"
+
+    end
+
+    def should_send
+      if @limiter.nil?
+        nil
+      end
+
+      @limiter.use_tokens(1)
     end
   end
 end
