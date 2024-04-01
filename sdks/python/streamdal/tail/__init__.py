@@ -46,13 +46,12 @@ class Tail:
         self.metrics = metrics
         self.active = active
 
-        self.limiter = token_bucket.Limiter(
-            float(request.sample_options.sample_interval_seconds),
-            request.sample_options.sample_rate,
-            token_bucket.MemoryStorage(),
-        )
-        if request.sample_options is not None:
-            pass
+        if isinstance(request.sample_options, protos.SampleOptions):
+            self.limiter = token_bucket.Limiter(
+                float(request.sample_options.sample_interval_seconds),
+                request.sample_options.sample_rate,
+                token_bucket.MemoryStorage(),
+            )
 
     def tail_iterator(self):
         while not self.exit.is_set():
