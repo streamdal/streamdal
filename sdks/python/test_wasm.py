@@ -345,4 +345,4 @@ class TestStreamdalWasm:
 
         assert res is not None
         assert res.status == protos.ExecStatus.EXEC_STATUS_TRUE
-        assert res.data.bytes == b'{"users":[{"name": "Bob","email": "REDACTED"}]}'
+        assert res.data == b'{"users":[{"name": "Bob","email": "REDACTED"}]}'

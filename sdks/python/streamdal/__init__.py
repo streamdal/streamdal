@@ -360,13 +360,13 @@ class StreamdalClient:
                 )
 
                 # Exec wasm
-                wasm_resp = self._call_wasm(step, resp.data.bytes, isr)
+                wasm_resp = self._call_wasm(step, resp.data, isr)
 
                 if self.cfg.dry_run:
                     self.log.debug(f"Running step '{step.name}' in dry-run mode")
 
                 if len(wasm_resp.output_payload) > 0:
-                    resp.data.bytes = wasm_resp.output_payload
+                    resp.data = wasm_resp.output_payload
 
                 self._handle_schema(aud, step, wasm_resp)
 
@@ -388,7 +388,7 @@ class StreamdalClient:
                     isr = None  # avoid passing step result on error
 
                 # Send notification if necessary
-                self._notify_condition(pipeline, step, aud, cond, resp.data.bytes, cond_type)
+                self._notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
 
                 # Continue to next step, nothing needed
                 if self.cfg.dry_run:
@@ -439,19 +439,19 @@ class StreamdalClient:
                     step_status.status = protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
                     pipeline_status.step_status.append(step_status)
                     resp.pipeline_status.append(pipeline_status)
-                    self._send_tail(aud, pipeline.id, original_data, resp.data.bytes)
+                    self._send_tail(aud, pipeline.id, original_data, resp.data)
                     return resp
 
                 pipeline_status.step_status.append(step_status)
 
             resp.pipeline_status.append(pipeline_status)
 
-        self._send_tail(aud, "", original_data, resp.data.bytes)
+        self._send_tail(aud, "", original_data, resp.data)
 
         # The value of data will be modified each step above regardless of dry run, so that pipelines
         # can execute as expected. This is why we need to reset to the original data here.
         if self.cfg.dry_run:
-            resp.data.bytes = copy(req.data)
+            resp.data = copy(req.data)
 
         return resp
 
