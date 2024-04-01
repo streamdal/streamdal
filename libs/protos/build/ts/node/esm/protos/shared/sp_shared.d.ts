@@ -5,31 +5,77 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * WasmModule is used to ensure we only send the wasm module once per request
+ * Main type representing a wasm module entry. Used by server for external.*Wasm()
+ * methods; also used to ensure we only send the wasm module once per request
  * instead of duplicated in every pipeline where it is used. This prevents
- * over-sized payloads on SDK startup
+ * over-sized payloads on SDK startup.
  *
  * @generated from protobuf message protos.shared.WasmModule
  */
 export interface WasmModule {
     /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
+     * ID is uuid(sha256(_wasm_bytes)) and is used for referencing the Wasm module
      *
      * @generated from protobuf field: string id = 1;
      */
     id: string;
     /**
-     * WASM module bytes (set by server)
+     * Contents of the Wasm module
      *
      * @generated from protobuf field: bytes bytes = 2;
      */
     bytes: Uint8Array;
     /**
-     * WASM function name to execute (set by server)
+     * Entry point function name
      *
      * @generated from protobuf field: string function = 3;
      */
     function: string;
+    /**
+     * Friendly name for the Wasm module
+     *
+     * @generated from protobuf field: string name = 4;
+     */
+    name: string;
+    /**
+     * Filename of the Wasm module (used only for bundled wasm)
+     *
+     * @generated from protobuf field: string _filename = 5;
+     */
+    Filename: string;
+    /**
+     * Indicates whether this wasm entry is for bundled wasm or for wasm added via
+     * CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+     *
+     * @generated from protobuf field: bool _bundled = 6;
+     */
+    Bundled: boolean;
+    /**
+     * Informative, debug fields
+     *
+     * @generated from protobuf field: optional string description = 101;
+     */
+    description?: string;
+    /**
+     * @generated from protobuf field: optional string version = 102;
+     */
+    version?: string;
+    /**
+     * @generated from protobuf field: optional string url = 103;
+     */
+    url?: string;
+    /**
+     * Set by server
+     *
+     * @generated from protobuf field: optional int64 _created_at_unix_ts_ns_utc = 1000;
+     */
+    CreatedAtUnixTsNsUtc?: string;
+    /**
+     * Set by server
+     *
+     * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
+     */
+    UpdatedAtUnixTsNsUtc?: string;
 }
 /**
  * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.

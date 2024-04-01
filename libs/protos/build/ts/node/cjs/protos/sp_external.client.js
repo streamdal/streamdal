@@ -282,7 +282,7 @@ class ExternalClient {
         return (0, runtime_rpc_1.stackIntercept)("unary", this._transport, method, opt, input);
     }
     /**
-     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
      */
     createWasm(input, options) {
         const method = this.methods[32], opt = this._transport.mergeOptions(options);

@@ -4,6 +4,7 @@ import type { TestResponse } from "./sp_external";
 import type { TestRequest } from "./sp_external";
 import type { DeleteWasmRequest } from "./sp_external";
 import type { UpdateWasmRequest } from "./sp_external";
+import type { CreateWasmResponse } from "./sp_external";
 import type { CreateWasmRequest } from "./sp_external";
 import type { GetAllWasmResponse } from "./sp_external";
 import type { GetAllWasmRequest } from "./sp_external";
@@ -231,9 +232,9 @@ export interface IExternalClient {
      */
     getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse>;
     /**
-     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
      */
-    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, StandardResponse>;
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, CreateWasmResponse>;
     /**
      * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
      */
@@ -435,9 +436,9 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse>;
     /**
-     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.StandardResponse);
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
      */
-    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, StandardResponse>;
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, CreateWasmResponse>;
     /**
      * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
      */

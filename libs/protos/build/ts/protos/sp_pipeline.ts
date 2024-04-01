@@ -237,7 +237,7 @@ export interface PipelineStep {
     } | {
         oneofKind: "custom";
         /**
-         * If set, _wasm_id MUST  e filled out and MUST exist
+         * If set, _wasm_id MUST be set
          *
          * @generated from protobuf field: protos.steps.CustomStep custom = 1004;
          */

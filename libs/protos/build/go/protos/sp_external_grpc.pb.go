@@ -116,7 +116,7 @@ type ExternalClient interface {
 	// BEGIN Wasm methods
 	GetWasm(ctx context.Context, in *GetWasmRequest, opts ...grpc.CallOption) (*GetWasmResponse, error)
 	GetAllWasm(ctx context.Context, in *GetAllWasmRequest, opts ...grpc.CallOption) (*GetAllWasmResponse, error)
-	CreateWasm(ctx context.Context, in *CreateWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error)
+	CreateWasm(ctx context.Context, in *CreateWasmRequest, opts ...grpc.CallOption) (*CreateWasmResponse, error)
 	UpdateWasm(ctx context.Context, in *UpdateWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	DeleteWasm(ctx context.Context, in *DeleteWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Test method
@@ -513,8 +513,8 @@ func (c *externalClient) GetAllWasm(ctx context.Context, in *GetAllWasmRequest, 
 	return out, nil
 }
 
-func (c *externalClient) CreateWasm(ctx context.Context, in *CreateWasmRequest, opts ...grpc.CallOption) (*StandardResponse, error) {
-	out := new(StandardResponse)
+func (c *externalClient) CreateWasm(ctx context.Context, in *CreateWasmRequest, opts ...grpc.CallOption) (*CreateWasmResponse, error) {
+	out := new(CreateWasmResponse)
 	err := c.cc.Invoke(ctx, External_CreateWasm_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -608,7 +608,7 @@ type ExternalServer interface {
 	// BEGIN Wasm methods
 	GetWasm(context.Context, *GetWasmRequest) (*GetWasmResponse, error)
 	GetAllWasm(context.Context, *GetAllWasmRequest) (*GetAllWasmResponse, error)
-	CreateWasm(context.Context, *CreateWasmRequest) (*StandardResponse, error)
+	CreateWasm(context.Context, *CreateWasmRequest) (*CreateWasmResponse, error)
 	UpdateWasm(context.Context, *UpdateWasmRequest) (*StandardResponse, error)
 	DeleteWasm(context.Context, *DeleteWasmRequest) (*StandardResponse, error)
 	// Test method
@@ -716,7 +716,7 @@ func (UnimplementedExternalServer) GetWasm(context.Context, *GetWasmRequest) (*G
 func (UnimplementedExternalServer) GetAllWasm(context.Context, *GetAllWasmRequest) (*GetAllWasmResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllWasm not implemented")
 }
-func (UnimplementedExternalServer) CreateWasm(context.Context, *CreateWasmRequest) (*StandardResponse, error) {
+func (UnimplementedExternalServer) CreateWasm(context.Context, *CreateWasmRequest) (*CreateWasmResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWasm not implemented")
 }
 func (UnimplementedExternalServer) UpdateWasm(context.Context, *UpdateWasmRequest) (*StandardResponse, error) {

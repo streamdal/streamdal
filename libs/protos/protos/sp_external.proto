@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package protos;
 
+import "shared/sp_shared.proto";
 import "sp_common.proto";
 import "sp_info.proto";
 import "sp_notify.proto";
 import "sp_pipeline.proto";
-import "sp_wsm.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
@@ -102,7 +102,7 @@ service External {
 
   rpc GetAllWasm(GetAllWasmRequest) returns (GetAllWasmResponse);
 
-  rpc CreateWasm(CreateWasmRequest) returns (StandardResponse);
+  rpc CreateWasm(CreateWasmRequest) returns (CreateWasmResponse);
 
   rpc UpdateWasm(UpdateWasmRequest) returns (StandardResponse);
 
@@ -341,7 +341,7 @@ message GetWasmRequest {
 }
 
 message GetWasmResponse {
-  protos.Wasm wasm = 1;
+  protos.shared.WasmModule wasm = 1;
 }
 
 message GetAllWasmRequest {
@@ -349,21 +349,25 @@ message GetAllWasmRequest {
 }
 
 message GetAllWasmResponse {
-  repeated protos.Wasm wasm = 1;
+  repeated protos.shared.WasmModule wasm = 1;
 }
 
 message CreateWasmRequest {
-  protos.Wasm wasm = 1;
+  protos.shared.WasmModule wasm = 1;
+}
+
+message CreateWasmResponse {
+  string message = 1;
+  string id = 2;
 }
 
 message UpdateWasmRequest {
-  protos.Wasm wasm = 1;
+  protos.shared.WasmModule wasm = 1;
 }
 
 message DeleteWasmRequest {
   repeated string ids = 1;
 }
-
 
 message TestRequest {
   string input = 1;

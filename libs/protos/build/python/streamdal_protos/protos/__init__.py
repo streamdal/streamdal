@@ -2,7 +2,6 @@
 # sources: sp_bus.proto, sp_command.proto, sp_common.proto, sp_external.proto, sp_info.proto, sp_internal.proto, sp_kv.proto, sp_notify.proto, sp_pipeline.proto, sp_sdk.proto, sp_wsm.proto
 # plugin: python-betterproto
 # This file has been @generated
-import builtins
 import warnings
 from dataclasses import dataclass
 from typing import (
@@ -115,25 +114,6 @@ class ClientType(betterproto.Enum):
     CLIENT_TYPE_SHIM = 2
 
 
-class WasmExitCode(betterproto.Enum):
-    """
-    Included in Wasm response; the SDK should use the WASMExitCode to determine
-    what to do next - should it execute next step, should it notify or should
-    it stop execution/abort the rest of the steps in current or all pipelines.
-    Example: a. Wasm func returns WASM_EXIT_CODE_FALSE - read
-    PipelineStep.on_false conditions to determine what to do next. b. Wasm func
-    returns WASM_EXIT_CODE_TRUE - read PipelineStep.on_true conditions to
-    determine what to do next. .. and so on. TODO: This might be a dupe -
-    should Wasm use ExecStatus instead of this? protolint:disable:next
-    ENUM_FIELD_NAMES_PREFIX
-    """
-
-    WASM_EXIT_CODE_UNSET = 0
-    WASM_EXIT_CODE_TRUE = 1
-    WASM_EXIT_CODE_FALSE = 2
-    WASM_EXIT_CODE_ERROR = 3
-
-
 class AppRegistrationStatusResponseStatus(betterproto.Enum):
     STATUS_UNSET = 0
     STATUS_SUBMIT = 1
@@ -179,6 +159,25 @@ class ExecStatus(betterproto.Enum):
     request. Example error cases: SDK can't find the appropriate Wasm module,
     Wasm function cannot alloc or dealloc memory, etc.
     """
+
+
+class WasmExitCode(betterproto.Enum):
+    """
+    Included in Wasm response; the SDK should use the WASMExitCode to determine
+    what to do next - should it execute next step, should it notify or should
+    it stop execution/abort the rest of the steps in current or all pipelines.
+    Example: a. Wasm func returns WASM_EXIT_CODE_FALSE - read
+    PipelineStep.on_false conditions to determine what to do next. b. Wasm func
+    returns WASM_EXIT_CODE_TRUE - read PipelineStep.on_true conditions to
+    determine what to do next. .. and so on. TODO: This might be a dupe -
+    should Wasm use ExecStatus instead of this? protolint:disable:next
+    ENUM_FIELD_NAMES_PREFIX
+    """
+
+    WASM_EXIT_CODE_UNSET = 0
+    WASM_EXIT_CODE_TRUE = 1
+    WASM_EXIT_CODE_FALSE = 2
+    WASM_EXIT_CODE_ERROR = 3
 
 
 @dataclass(eq=False, repr=False)
@@ -489,7 +488,7 @@ class PipelineStep(betterproto.Message):
     encode: "steps.EncodeStep" = betterproto.message_field(1002, group="step")
     decode: "steps.DecodeStep" = betterproto.message_field(1003, group="step")
     custom: "steps.CustomStep" = betterproto.message_field(1004, group="step")
-    """If set, _wasm_id MUST  e filled out and MUST exist"""
+    """If set, _wasm_id MUST be set"""
 
     http_request: "steps.HttpRequestStep" = betterproto.message_field(
         1005, group="step"
@@ -587,135 +586,6 @@ class ClientInfo(betterproto.Message):
     node_name: Optional[str] = betterproto.string_field(
         9, optional=True, group="X_node_name"
     )
-
-
-@dataclass(eq=False, repr=False)
-class WasmRequest(betterproto.Message):
-    """SDK generates a WASM request and passes this to the WASM func"""
-
-    step: "PipelineStep" = betterproto.message_field(1)
-    """
-    The actual step that the WASM func will operate on. This is the same step
-    that is declared in protos.Pipeline.
-    """
-
-    input_payload: bytes = betterproto.bytes_field(2)
-    """Payload data that WASM func will operate on"""
-
-    input_step: Optional[bytes] = betterproto.bytes_field(
-        3, optional=True, group="_input_step"
-    )
-    """
-    Potentially filled out result from previous step. If this is first step in
-    the pipeline, it will be empty.
-    """
-
-    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
-        4, optional=True, group="_inter_step_result"
-    )
-    """
-    Potential input from a previous step if `Step.Dynamic == true` This is used
-    for communicating data between steps. For example, when trying to find
-    email addresses in a payload and then passing on the results to a transform
-    step to obfuscate them
-    """
-
-
-@dataclass(eq=False, repr=False)
-class WasmResponse(betterproto.Message):
-    """Returned by all WASM functions"""
-
-    output_payload: bytes = betterproto.bytes_field(1)
-    """
-    Potentially modified input payload. Concept: All WASM funcs accept an
-    input_payload in WASMRequest, WASM func reads input payload, modifies it
-    and writes the modified output to output_payload.
-    """
-
-    exit_code: "WasmExitCode" = betterproto.enum_field(2)
-    """
-    Exit code that the WASM func exited with; more info in WASMExitCode's
-    comment
-    """
-
-    exit_msg: str = betterproto.string_field(3)
-    """Additional info about the reason a specific exit code was returned"""
-
-    output_step: Optional[bytes] = betterproto.bytes_field(
-        4, optional=True, group="_output_step"
-    )
-    """
-    Potential additional step output - ie. if a WASM func is an HTTPGet,
-    output_step would contain the HTTP response body; if the WASM func is a
-    KVGet, the output_step would be the value of the fetched key.
-    """
-
-    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
-        5, optional=True, group="_inter_step_result"
-    )
-    """
-    If `Step.Dynamic == true`, this field should be filled out by the WASM
-    module This is used for communicating data between steps. For example, when
-    trying to find email addresses in a payload and then passing on the results
-    to a transform step to obfuscate them
-    """
-
-
-@dataclass(eq=False, repr=False)
-class InterStepResult(betterproto.Message):
-    """
-    Intended for communicating wasm results between steps. Currently only used
-    for passing results from a Detective Step to a Transform step
-    """
-
-    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
-        1, group="input_from"
-    )
-
-
-@dataclass(eq=False, repr=False)
-class Wasm(betterproto.Message):
-    """Used for referencing both bundled and custom wasm modules"""
-
-    id: str = betterproto.string_field(1)
-    """ID used for referencing the Wasm module"""
-
-    name: str = betterproto.string_field(2)
-    """Friendly name for the Wasm module"""
-
-    bytes: builtins.bytes = betterproto.bytes_field(3)
-    """Contents of the Wasm module"""
-
-    function_name: str = betterproto.string_field(4)
-    """Entry point function name"""
-
-    filename: str = betterproto.string_field(5)
-    """Filename of the Wasm module (used only for bundled wasm)"""
-
-    bundled: bool = betterproto.bool_field(6)
-    """
-    Indicates whether this wasm entry is for bundled wasm or for wasm added via
-    CreateWasm(); ignored in CreateWasm() and UpdateWasm().
-    """
-
-    description: Optional[str] = betterproto.string_field(
-        101, optional=True, group="_description"
-    )
-    """Informative, debug fields"""
-
-    version: Optional[str] = betterproto.string_field(
-        102, optional=True, group="_version"
-    )
-    url: Optional[str] = betterproto.string_field(103, optional=True, group="_url")
-    created_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
-        1000, optional=True, group="X_created_at_unix_ts_ns_utc"
-    )
-    """Set by server"""
-
-    updated_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
-        1001, optional=True, group="X_updated_at_unix_ts_ns_utc"
-    )
-    """Set by server"""
 
 
 @dataclass(eq=False, repr=False)
@@ -997,7 +867,7 @@ class GetWasmRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetWasmResponse(betterproto.Message):
-    wasm: "Wasm" = betterproto.message_field(1)
+    wasm: "shared.WasmModule" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1007,17 +877,23 @@ class GetAllWasmRequest(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class GetAllWasmResponse(betterproto.Message):
-    wasm: List["Wasm"] = betterproto.message_field(1)
+    wasm: List["shared.WasmModule"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
 class CreateWasmRequest(betterproto.Message):
-    wasm: "Wasm" = betterproto.message_field(1)
+    wasm: "shared.WasmModule" = betterproto.message_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class CreateWasmResponse(betterproto.Message):
+    message: str = betterproto.string_field(1)
+    id: str = betterproto.string_field(2)
 
 
 @dataclass(eq=False, repr=False)
 class UpdateWasmRequest(betterproto.Message):
-    wasm: "Wasm" = betterproto.message_field(1)
+    wasm: "shared.WasmModule" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1423,6 +1299,90 @@ class StepStatus(betterproto.Message):
     future pipelines - the user must define the abort conditions for
     "on_error".
     """
+
+
+@dataclass(eq=False, repr=False)
+class WasmRequest(betterproto.Message):
+    """SDK generates a WASM request and passes this to the WASM func"""
+
+    step: "PipelineStep" = betterproto.message_field(1)
+    """
+    The actual step that the WASM func will operate on. This is the same step
+    that is declared in protos.Pipeline.
+    """
+
+    input_payload: bytes = betterproto.bytes_field(2)
+    """Payload data that WASM func will operate on"""
+
+    input_step: Optional[bytes] = betterproto.bytes_field(
+        3, optional=True, group="_input_step"
+    )
+    """
+    Potentially filled out result from previous step. If this is first step in
+    the pipeline, it will be empty.
+    """
+
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        4, optional=True, group="_inter_step_result"
+    )
+    """
+    Potential input from a previous step if `Step.Dynamic == true` This is used
+    for communicating data between steps. For example, when trying to find
+    email addresses in a payload and then passing on the results to a transform
+    step to obfuscate them
+    """
+
+
+@dataclass(eq=False, repr=False)
+class WasmResponse(betterproto.Message):
+    """Returned by all WASM functions"""
+
+    output_payload: bytes = betterproto.bytes_field(1)
+    """
+    Potentially modified input payload. Concept: All WASM funcs accept an
+    input_payload in WASMRequest, WASM func reads input payload, modifies it
+    and writes the modified output to output_payload.
+    """
+
+    exit_code: "WasmExitCode" = betterproto.enum_field(2)
+    """
+    Exit code that the WASM func exited with; more info in WASMExitCode's
+    comment
+    """
+
+    exit_msg: str = betterproto.string_field(3)
+    """Additional info about the reason a specific exit code was returned"""
+
+    output_step: Optional[bytes] = betterproto.bytes_field(
+        4, optional=True, group="_output_step"
+    )
+    """
+    Potential additional step output - ie. if a WASM func is an HTTPGet,
+    output_step would contain the HTTP response body; if the WASM func is a
+    KVGet, the output_step would be the value of the fetched key.
+    """
+
+    inter_step_result: Optional["InterStepResult"] = betterproto.message_field(
+        5, optional=True, group="_inter_step_result"
+    )
+    """
+    If `Step.Dynamic == true`, this field should be filled out by the WASM
+    module This is used for communicating data between steps. For example, when
+    trying to find email addresses in a payload and then passing on the results
+    to a transform step to obfuscate them
+    """
+
+
+@dataclass(eq=False, repr=False)
+class InterStepResult(betterproto.Message):
+    """
+    Intended for communicating wasm results between steps. Currently only used
+    for passing results from a Detective Step to a Transform step
+    """
+
+    detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
+        1, group="input_from"
+    )
 
 
 class ExternalStub(betterproto.ServiceStub):
@@ -1981,11 +1941,11 @@ class ExternalStub(betterproto.ServiceStub):
         timeout: Optional[float] = None,
         deadline: Optional["Deadline"] = None,
         metadata: Optional["MetadataLike"] = None
-    ) -> "StandardResponse":
+    ) -> "CreateWasmResponse":
         return await self._unary_unary(
             "/protos.External/CreateWasm",
             create_wasm_request,
-            StandardResponse,
+            CreateWasmResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -2346,7 +2306,7 @@ class ExternalBase(ServiceBase):
 
     async def create_wasm(
         self, create_wasm_request: "CreateWasmRequest"
-    ) -> "StandardResponse":
+    ) -> "CreateWasmResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def update_wasm(
@@ -2611,7 +2571,7 @@ class ExternalBase(ServiceBase):
         await stream.send_message(response)
 
     async def __rpc_create_wasm(
-        self, stream: "grpclib.server.Stream[CreateWasmRequest, StandardResponse]"
+        self, stream: "grpclib.server.Stream[CreateWasmRequest, CreateWasmResponse]"
     ) -> None:
         request = await stream.recv_message()
         response = await self.create_wasm(request)
@@ -2836,7 +2796,7 @@ class ExternalBase(ServiceBase):
                 self.__rpc_create_wasm,
                 grpclib.const.Cardinality.UNARY_UNARY,
                 CreateWasmRequest,
-                StandardResponse,
+                CreateWasmResponse,
             ),
             "/protos.External/UpdateWasm": grpclib.const.Handler(
                 self.__rpc_update_wasm,
