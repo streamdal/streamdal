@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/streamdal/apps/server/util"
@@ -17,7 +17,7 @@ var (
 )
 
 // GetWasm will fetch Wasm from the store by name and ID
-func (s *Store) GetWasm(ctx context.Context, name, id string) (*protos.Wasm, error) {
+func (s *Store) GetWasm(ctx context.Context, name, id string) (*shared.WasmModule, error) {
 	s.log.Debugf("GetWasm(): Attempting to fetch Wasm by name '%s' and id '%s'", name, id)
 
 	data, err := s.read(ctx, RedisWasmKey(name, id))
@@ -31,7 +31,7 @@ func (s *Store) GetWasm(ctx context.Context, name, id string) (*protos.Wasm, err
 	}
 
 	// Try to marshal the data into a Wasm entry
-	entry := &protos.Wasm{}
+	entry := &shared.WasmModule{}
 	if err := proto.Unmarshal(data, entry); err != nil {
 		return nil, errors.Wrap(err, "unable to unmarshal Wasm from store")
 	}
@@ -40,7 +40,7 @@ func (s *Store) GetWasm(ctx context.Context, name, id string) (*protos.Wasm, err
 }
 
 // GetWasmByID will fetch Wasm from the store by ID (regardless of 'name')
-func (s *Store) GetWasmByID(ctx context.Context, id string) (*protos.Wasm, error) {
+func (s *Store) GetWasmByID(ctx context.Context, id string) (*shared.WasmModule, error) {
 	s.log.Debugf("GetWasmByID(): Attempting to fetch Wasm by id '%s'", id)
 
 	keys, err := s.options.RedisBackend.Keys(ctx, RedisWasmKey("*", id)).Result()
@@ -65,7 +65,7 @@ func (s *Store) GetWasmByID(ctx context.Context, id string) (*protos.Wasm, error
 }
 
 // GetWasmByName will fetch Wasm from the store by name (regardless of 'id')
-func (s *Store) GetWasmByName(ctx context.Context, name string) (*protos.Wasm, error) {
+func (s *Store) GetWasmByName(ctx context.Context, name string) (*shared.WasmModule, error) {
 	redisKey := RedisWasmKey(name, "*")
 
 	s.log.Debugf("GetWasmByName(): Attempting to fetch Wasm by name '%s' using key '%s'", name, redisKey)
@@ -93,7 +93,7 @@ func (s *Store) GetWasmByName(ctx context.Context, name string) (*protos.Wasm, e
 
 // SetWasm will store Wasm in the store by name and ID; it will overwrite an
 // existing entry (if it exists).
-func (s *Store) SetWasm(ctx context.Context, name, id string, wasm *protos.Wasm) error {
+func (s *Store) SetWasm(ctx context.Context, name, id string, wasm *shared.WasmModule) error {
 	if err := validate.SetWasm(name, id, wasm); err != nil {
 		return errors.Wrap(err, "unable to validate SetWasm params")
 	}
@@ -113,7 +113,7 @@ func (s *Store) SetWasm(ctx context.Context, name, id string, wasm *protos.Wasm)
 // SetWasmByID will overwrite an EXISTING Wasm entry by ID. This method
 // requires for an existing Wasm object to exist in redi and will use the
 // discovered 'id' to overwrite the entry.
-func (s *Store) SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm) error {
+func (s *Store) SetWasmByID(ctx context.Context, id string, wasm *shared.WasmModule) error {
 	if err := validate.SetWasmByID(id, wasm); err != nil {
 		return errors.Wrap(err, "unable to validate SetWasmByName params")
 	}
@@ -142,7 +142,7 @@ func (s *Store) SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm) e
 // SetWasmByName will overwrite an EXISTING Wasm entry by name. This method
 // requires for an existing Wasm object to exist in redis and will use the
 // discovered 'name' to overwrite the entry.
-func (s *Store) SetWasmByName(ctx context.Context, name string, wasm *protos.Wasm) error {
+func (s *Store) SetWasmByName(ctx context.Context, name string, wasm *shared.WasmModule) error {
 	if err := validate.SetWasmByName(name, wasm); err != nil {
 		return errors.Wrap(err, "unable to validate SetWasmByName params")
 	}
@@ -239,14 +239,14 @@ func (s *Store) DeleteWasmByName(ctx context.Context, name string) error {
 	return s.DeleteWasm(ctx, name, id)
 }
 
-func (s *Store) GetAllWasm(ctx context.Context) ([]*protos.Wasm, error) {
+func (s *Store) GetAllWasm(ctx context.Context) ([]*shared.WasmModule, error) {
 	// Fetch all keys that match the wasm key pattern
 	keys, err := s.options.RedisBackend.Keys(ctx, RedisWasmPrefix+":*").Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Wasm keys")
 	}
 
-	entries := make([]*protos.Wasm, 0)
+	entries := make([]*shared.WasmModule, 0)
 
 	// Fetch all wasm entries
 	for _, key := range keys {
@@ -256,7 +256,7 @@ func (s *Store) GetAllWasm(ctx context.Context) ([]*protos.Wasm, error) {
 		}
 
 		// Try to marshal the data into a Wasm entry
-		entry := &protos.Wasm{}
+		entry := &shared.WasmModule{}
 		if err := proto.Unmarshal(data, entry); err != nil {
 			return nil, errors.Wrap(err, "unable to unmarshal Wasm from store")
 		}

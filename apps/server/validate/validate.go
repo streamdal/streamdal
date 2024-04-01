@@ -892,7 +892,7 @@ func DeleteWasmRequest(r *protos.DeleteWasmRequest) error {
 	return nil
 }
 
-func Wasm(w *protos.Wasm, mustContainID bool) error {
+func Wasm(w *shared.WasmModule, mustContainID bool) error {
 	if w == nil {
 		return ErrNilInput
 	}
@@ -916,7 +916,7 @@ func Wasm(w *protos.Wasm, mustContainID bool) error {
 	return nil
 }
 
-func SetWasm(name, id string, wasm *protos.Wasm) error {
+func SetWasm(name, id string, wasm *shared.WasmModule) error {
 	if name == "" {
 		return ErrEmptyField("Name")
 	}
@@ -932,7 +932,7 @@ func SetWasm(name, id string, wasm *protos.Wasm) error {
 	return nil
 }
 
-func SetWasmByName(name string, wasm *protos.Wasm) error {
+func SetWasmByName(name string, wasm *shared.WasmModule) error {
 	if name == "" {
 		return ErrEmptyField("Name")
 	}
@@ -944,7 +944,7 @@ func SetWasmByName(name string, wasm *protos.Wasm) error {
 	return nil
 }
 
-func SetWasmByID(id string, wasm *protos.Wasm) error {
+func SetWasmByID(id string, wasm *shared.WasmModule) error {
 	if id == "" {
 		return ErrEmptyField("Id")
 	}

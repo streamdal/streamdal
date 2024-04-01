@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+
 	telTypes "github.com/streamdal/streamdal/apps/server/types"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
@@ -166,13 +168,13 @@ type IStore interface {
 	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
 
 	// BEGIN Wasm-related methods
-	GetAllWasm(ctx context.Context) ([]*protos.Wasm, error)
-	GetWasm(ctx context.Context, name, id string) (*protos.Wasm, error)
-	GetWasmByID(ctx context.Context, id string) (*protos.Wasm, error)
-	GetWasmByName(ctx context.Context, name string) (*protos.Wasm, error)
-	SetWasm(ctx context.Context, id, name string, wasm *protos.Wasm) error
-	SetWasmByName(ctx context.Context, name string, wasm *protos.Wasm) error
-	SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm) error
+	GetAllWasm(ctx context.Context) ([]*shared.WasmModule, error)
+	GetWasm(ctx context.Context, name, id string) (*shared.WasmModule, error)
+	GetWasmByID(ctx context.Context, id string) (*shared.WasmModule, error)
+	GetWasmByName(ctx context.Context, name string) (*shared.WasmModule, error)
+	SetWasm(ctx context.Context, id, name string, wasm *shared.WasmModule) error
+	SetWasmByName(ctx context.Context, name string, wasm *shared.WasmModule) error
+	SetWasmByID(ctx context.Context, id string, wasm *shared.WasmModule) error
 	DeleteWasm(ctx context.Context, id, name string) error
 	DeleteWasmByID(ctx context.Context, id string) error
 	DeleteWasmByName(ctx context.Context, name string) error

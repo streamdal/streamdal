@@ -1261,10 +1261,9 @@ func (s *ExternalServer) GetAllWasm(ctx context.Context, req *protos.GetAllWasmR
 }
 
 // TODO: Implement
-func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.StandardResponse, error) {
+func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.CreateWasmResponse, error) {
 	if err := validate.CreateWasmRequest(req); err != nil {
-		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
-			"unable to validate CreateWasm request: "+err.Error()), nil
+		return nil, errors.Wrap(err, "unable to validate CreateWasm request")
 	}
 
 	// TODO: Try to save Wasm to store

@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
@@ -24,34 +25,34 @@ type IWasm interface {
 }
 
 var (
-	config = map[string]protos.Wasm{
+	config = map[string]shared.WasmModule{
 		"detective": {
-			FunctionName: "f",
-			XFilename:    "detective.wasm",
+			Function:  "f",
+			XFilename: "detective.wasm",
 		},
 		"transform": {
-			FunctionName: "f",
-			XFilename:    "transform.wasm",
+			Function:  "f",
+			XFilename: "transform.wasm",
 		},
 		"httprequest": {
-			FunctionName: "f",
-			XFilename:    "httprequest.wasm",
+			Function:  "f",
+			XFilename: "httprequest.wasm",
 		},
 		"kv": {
-			FunctionName: "f",
-			XFilename:    "kv.wasm",
+			Function:  "f",
+			XFilename: "kv.wasm",
 		},
 		"inferschema": {
-			FunctionName: "f",
-			XFilename:    "inferschema.wasm",
+			Function:  "f",
+			XFilename: "inferschema.wasm",
 		},
 		"validjson": {
-			FunctionName: "f",
-			XFilename:    "validjson.wasm",
+			Function:  "f",
+			XFilename: "validjson.wasm",
 		},
 		"schemavalidation": {
-			FunctionName: "f",
-			XFilename:    "schemavalidation.wasm",
+			Function:  "f",
+			XFilename: "schemavalidation.wasm",
 		},
 	}
 )
@@ -99,7 +100,7 @@ func (w *Wasm) GetNumPreloaded() int {
 type Stats struct {
 	NumBundled int
 	NumCustom  int
-	All        []*protos.Wasm
+	All        []*shared.WasmModule
 }
 
 // GetWasmStats returns statistics about the Wasm modules in the store
@@ -140,7 +141,7 @@ func (w *Wasm) PopulateWASMFields(ctx context.Context, pipeline *protos.Pipeline
 
 	for _, s := range pipeline.Steps {
 		var (
-			entry *protos.Wasm
+			entry *shared.WasmModule
 			err   error
 		)
 
@@ -173,7 +174,7 @@ func (w *Wasm) PopulateWASMFields(ctx context.Context, pipeline *protos.Pipeline
 			return errors.Wrapf(err, "error loading '%T' (id: '%s') Wasm entry", s.Step, s.GetXWasmId())
 		}
 
-		s.XWasmFunction = &entry.FunctionName
+		s.XWasmFunction = &entry.Function
 		s.XWasmBytes = entry.Bytes
 		s.XWasmId = &entry.Id
 	}
