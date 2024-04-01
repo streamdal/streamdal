@@ -25,130 +25,6 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_4_0;
 
-///  This is a separate type because some SDKs may want to implement some interface
-///  for this type (ie. Stringer interface for Go SDK).
-// @@protoc_insertion_point(message:protos.Payload)
-#[derive(PartialEq,Clone,Default,Debug)]
-pub struct Payload {
-    // message fields
-    // @@protoc_insertion_point(field:protos.Payload.bytes)
-    pub bytes: ::std::vec::Vec<u8>,
-    // special fields
-    // @@protoc_insertion_point(special_field:protos.Payload.special_fields)
-    pub special_fields: ::protobuf::SpecialFields,
-}
-
-impl<'a> ::std::default::Default for &'a Payload {
-    fn default() -> &'a Payload {
-        <Payload as ::protobuf::Message>::default_instance()
-    }
-}
-
-impl Payload {
-    pub fn new() -> Payload {
-        ::std::default::Default::default()
-    }
-
-    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
-        let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "bytes",
-            |m: &Payload| { &m.bytes },
-            |m: &mut Payload| { &mut m.bytes },
-        ));
-        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Payload>(
-            "Payload",
-            fields,
-            oneofs,
-        )
-    }
-}
-
-impl ::protobuf::Message for Payload {
-    const NAME: &'static str = "Payload";
-
-    fn is_initialized(&self) -> bool {
-        true
-    }
-
-    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
-        while let Some(tag) = is.read_raw_tag_or_eof()? {
-            match tag {
-                10 => {
-                    self.bytes = is.read_bytes()?;
-                },
-                tag => {
-                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
-                },
-            };
-        }
-        ::std::result::Result::Ok(())
-    }
-
-    // Compute sizes of nested messages
-    #[allow(unused_variables)]
-    fn compute_size(&self) -> u64 {
-        let mut my_size = 0;
-        if !self.bytes.is_empty() {
-            my_size += ::protobuf::rt::bytes_size(1, &self.bytes);
-        }
-        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
-        self.special_fields.cached_size().set(my_size as u32);
-        my_size
-    }
-
-    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.bytes.is_empty() {
-            os.write_bytes(1, &self.bytes)?;
-        }
-        os.write_unknown_fields(self.special_fields.unknown_fields())?;
-        ::std::result::Result::Ok(())
-    }
-
-    fn special_fields(&self) -> &::protobuf::SpecialFields {
-        &self.special_fields
-    }
-
-    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
-        &mut self.special_fields
-    }
-
-    fn new() -> Payload {
-        Payload::new()
-    }
-
-    fn clear(&mut self) {
-        self.bytes.clear();
-        self.special_fields.clear();
-    }
-
-    fn default_instance() -> &'static Payload {
-        static instance: Payload = Payload {
-            bytes: ::std::vec::Vec::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
-    }
-}
-
-impl ::protobuf::MessageFull for Payload {
-    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
-        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
-        descriptor.get(|| file_descriptor().message_by_package_relative_name("Payload").unwrap()).clone()
-    }
-}
-
-impl ::std::fmt::Display for Payload {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        ::protobuf::text_format::fmt(self, f)
-    }
-}
-
-impl ::protobuf::reflect::ProtobufValue for Payload {
-    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
-}
-
 ///  Common return response used by all SDKs
 // @@protoc_insertion_point(message:protos.SDKResponse)
 #[derive(PartialEq,Clone,Default,Debug)]
@@ -156,7 +32,7 @@ pub struct SDKResponse {
     // message fields
     ///  Contains (potentially) modified input data
     // @@protoc_insertion_point(field:protos.SDKResponse.data)
-    pub data: ::protobuf::MessageField<Payload>,
+    pub data: ::std::vec::Vec<u8>,
     ///  Execution status of the last step
     // @@protoc_insertion_point(field:protos.SDKResponse.status)
     pub status: ::protobuf::EnumOrUnknown<ExecStatus>,
@@ -195,7 +71,7 @@ impl SDKResponse {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(5);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, Payload>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "data",
             |m: &SDKResponse| { &m.data },
             |m: &mut SDKResponse| { &mut m.data },
@@ -239,7 +115,7 @@ impl ::protobuf::Message for SDKResponse {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.data)?;
+                    self.data = is.read_bytes()?;
                 },
                 16 => {
                     self.status = is.read_enum_or_unknown()?;
@@ -277,9 +153,8 @@ impl ::protobuf::Message for SDKResponse {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.data.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        if !self.data.is_empty() {
+            my_size += ::protobuf::rt::bytes_size(1, &self.data);
         }
         if self.status != ::protobuf::EnumOrUnknown::new(ExecStatus::EXEC_STATUS_UNSET) {
             my_size += ::protobuf::rt::int32_size(2, self.status.value());
@@ -303,8 +178,8 @@ impl ::protobuf::Message for SDKResponse {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.data.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        if !self.data.is_empty() {
+            os.write_bytes(1, &self.data)?;
         }
         if self.status != ::protobuf::EnumOrUnknown::new(ExecStatus::EXEC_STATUS_UNSET) {
             os.write_enum(2, ::protobuf::EnumOrUnknown::value(&self.status))?;
@@ -791,116 +666,108 @@ impl ExecStatus {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0csp_sdk.proto\x12\x06protos\x1a\x11sp_pipeline.proto\"\x1f\n\x07Pay\
-    load\x12\x14\n\x05bytes\x18\x01\x20\x01(\x0cR\x05bytes\"\xda\x02\n\x0bSD\
-    KResponse\x12#\n\x04data\x18\x01\x20\x01(\x0b2\x0f.protos.PayloadR\x04da\
-    ta\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecStatusR\x06stat\
-    us\x12*\n\x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatusMessage\x88\
-    \x01\x01\x12?\n\x0fpipeline_status\x18\x04\x20\x03(\x0b2\x16.protos.Pipe\
-    lineStatusR\x0epipelineStatus\x12=\n\x08metadata\x18\x05\x20\x03(\x0b2!.\
-    protos.SDKResponse.MetadataEntryR\x08metadata\x1a;\n\rMetadataEntry\x12\
-    \x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\
-    \x01(\tR\x05value:\x028\x01B\x11\n\x0f_status_message\"i\n\x0ePipelineSt\
-    atus\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\
-    \x20\x01(\tR\x04name\x123\n\x0bstep_status\x18\x03\x20\x03(\x0b2\x12.pro\
-    tos.StepStatusR\nstepStatus\"\xcc\x01\n\nStepStatus\x12\x12\n\x04name\
-    \x18\x01\x20\x01(\tR\x04name\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.\
-    protos.ExecStatusR\x06status\x12*\n\x0estatus_message\x18\x03\x20\x01(\t\
-    H\0R\rstatusMessage\x88\x01\x01\x12?\n\x0fabort_condition\x18\x04\x20\
-    \x01(\x0e2\x16.protos.AbortConditionR\x0eabortConditionB\x11\n\x0f_statu\
-    s_message*g\n\nExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\x10\0\x12\x14\n\
-    \x10EXEC_STATUS_TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FALSE\x10\x02\x12\
-    \x15\n\x11EXEC_STATUS_ERROR\x10\x03B<Z:github.com/streamdal/streamdal/li\
-    bs/protos/build/go/protosJ\xe7\x15\n\x06\x12\x04\0\0S\x01\n\x08\n\x01\
-    \x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\
-    \x12\x03\x04\0\x1b\n\x08\n\x01\x08\x12\x03\x06\0Q\n\t\n\x02\x08\x0b\x12\
-    \x03\x06\0Q\n\n\n\x02\x05\0\x12\x04\x08\0\x17\x01\n\n\n\x03\x05\0\x01\
-    \x12\x03\x08\x05\x0f\n\x87\x01\n\x04\x05\0\x02\0\x12\x03\x0b\x02\x18\x1a\
-    z\x20Unset\x20status.\x20This\x20should\x20never\x20be\x20returned\x20by\
-    \x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20is\n\x20probably\x20a\x20b\
-    ug\x20(and\x20you\x20should\x20file\x20an\x20issue)\n\n\x0c\n\x05\x05\0\
-    \x02\0\x01\x12\x03\x0b\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0b\
-    \x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0e\x02\x17\x1a7\x20Indicates\
-    \x20that\x20the\x20step\x20execution\x20evaluated\x20to\x20\"true\"\n\n\
-    \x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0e\x02\x12\n\x0c\n\x05\x05\0\x02\
-    \x01\x02\x12\x03\x0e\x15\x16\nE\n\x04\x05\0\x02\x02\x12\x03\x11\x02\x18\
-    \x1a8\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\x20t\
-    o\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x11\x02\x13\n\x0c\
-    \n\x05\x05\0\x02\x02\x02\x12\x03\x11\x16\x17\n\xd6\x01\n\x04\x05\0\x02\
-    \x03\x12\x03\x16\x02\x18\x1a\xc8\x01\x20Indicates\x20that\x20the\x20SDK\
-    \x20encountered\x20an\x20error\x20while\x20trying\x20to\x20process\x20th\
-    e\n\x20request.\x20Example\x20error\x20cases:\x20SDK\x20can't\x20find\
-    \x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\x20function\x20canno\
-    t\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\x0c\n\x05\x05\0\x02\
-    \x03\x01\x12\x03\x16\x02\x13\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x16\
-    \x16\x17\n\x91\x01\n\x02\x04\0\x12\x04\x1b\0\x1d\x01\x1a\x84\x01\x20This\
-    \x20is\x20a\x20separate\x20type\x20because\x20some\x20SDKs\x20may\x20wan\
-    t\x20to\x20implement\x20some\x20interface\n\x20for\x20this\x20type\x20(i\
-    e.\x20Stringer\x20interface\x20for\x20Go\x20SDK).\n\n\n\n\x03\x04\0\x01\
-    \x12\x03\x1b\x08\x0f\n\x0b\n\x04\x04\0\x02\0\x12\x03\x1c\x02\x12\n\x0c\n\
-    \x05\x04\0\x02\0\x05\x12\x03\x1c\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\
-    \x03\x1c\x08\r\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1c\x10\x11\n5\n\x02\
-    \x04\x01\x12\x04\x20\06\x01\x1a)\x20Common\x20return\x20response\x20used\
-    \x20by\x20all\x20SDKs\n\n\n\n\x03\x04\x01\x01\x12\x03\x20\x08\x13\n9\n\
-    \x04\x04\x01\x02\0\x12\x03\"\x02\x13\x1a,\x20Contains\x20(potentially)\
-    \x20modified\x20input\x20data\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03\"\
-    \x02\t\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03\"\n\x0e\n\x0c\n\x05\x04\x01\
-    \x02\0\x03\x12\x03\"\x11\x12\n0\n\x04\x04\x01\x02\x01\x12\x03%\x02\x18\
-    \x1a#\x20Execution\x20status\x20of\x20the\x20last\x20step\n\n\x0c\n\x05\
-    \x04\x01\x02\x01\x06\x12\x03%\x02\x0c\n\x0c\n\x05\x04\x01\x02\x01\x01\
-    \x12\x03%\r\x13\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03%\x16\x17\nN\n\
-    \x04\x04\x01\x02\x02\x12\x03(\x02%\x1aA\x20Optional\x20message\x20accomp\
-    anying\x20the\x20exec\x20status\x20for\x20the\x20last\x20step\n\n\x0c\n\
-    \x05\x04\x01\x02\x02\x04\x12\x03(\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x05\
-    \x12\x03(\x0b\x11\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03(\x12\x20\n\x0c\
-    \n\x05\x04\x01\x02\x02\x03\x12\x03(#$\nV\n\x04\x04\x01\x02\x03\x12\x03+\
-    \x02.\x1aI\x20An\x20array\x20of\x20pipelines\x20that\x20the\x20SDK\x20ex\
-    ecuted\x20and\x20the\x20status\x20of\x20each\x20step\n\n\x0c\n\x05\x04\
-    \x01\x02\x03\x04\x12\x03+\x02\n\n\x0c\n\x05\x04\x01\x02\x03\x06\x12\x03+\
-    \x0b\x19\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03+\x1a)\n\x0c\n\x05\x04\
-    \x01\x02\x03\x03\x12\x03+,-\n\x92\x03\n\x04\x04\x01\x02\x04\x12\x035\x02\
-    #\x1a\x84\x03\x20Includes\x20any\x20metadata\x20that\x20the\x20step(s)\
-    \x20may\x20want\x20to\x20pass\x20back\x20to\x20the\x20user.\n\n\x20NOTE:\
-    \x20Metadata\x20is\x20aggregated\x20across\x20all\x20steps\x20in\x20the\
-    \x20pipeline,\x20so\x20if\x20two\n\x20steps\x20both\x20set\x20a\x20key\
-    \x20\"foo\"\x20to\x20different\x20values,\x20the\x20value\x20of\x20\"foo\
-    \"\x20in\x20the\n\x20response\x20will\x20be\x20the\x20value\x20set\x20by\
-    \x20the\x20last\x20step\x20in\x20the\x20pipeline.\n\n\x20To\x20learn\x20\
-    more\x20about\x20\"metadata\",\x20see\x20SDK\x20Spec\x20V2\x20doc\x20\"P\
-    ipeline\x20Step\x20&\x20Error\n\x20Behavior\"\x20section.\n\n\x0c\n\x05\
-    \x04\x01\x02\x04\x06\x12\x035\x02\x15\n\x0c\n\x05\x04\x01\x02\x04\x01\
-    \x12\x035\x16\x1e\n\x0c\n\x05\x04\x01\x02\x04\x03\x12\x035!\"\n\n\n\x02\
-    \x04\x02\x12\x048\0A\x01\n\n\n\x03\x04\x02\x01\x12\x038\x08\x16\n!\n\x04\
-    \x04\x02\x02\0\x12\x03:\x02\x10\x1a\x14\x20ID\x20of\x20the\x20pipeline\n\
-    \n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03:\x02\x08\n\x0c\n\x05\x04\x02\x02\
-    \0\x01\x12\x03:\t\x0b\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03:\x0e\x0f\n'\
-    \n\x04\x04\x02\x02\x01\x12\x03=\x02\x12\x1a\x1a\x20The\x20name\x20of\x20\
-    the\x20pipeline\n\n\x0c\n\x05\x04\x02\x02\x01\x05\x12\x03=\x02\x08\n\x0c\
-    \n\x05\x04\x02\x02\x01\x01\x12\x03=\t\r\n\x0c\n\x05\x04\x02\x02\x01\x03\
-    \x12\x03=\x10\x11\n6\n\x04\x04\x02\x02\x02\x12\x03@\x02&\x1a)\x20The\x20\
-    status\x20of\x20each\x20step\x20in\x20the\x20pipeline\n\n\x0c\n\x05\x04\
-    \x02\x02\x02\x04\x12\x03@\x02\n\n\x0c\n\x05\x04\x02\x02\x02\x06\x12\x03@\
-    \x0b\x15\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03@\x16!\n\x0c\n\x05\x04\
-    \x02\x02\x02\x03\x12\x03@$%\n\n\n\x02\x04\x03\x12\x04C\0S\x01\n\n\n\x03\
-    \x04\x03\x01\x12\x03C\x08\x12\n#\n\x04\x04\x03\x02\0\x12\x03E\x02\x12\
-    \x1a\x16\x20The\x20name\x20of\x20the\x20step\n\n\x0c\n\x05\x04\x03\x02\0\
-    \x05\x12\x03E\x02\x08\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03E\t\r\n\x0c\n\
-    \x05\x04\x03\x02\0\x03\x12\x03E\x10\x11\n3\n\x04\x04\x03\x02\x01\x12\x03\
-    H\x02\x18\x1a&\x20Execution\x20outcome\x20status\x20of\x20the\x20step\n\
-    \n\x0c\n\x05\x04\x03\x02\x01\x06\x12\x03H\x02\x0c\n\x0c\n\x05\x04\x03\
-    \x02\x01\x01\x12\x03H\r\x13\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x03H\x16\
-    \x17\n<\n\x04\x04\x03\x02\x02\x12\x03K\x02%\x1a/\x20Optional\x20message\
-    \x20accompanying\x20the\x20exec\x20status\n\n\x0c\n\x05\x04\x03\x02\x02\
-    \x04\x12\x03K\x02\n\n\x0c\n\x05\x04\x03\x02\x02\x05\x12\x03K\x0b\x11\n\
-    \x0c\n\x05\x04\x03\x02\x02\x01\x12\x03K\x12\x20\n\x0c\n\x05\x04\x03\x02\
-    \x02\x03\x12\x03K#$\n\xf0\x01\n\x04\x04\x03\x02\x03\x12\x03R\x02%\x1a\
-    \xe2\x01\x20Indicates\x20if\x20current\x20or\x20all\x20future\x20pipelin\
-    es\x20were\x20aborted.\n\n\x20IMPORTANT:\x20The\x20SDK\x20running\x20int\
-    o\x20an\x20error\x20does\x20not\x20automatically\x20abort\n\x20current\
-    \x20or\x20all\x20future\x20pipelines\x20-\x20the\x20user\x20must\x20defi\
-    ne\x20the\x20abort\x20conditions\n\x20for\x20\"on_error\".\n\n\x0c\n\x05\
-    \x04\x03\x02\x03\x06\x12\x03R\x02\x10\n\x0c\n\x05\x04\x03\x02\x03\x01\
-    \x12\x03R\x11\x20\n\x0c\n\x05\x04\x03\x02\x03\x03\x12\x03R#$b\x06proto3\
+    \n\x0csp_sdk.proto\x12\x06protos\x1a\x11sp_pipeline.proto\"\xc9\x02\n\
+    \x0bSDKResponse\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\x12*\n\
+    \x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecStatusR\x06status\x12*\n\
+    \x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatusMessage\x88\x01\x01\x12\
+    ?\n\x0fpipeline_status\x18\x04\x20\x03(\x0b2\x16.protos.PipelineStatusR\
+    \x0epipelineStatus\x12=\n\x08metadata\x18\x05\x20\x03(\x0b2!.protos.SDKR\
+    esponse.MetadataEntryR\x08metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03ke\
+    y\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05v\
+    alue:\x028\x01B\x11\n\x0f_status_message\"i\n\x0ePipelineStatus\x12\x0e\
+    \n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\
+    \x04name\x123\n\x0bstep_status\x18\x03\x20\x03(\x0b2\x12.protos.StepStat\
+    usR\nstepStatus\"\xcc\x01\n\nStepStatus\x12\x12\n\x04name\x18\x01\x20\
+    \x01(\tR\x04name\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecS\
+    tatusR\x06status\x12*\n\x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatus\
+    Message\x88\x01\x01\x12?\n\x0fabort_condition\x18\x04\x20\x01(\x0e2\x16.\
+    protos.AbortConditionR\x0eabortConditionB\x11\n\x0f_status_message*g\n\n\
+    ExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\x10\0\x12\x14\n\x10EXEC_STATUS\
+    _TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FALSE\x10\x02\x12\x15\n\x11EXEC_S\
+    TATUS_ERROR\x10\x03B<Z:github.com/streamdal/streamdal/libs/protos/build/\
+    go/protosJ\x90\x14\n\x06\x12\x04\0\0M\x01\n\x08\n\x01\x0c\x12\x03\0\0\
+    \x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\
+    \n\x08\n\x01\x08\x12\x03\x06\0Q\n\t\n\x02\x08\x0b\x12\x03\x06\0Q\n\n\n\
+    \x02\x05\0\x12\x04\x08\0\x17\x01\n\n\n\x03\x05\0\x01\x12\x03\x08\x05\x0f\
+    \n\x87\x01\n\x04\x05\0\x02\0\x12\x03\x0b\x02\x18\x1az\x20Unset\x20status\
+    .\x20This\x20should\x20never\x20be\x20returned\x20by\x20the\x20SDK.\x20I\
+    f\x20it\x20does,\x20it\x20is\n\x20probably\x20a\x20bug\x20(and\x20you\
+    \x20should\x20file\x20an\x20issue)\n\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\
+    \x0b\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0b\x16\x17\nD\n\x04\
+    \x05\0\x02\x01\x12\x03\x0e\x02\x17\x1a7\x20Indicates\x20that\x20the\x20s\
+    tep\x20execution\x20evaluated\x20to\x20\"true\"\n\n\x0c\n\x05\x05\0\x02\
+    \x01\x01\x12\x03\x0e\x02\x12\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x0e\
+    \x15\x16\nE\n\x04\x05\0\x02\x02\x12\x03\x11\x02\x18\x1a8\x20Indicates\
+    \x20that\x20the\x20step\x20execution\x20evaluated\x20to\x20\"false\"\n\n\
+    \x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x11\x02\x13\n\x0c\n\x05\x05\0\x02\
+    \x02\x02\x12\x03\x11\x16\x17\n\xd6\x01\n\x04\x05\0\x02\x03\x12\x03\x16\
+    \x02\x18\x1a\xc8\x01\x20Indicates\x20that\x20the\x20SDK\x20encountered\
+    \x20an\x20error\x20while\x20trying\x20to\x20process\x20the\n\x20request.\
+    \x20Example\x20error\x20cases:\x20SDK\x20can't\x20find\x20the\x20appropr\
+    iate\x20Wasm\x20module,\n\x20Wasm\x20function\x20cannot\x20alloc\x20or\
+    \x20dealloc\x20memory,\x20etc.\n\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\
+    \x16\x02\x13\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x16\x16\x17\n5\n\x02\
+    \x04\0\x12\x04\x1a\00\x01\x1a)\x20Common\x20return\x20response\x20used\
+    \x20by\x20all\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\x1a\x08\x13\n9\n\x04\
+    \x04\0\x02\0\x12\x03\x1c\x02\x11\x1a,\x20Contains\x20(potentially)\x20mo\
+    dified\x20input\x20data\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x1c\x02\
+    \x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1c\x08\x0c\n\x0c\n\x05\x04\0\
+    \x02\0\x03\x12\x03\x1c\x0f\x10\n0\n\x04\x04\0\x02\x01\x12\x03\x1f\x02\
+    \x18\x1a#\x20Execution\x20status\x20of\x20the\x20last\x20step\n\n\x0c\n\
+    \x05\x04\0\x02\x01\x06\x12\x03\x1f\x02\x0c\n\x0c\n\x05\x04\0\x02\x01\x01\
+    \x12\x03\x1f\r\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1f\x16\x17\nN\
+    \n\x04\x04\0\x02\x02\x12\x03\"\x02%\x1aA\x20Optional\x20message\x20accom\
+    panying\x20the\x20exec\x20status\x20for\x20the\x20last\x20step\n\n\x0c\n\
+    \x05\x04\0\x02\x02\x04\x12\x03\"\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\
+    \x03\"\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\"\x12\x20\n\x0c\n\
+    \x05\x04\0\x02\x02\x03\x12\x03\"#$\nV\n\x04\x04\0\x02\x03\x12\x03%\x02.\
+    \x1aI\x20An\x20array\x20of\x20pipelines\x20that\x20the\x20SDK\x20execute\
+    d\x20and\x20the\x20status\x20of\x20each\x20step\n\n\x0c\n\x05\x04\0\x02\
+    \x03\x04\x12\x03%\x02\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03%\x0b\x19\n\
+    \x0c\n\x05\x04\0\x02\x03\x01\x12\x03%\x1a)\n\x0c\n\x05\x04\0\x02\x03\x03\
+    \x12\x03%,-\n\x92\x03\n\x04\x04\0\x02\x04\x12\x03/\x02#\x1a\x84\x03\x20I\
+    ncludes\x20any\x20metadata\x20that\x20the\x20step(s)\x20may\x20want\x20t\
+    o\x20pass\x20back\x20to\x20the\x20user.\n\n\x20NOTE:\x20Metadata\x20is\
+    \x20aggregated\x20across\x20all\x20steps\x20in\x20the\x20pipeline,\x20so\
+    \x20if\x20two\n\x20steps\x20both\x20set\x20a\x20key\x20\"foo\"\x20to\x20\
+    different\x20values,\x20the\x20value\x20of\x20\"foo\"\x20in\x20the\n\x20\
+    response\x20will\x20be\x20the\x20value\x20set\x20by\x20the\x20last\x20st\
+    ep\x20in\x20the\x20pipeline.\n\n\x20To\x20learn\x20more\x20about\x20\"me\
+    tadata\",\x20see\x20SDK\x20Spec\x20V2\x20doc\x20\"Pipeline\x20Step\x20&\
+    \x20Error\n\x20Behavior\"\x20section.\n\n\x0c\n\x05\x04\0\x02\x04\x06\
+    \x12\x03/\x02\x15\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03/\x16\x1e\n\x0c\n\
+    \x05\x04\0\x02\x04\x03\x12\x03/!\"\n\n\n\x02\x04\x01\x12\x042\0;\x01\n\n\
+    \n\x03\x04\x01\x01\x12\x032\x08\x16\n!\n\x04\x04\x01\x02\0\x12\x034\x02\
+    \x10\x1a\x14\x20ID\x20of\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\x02\0\
+    \x05\x12\x034\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x034\t\x0b\n\x0c\
+    \n\x05\x04\x01\x02\0\x03\x12\x034\x0e\x0f\n'\n\x04\x04\x01\x02\x01\x12\
+    \x037\x02\x12\x1a\x1a\x20The\x20name\x20of\x20the\x20pipeline\n\n\x0c\n\
+    \x05\x04\x01\x02\x01\x05\x12\x037\x02\x08\n\x0c\n\x05\x04\x01\x02\x01\
+    \x01\x12\x037\t\r\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x037\x10\x11\n6\n\
+    \x04\x04\x01\x02\x02\x12\x03:\x02&\x1a)\x20The\x20status\x20of\x20each\
+    \x20step\x20in\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\x02\x02\x04\x12\
+    \x03:\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03:\x0b\x15\n\x0c\n\x05\
+    \x04\x01\x02\x02\x01\x12\x03:\x16!\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\
+    \x03:$%\n\n\n\x02\x04\x02\x12\x04=\0M\x01\n\n\n\x03\x04\x02\x01\x12\x03=\
+    \x08\x12\n#\n\x04\x04\x02\x02\0\x12\x03?\x02\x12\x1a\x16\x20The\x20name\
+    \x20of\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\0\x05\x12\x03?\x02\x08\n\
+    \x0c\n\x05\x04\x02\x02\0\x01\x12\x03?\t\r\n\x0c\n\x05\x04\x02\x02\0\x03\
+    \x12\x03?\x10\x11\n3\n\x04\x04\x02\x02\x01\x12\x03B\x02\x18\x1a&\x20Exec\
+    ution\x20outcome\x20status\x20of\x20the\x20step\n\n\x0c\n\x05\x04\x02\
+    \x02\x01\x06\x12\x03B\x02\x0c\n\x0c\n\x05\x04\x02\x02\x01\x01\x12\x03B\r\
+    \x13\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03B\x16\x17\n<\n\x04\x04\x02\
+    \x02\x02\x12\x03E\x02%\x1a/\x20Optional\x20message\x20accompanying\x20th\
+    e\x20exec\x20status\n\n\x0c\n\x05\x04\x02\x02\x02\x04\x12\x03E\x02\n\n\
+    \x0c\n\x05\x04\x02\x02\x02\x05\x12\x03E\x0b\x11\n\x0c\n\x05\x04\x02\x02\
+    \x02\x01\x12\x03E\x12\x20\n\x0c\n\x05\x04\x02\x02\x02\x03\x12\x03E#$\n\
+    \xf0\x01\n\x04\x04\x02\x02\x03\x12\x03L\x02%\x1a\xe2\x01\x20Indicates\
+    \x20if\x20current\x20or\x20all\x20future\x20pipelines\x20were\x20aborted\
+    .\n\n\x20IMPORTANT:\x20The\x20SDK\x20running\x20into\x20an\x20error\x20d\
+    oes\x20not\x20automatically\x20abort\n\x20current\x20or\x20all\x20future\
+    \x20pipelines\x20-\x20the\x20user\x20must\x20define\x20the\x20abort\x20c\
+    onditions\n\x20for\x20\"on_error\".\n\n\x0c\n\x05\x04\x02\x02\x03\x06\
+    \x12\x03L\x02\x10\n\x0c\n\x05\x04\x02\x02\x03\x01\x12\x03L\x11\x20\n\x0c\
+    \n\x05\x04\x02\x02\x03\x03\x12\x03L#$b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -919,8 +786,7 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
             let mut deps = ::std::vec::Vec::with_capacity(1);
             deps.push(super::sp_pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(4);
-            messages.push(Payload::generated_message_descriptor_data());
+            let mut messages = ::std::vec::Vec::with_capacity(3);
             messages.push(SDKResponse::generated_message_descriptor_data());
             messages.push(PipelineStatus::generated_message_descriptor_data());
             messages.push(StepStatus::generated_message_descriptor_data());
