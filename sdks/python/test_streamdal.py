@@ -58,7 +58,7 @@ class TestStreamdalClient:
         res = self.client.process(req)
 
         assert res is not None
-        assert res.data.bytes == payload_bytes
+        assert res.data == payload_bytes
         fake_metrics.incr.assert_called_once()
 
     def test_notify_condition(self):
@@ -136,7 +136,7 @@ class TestStreamdalClient:
 
         assert resp is not None
         assert resp.status == protos.ExecStatus.EXEC_STATUS_TRUE
-        assert resp.data.bytes == b'{"object": {"type": "streamdal"}}'
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
 
     def test_process_failure_and_abort(self):
         fake_stub = mock.AsyncMock()
@@ -207,7 +207,7 @@ class TestStreamdalClient:
         fake_stub.notify.assert_called_once()
         assert resp.status == protos.ExecStatus.EXEC_STATUS_FALSE
         assert resp.status_message == "Step returned: field not found"
-        assert resp.data.bytes == b"{}"
+        assert resp.data == b"{}"
         assert len(resp.pipeline_status) == 1
         assert len(resp.pipeline_status[0].step_status) == 1
         assert (
@@ -274,7 +274,7 @@ class TestStreamdalClient:
 
         assert resp is not None
         assert resp.status == protos.ExecStatus.EXEC_STATUS_TRUE
-        assert resp.data.bytes == b'{"object": {"type": "streamdal"}}'
+        assert resp.data == b'{"object": {"type": "streamdal"}}'
 
     def test_tail_request_start(self, mocker):
         m = mock.Mock()
