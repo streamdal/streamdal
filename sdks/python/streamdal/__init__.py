@@ -400,7 +400,7 @@ class StreamdalClient:
                 # Continue to next step, nothing needed
                 if self.cfg.dry_run:
                     self.log.debug(
-                        f"Step '{step.name}' completed with status, continuing to next step"
+                        f"Step '{step.name}' completed with status '{exec_status.__str__()}', continuing to next step"
                     )
                     continue
 
