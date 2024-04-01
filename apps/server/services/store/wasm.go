@@ -18,6 +18,8 @@ var (
 
 // GetWasm will fetch Wasm from the store by name and ID
 func (s *Store) GetWasm(ctx context.Context, name, id string) (*protos.Wasm, error) {
+	s.log.Debugf("GetWasm(): Attempting to fetch Wasm by name '%s' and id '%s'", name, id)
+
 	data, err := s.read(ctx, RedisWasmKey(name, id))
 	if err != nil {
 		if err != redis.Nil {
@@ -39,6 +41,8 @@ func (s *Store) GetWasm(ctx context.Context, name, id string) (*protos.Wasm, err
 
 // GetWasmByID will fetch Wasm from the store by ID (regardless of 'name')
 func (s *Store) GetWasmByID(ctx context.Context, id string) (*protos.Wasm, error) {
+	s.log.Debugf("GetWasmByID(): Attempting to fetch Wasm by id '%s'", id)
+
 	keys, err := s.options.RedisBackend.Keys(ctx, RedisWasmKey("*", id)).Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Wasm keys by id")
@@ -52,12 +56,21 @@ func (s *Store) GetWasmByID(ctx context.Context, id string) (*protos.Wasm, error
 		return nil, errors.New("bug? found multiple wasm entries with the same ID")
 	}
 
-	return s.GetWasm(ctx, keys[0], id)
+	name, err := util.GetWasmNameFromKey(keys[0])
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to extract name from key")
+	}
+
+	return s.GetWasm(ctx, name, id)
 }
 
 // GetWasmByName will fetch Wasm from the store by name (regardless of 'id')
 func (s *Store) GetWasmByName(ctx context.Context, name string) (*protos.Wasm, error) {
-	keys, err := s.options.RedisBackend.Keys(ctx, RedisWasmKey(name, "*")).Result()
+	redisKey := RedisWasmKey(name, "*")
+
+	s.log.Debugf("GetWasmByName(): Attempting to fetch Wasm by name '%s' using key '%s'", name, redisKey)
+
+	keys, err := s.options.RedisBackend.Keys(ctx, redisKey).Result()
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list Wasm keys by name")
 	}
@@ -70,7 +83,12 @@ func (s *Store) GetWasmByName(ctx context.Context, name string) (*protos.Wasm, e
 		return nil, errors.New("bug? found multiple wasm entries with the same name")
 	}
 
-	return s.GetWasm(ctx, name, keys[0])
+	id, err := util.GetWasmIDFromRedisKey(keys[0])
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to extract id from key")
+	}
+
+	return s.GetWasm(ctx, name, id)
 }
 
 // SetWasm will store Wasm in the store by name and ID; it will overwrite an

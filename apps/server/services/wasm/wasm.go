@@ -170,7 +170,7 @@ func (w *Wasm) PopulateWASMFields(ctx context.Context, pipeline *protos.Pipeline
 		}
 
 		if err != nil {
-			return errors.Wrapf(err, "error loading '%T' WASM entry", s.Step)
+			return errors.Wrapf(err, "error loading '%T' (id: '%s') Wasm entry", s.Step, s.GetXWasmId())
 		}
 
 		s.XWasmFunction = &entry.FunctionName
