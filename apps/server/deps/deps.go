@@ -57,6 +57,7 @@ type Dependencies struct {
 	ShutdownContext   context.Context
 	ShutdownFunc      context.CancelFunc
 	Telemetry         statsd.Statter
+	WasmService       wasm.IWasm
 }
 
 func New(cfg *config.Config) (*Dependencies, error) {
@@ -76,8 +77,9 @@ func New(cfg *config.Config) (*Dependencies, error) {
 		ShutdownFunc:    cancel,
 	}
 
-	if err := d.validateWASM(); err != nil {
-		return nil, errors.Wrap(err, "unable to validate WASM")
+	// Basic wasm dir validation
+	if _, err := os.Stat(cfg.WASMDir); os.IsNotExist(err) {
+		return nil, errors.New("wasm directory does not exist")
 	}
 
 	if err := d.setupHealthChecks(); err != nil {
@@ -104,37 +106,6 @@ func New(cfg *config.Config) (*Dependencies, error) {
 	}
 
 	return d, nil
-}
-
-func (d *Dependencies) validateWASM() error {
-	// Lame... means that tests need to have TEST=true env var set
-	if os.Getenv("TEST") != "" {
-		os.Chdir("../..")
-	}
-
-	for name, mapping := range wasm.Options {
-		if mapping.Filename == "" {
-			return errors.Errorf("wasm.Options[%s].Filename cannot be empty", name)
-		}
-
-		if mapping.FuncName == "" {
-			return errors.Errorf("wasm.Options[%s].FuncName cannot be empty", name)
-		}
-
-		// Check if the file exists
-		fullPath := d.Config.WASMDir + "/" + mapping.Filename
-
-		if _, err := os.Stat(fullPath); err != nil {
-			return errors.Wrapf(err, "unable to stat wasm file '%s'", fullPath)
-		}
-
-		// Just in case, try to load it as well
-		if _, err := wasm.Load(name, d.Config.WASMDir); err != nil {
-			return errors.Wrapf(err, "unable to load wasm file '%s'", name)
-		}
-	}
-
-	return nil
 }
 
 func (d *Dependencies) setupHealthChecks() error {
@@ -245,17 +216,51 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 
 	d.PubSubService = pubsub.New()
 
+	// This needs to happen AFTER the store service is created AND BEFORE the
+	// bus service is created.
+
+	// Lame... means that tests need to have TEST=true env var set
+	if os.Getenv("TEST") != "" {
+		if err := os.Chdir("../.."); err != nil {
+			return errors.Wrap(err, "unable to change directory during wasm setup")
+		}
+	}
+
+	wasmService, err := wasm.New(d.ShutdownContext, d.StoreService, cfg.WASMDir)
+	if err != nil {
+		return errors.Wrap(err, "unable to create new wasm service")
+	}
+
+	if cfg.DisplayWasmStats {
+		stats, err := wasmService.GetWasmStats()
+		if err != nil {
+			return errors.Wrap(err, "unable to get wasm stats")
+		}
+
+		logrus.Debug("------------- Begin Wasm Stats --------------")
+		logrus.Debugf("Preloaded: '%d'   Bundled: '%d'    Custom: '%d'", wasmService.GetNumPreloaded(), stats.NumBundled, stats.NumCustom)
+
+		for _, w := range stats.All {
+			logrus.Debugf("Name: '%s'   ID: '%s'   Created At: %s", w.Name, w.Id, time.Unix(0, w.GetXCreatedAtUnixTsNsUtc()).String())
+		}
+
+		logrus.Debug("------------- End Wasm Stats --------------")
+
+	}
+
+	d.WasmService = wasmService
+
 	busService, err := bus.New(&bus.Options{
 		Store:               storeService,
 		RedisBackend:        d.RedisBackend,
 		Cmd:                 d.CmdService,
 		NodeName:            d.Config.NodeName,
 		ShutdownCtx:         d.ShutdownContext,
-		WASMDir:             d.Config.WASMDir,
 		Metrics:             d.MetricsService,
 		PubSub:              d.PubSubService,
 		NumTailWorkers:      cfg.NumTailWorkers,
 		NumBroadcastWorkers: cfg.NumBroadcastWorkers,
+		WasmService:         d.WasmService,
 	})
 	if err != nil {
 		return errors.Wrap(err, "unable to create new bus service")

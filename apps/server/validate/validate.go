@@ -2,7 +2,6 @@ package validate
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 
 	"github.com/pkg/errors"
@@ -10,8 +9,6 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
-
-	"github.com/streamdal/streamdal/apps/server/services/wasm"
 )
 
 var (
@@ -858,10 +855,15 @@ func CreateWasmRequest(r *protos.CreateWasmRequest) error {
 		return errors.Wrap(err, "invalid custom wasm")
 	}
 
-	// Cannot use reserved wasm names
-	if _, ok := wasm.Options[r.Wasm.Name]; ok {
-		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.Wasm.Name)
-	}
+	// TODO: Should wasm names be unique?
+	// PROS:
+	//	1. Allow public methods like "UpdateWasmByName" instead of "UpdateWasmByID"
+	//     This simplifies API usage.
+	//  2. Preloading bundled wasm is easy - UpdateWasmByName() and that's it
+	// CONS:
+	//  1. If a user re-uses a Wasm name, it might get confusing
+	//  2. API usage becomes more complex -- DeleteWasmByName() will no longer be possible
+	//  3. ^ Pre-loading Wasm becomes (slightly) more complex
 
 	return nil
 }
@@ -875,11 +877,6 @@ func UpdateWasmRequest(r *protos.UpdateWasmRequest) error {
 		return errors.Wrap(err, "invalid custom wasm")
 	}
 
-	// Cannot use reserved wasm names
-	if _, ok := wasm.Options[r.Wasm.Name]; ok {
-		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.Wasm.Name)
-	}
-
 	return nil
 }
 
@@ -890,11 +887,6 @@ func DeleteWasmRequest(r *protos.DeleteWasmRequest) error {
 
 	if len(r.Ids) < 1 {
 		return errors.New("must specify at least one ID")
-	}
-
-	// Cannot delete ID's for bundled wasm
-	if wasm.IsBundled(r.Ids...) {
-		return errors.New("cannot delete bundled wasm")
 	}
 
 	return nil

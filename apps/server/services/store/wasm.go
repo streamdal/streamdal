@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
@@ -107,7 +106,7 @@ func (s *Store) SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm) e
 	}
 
 	if len(keys) == 0 {
-		return fmt.Errorf("wasm with id '%s' not found", id)
+		return ErrWasmNotFound
 	}
 
 	if len(keys) > 1 {
@@ -136,7 +135,7 @@ func (s *Store) SetWasmByName(ctx context.Context, name string, wasm *protos.Was
 	}
 
 	if len(keys) == 0 {
-		return fmt.Errorf("wasm with name '%s' not found", name)
+		return ErrWasmNotFound
 	}
 
 	if len(keys) > 1 {
@@ -178,7 +177,7 @@ func (s *Store) DeleteWasmByID(ctx context.Context, id string) error {
 	}
 
 	if len(keys) == 0 {
-		return fmt.Errorf("wasm with id '%s' not found", id)
+		return ErrWasmNotFound
 	}
 
 	if len(keys) > 1 {
@@ -207,7 +206,7 @@ func (s *Store) DeleteWasmByName(ctx context.Context, name string) error {
 	}
 
 	if len(keys) == 0 {
-		return fmt.Errorf("wasm with name '%s' not found", name)
+		return ErrWasmNotFound
 	}
 
 	if len(keys) > 1 {
@@ -220,4 +219,32 @@ func (s *Store) DeleteWasmByName(ctx context.Context, name string) error {
 	}
 
 	return s.DeleteWasm(ctx, name, id)
+}
+
+func (s *Store) GetAllWasm(ctx context.Context) ([]*protos.Wasm, error) {
+	// Fetch all keys that match the wasm key pattern
+	keys, err := s.options.RedisBackend.Keys(ctx, RedisWasmPrefix+":*").Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list Wasm keys")
+	}
+
+	entries := make([]*protos.Wasm, 0)
+
+	// Fetch all wasm entries
+	for _, key := range keys {
+		data, err := s.read(ctx, key)
+		if err != nil {
+			return nil, errors.Wrap(err, "unable to read Wasm from store")
+		}
+
+		// Try to marshal the data into a Wasm entry
+		entry := &protos.Wasm{}
+		if err := proto.Unmarshal(data, entry); err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal Wasm from store")
+		}
+
+		entries = append(entries, entry)
+	}
+
+	return entries, nil
 }

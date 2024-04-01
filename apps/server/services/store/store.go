@@ -166,15 +166,16 @@ type IStore interface {
 	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
 
 	// BEGIN Wasm-related methods
-	GetWasm(ctx context.Context, name, id string, option ...*Option) (*protos.Wasm, error)
-	GetWasmByID(ctx context.Context, id string, option ...*Option) (*protos.Wasm, error)
-	GetWasmByName(ctx context.Context, name string, option ...*Option) (*protos.Wasm, error)
-	SetWasm(ctx context.Context, id, name string, wasm *protos.Wasm, option ...*Option) error
-	SetWasmByName(ctx context.Context, name string, wasm *protos.Wasm, option ...*Option) error
-	SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm, option ...*Option) error
-	DeleteWasm(ctx context.Context, id, name string, option ...*Option) error
-	DeleteWasmByID(ctx context.Context, id string, option ...*Option) error
-	DeleteWasmByName(ctx context.Context, name string, option ...*Option) error
+	GetAllWasm(ctx context.Context) ([]*protos.Wasm, error)
+	GetWasm(ctx context.Context, name, id string) (*protos.Wasm, error)
+	GetWasmByID(ctx context.Context, id string) (*protos.Wasm, error)
+	GetWasmByName(ctx context.Context, name string) (*protos.Wasm, error)
+	SetWasm(ctx context.Context, id, name string, wasm *protos.Wasm) error
+	SetWasmByName(ctx context.Context, name string, wasm *protos.Wasm) error
+	SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm) error
+	DeleteWasm(ctx context.Context, id, name string) error
+	DeleteWasmByID(ctx context.Context, id string) error
+	DeleteWasmByName(ctx context.Context, name string) error
 	// END Wasm-related methods
 }
 

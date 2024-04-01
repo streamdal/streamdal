@@ -15,6 +15,7 @@ import (
 	"github.com/streamdal/streamdal/apps/server/services/metrics"
 	"github.com/streamdal/streamdal/apps/server/services/pubsub"
 	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/services/wasm"
 	"github.com/streamdal/streamdal/apps/server/validate"
 )
 
@@ -121,9 +122,9 @@ type Options struct {
 	Metrics             metrics.IMetrics
 	Cmd                 cmd.ICmd
 	NodeName            string
-	WASMDir             string
 	ShutdownCtx         context.Context
 	PubSub              pubsub.IPubSub
+	WasmService         wasm.IWasm
 	NumBroadcastWorkers int
 	NumTailWorkers      int
 }
@@ -160,16 +161,16 @@ func (o *Options) validate() error {
 		return errors.New("cmd service must be provided")
 	}
 
-	if o.WASMDir == "" {
-		return errors.New("wasm dir must be provided")
-	}
-
 	if o.Metrics == nil {
 		return errors.New("metrics service must be provided")
 	}
 
 	if o.PubSub == nil {
 		return errors.New("pubsub must be provided")
+	}
+
+	if o.WasmService == nil {
+		return errors.New("wasm service must be provided")
 	}
 
 	if o.NumTailWorkers <= 0 {

@@ -328,7 +328,7 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	req.Pipeline.Id = util.GenerateUUID()
 
 	// Populate WASM fields
-	if err := util.PopulateWASMFields(req.Pipeline, s.Options.Config.WASMDir); err != nil {
+	if err := s.Options.WasmService.PopulateWASMFields(ctx, req.Pipeline); err != nil {
 		return nil, errors.Wrap(err, "unable to populate WASM fields")
 	}
 
@@ -382,7 +382,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}
 
 	// Re-populate WASM bytes (since they are stripped for UI)
-	if err := util.PopulateWASMFields(req.Pipeline, s.Options.Config.WASMDir); err != nil {
+	if err := s.Options.WasmService.PopulateWASMFields(ctx, req.Pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, errors.Wrap(err, "unable to repopulate WASM data").Error()), nil
 	}
 
