@@ -9,6 +9,7 @@ require "base64"
 require 'logger'
 require_relative 'audiences'
 require_relative 'validation'
+require_relative 'metrics'
 
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5 # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10 # 100 milliseconds
@@ -18,6 +19,10 @@ DEFAULT_HEARTBEAT_INTERVAL = 1 # 1 second
 MAX_PAYLOAD_SIZE = 1024 * 1024 # 1 megabyte
 
 module Streamdal
+
+  OPERATION_TYPE_PRODUCER = "producer"
+  OPERATION_TYPE_CONSUMER = "consumer"
+
   # Data class to hold instantiated wasm functions
   class WasmFunction
 
@@ -51,6 +56,7 @@ module Streamdal
       @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
       @tail = {}
       @paused_tails = {}
+      @metrics = Streamdal::Metrics.new
 
       # TODO: kv
       # TODO: metrics
@@ -188,10 +194,6 @@ module Streamdal
       end
     end
 
-    def process(data)
-      puts "Processing data: #{data}"
-    end
-
     def call_wasm(step, data, isr)
       if step.nil?
         raise "step is required"
@@ -277,7 +279,7 @@ module Streamdal
 
       []
     end
-    
+
     def _heartbeat
       # TODO: figure out how to exit cleanly
       while true
@@ -343,6 +345,185 @@ module Streamdal
         req._metadata = _metadata
 
         @stub.send_tail(req, metadata: _metadata)
+      end
+    end
+
+    def process(req)
+      if req.nil? || req.length == 0
+        raise "invalid process request is required"
+      end
+
+      resp = Streamda::Protos::SdkResponse.new
+      resp.data = req[:data]
+      resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+      resp.pipeline_status = []
+
+      aud = Streamdal::Protos::Audience.new
+      aud.operation_type = req[:operation_type]
+      aud.operation_name = req[:operation_name]
+      aud.component_name = req[:component_name]
+      aud.service_name = @cfg[:service_name]
+      _add_audience(aud)
+
+      labels = {
+        "service": @cfg[:service_name],
+        "operation_type": req[:operation_type],
+        "operation": req[:operation_name],
+        "component": req[:component_name],
+        "pipeline_name": "",
+        "pipeline_id": "",
+      }
+
+      # TODO: metrics
+      bytes_counter = Streamdal::Metrics::COUNTER_CONSUME_BYTES
+      errors_counter = Streamdal::Metrics::COUNTER_CONSUME_ERRORS
+      total_counter = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED
+      rate_bytes = Streamdal::Metrics::COUNTER_CONSUME_BYTES_RATE
+      rate_processed = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED_RATE
+
+      if req[:operation_type] == OPERATION_TYPE_PRODUCER
+        bytes_counter = Streamdal::Metrics::COUNTER_PRODUCE_BYTES
+        errors_counter = Streamdal::Metrics::COUNTER_PRODUCE_ERRORS
+        total_counter = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED
+        rate_bytes = Streamdal::Metrics::COUNTER_PRODUCE_BYTES_RATE
+        rate_processed = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED_RATE
+      end
+
+      payload_size = req[:data].length
+
+      if payload_size > MAX_PAYLOAD_SIZE
+        # TODO: add metrics
+        resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
+        resp.error = "payload size exceeds maximum allowed size"
+        resp
+      end
+
+      # Needed for send_tail()
+      original_data = req[:data]
+
+      pipelines = _get_pipelines(aud)
+      if pipelines.length == 0
+        _send_tail(aud, "", original_data, original_data)
+        resp
+      end
+
+      @metrics.incr(rate_bytes, 1, {}, aud)
+      @metrics.incr(rate_processed, 1, {}, aud)
+
+      # Used for passing data between steps
+      isr = nil
+
+      pipelines.each do |pipeline|
+        pipeline_status = Streamdal::Protos::PipelineStatus.new
+        pipeline_status.id = pipeline.id
+        pipeline_status.name = pipeline.name
+        pipeline_status.step_status = []
+
+        @logger.debug "Running pipeline: '#{pipeline.name}'"
+
+        labels[:pipeline_id] = pipeline.id
+        labels[:pipeline_name] = pipeline.name
+
+        @metrics.incr(total_counter, 1, {}, aud)
+        @metrics.incr(bytes_counter, 1, {}, aud)
+
+        pipeline.steps.each do |step|
+          step_status = Streamdal::Protos::StepStatus.new
+          step_status.name = step.name
+          step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+
+          begin
+            wasm_resp = call_wasm(step, req[:data], isr)
+          rescue => e
+            @logger.error "Error running step '#{step.name}': #{e}"
+            step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
+            step_status.error = e.to_s
+            pipeline_status.step_status.push(step_status)
+            break
+          end
+
+          if @cfg[:dry_run]
+            @logger.debug "Running step '#{step.name}' in dry-run mode"
+          end
+
+          if wasm_resp.output_payload.length > 0
+            resp.data = wasm_resp.output_payload
+          end
+
+          _handle_schema(aud, step, wasm_resp)
+
+          isr = wasm_resp.inter_step_result
+
+          case wasm_resp.exit_code
+          when Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_FALSE
+            cond = step.on_false
+            cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_FALSE
+            exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_FALSE
+          when Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
+            cond = step.on_error
+            cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_ERROR
+            exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
+            isr = nil
+          else
+            cond = step.on_true
+            exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+            cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_TRUE
+          end
+
+          _notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
+
+          if @cfg[:dry_run]
+            @logger.debug("Step '#{step.name}' completed with status: #{exec_status}, continuing to next step")
+            next
+          end
+
+          # Pull metadata from step into SDKResponse
+          unless cond.nil?
+            resp.metadata = cond.metadata
+          end
+
+          # Failure conditions
+          unless cond.nil?
+            
+          end
+
+        end
+      end
+    end
+
+    def _notify_condition(pipeline, step, aud, cond, data, cond_type)
+      if cond.nil?
+        nil
+      end
+
+      unless cond.notify
+        nil
+      end
+
+      @logger.debug "Notifying"
+
+      if @cfg[:dry_run]
+        nil
+      end
+
+      @metrics.incr(Streamdal::Metrics::COUNTER_NOTIFY, 1, {
+        "service": @cfg[:service_name],
+        "component_name": aud.component_name,
+        "pipeline_name": pipeline.name,
+        "pipeline_id": pipeline.id,
+        "operation_name": aud.operation_name,
+      }, aud)
+
+      req = Streamdal::Protos::NotifyRequest.new
+      req.audience = aud
+      req.pipeline_id = pipeline.id
+      req.step = step
+      req.payload = data
+      req.condition_type = cond_type
+      req.occurred_at_unix_ts_utc = Time.now.to_i
+
+      Thread.new do
+        @stub.notify(req, metadata: _metadata)
       end
     end
 
