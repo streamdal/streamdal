@@ -81,37 +81,3 @@ message InterStepResult {
     steps.DetectiveStepResult detective_result = 1;
   }
 }
-
-// Used for referencing both bundled and custom wasm modules
-message Wasm {
-  // ID used for referencing the Wasm module
-  string id = 1;
-
-  // Friendly name for the Wasm module
-  string name = 2;
-
-  // Contents of the Wasm module
-  bytes bytes = 3;
-
-  // Entry point function name
-  string function_name = 4;
-
-  // Filename of the Wasm module (used only for bundled wasm)
-  string _filename = 5; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-
-  // Indicates whether this wasm entry is for bundled wasm or for wasm added via
-  // CreateWasm(); ignored in CreateWasm() and UpdateWasm().
-  bool _bundled = 6; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-
-  // Informative, debug fields
-  optional string description = 101;
-  optional string version = 102;
-  optional string url = 103;
-
-  // Set by server
-  optional int64 _created_at_unix_ts_ns_utc = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-
-  // Set by server
-  optional int64 _updated_at_unix_ts_ns_utc = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
-}
-

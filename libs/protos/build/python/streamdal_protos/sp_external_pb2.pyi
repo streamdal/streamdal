@@ -1,8 +1,8 @@
+from shared import sp_shared_pb2 as _sp_shared_pb2
 import sp_common_pb2 as _sp_common_pb2
 import sp_info_pb2 as _sp_info_pb2
 import sp_notify_pb2 as _sp_notify_pb2
 import sp_pipeline_pb2 as _sp_pipeline_pb2
-import sp_wsm_pb2 as _sp_wsm_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -96,8 +96,16 @@ class CreatePipelineResponse(_message.Message):
 class CreateWasmRequest(_message.Message):
     __slots__ = ["wasm"]
     WASM_FIELD_NUMBER: _ClassVar[int]
-    wasm: _sp_wsm_pb2.Wasm
-    def __init__(self, wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+    wasm: _sp_shared_pb2.WasmModule
+    def __init__(self, wasm: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...
+
+class CreateWasmResponse(_message.Message):
+    __slots__ = ["id", "message"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    message: str
+    def __init__(self, message: _Optional[str] = ..., id: _Optional[str] = ...) -> None: ...
 
 class DeleteAudienceRequest(_message.Message):
     __slots__ = ["audience", "force"]
@@ -184,8 +192,8 @@ class GetAllWasmRequest(_message.Message):
 class GetAllWasmResponse(_message.Message):
     __slots__ = ["wasm"]
     WASM_FIELD_NUMBER: _ClassVar[int]
-    wasm: _containers.RepeatedCompositeFieldContainer[_sp_wsm_pb2.Wasm]
-    def __init__(self, wasm: _Optional[_Iterable[_Union[_sp_wsm_pb2.Wasm, _Mapping]]] = ...) -> None: ...
+    wasm: _containers.RepeatedCompositeFieldContainer[_sp_shared_pb2.WasmModule]
+    def __init__(self, wasm: _Optional[_Iterable[_Union[_sp_shared_pb2.WasmModule, _Mapping]]] = ...) -> None: ...
 
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []
@@ -297,8 +305,8 @@ class GetWasmRequest(_message.Message):
 class GetWasmResponse(_message.Message):
     __slots__ = ["wasm"]
     WASM_FIELD_NUMBER: _ClassVar[int]
-    wasm: _sp_wsm_pb2.Wasm
-    def __init__(self, wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+    wasm: _sp_shared_pb2.WasmModule
+    def __init__(self, wasm: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...
 
 class PausePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]
@@ -363,5 +371,5 @@ class UpdatePipelineRequest(_message.Message):
 class UpdateWasmRequest(_message.Message):
     __slots__ = ["wasm"]
     WASM_FIELD_NUMBER: _ClassVar[int]
-    wasm: _sp_wsm_pb2.Wasm
-    def __init__(self, wasm: _Optional[_Union[_sp_wsm_pb2.Wasm, _Mapping]] = ...) -> None: ...
+    wasm: _sp_shared_pb2.WasmModule
+    def __init__(self, wasm: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...

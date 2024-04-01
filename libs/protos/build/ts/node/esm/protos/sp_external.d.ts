@@ -5,7 +5,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
-import { Wasm } from "./sp_wsm.js";
+import { WasmModule } from "./shared/sp_shared.js";
 import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
@@ -518,9 +518,9 @@ export interface GetWasmRequest {
  */
 export interface GetWasmResponse {
     /**
-     * @generated from protobuf field: protos.Wasm wasm = 1;
+     * @generated from protobuf field: protos.shared.WasmModule wasm = 1;
      */
-    wasm?: Wasm;
+    wasm?: WasmModule;
 }
 /**
  * Nothing needed here
@@ -534,27 +534,40 @@ export interface GetAllWasmRequest {
  */
 export interface GetAllWasmResponse {
     /**
-     * @generated from protobuf field: repeated protos.Wasm wasm = 1;
+     * @generated from protobuf field: repeated protos.shared.WasmModule wasm = 1;
      */
-    wasm: Wasm[];
+    wasm: WasmModule[];
 }
 /**
  * @generated from protobuf message protos.CreateWasmRequest
  */
 export interface CreateWasmRequest {
     /**
-     * @generated from protobuf field: protos.Wasm wasm = 1;
+     * @generated from protobuf field: protos.shared.WasmModule wasm = 1;
      */
-    wasm?: Wasm;
+    wasm?: WasmModule;
+}
+/**
+ * @generated from protobuf message protos.CreateWasmResponse
+ */
+export interface CreateWasmResponse {
+    /**
+     * @generated from protobuf field: string message = 1;
+     */
+    message: string;
+    /**
+     * @generated from protobuf field: string id = 2;
+     */
+    id: string;
 }
 /**
  * @generated from protobuf message protos.UpdateWasmRequest
  */
 export interface UpdateWasmRequest {
     /**
-     * @generated from protobuf field: protos.Wasm wasm = 1;
+     * @generated from protobuf field: protos.shared.WasmModule wasm = 1;
      */
-    wasm?: Wasm;
+    wasm?: WasmModule;
 }
 /**
  * @generated from protobuf message protos.DeleteWasmRequest
@@ -1030,6 +1043,16 @@ declare class CreateWasmRequest$Type extends MessageType<CreateWasmRequest> {
  * @generated MessageType for protobuf message protos.CreateWasmRequest
  */
 export declare const CreateWasmRequest: CreateWasmRequest$Type;
+declare class CreateWasmResponse$Type extends MessageType<CreateWasmResponse> {
+    constructor();
+    create(value?: PartialMessage<CreateWasmResponse>): CreateWasmResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateWasmResponse): CreateWasmResponse;
+    internalBinaryWrite(message: CreateWasmResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateWasmResponse
+ */
+export declare const CreateWasmResponse: CreateWasmResponse$Type;
 declare class UpdateWasmRequest$Type extends MessageType<UpdateWasmRequest> {
     constructor();
     create(value?: PartialMessage<UpdateWasmRequest>): UpdateWasmRequest;

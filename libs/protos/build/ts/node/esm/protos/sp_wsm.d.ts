@@ -107,76 +107,6 @@ export interface InterStepResult {
     };
 }
 /**
- * Used for referencing both bundled and custom wasm modules
- *
- * @generated from protobuf message protos.Wasm
- */
-export interface Wasm {
-    /**
-     * ID used for referencing the Wasm module
-     *
-     * @generated from protobuf field: string id = 1;
-     */
-    id: string;
-    /**
-     * Friendly name for the Wasm module
-     *
-     * @generated from protobuf field: string name = 2;
-     */
-    name: string;
-    /**
-     * Contents of the Wasm module
-     *
-     * @generated from protobuf field: bytes bytes = 3;
-     */
-    bytes: Uint8Array;
-    /**
-     * Entry point function name
-     *
-     * @generated from protobuf field: string function_name = 4;
-     */
-    functionName: string;
-    /**
-     * Filename of the Wasm module (used only for bundled wasm)
-     *
-     * @generated from protobuf field: string _filename = 5;
-     */
-    Filename: string;
-    /**
-     * Indicates whether this wasm entry is for bundled wasm or for wasm added via
-     * CreateWasm(); ignored in CreateWasm() and UpdateWasm().
-     *
-     * @generated from protobuf field: bool _bundled = 6;
-     */
-    Bundled: boolean;
-    /**
-     * Informative, debug fields
-     *
-     * @generated from protobuf field: optional string description = 101;
-     */
-    description?: string;
-    /**
-     * @generated from protobuf field: optional string version = 102;
-     */
-    version?: string;
-    /**
-     * @generated from protobuf field: optional string url = 103;
-     */
-    url?: string;
-    /**
-     * Set by server
-     *
-     * @generated from protobuf field: optional int64 _created_at_unix_ts_ns_utc = 1000;
-     */
-    CreatedAtUnixTsNsUtc?: string;
-    /**
-     * Set by server
-     *
-     * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
-     */
-    UpdatedAtUnixTsNsUtc?: string;
-}
-/**
  * Included in Wasm response; the SDK should use the WASMExitCode to determine
  * what to do next - should it execute next step, should it notify or should it
  * stop execution/abort the rest of the steps in current or all pipelines.
@@ -243,14 +173,4 @@ declare class InterStepResult$Type extends MessageType<InterStepResult> {
  * @generated MessageType for protobuf message protos.InterStepResult
  */
 export declare const InterStepResult: InterStepResult$Type;
-declare class Wasm$Type extends MessageType<Wasm> {
-    constructor();
-    create(value?: PartialMessage<Wasm>): Wasm;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Wasm): Wasm;
-    internalBinaryWrite(message: Wasm, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message protos.Wasm
- */
-export declare const Wasm: Wasm$Type;
 export {};

@@ -49,11 +49,19 @@ class WasmModule$Type extends MessageType {
         super("protos.shared.WasmModule", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "function", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "function", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "_filename", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "_bundled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 101, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 102, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 103, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_created_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
         ]);
     }
     create(value) {
-        const message = { id: "", bytes: new Uint8Array(0), function: "" };
+        const message = { id: "", bytes: new Uint8Array(0), function: "", name: "", Filename: "", Bundled: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -72,6 +80,30 @@ class WasmModule$Type extends MessageType {
                     break;
                 case /* string function */ 3:
                     message.function = reader.string();
+                    break;
+                case /* string name */ 4:
+                    message.name = reader.string();
+                    break;
+                case /* string _filename */ 5:
+                    message.Filename = reader.string();
+                    break;
+                case /* bool _bundled */ 6:
+                    message.Bundled = reader.bool();
+                    break;
+                case /* optional string description */ 101:
+                    message.description = reader.string();
+                    break;
+                case /* optional string version */ 102:
+                    message.version = reader.string();
+                    break;
+                case /* optional string url */ 103:
+                    message.url = reader.string();
+                    break;
+                case /* optional int64 _created_at_unix_ts_ns_utc */ 1000:
+                    message.CreatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                case /* optional int64 _updated_at_unix_ts_ns_utc */ 1001:
+                    message.UpdatedAtUnixTsNsUtc = reader.int64().toString();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -94,6 +126,30 @@ class WasmModule$Type extends MessageType {
         /* string function = 3; */
         if (message.function !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.function);
+        /* string name = 4; */
+        if (message.name !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.name);
+        /* string _filename = 5; */
+        if (message.Filename !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.Filename);
+        /* bool _bundled = 6; */
+        if (message.Bundled !== false)
+            writer.tag(6, WireType.Varint).bool(message.Bundled);
+        /* optional string description = 101; */
+        if (message.description !== undefined)
+            writer.tag(101, WireType.LengthDelimited).string(message.description);
+        /* optional string version = 102; */
+        if (message.version !== undefined)
+            writer.tag(102, WireType.LengthDelimited).string(message.version);
+        /* optional string url = 103; */
+        if (message.url !== undefined)
+            writer.tag(103, WireType.LengthDelimited).string(message.url);
+        /* optional int64 _created_at_unix_ts_ns_utc = 1000; */
+        if (message.CreatedAtUnixTsNsUtc !== undefined)
+            writer.tag(1000, WireType.Varint).int64(message.CreatedAtUnixTsNsUtc);
+        /* optional int64 _updated_at_unix_ts_ns_utc = 1001; */
+        if (message.UpdatedAtUnixTsNsUtc !== undefined)
+            writer.tag(1001, WireType.Varint).int64(message.UpdatedAtUnixTsNsUtc);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

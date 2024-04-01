@@ -630,7 +630,7 @@ type PipelineStep_Decode struct {
 }
 
 type PipelineStep_Custom struct {
-	// If set, _wasm_id MUST  e filled out and MUST exist
+	// If set, _wasm_id MUST be set
 	Custom *steps.CustomStep `protobuf:"bytes,1004,opt,name=custom,proto3,oneof"`
 }
 
