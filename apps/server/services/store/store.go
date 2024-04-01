@@ -60,7 +60,7 @@ const (
 	// InstallIDKey is a unique ID for this streamdal server cluster
 	// Each cluster will get a unique UUID. This is used to track the number of
 	// installs for telemetry and is completely random for anonymization purposes.
-	InstallIDKey = "install_id"
+	InstallIDKey = "streamdal_install_id"
 
 	RedisCreationDateKey = "streamdal_settings:creation_date"
 )
