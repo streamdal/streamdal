@@ -261,7 +261,7 @@ class StreamdalClient:
             raise ValueError("req is required")
 
         resp = protos.SdkResponse(
-            data=protos.Payload(bytes=copy(req.data)),
+            data=copy(req.data),
             status=protos.ExecStatus.EXEC_STATUS_TRUE,
             pipeline_status=[],
         )
