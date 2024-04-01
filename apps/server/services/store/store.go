@@ -46,6 +46,8 @@ store any persistent state in memory!
 var (
 	ErrPipelineNotFound = errors.New("pipeline not found")
 	ErrConfigNotFound   = errors.New("config not found")
+	ErrMustExist        = errors.New("object does not exist and MustExist is set")
+	ErrNoOverwrite      = errors.New("object exists and NoOverwrite is set")
 )
 
 const (
@@ -162,6 +164,125 @@ type IStore interface {
 
 	// GetAudiencesByPipelineID returns a slice of audiences that use a pipeline ID
 	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+
+	// BEGIN Wasm-related methods
+	GetWasm(ctx context.Context, name, id string, option ...*Option) (*protos.Wasm, error)
+	GetWasmByID(ctx context.Context, id string, option ...*Option) (*protos.Wasm, error)
+	GetWasmByName(ctx context.Context, name string, option ...*Option) (*protos.Wasm, error)
+	SetWasm(ctx context.Context, id, name string, wasm *protos.Wasm, option ...*Option) error
+	SetWasmByName(ctx context.Context, name string, wasm *protos.Wasm, option ...*Option) error
+	SetWasmByID(ctx context.Context, id string, wasm *protos.Wasm, option ...*Option) error
+	DeleteWasm(ctx context.Context, id, name string, option ...*Option) error
+	DeleteWasmByID(ctx context.Context, id string, option ...*Option) error
+	DeleteWasmByName(ctx context.Context, name string, option ...*Option) error
+	// END Wasm-related methods
+}
+
+// Option contains settings that can influence read, write or delete operations.
+//
+// NOTE: Redis transactions do NOT function like "traditional" txns as there is
+// no concept of a "rollback" or "commit". Txns in redis are essentially
+// grouped commands that are executed atomically. Due to this, Options currently
+// does not support TXNs and there is a _small_ potential for races.
+//
+// See: https://redis.io/docs/interact/transactions/
+// See: https://redis.com/blog/you-dont-need-transaction-rollbacks-in-redis/
+type Option struct {
+	// When set, the store will NOT overwrite an existing object. Applies to write().
+	NoOverwrite bool
+
+	// When set, the store will ensure that the object exists before performing
+	// the operation. Applies to write() and delete(). NOTE: MustExist
+	// and MustNotExist are mutually exclusive.
+	MustExist bool
+
+	// Optional TTL to set on the key. Applies to write().
+	TTL time.Duration
+}
+
+// Generic read method; will use optional transaction if provided (will only use
+// the first transaction provided).
+func (s *Store) read(ctx context.Context, key string, option ...*Option) ([]byte, error) {
+	if key == "" {
+		return nil, errors.New("key is required")
+	}
+
+	data, err := s.options.RedisBackend.Get(ctx, key).Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func (s *Store) write(ctx context.Context, key string, value []byte, option ...*Option) error {
+	if key == "" {
+		return errors.New("key is required")
+	}
+
+	var (
+		exists bool
+		ttl    time.Duration
+	)
+
+	// If MustExist is set, check if the object exists
+	if len(option) > 0 && option[0] != nil {
+		if option[0].MustExist {
+			_, err := s.read(ctx, key, option[0])
+			if err != nil {
+				if err == redis.Nil {
+					return ErrMustExist
+				}
+
+				return errors.Wrap(err, "unable to read object from redis")
+			}
+
+			// Object exists
+			exists = true
+		}
+
+		if option[0].NoOverwrite && exists {
+			return ErrNoOverwrite
+		}
+
+		if option[0].TTL > 0 {
+			ttl = option[0].TTL
+		}
+	}
+
+	// Safe toi write object
+	if err := s.options.RedisBackend.Set(ctx, key, value, ttl).Err(); err != nil {
+		return errors.Wrap(err, "unable to write object to redis")
+	}
+
+	return nil
+}
+
+func (s *Store) delete(ctx context.Context, key string, option ...*Option) error {
+	if key == "" {
+		return errors.New("key is required")
+	}
+
+	if len(option) > 0 && option[0] != nil {
+		// If MustExist is specified, first read object to make sure it exists
+		if option[0].MustExist {
+			_, err := s.read(ctx, key, option[0])
+			if err != nil {
+				if err == redis.Nil {
+					return ErrMustExist
+				}
+
+				return errors.Wrap(err, "unable to read object from redis for delete operation with MustExist option")
+			}
+		}
+	}
+
+	// Can safely delete
+	if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
+		return errors.Wrap(err, "unable to delete object from redis")
+	}
+
+	return nil
 }
 
 func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {

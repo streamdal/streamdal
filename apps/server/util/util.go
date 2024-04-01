@@ -15,8 +15,6 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
-
-	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 const (
@@ -122,51 +120,51 @@ func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string)
 	}
 }
 
-// PopulateWASMFields is used for populating WASM in *protos.Pipeline because
-// the SDK may not have had audiences at startup and thus GetSetPipelinesByService()
-// would not have returned any WASM data.
-func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
-	if pipeline == nil {
-		return errors.New("pipeline cannot be nil")
-	}
-
-	for _, s := range pipeline.Steps {
-		var (
-			mapping *wasm.Mapping
-			err     error
-		)
-
-		// We can do this dynamically later
-		switch s.Step.(type) {
-		case *protos.PipelineStep_Detective:
-			mapping, err = wasm.Load("detective", prefix)
-		case *protos.PipelineStep_Transform:
-			mapping, err = wasm.Load("transform", prefix)
-		case *protos.PipelineStep_Kv:
-			mapping, err = wasm.Load("kv", prefix)
-		case *protos.PipelineStep_HttpRequest:
-			mapping, err = wasm.Load("httprequest", prefix)
-		case *protos.PipelineStep_InferSchema:
-			mapping, err = wasm.Load("inferschema", prefix)
-		case *protos.PipelineStep_SchemaValidation:
-			mapping, err = wasm.Load("schemavalidation", prefix)
-		case *protos.PipelineStep_ValidJson:
-			mapping, err = wasm.Load("validjson", prefix)
-		default:
-			return errors.Errorf("unknown pipeline step type: %T", s.Step)
-		}
-
-		if err != nil {
-			return errors.Wrapf(err, "error loading '%T' WASM mapping", s.Step)
-		}
-
-		s.XWasmFunction = &mapping.FuncName
-		s.XWasmBytes = mapping.Contents
-		s.XWasmId = &mapping.ID
-	}
-
-	return nil
-}
+//// PopulateWASMFields is used for populating WASM in *protos.Pipeline because
+//// the SDK may not have had audiences at startup and thus GetSetPipelinesByService()
+//// would not have returned any WASM data.
+//func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
+//	if pipeline == nil {
+//		return errors.New("pipeline cannot be nil")
+//	}
+//
+//	for _, s := range pipeline.Steps {
+//		var (
+//			mapping *wasm.Mapping
+//			err     error
+//		)
+//
+//		// We can do this dynamically later
+//		switch s.Step.(type) {
+//		case *protos.PipelineStep_Detective:
+//			mapping, err = wasm2.Load("detective", prefix)
+//		case *protos.PipelineStep_Transform:
+//			mapping, err = wasm2.Load("transform", prefix)
+//		case *protos.PipelineStep_Kv:
+//			mapping, err = wasm2.Load("kv", prefix)
+//		case *protos.PipelineStep_HttpRequest:
+//			mapping, err = wasm2.Load("httprequest", prefix)
+//		case *protos.PipelineStep_InferSchema:
+//			mapping, err = wasm2.Load("inferschema", prefix)
+//		case *protos.PipelineStep_SchemaValidation:
+//			mapping, err = wasm2.Load("schemavalidation", prefix)
+//		case *protos.PipelineStep_ValidJson:
+//			mapping, err = wasm2.Load("validjson", prefix)
+//		default:
+//			return errors.Errorf("unknown pipeline step type: %T", s.Step)
+//		}
+//
+//		if err != nil {
+//			return errors.Wrapf(err, "error loading '%T' WASM mapping", s.Step)
+//		}
+//
+//		s.XWasmFunction = &mapping.FuncName
+//		s.XWasmBytes = mapping.Contents
+//		s.XWasmId = &mapping.ID
+//	}
+//
+//	return nil
+//}
 
 // GenerateWasmMapping will generate a map of WASM modules from the given command(s).
 // NOTE: This is primarily useful for commands that have Steps which contain
@@ -435,4 +433,22 @@ func AudienceInList(audience *protos.Audience, list []*protos.Audience) bool {
 	}
 
 	return false
+}
+
+func GetWasmIDFromRedisKey(key string) (string, error) {
+	split := strings.Split(key, ":")
+	if len(split) != 3 {
+		return "", errors.New("Wasm redis key does not contain 3 parts")
+	}
+
+	return split[2], nil
+}
+
+func GetWasmNameFromKey(key string) (string, error) {
+	split := strings.Split(key, ":")
+	if len(split) != 3 {
+		return "", errors.New("Wasm redis key does not contain 3 parts")
+	}
+
+	return split[1], nil
 }

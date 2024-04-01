@@ -25,9 +25,9 @@ import (
 	"github.com/streamdal/streamdal/apps/server/services/pubsub"
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/services/telemetry"
+	"github.com/streamdal/streamdal/apps/server/services/wasm"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
-	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 const (
@@ -112,13 +112,13 @@ func (d *Dependencies) validateWASM() error {
 		os.Chdir("../..")
 	}
 
-	for name, mapping := range wasm.Config {
+	for name, mapping := range wasm.Options {
 		if mapping.Filename == "" {
-			return errors.Errorf("wasm.Config[%s].Filename cannot be empty", name)
+			return errors.Errorf("wasm.Options[%s].Filename cannot be empty", name)
 		}
 
 		if mapping.FuncName == "" {
-			return errors.Errorf("wasm.Config[%s].FuncName cannot be empty", name)
+			return errors.Errorf("wasm.Options[%s].FuncName cannot be empty", name)
 		}
 
 		// Check if the file exists

@@ -11,7 +11,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
-	"github.com/streamdal/streamdal/apps/server/wasm"
+	"github.com/streamdal/streamdal/apps/server/services/wasm"
 )
 
 var (
@@ -854,13 +854,13 @@ func CreateWasmRequest(r *protos.CreateWasmRequest) error {
 		return ErrNilInput
 	}
 
-	if err := Wasm(r.CustomWasm, false); err != nil {
+	if err := Wasm(r.Wasm, false); err != nil {
 		return errors.Wrap(err, "invalid custom wasm")
 	}
 
 	// Cannot use reserved wasm names
-	if _, ok := wasm.Config[r.CustomWasm.Name]; ok {
-		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.CustomWasm.Name)
+	if _, ok := wasm.Options[r.Wasm.Name]; ok {
+		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.Wasm.Name)
 	}
 
 	return nil
@@ -871,13 +871,13 @@ func UpdateWasmRequest(r *protos.UpdateWasmRequest) error {
 		return ErrNilInput
 	}
 
-	if err := Wasm(r.CustomWasm, true); err != nil {
+	if err := Wasm(r.Wasm, true); err != nil {
 		return errors.Wrap(err, "invalid custom wasm")
 	}
 
 	// Cannot use reserved wasm names
-	if _, ok := wasm.Config[r.CustomWasm.Name]; ok {
-		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.CustomWasm.Name)
+	if _, ok := wasm.Options[r.Wasm.Name]; ok {
+		return fmt.Errorf("cannot use reserved name '%s' for wasm", r.Wasm.Name)
 	}
 
 	return nil
@@ -913,12 +913,64 @@ func Wasm(w *protos.Wasm, mustContainID bool) error {
 		return ErrEmptyField("Name")
 	}
 
-	if w.WasmBytes == nil {
+	if w.Bytes == nil {
 		return ErrNilField("WasmBytes")
 	}
 
-	if len(w.WasmBytes) == 0 {
-		return errors.New("WasmBytes cannot be empty")
+	if len(w.Bytes) == 0 {
+		return errors.New("Bytes cannot be empty")
+	}
+
+	return nil
+}
+
+func SetWasm(name, id string, wasm *protos.Wasm) error {
+	if name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if err := Wasm(wasm, true); err != nil {
+		return errors.Wrap(err, "invalid custom wasm")
+	}
+
+	return nil
+}
+
+func SetWasmByName(name string, wasm *protos.Wasm) error {
+	if name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if err := Wasm(wasm, true); err != nil {
+		return errors.Wrap(err, "invalid wasm")
+	}
+
+	return nil
+}
+
+func SetWasmByID(id string, wasm *protos.Wasm) error {
+	if id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if err := Wasm(wasm, true); err != nil {
+		return errors.Wrap(err, "invalid wasm")
+	}
+
+	return nil
+}
+
+func DeleteWasm(name, id string) error {
+	if name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	return nil
