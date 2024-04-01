@@ -1238,6 +1238,7 @@ func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppR
 	return s.uibffPostRequest("/v1/app/register/reject", req)
 }
 
+// TODO: Implement
 func (s *ExternalServer) GetWasm(ctx context.Context, req *protos.GetWasmRequest) (*protos.GetWasmResponse, error) {
 	if err := validate.GetWasmRequest(req); err != nil {
 		return nil, errors.Wrap(err, "unable to validate GetWasm request")
@@ -1248,6 +1249,7 @@ func (s *ExternalServer) GetWasm(ctx context.Context, req *protos.GetWasmRequest
 	return nil, status.Errorf(codes.Unimplemented, "method GetWasm not implemented")
 }
 
+// TODO: Implement
 func (s *ExternalServer) GetAllWasm(ctx context.Context, req *protos.GetAllWasmRequest) (*protos.GetAllWasmResponse, error) {
 	if err := validate.GetAllWasmRequest(req); err != nil {
 		return nil, errors.Wrap(err, "unable to validate GetAllWasm request")
@@ -1258,6 +1260,7 @@ func (s *ExternalServer) GetAllWasm(ctx context.Context, req *protos.GetAllWasmR
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllWasm not implemented")
 }
 
+// TODO: Implement
 func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.StandardResponse, error) {
 	if err := validate.CreateWasmRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
@@ -1269,6 +1272,7 @@ func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmR
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWasm not implemented")
 }
 
+// TODO: Implement
 func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdateWasmRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
@@ -1278,6 +1282,7 @@ func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmR
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateWasm not implemented")
 }
 
+// TODO: Implement
 func (s *ExternalServer) DeleteWasm(ctx context.Context, req *protos.DeleteWasmRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteWasmRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
