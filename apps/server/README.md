@@ -102,7 +102,7 @@ $ grpcurl -d '{"input": "Hello world"}' -plaintext -H "auth-token: 1234" \
 localhost:8082 protos.External/Test
 ```
 
-# Encryption
+## Encryption
 
 To run the server, you will have to generate an AES256 key and pass it via `--aes-key` flag or `STREAMDAL_SERVER_AES_KEY` 
 environment variable.
@@ -121,8 +121,6 @@ will automatically tag and release a new console version with `apps/server/vX.Y.
 <sub>If you'd like to skip running the release action on push/merge to `main`,
 include "norelease" anywhere in the commit message.</sub>
 
-# Testing
-Make sure to run tests via `make test`. This is necessary as we have to set
-certain environment variables for the tests to run properly.
-
-Use `go run main.go --seed-dummy-data` to seed redis with test data for use with development and hand-testing
+## Testing
+1. The server test suite consists of integration tests (and thus require deps like `redis` to be running).
+1. Make sure to run tests via `make test`.
