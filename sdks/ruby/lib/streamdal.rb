@@ -56,7 +56,7 @@ module Streamdal
       @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
       @tails = {}
       @paused_tails = {}
-      @metrics = Streamdal::Metrics.new
+      @metrics = Streamdal::Metrics.new(cfg)
 
       # TODO: kv
       # TODO: metrics

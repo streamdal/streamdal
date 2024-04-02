@@ -1,22 +1,52 @@
 module Streamdal
+
+  CounterEntry = Struct.new(:name, :aud, :labels, :value)
+
+  MetricsConfig = Struct.new(:stub, :auth_token, :log) do
+    def validate
+      if stub.nil?
+        raise ArgumentError, "stub is nil"
+      end
+
+      if auth_token.nil?
+        raise ArgumentError, "auth_token is nil"
+      end
+
+      if log.nil?
+        raise ArgumentError, "log is nil"
+      end
+    end
+  end
+
   class Counter
+    attr_accessor :last_updated
+
     def initialize(name, aud, labels = {}, value = 0.0)
       @name = name
       @aud = aud
       @labels = labels
       @value = value
+      @last_updated = Time::now
+      @value_mutex = Mutex.new
     end
 
     def incr(val)
-      @value += val
+      @value_mutex.synchronize do
+        @value += val
+        @last_updated = Time::now
+      end
     end
 
     def reset
-      @value = 0.0
+      @value_mutex.synchronize do
+        @value = 0.0
+      end
     end
 
     def val
-      @value
+      @value_mutex.synchronize do
+        @value
+      end
     end
   end
 
@@ -35,34 +65,73 @@ module Streamdal
     COUNTER_CONSUME_PROCESSED_RATE = "counter_consume_processed_rate"
     COUNTER_PRODUCE_PROCESSED_RATE = "counter_produce_processed_rate"
 
+    WORKER_POOL_SIZE = 3
+    DEFAULT_COUNTER_REAPER_INTERVAL = 10
+    DEFAULT_COUNTER_TTL = 10
+
     def initialize(cfg)
-      _validate_config(cfg)
+      if cfg.nil?
+        raise ArgumentError, "cfg is nil"
+      end
+
+      cfg.validate
+
       @cfg = cfg
       @counters = {}
+      @counters_mtx = Mutex.new
+      @exit = false
+      @incr_queue = Queue.new
+    end
+
+    def shutdown
+      @exit = true
+
+      # TODO: join threads
     end
 
     def self.composite_id(counter_name, labels = {})
-      "#{counter_name}-#{labels.values.join("-")}"
+      "#{counter_name}-#{labels.values.join("-")}".freeze
     end
 
-    def get_counter(name, labels = {})
-      k = composite_id(name, labels)
-      
-      if @counters.key?(k)
-        return @counters[k]
+    def get_counter(ce)
+
+      k = composite_id(ce.name, ce.labels)
+
+      @counters_mtx.synchronize do
+        if @counters.key?(k)
+          @counters[k]
+        end
       end
 
-      nil
+      # No counter exists, create a new one and return it
+      new_counter(ce)
     end
 
-    def new_counter(name, aud, labels = {}, value = 0.0)
-      c = Counter.new(name, aud, labels, value)
-      @counters[composite_id(name, labels)] = c
+    def new_counter(ce)
+      c = Counter.new(ce.name, ce.aud, ce.labels, ce.value)
+
+      @counters_mtx.synchronize do
+        @counters[composite_id(ce)] = c
+      end
+
       c
     end
 
-    def incr(name, value, labels, aud)
-      nil
+    def incr(ce)
+      c = get_counter(ce)
+
+      if c.nil?
+        new_counter(ce)
+        nil
+      end
+
+      @incr_queue.push(ce)
+    end
+
+    def remove_counter(name)
+      @counters_mtx.synchronize do
+        @counters.delete(name)
+      end
     end
 
     private
@@ -71,8 +140,17 @@ module Streamdal
       nil
     end
 
-    def _publish_metrics
-      nil
+    def _publish_metrics(ce)
+      metric = Streamdal::Protos::Metric.new
+      metric.name = ce.name
+      metric.labels = ce.labels
+      metric.value = ce.value
+      metric.audience = ce.aud
+
+      req = Streamdal::Protos::MetricsRequest.new
+      req.metrics = [metric]
+
+      @cfg.stub.metrics(req, metadata: _metadata)
     end
 
     def _run_publisher
@@ -83,33 +161,43 @@ module Streamdal
       nil
     end
 
-    def remove_counter
-      nil
-    end
-
     def _run_reaper
-      nil
+      @logger.debug("Starting reaper")
+
+      unless @exit
+        # Sleep on startup and then and between each loop run
+        sleep(DEFAULT_COUNTER_REAPER_INTERVAL)
+
+        # Get all counters
+        # Loop over each counter, get the value,
+        #   if value > 0, continue
+        #   if now() - last_updated > 10 seconds, remove counter
+        # Grab copy of counters
+        @counters_mtx.lock
+        new_counters = @counters.dup
+        @counters_mtx.unlock
+
+        new_counters.each do |name, counter|
+          if counter.val > 0
+            next
+          end
+
+          if Time::now - counter.last_updated > DEFAULT_COUNTER_TTL
+            remove_counter(name)
+          end
+        end
+      end
+
+      @logger.debug("Exiting reaper")
     end
 
     def _run_incrementer_worker
-      nil
-    end
+      @logger.debug("Starting incrementer worker")
 
-    def _validate_config(cfg)
-      if cfg.nil?
-        raise ArgumentError, "cfg is nil"
-      end
-
-      if cfg[:stub].nil?
-        raise ArgumentError, "stub is nil"
-      end
-
-      if cfg[:auth_token].nil?
-        raise ArgumentError, "auth_token is nil"
-      end
-
-      if cfg[:log].nil?
-        raise ArgumentError, "log is nil"
+      until @exit
+        ce = @incr_queue.pop
+        c = get_counter(ce.name)
+        c.incr(ce.value)
       end
     end
   end
