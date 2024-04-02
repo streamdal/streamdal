@@ -68,7 +68,7 @@ func CtxStringValue(ctx context.Context, key string) string {
 	return values[0]
 }
 
-func Pointer[T any](val T) *T {
+func Pointer[T any](val T) *T { // DS: Generics! In the wild!
 	return &val
 }
 

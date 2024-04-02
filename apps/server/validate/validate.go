@@ -905,6 +905,11 @@ func Wasm(w *shared.WasmModule, mustContainID bool) error {
 		return ErrEmptyField("Name")
 	}
 
+	// Name should be alpha-numeric + dashes and underscores
+	if !ValidCharactersRegex.MatchString(w.Name) {
+		return ErrInvalidCharacters("Name")
+	}
+
 	if w.Bytes == nil {
 		return ErrNilField("WasmBytes")
 	}

@@ -20,6 +20,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/services/wasm"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/apps/server/validate"
@@ -31,6 +32,9 @@ const (
 
 	// streamKeepaliveInterval is how often we send a keepalive on gRPC streams
 	streamKeepaliveInterval = 10 * time.Second
+
+	// customWasmModifier is the modifier string we use when generating an ID for a custom WASM module
+	customWasmModifier = "~custom~"
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -1238,57 +1242,213 @@ func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppR
 	return s.uibffPostRequest("/v1/app/register/reject", req)
 }
 
-// TODO: Implement
+// WARNING: All of the CRUD wasm methods have possible races when multiple gRPC
+// clients perform changes. This can be fixed by using a distributed lock.
+
 func (s *ExternalServer) GetWasm(ctx context.Context, req *protos.GetWasmRequest) (*protos.GetWasmResponse, error) {
 	if err := validate.GetWasmRequest(req); err != nil {
 		return nil, errors.Wrap(err, "unable to validate GetWasm request")
 	}
 
-	// TODO: Attempt to fetch WasmEntry
+	module, err := s.Options.StoreService.GetWasmByID(ctx, req.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get Wasm entry")
+	}
 
-	return nil, status.Errorf(codes.Unimplemented, "method GetWasm not implemented")
+	// Strip bytes in each module to save b/w and avoid max message size limits
+	module.Bytes = nil
+
+	return &protos.GetWasmResponse{
+		Wasm: module,
+	}, nil
 }
 
-// TODO: Implement
 func (s *ExternalServer) GetAllWasm(ctx context.Context, req *protos.GetAllWasmRequest) (*protos.GetAllWasmResponse, error) {
 	if err := validate.GetAllWasmRequest(req); err != nil {
 		return nil, errors.Wrap(err, "unable to validate GetAllWasm request")
 	}
 
-	// TODO: Attempt to get ALL Wasm entries
-
-	return nil, status.Errorf(codes.Unimplemented, "method GetAllWasm not implemented")
-}
-
-// TODO: Implement
-func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.CreateWasmResponse, error) {
-	if err := validate.CreateWasmRequest(req); err != nil {
-		return nil, errors.Wrap(err, "unable to validate CreateWasm request")
+	modules, err := s.Options.StoreService.GetAllWasm(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get all Wasm entries")
 	}
 
-	// TODO: Try to save Wasm to store
+	// Strip bytes in each module to save b/w and avoid max message size limits
+	for _, module := range modules {
+		module.Bytes = nil
+	}
 
-	return nil, status.Errorf(codes.Unimplemented, "method CreateWasm not implemented")
+	return &protos.GetAllWasmResponse{
+		Wasm: modules,
+	}, nil
 }
 
-// TODO: Implement
+func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.CreateWasmResponse, error) {
+	if err := validate.CreateWasmRequest(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "unable to validate CreateWasm request: %s", err.Error())
+	}
+
+	// Generate ID
+	id := wasm.DeterminativeUUID(req.Wasm.Bytes, customWasmModifier)
+
+	// Check if this ID already exists - if it does, return an error - user should use UpdateWasm()
+	existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, id)
+	if err != nil {
+		if err != store.ErrWasmNotFound {
+			return nil, status.Errorf(codes.Internal, "unable to complete existing Wasm module check: %s", err.Error())
+		}
+
+		// Wasm not found - great!
+	}
+
+	if existingWasm != nil {
+		// Return a more helpful error message
+		if existingWasm.Name == req.Wasm.Name {
+			return nil, status.Error(codes.AlreadyExists, "Wasm module with this 'id' and 'name' already exists, use external.UpdateWasm() to update")
+		}
+
+		return nil, status.Error(codes.AlreadyExists, "Wasm module with this ID already exists, use external.UpdateWasm() instead")
+	}
+
+	// ID cannot be set by user
+	req.Wasm.Id = id
+
+	// CreatedAt timestamp can only be created by server
+	req.Wasm.XCreatedAtUnixTsNsUtc = util.Pointer(time.Now().UTC().UnixNano())
+
+	// Cannot create bundled wasm modules
+	req.Wasm.XBundled = false
+
+	// Ignore possible UpdatedAt - it is only set by server in UpdateWasm()
+	req.Wasm.XUpdatedAtUnixTsNsUtc = nil
+
+	if err := s.Options.StoreService.SetWasm(ctx, req.Wasm.Name, req.Wasm.Id, req.Wasm); err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to store Wasm module: %s", err.Error())
+	}
+
+	return &protos.CreateWasmResponse{
+		Message: "Wasm module created",
+		Id:      id,
+	}, nil
+}
+
+// UpdateWasm will update _existing_ wasm. Updating bundled wasm modules is not allowed.
 func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmRequest) (*protos.StandardResponse, error) {
 	if err := validate.UpdateWasmRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
 			"unable to validate UpdateWasm request: "+err.Error()), nil
 	}
 
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateWasm not implemented")
+	// Wasm with this ID and Name should exist
+	existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, req.Wasm.Id)
+	if err != nil {
+		// Helpful error message
+		if err == store.ErrWasmNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND,
+				"Existing wasm module not found"), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get existing Wasm module: "+err.Error()), nil
+	}
+
+	// Existing wasm module should exist at this point but let's double check jic
+	if existingWasm == nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+			"bug? existing Wasm module not found"), nil
+	}
+
+	// Do not allow updating bundled wasm modules
+	if existingWasm.XBundled {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			fmt.Sprintf("cannot update bundled wasm module with ID '%s'", req.Wasm.Id)), nil
+	}
+
+	// New Wasm cannot be set as bundled
+	req.Wasm.XBundled = false
+
+	// Keep the old created at timestamp
+	req.Wasm.XCreatedAtUnixTsNsUtc = existingWasm.XCreatedAtUnixTsNsUtc
+
+	// Update the updated_at timestamp
+	req.Wasm.XUpdatedAtUnixTsNsUtc = util.Pointer(time.Now().UTC().UnixNano())
+
+	// Let's update it
+	if err := s.Options.StoreService.SetWasm(ctx, req.Wasm.Name, req.Wasm.Id, req.Wasm); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to update Wasm module: "+err.Error()), nil
+	}
+
+	// If the name has changed, we need to delete the old entry
+	if req.Wasm.Name != existingWasm.Name {
+		if err := s.Options.StoreService.DeleteWasm(ctx, existingWasm.Name, existingWasm.Id); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to delete old Wasm module': "+err.Error()), nil
+		}
+	}
+
+	// TODO: Emit a SetPipelines command to anyone that used the original Wasm
+
+	return util.StandardResponse(
+		ctx,
+		protos.ResponseCode_RESPONSE_CODE_OK,
+		fmt.Sprintf("successfully updated wasm module with id '%s', name '%s'", req.Wasm.Id, req.Wasm.Name),
+	), nil
 }
 
-// TODO: Implement
+// DeleteWasm will delete a Wasm module by ID. Deleting bundled Wasm modules is
+// not allowed.
 func (s *ExternalServer) DeleteWasm(ctx context.Context, req *protos.DeleteWasmRequest) (*protos.StandardResponse, error) {
 	if err := validate.DeleteWasmRequest(req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
 			"unable to validate DeleteWasm request: "+err.Error()), nil
 	}
 
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteWasm not implemented")
+	// Do this in two passes - start with pre-validation.
+	//
+	// NOTE: If we did this in one go and if any, non-first ID fails - the user
+	// would have to keep updating their delete request as subsequent validation
+	// calls will fail because we will have already deleted the Wasm module with
+	// the given ID.
+	for _, id := range req.Ids {
+		// Is there wasm with this ID?
+		existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, id)
+		if err != nil {
+			// Try to be a bit more helpful
+			if err == store.ErrWasmNotFound {
+				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+					fmt.Sprintf("wasm module with ID '%s' not found", id)), nil
+			}
+
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to get Wasm module with ID '%s': %s", id, err)), nil
+		}
+
+		if existingWasm == nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND,
+				fmt.Sprintf("bug? wasm module with ID '%s' not found", id)), nil
+		}
+
+		// Do not allow deletion of bundled wasm modules
+		if existingWasm.XBundled {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+				fmt.Sprintf("cannot delete bundled wasm module with ID '%s'", id)), nil
+		}
+	}
+
+	// All validation has passed, we can safely delete the Wasm modules
+	for _, id := range req.Ids {
+		if err := s.Options.StoreService.DeleteWasmByID(ctx, id); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to delete Wasm module: "+err.Error()), nil
+		}
+	}
+
+	// TODO: If this wasm was used in any pipelines, we must emit an updated
+	// SetPipelines command.
+
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK,
+		fmt.Sprintf("Successfully deleted '%d' asm module(s)", len(req.Ids))), nil
 }
 
 func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*protos.StandardResponse, error) {
