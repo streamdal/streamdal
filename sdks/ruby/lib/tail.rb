@@ -40,13 +40,12 @@ module Streamdal
     def stop_tail
       @logger.debug("Stopping tail for '#{@request.id}'")
       @active = false
-      @stub = nil # No close method, garbage collector handles it in ruby
     end
-    
+
     def start_tail_worker(worker_id)
       @logger.debug("Starting tail worker #{worker_id}")
 
-      # Create gRPC connection
+      # Each worker gets it's own gRPC connection
       stub = Streamdal::Protos::Internal::Stub.new(@streamdal_url, :this_channel_is_insecure)
 
       while @active
@@ -64,10 +63,10 @@ module Streamdal
           next
         end
 
-        unless @stub.nil?
+        unless stub.nil?
           @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
           tail_response = @queue.pop(non_block = false)
-          @stub.tail(tail_response, metadata: { "auth-token" => @auth_token })
+          stub.tail(tail_response, metadata: { "auth-token" => @auth_token })
         end
       end
 
@@ -77,7 +76,7 @@ module Streamdal
 
     def should_send
       if @limiter.nil?
-        nil
+        true
       end
 
       @limiter.use_tokens(1)
