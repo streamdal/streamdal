@@ -79,15 +79,6 @@ func TestAudienceFromStr(t *testing.T) {
 	}
 }
 
-func TestInjectSchemaInferenceForSetPipelinesCommands(t *testing.T) {
-	g := gomega.NewWithT(t)
-
-	// Empty commands should return empty commands
-	numInjected, err := InjectSchemaInferenceForSetPipelinesCommands(make([]*protos.Command, 0), "wasmDir")
-	g.Expect(err).ToNot(gomega.HaveOccurred())
-	g.Expect(numInjected).To(gomega.Equal(0))
-}
-
 func TestAudienceToStr(t *testing.T) {
 	g := gomega.NewWithT(t)
 

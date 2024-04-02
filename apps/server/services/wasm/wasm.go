@@ -263,6 +263,14 @@ func preloadAll(storeService store.IStore, wasmPrefix string) (int, error) {
 
 // Preloads a WASM file from disk (using optional prefix) and writes it to redis
 func preload(ctx context.Context, storeService store.IStore, name string, wasmPrefix ...string) error {
+	if storeService == nil {
+		return errors.New("preload: store service cannot be nil")
+	}
+
+	if name == "" {
+		return errors.New("preload(): name is required")
+	}
+
 	entry, ok := config[name]
 	if !ok {
 		return errors.Errorf("wasm entry '%s' not found in config", name)

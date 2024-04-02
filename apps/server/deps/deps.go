@@ -219,34 +219,24 @@ func (d *Dependencies) setupServices(cfg *config.Config) error {
 	// This needs to happen AFTER the store service is created AND BEFORE the
 	// bus service is created.
 
-	// Lame... means that tests need to have TEST=true env var set
-	if os.Getenv("TEST") != "" {
-		if err := os.Chdir("../.."); err != nil {
-			return errors.Wrap(err, "unable to change directory during wasm setup")
-		}
-	}
-
 	wasmService, err := wasm.New(d.ShutdownContext, d.StoreService, cfg.WASMDir)
 	if err != nil {
 		return errors.Wrap(err, "unable to create new wasm service")
 	}
 
-	if cfg.DisplayWasmStats {
-		stats, err := wasmService.GetWasmStats()
-		if err != nil {
-			return errors.Wrap(err, "unable to get wasm stats")
-		}
-
-		logrus.Debug("------------- Begin Wasm Stats --------------")
-		logrus.Debugf("Preloaded: '%d'   Bundled: '%d'    Custom: '%d'", wasmService.GetNumPreloaded(), stats.NumBundled, stats.NumCustom)
-
-		for _, w := range stats.All {
-			logrus.Debugf("Name: '%s'   ID: '%s'   Created At: %s", w.Name, w.Id, time.Unix(0, w.GetXCreatedAtUnixTsNsUtc()).String())
-		}
-
-		logrus.Debug("------------- End Wasm Stats --------------")
-
+	stats, err := wasmService.GetWasmStats()
+	if err != nil {
+		return errors.Wrap(err, "unable to get wasm stats")
 	}
+
+	logrus.Debug("------------- Begin Wasm Stats --------------")
+	logrus.Debugf("Preloaded: '%d'   Bundled: '%d'    Custom: '%d'", wasmService.GetNumPreloaded(), stats.NumBundled, stats.NumCustom)
+
+	for _, w := range stats.All {
+		logrus.Debugf("Name: '%s'   ID: '%s'   Created At: %s", w.Name, w.Id, time.Unix(0, w.GetXCreatedAtUnixTsNsUtc()).String())
+	}
+
+	logrus.Debug("------------- End Wasm Stats --------------")
 
 	d.WasmService = wasmService
 

@@ -955,6 +955,74 @@ var _ = Describe("External gRPC API", func() {
 		//    - Broadcast a DeleteAudience message
 		// 3. Deleting an audience without specifying audience should error
 	})
+
+	// TODO: Write tests
+	Context("GetWasm", func() {
+		It("happy path: should return info about specific wasm module", func() {
+			// Reminder: Should have all fields filled out (createdAt, updatedAt)
+		})
+
+		It("querying unknown wasm module should return error", func() {
+
+		})
+	})
+
+	// TODO: Write tests
+	Context("GetAllWasm", func() {
+		It("happy path: should return all wasm modules", func() {
+
+		})
+	})
+
+	// TODO: Write tests
+	Context("CreateWasm", func() {
+		It("happy path: should create a new wasm module", func() {
+			// Reminder: Should set ID, overwrite bundled, set created at date, reset updated at
+		})
+
+		It("should error if wasm module already exists", func() {
+
+		})
+
+		It("should error if wasm module is missing fields", func() {
+
+		})
+	})
+
+	// TODO: Write tests
+	Context("UpdateWasm", func() {
+		It("happy path: should update a wasm module", func() {
+			// Reminder: Make sure to test fields are being updated as expected
+			// Reminder: try to load wasm from redis and it can be unmarshalled
+		})
+
+		It("won't allow updating a wasm module that doesn't exist", func() {
+
+		})
+
+		It("won't allow updating a wasm module that is bundled", func() {
+
+		})
+
+		It("won't allow updating a wasm module with missing fields", func() {
+
+		})
+	})
+
+	// TODO: Write tests
+	Context("DeleteWasm", func() {
+		It("happy path: should delete a wasm module", func() {
+
+		})
+
+		It("returns error if an id does not exist", func() {
+
+		})
+
+		It("cannot delete bundled wasm", func() {
+			// Reminder: should return error
+		})
+	})
 })
 
 func genAESKey() string {
@@ -975,7 +1043,7 @@ func runServer() {
 		GRPCAPIListenAddress: GRPCAPIAddress,
 		RedisURL:             "localhost:6379",
 		SessionTTL:           time.Second * 5,
-		WASMDir:              "./assets/wasm",
+		WASMDir:              "../../assets/wasm",
 		AesKey:               genAESKey(),
 		TelemetryDisable:     true,
 	})
@@ -996,6 +1064,7 @@ func runServer() {
 		MetricsService:  d.MetricsService,
 		KVService:       d.KVService,
 		Telemetry:       d.Telemetry,
+		WasmService:     d.WasmService,
 	})
 
 	if err != nil {
