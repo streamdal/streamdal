@@ -113,7 +113,7 @@ const initConfigs = (configs?: StreamdalConfigs) => {
   return internalConfigs;
 };
 
-const encodeJson = (data: string): Uint8Array => {
+const encodeJSON = (data: string): Uint8Array => {
   return new TextEncoder().encode(data);
 };
 
@@ -154,7 +154,7 @@ export const registerStreamdal = async (
       return retryProcessPipelines({
         configs: internalConfigs,
         audience,
-        data: encodeJson(data),
+        data: encodeJSON(data),
       });
     },
     processAny: async ({
@@ -200,6 +200,28 @@ export class Streamdal {
       configs: this.internalConfigs,
       audience,
       data,
+    });
+  }
+
+  async processJSON({
+    audience,
+    data,
+  }: StreamdalJSONRequest): Promise<SDKResponse> {
+    return retryProcessPipelines({
+      configs: this.internalConfigs,
+      audience,
+      data: encodeJSON(data),
+    });
+  }
+
+  async processAny({
+    audience,
+    data,
+  }: StreamdalAnyRequest): Promise<SDKResponse> {
+    return retryProcessPipelines({
+      configs: this.internalConfigs,
+      audience,
+      data: encodeAny(data),
     });
   }
 }
