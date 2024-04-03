@@ -79,12 +79,10 @@ class CreateNotificationResponse(_message.Message):
     def __init__(self, notification: _Optional[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class CreatePipelineRequest(_message.Message):
-    __slots__ = ["pipeline", "pipeline_json"]
+    __slots__ = ["pipeline"]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
-    PIPELINE_JSON_FIELD_NUMBER: _ClassVar[int]
     pipeline: _sp_pipeline_pb2.Pipeline
-    pipeline_json: bytes
-    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ..., pipeline_json: _Optional[bytes] = ...) -> None: ...
+    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
 
 class CreatePipelineResponse(_message.Message):
     __slots__ = ["message", "pipeline_id"]
