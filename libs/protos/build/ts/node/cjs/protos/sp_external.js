@@ -369,7 +369,8 @@ exports.GetPipelineResponse = new GetPipelineResponse$Type();
 class CreatePipelineRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.CreatePipelineRequest", [
-            { no: 1, name: "pipeline", kind: "message", T: () => sp_pipeline_1.Pipeline }
+            { no: 1, name: "pipeline", kind: "message", T: () => sp_pipeline_1.Pipeline },
+            { no: 2, name: "pipeline_json", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value) {
@@ -387,6 +388,9 @@ class CreatePipelineRequest$Type extends runtime_5.MessageType {
                 case /* protos.Pipeline pipeline */ 1:
                     message.pipeline = sp_pipeline_1.Pipeline.internalBinaryRead(reader, reader.uint32(), options, message.pipeline);
                     break;
+                case /* optional bytes pipeline_json */ 2:
+                    message.pipelineJson = reader.bytes();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -402,6 +406,9 @@ class CreatePipelineRequest$Type extends runtime_5.MessageType {
         /* protos.Pipeline pipeline = 1; */
         if (message.pipeline)
             sp_pipeline_1.Pipeline.internalBinaryWrite(message.pipeline, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* optional bytes pipeline_json = 2; */
+        if (message.pipelineJson !== undefined)
+            writer.tag(2, runtime_1.WireType.LengthDelimited).bytes(message.pipelineJson);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

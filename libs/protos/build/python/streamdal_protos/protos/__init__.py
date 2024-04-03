@@ -635,7 +635,15 @@ class GetPipelineResponse(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class CreatePipelineRequest(betterproto.Message):
+    """
+    Pipeline can be created either by passing in a pipeline object or pipeline
+    as JSON bytes.
+    """
+
     pipeline: "Pipeline" = betterproto.message_field(1)
+    pipeline_json: Optional[bytes] = betterproto.bytes_field(
+        2, optional=True, group="_pipeline_json"
+    )
 
 
 @dataclass(eq=False, repr=False)

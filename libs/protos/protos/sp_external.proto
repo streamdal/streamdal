@@ -144,8 +144,11 @@ message GetPipelineResponse {
   protos.Pipeline pipeline = 1;
 }
 
+// Pipeline can be created either by passing in a pipeline object or pipeline
+// as JSON bytes.
 message CreatePipelineRequest {
   protos.Pipeline pipeline = 1;
+  optional bytes pipeline_json = 2;
 }
 
 message CreatePipelineResponse {
