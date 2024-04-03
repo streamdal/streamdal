@@ -1,19 +1,19 @@
 module Streamdal
   class Counter
-    attr_accessor :last_updated
+    attr_accessor :last_updated, :name, :aud, :labels
 
     def initialize(name, aud, labels = {}, value = 0.0)
       @name = name
       @aud = aud
       @labels = labels
-      @value = value
+      @value = 0
       @last_updated = Time::now
       @value_mtx = Mutex.new
     end
 
     def incr(val)
       @value_mtx.synchronize do
-        @value += val
+        @value = @value + val
         @last_updated = Time::now
       end
     end
@@ -100,12 +100,18 @@ module Streamdal
     end
 
     def self.composite_id(counter_name, labels = {})
+      if labels.nil?
+        labels = {}
+      end
       "#{counter_name}-#{labels.values.join("-")}".freeze
     end
 
     def get_counter(ce)
+      if ce.nil?
+        raise ArgumentError, "ce is nil"
+      end
 
-      k = composite_id(ce.name, ce.labels)
+      k = Metrics::composite_id(ce.name, ce.labels)
 
       @counters_mtx.synchronize do
         if @counters.key?(k)
@@ -121,7 +127,7 @@ module Streamdal
       c = Counter.new(ce.name, ce.aud, ce.labels, ce.value)
 
       @counters_mtx.synchronize do
-        @counters[composite_id(ce)] = c
+        @counters[Metrics::composite_id(ce.name, ce.labels)] = c
       end
 
       c
@@ -187,7 +193,7 @@ module Streamdal
         new_counters = @counters.dup
         @counters_mtx.unlock
 
-        new_counters.each do |name, counter|
+        new_counters.each do |_, counter|
           if counter.val == 0
             next
           end
@@ -205,6 +211,9 @@ module Streamdal
 
       until @exit
         ce = @incr_queue.pop
+        if ce.nil?
+          next
+        end
         begin
           _publish_metrics(ce)
         rescue => e
@@ -227,18 +236,16 @@ module Streamdal
         #   if value > 0, continue
         #   if now() - last_updated > 10 seconds, remove counter
         # Grab copy of counters
-        @counters_mtx.lock
-        new_counters = @counters.dup
-        @counters_mtx.unlock
+        @counters_mtx.synchronize do
+          @counters.each do |name, counter|
+            if counter.val > 0
+              next
+            end
 
-        new_counters.each do |name, counter|
-          if counter.val > 0
-            next
-          end
-
-          if Time::now - counter.last_updated > DEFAULT_COUNTER_TTL
-            @cfg.log.debug("Reaping counter '#{name}'")
-            remove_counter(name)
+            if Time::now - counter.last_updated > DEFAULT_COUNTER_TTL
+              @cfg.log.debug("Reaping counter '#{name}'")
+              @counters.delete(name)
+            end
           end
         end
       end
@@ -251,7 +258,8 @@ module Streamdal
 
       until @exit
         ce = @incr_queue.pop
-        c = get_counter(ce.name)
+        c = get_counter(ce)
+
         c.incr(ce.value)
       end
 

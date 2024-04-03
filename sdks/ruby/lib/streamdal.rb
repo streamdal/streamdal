@@ -7,6 +7,7 @@ require "wasmtime"
 require "google/protobuf"
 require "base64"
 require 'logger'
+require 'sp_sdk_pb'
 require_relative 'audiences'
 require_relative 'validation'
 require_relative 'metrics'
@@ -21,8 +22,8 @@ MAX_PAYLOAD_SIZE = 1024 * 1024 # 1 megabyte
 
 module Streamdal
 
-  OPERATION_TYPE_PRODUCER = "producer"
-  OPERATION_TYPE_CONSUMER = "consumer"
+  OPERATION_TYPE_PRODUCER = 2
+  OPERATION_TYPE_CONSUMER = 1
 
   # Data class to hold instantiated wasm functions
   class WasmFunction
@@ -36,11 +37,18 @@ module Streamdal
 
   end
 
+  # Sharon.schadler@pltitle.com
+
   # Data class to store/pass audiences
-  class Audience
-    @operation_type
-    @operation_name
-    @component_name
+  Audience = Struct.new(:operation_type, :operation_name, :component_name) do
+    def to_proto(service_name)
+      Streamdal::Protos::Audience.new(
+        operation_type: Streamdal::Protos::OperationType.lookup(operation_type.to_i),
+        operation_name: operation_name,
+        component_name: component_name,
+        service_name: service_name,
+      )
+    end
   end
 
   class Client
@@ -169,18 +177,19 @@ module Streamdal
         raise "cmd is required"
       end
 
-      cmd.set_pipelines.pipelines.each do |p|
-        p.steps.each_with_index { |idx, step|
+      cmd.set_pipelines.pipelines.each_with_index { |p, pIdx|
+        p.steps.each_with_index { |step, idx|
           if step._wasm_bytes == ""
-            if cmd.set_pipelines.wasm_modules.key?(step._wasm_id)
-              step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id]
-              cmd.set_pipelines.steps[idx] = step
+            # puts "wasm modules #{cmd.set_pipelines.wasm_modules.inspect}"
+            if cmd.set_pipelines.wasm_modules.has_key?(step._wasm_id)
+              step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
+              cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
             else
               @logger.error "WASM module not found for step: #{step._wasm_id}"
             end
           end
         }
-      end
+      }
     end
 
     def _pull_initial_pipelines
@@ -350,48 +359,47 @@ module Streamdal
       end
     end
 
-    def process(req)
-      if req.nil? || req.length == 0
-        raise "invalid process request is required"
+    def process(data, audience)
+      if data.length == 0
+        raise "data is required"
       end
 
-      resp = Streamda::Protos::SdkResponse.new
-      resp.data = req[:data]
-      resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
-      resp.pipeline_status = []
+      if audience.nil?
+        raise "audience is required"
+      end
 
-      aud = Streamdal::Protos::Audience.new
-      aud.operation_type = req[:operation_type]
-      aud.operation_name = req[:operation_name]
-      aud.component_name = req[:component_name]
-      aud.service_name = @cfg[:service_name]
+      resp = Streamdal::Protos::SDKResponse.new
+      resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+      resp.pipeline_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::PipelineStatus, [])
+
+      aud = audience.to_proto(@cfg[:service_name])
       _add_audience(aud)
 
       labels = {
         "service": @cfg[:service_name],
-        "operation_type": req[:operation_type],
-        "operation": req[:operation_name],
-        "component": req[:component_name],
+        "operation_type": aud.operation_type,
+        "operation": aud.operation_name,
+        "component": aud.component_name,
         "pipeline_name": "",
         "pipeline_id": "",
       }
 
       # TODO: metrics
-      bytes_counter = Streamdal::Metrics::COUNTER_CONSUME_BYTES
+      bytes_processed = Streamdal::Metrics::COUNTER_CONSUME_BYTES
       errors_counter = Streamdal::Metrics::COUNTER_CONSUME_ERRORS
       total_counter = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED
       rate_bytes = Streamdal::Metrics::COUNTER_CONSUME_BYTES_RATE
       rate_processed = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED_RATE
 
-      if req[:operation_type] == OPERATION_TYPE_PRODUCER
-        bytes_counter = Streamdal::Metrics::COUNTER_PRODUCE_BYTES
+      if aud.operation_type == OPERATION_TYPE_PRODUCER
+        bytes_processed = Streamdal::Metrics::COUNTER_PRODUCE_BYTES
         errors_counter = Streamdal::Metrics::COUNTER_PRODUCE_ERRORS
         total_counter = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED
         rate_bytes = Streamdal::Metrics::COUNTER_PRODUCE_BYTES_RATE
         rate_processed = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED_RATE
       end
 
-      payload_size = req[:data].length
+      payload_size = data.length
 
       if payload_size > MAX_PAYLOAD_SIZE
         # TODO: add metrics
@@ -401,7 +409,7 @@ module Streamdal
       end
 
       # Needed for send_tail()
-      original_data = req[:data]
+      original_data = data
 
       pipelines = _get_pipelines(aud)
       if pipelines.length == 0
@@ -409,8 +417,8 @@ module Streamdal
         resp
       end
 
-      @metrics.incr(rate_bytes, 1, {}, aud)
-      @metrics.incr(rate_processed, 1, {}, aud)
+      @metrics.incr(Streamdal::Metrics::CounterEntry.new(bytes_processed, aud, labels, data.length))
+      @metrics.incr(Streamdal::Metrics::CounterEntry.new(rate_processed, aud, labels, 1))
 
       # Used for passing data between steps
       isr = nil
@@ -427,7 +435,7 @@ module Streamdal
         labels[:pipeline_name] = pipeline.name
 
         @metrics.incr(total_counter, 1, {}, aud)
-        @metrics.incr(bytes_counter, 1, {}, aud)
+        @metrics.incr(bytes_processed, 1, {}, aud)
 
         pipeline.steps.each do |step|
           step_status = Streamdal::Protos::StepStatus.new
@@ -435,7 +443,7 @@ module Streamdal
           step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
 
           begin
-            wasm_resp = call_wasm(step, req[:data], isr)
+            wasm_resp = call_wasm(step, data, isr)
           rescue => e
             @logger.error "Error running step '#{step.name}': #{e}"
             step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
@@ -467,7 +475,8 @@ module Streamdal
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
             isr = nil
 
-            @metrics.incr(errors_counter, 1, labels, aud)
+            # errors_counter, 1, labels, aud
+            @metrics.incr(Streamdal::Metrics::CounterEntry.new(errors_counter, aud, labels, 1))
           else
             cond = step.on_true
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
@@ -548,13 +557,13 @@ module Streamdal
         nil
       end
 
-      @metrics.incr(Streamdal::Metrics::COUNTER_NOTIFY, 1, {
+      @metrics.incr(Streamdal::Metrics::CounterEntry.new(Streamdal::Metrics::COUNTER_NOTIFY, aud, {
         "service": @cfg[:service_name],
         "component_name": aud.component_name,
         "pipeline_name": pipeline.name,
         "pipeline_id": pipeline.id,
         "operation_name": aud.operation_name,
-      }, aud)
+      }, 1))
 
       req = Streamdal::Protos::NotifyRequest.new
       req.audience = aud
@@ -593,6 +602,8 @@ module Streamdal
         )
 
         t.start_tail_workers
+
+        _set_active_tail(t)
 
       end
     end
