@@ -1,23 +1,4 @@
 module Streamdal
-
-  CounterEntry = Struct.new(:name, :aud, :labels, :value)
-
-  MetricsConfig = Struct.new(:stub, :auth_token, :log) do
-    def validate
-      if stub.nil?
-        raise ArgumentError, "stub is nil"
-      end
-
-      if auth_token.nil?
-        raise ArgumentError, "auth_token is nil"
-      end
-
-      if log.nil?
-        raise ArgumentError, "log is nil"
-      end
-    end
-  end
-
   class Counter
     attr_accessor :last_updated
 
@@ -27,24 +8,24 @@ module Streamdal
       @labels = labels
       @value = value
       @last_updated = Time::now
-      @value_mutex = Mutex.new
+      @value_mtx = Mutex.new
     end
 
     def incr(val)
-      @value_mutex.synchronize do
+      @value_mtx.synchronize do
         @value += val
         @last_updated = Time::now
       end
     end
 
     def reset
-      @value_mutex.synchronize do
+      @value_mtx.synchronize do
         @value = 0.0
       end
     end
 
     def val
-      @value_mutex.synchronize do
+      @value_mtx.synchronize do
         @value
       end
     end
@@ -68,6 +49,21 @@ module Streamdal
     WORKER_POOL_SIZE = 3
     DEFAULT_COUNTER_REAPER_INTERVAL = 10
     DEFAULT_COUNTER_TTL = 10
+    DEFAULT_COUNTER_PUBLISH_INTERVAL = 1
+
+    CounterEntry = Struct.new(:name, :aud, :labels, :value)
+
+    Config = Struct.new(:streamdal_url, :streamdal_token, :log) do
+      def validate
+        if streamdal_url.nil? || streamdal_url.empty?
+          raise ArgumentError, "streamdal_url is required"
+        end
+
+        if streamdal_token.nil? || streamdal_token.empty?
+          raise ArgumentError, "streamdal_token is required"
+        end
+      end
+    end
 
     def initialize(cfg)
       if cfg.nil?
@@ -81,12 +77,26 @@ module Streamdal
       @counters_mtx = Mutex.new
       @exit = false
       @incr_queue = Queue.new
+      @publish_queue = Queue.new
+      @workers = []
+      @logger = cfg.log || Logger.new(STDOUT)
+
+      _start
     end
 
     def shutdown
+      # Set exit flag so workers exit
       @exit = true
 
-      # TODO: join threads
+      # Let loops exit
+      sleep(1)
+
+      # Exit any remaining threads
+      @workers.each do |w|
+        if w.running?
+          w.exit
+        end
+      end
     end
 
     def self.composite_id(counter_name, labels = {})
@@ -136,8 +146,14 @@ module Streamdal
 
     private
 
-    def _shutdown
-      nil
+    def _start
+      WORKER_POOL_SIZE.times do |i|
+        @workers << Thread.new { _run_incrementer_worker(i) }
+        @workers << Thread.new { _run_publisher_worker(i) }
+      end
+
+      @workers << Thread.new { _run_publisher }
+      @workers << Thread.new { _run_reaper }
     end
 
     def _publish_metrics(ce)
@@ -154,17 +170,55 @@ module Streamdal
     end
 
     def _run_publisher
-      nil
+      # Background thread that reads values from counters, adds them to the publish queue, and then
+      # resets the counter's value back to zero
+      unless @exit
+        @cfg.log.debug("Starting publisher")
+
+        # Sleep on startup and then and between each loop run
+        sleep(DEFAULT_COUNTER_PUBLISH_INTERVAL)
+
+        # Get all counters
+        # Loop over each counter, get the value,
+        #   if value > 0, continue
+        #   if now() - last_updated > 10 seconds, remove counter
+        # Grab copy of counters
+        @counters_mtx.lock
+        new_counters = @counters.dup
+        @counters_mtx.unlock
+
+        new_counters.each do |name, counter|
+          if counter.val == 0
+            next
+          end
+
+          ce = CounterEntry.new(counter.name, counter.aud, counter.labels, counter.val)
+          counter.reset
+
+          @publish_queue.push(ce)
+        end
+      end
     end
 
-    def _run_publisher_worker
-      nil
+    def _run_publisher_worker(worker_id)
+      @cfg.log.debug("Starting publisher worker '#{worker_id}'")
+
+      until @exit
+        ce = @incr_queue.pop
+        begin
+          _publish_metrics(ce)
+        rescue => e
+          @cfg.log.error("Failed to publish metrics: #{e}")
+        end
+      end
+
+      @cfg.log.debug("Exiting publisher worker '#{worker_id}'")
     end
 
     def _run_reaper
-      @logger.debug("Starting reaper")
+      @cfg.log.debug("Starting reaper")
 
-      unless @exit
+      until @exit
         # Sleep on startup and then and between each loop run
         sleep(DEFAULT_COUNTER_REAPER_INTERVAL)
 
@@ -183,22 +237,25 @@ module Streamdal
           end
 
           if Time::now - counter.last_updated > DEFAULT_COUNTER_TTL
+            @cfg.log.debug("Reaping counter '#{name}'")
             remove_counter(name)
           end
         end
       end
 
-      @logger.debug("Exiting reaper")
+      @cfg.log.debug("Exiting reaper")
     end
 
-    def _run_incrementer_worker
-      @logger.debug("Starting incrementer worker")
+    def _run_incrementer_worker(worker_id)
+      @cfg.log.debug("Starting incrementer worker '#{worker_id}'")
 
       until @exit
         ce = @incr_queue.pop
         c = get_counter(ce.name)
         c.incr(ce.value)
       end
+
+      @cfg.log.debug("Exiting incrementer worker '#{worker_id}'")
     end
   end
 end

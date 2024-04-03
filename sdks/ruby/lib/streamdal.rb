@@ -10,6 +10,7 @@ require 'logger'
 require_relative 'audiences'
 require_relative 'validation'
 require_relative 'metrics'
+require_relative 'schema'
 
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5 # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10 # 100 milliseconds
@@ -45,6 +46,7 @@ module Streamdal
   class Client
     include Audiences
     include Validation
+    include Schema
 
     def initialize(cfg = {})
       @cfg = cfg
@@ -56,7 +58,7 @@ module Streamdal
       @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
       @tails = {}
       @paused_tails = {}
-      @metrics = Streamdal::Metrics.new(cfg)
+      @metrics = Streamdal::Metrics.new(Streamdal::Metrics::Config.new(cfg[:streamdal_url], cfg[:streamdal_token], @logger))
 
       # TODO: kv
       # TODO: metrics
