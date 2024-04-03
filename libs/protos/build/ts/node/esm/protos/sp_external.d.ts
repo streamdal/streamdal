@@ -107,6 +107,8 @@ export interface GetPipelineResponse {
     pipeline?: Pipeline;
 }
 /**
+ * Create a new pipeline; accepts either pipeline object or pipeline as JSON bytes
+ *
  * @generated from protobuf message protos.CreatePipelineRequest
  */
 export interface CreatePipelineRequest {
@@ -114,6 +116,10 @@ export interface CreatePipelineRequest {
      * @generated from protobuf field: protos.Pipeline pipeline = 1;
      */
     pipeline?: Pipeline;
+    /**
+     * @generated from protobuf field: optional bytes pipeline_json = 2;
+     */
+    pipelineJson?: Uint8Array;
 }
 /**
  * @generated from protobuf message protos.CreatePipelineResponse
