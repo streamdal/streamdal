@@ -17,42 +17,14 @@ import (
 )
 
 var _ = Describe("Store", func() {
-	Describe("Wasm methods", func() {
+	Describe("Wasm Get* methods", func() {
 		var (
-			redisClient  *redis.Client
 			storeService *Store
 			modules      []*shared.WasmModule
 		)
 
 		BeforeEach(func() {
-			redisClient = redis.NewClient(&redis.Options{
-				Addr:     "localhost:6379",
-				Protocol: 3,
-				DB:       1, // Having these tests write to DB 1 to avoid conflicts with other tests
-				// TODO: Delete* operations should use a diff DB as well
-			})
-
-			redisErr := redisClient.ClientInfo(context.Background()).Err()
-			Expect(redisErr).ToNot(HaveOccurred())
-
-			var storeErr error
-
-			storeService, storeErr = New(&Options{
-				Encryption:   encryption.NewPlainText(),
-				RedisBackend: redisClient,
-				ShutdownCtx:  context.Background(),
-				NodeName:     "test-node",
-				SessionTTL:   5 * time.Second,
-				Telemetry:    &telemetry.DummyTelemetry{},
-				InstallID:    "test-install-id",
-			})
-
-			Expect(storeErr).ToNot(HaveOccurred())
-			Expect(storeService).ToNot(BeNil())
-
-			modules = addSampleWasm(redisClient)
-			Expect(modules).ToNot(BeNil())
-			Expect(len(modules)).To(Equal(2))
+			_, storeService, modules = setup(1)
 		})
 
 		Context("GetWasm", func() {
@@ -112,11 +84,35 @@ var _ = Describe("Store", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(fetched).ToNot(BeNil())
 				Expect(len(fetched)).To(Equal(2))
-				Expect(fetched[0].Id).To(Equal(modules[0].Id))
-				Expect(fetched[0].Name).To(Equal(modules[0].Name))
-				Expect(fetched[0].Bytes).To(Equal(modules[0].Bytes))
-				Expect(fetched[0].Function).To(Equal(modules[0].Function))
+
+				for _, m := range modules {
+					// Fetched should contain module
+					var found bool
+
+					for _, f := range fetched {
+						if f.Id == m.Id {
+							found = true
+							Expect(f.Name).To(Equal(m.Name))
+							Expect(f.Bytes).To(Equal(m.Bytes))
+							Expect(f.Function).To(Equal(m.Function))
+						}
+					}
+
+					Expect(found).To(BeTrue())
+				}
 			})
+		})
+	})
+
+	Describe("Wasm Set* methods", func() {
+		var (
+			redisClient  *redis.Client
+			storeService *Store
+			modules      []*shared.WasmModule
+		)
+
+		BeforeEach(func() {
+			redisClient, storeService, modules = setup(2)
 		})
 
 		Context("SetWasm()", func() {
@@ -156,19 +152,31 @@ var _ = Describe("Store", func() {
 				Expect(module.Name).To(Equal(modules[0].Name))
 				Expect(module.Bytes).To(Equal(modules[0].Bytes))
 			})
-		})
 
-		// TODO: This should be "OverwriteByID"
-		Context("SetWasmByID()", func() {
-			It("should store Wasm by ID", func() {
+			// TODO: This should be "OverwriteByID"
+			Context("SetWasmByID()", func() {
+				It("should store Wasm by ID", func() {
 
+				})
+			})
+
+			// TODO: This should be "OverwriteByName"
+			Context("SetWasmByName()", func() {
+				It("should store Wasm by name", func() {
+				})
 			})
 		})
+	})
 
-		// TODO: This should be "OverwriteByName"
-		Context("SetWasmByName()", func() {
-			It("should store Wasm by name", func() {
-			})
+	Describe("Wasm Delete* methods", func() {
+		var (
+			redisClient  *redis.Client
+			storeService *Store
+			modules      []*shared.WasmModule
+		)
+
+		BeforeEach(func() {
+			redisClient, storeService, modules = setup(3)
 		})
 
 		Context("DeleteWasm()", func() {
@@ -203,8 +211,39 @@ var _ = Describe("Store", func() {
 				Expect(keys).To(HaveLen(0))
 			})
 		})
+
 	})
 })
+
+func setup(db int) (*redis.Client, *Store, []*shared.WasmModule) {
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Protocol: 3,
+		DB:       db,
+	})
+
+	redisErr := redisClient.ClientInfo(context.Background()).Err()
+	Expect(redisErr).ToNot(HaveOccurred())
+
+	storeService, err := New(&Options{
+		Encryption:   encryption.NewPlainText(),
+		RedisBackend: redisClient,
+		ShutdownCtx:  context.Background(),
+		NodeName:     "test-node",
+		SessionTTL:   5 * time.Second,
+		Telemetry:    &telemetry.DummyTelemetry{},
+		InstallID:    "test-install-id",
+	})
+
+	Expect(err).ToNot(HaveOccurred())
+	Expect(storeService).ToNot(BeNil())
+
+	modules := addSampleWasm(redisClient)
+	Expect(modules).ToNot(BeNil())
+	Expect(len(modules)).To(Equal(2))
+
+	return redisClient, storeService, modules
+}
 
 func addSampleWasm(redisClient *redis.Client) []*shared.WasmModule {
 	Expect(redisClient).ToNot(BeNil())
