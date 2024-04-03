@@ -170,7 +170,7 @@ module Streamdal
       metric.audience = ce.aud
 
       req = Streamdal::Protos::MetricsRequest.new
-      req.metrics = [metric]
+      req.metrics = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Metric, [metric])
 
       @cfg.stub.metrics(req, metadata: _metadata)
     end

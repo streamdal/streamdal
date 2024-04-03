@@ -56,6 +56,9 @@ module Streamdal
     include Validation
     include Schema
 
+    # Aliases
+    CounterEntry = Streamdal::Metrics::CounterEntry
+
     def initialize(cfg = {})
       @cfg = cfg
       @functions = {}
@@ -74,7 +77,6 @@ module Streamdal
       # TODO: tails
 
       # # Connect to Streamdal External gRPC API
-      puts @cfg
       @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
 
       _pull_initial_pipelines
@@ -84,32 +86,30 @@ module Streamdal
       end
     end
 
-    def tmp
-      det = Streamdal::Protos::DetectiveStep.new
-      det.path = ""
-      det.args = Google::Protobuf::RepeatedField.new(:string, [])
-      det.type = Streamdal::Protos::DetectiveType::DETECTIVE_TYPE_PII_EMAIL
-      det.negate = false
-
-      step = Streamdal::Protos::PipelineStep.new
-      step.name = "detective"
-      step.detective = det
-      step._wasm_function = "f"
-      step._wasm_id = SecureRandom.uuid
-      step._wasm_bytes = File.read("detective.wasm", mode: "rb")
-
-      req = Streamdal::Protos::WASMRequest.new
-      req.step = step
-
-      req.input_payload = "{\"email\": \"mark@streamdal.com\", \"some\": \"val\"}"
-
-      res = _exec_wasm(req)
-
-      # unserialize into WASMResponse protobuf message
-      wasm_resp = Streamdal::Protos::WASMResponse.decode(res)
-
-      puts wasm_resp.inspect.gsub(",", "\n")
-    end
+    # def tmp
+    #   det = Streamdal::Protos::DetectiveStep.new
+    #   det.path = ""
+    #   det.args = Google::Protobuf::RepeatedField.new(:string, [])
+    #   det.type = Streamdal::Protos::DetectiveType::DETECTIVE_TYPE_PII_EMAIL
+    #   det.negate = false
+    #
+    #   step = Streamdal::Protos::PipelineStep.new
+    #   step.name = "detective"
+    #   step.detective = det
+    #   step._wasm_function = "f"
+    #   step._wasm_id = SecureRandom.uuid
+    #   step._wasm_bytes = File.read("detective.wasm", mode: "rb")
+    #
+    #   req = Streamdal::Protos::WASMRequest.new
+    #   req.step = step
+    #
+    #   req.input_payload = "{\"email\": \"mark@streamdal.com\", \"some\": \"val\"}"
+    #
+    #   res = _exec_wasm(req)
+    #
+    #   # unserialize into WASMResponse protobuf message
+    #   wasm_resp = Streamdal::Protos::WASMResponse.decode(res)
+    # end
 
     def _gen_register_request
       arch, os = RUBY_PLATFORM.split(/-/)
@@ -180,7 +180,6 @@ module Streamdal
       cmd.set_pipelines.pipelines.each_with_index { |p, pIdx|
         p.steps.each_with_index { |step, idx|
           if step._wasm_bytes == ""
-            # puts "wasm modules #{cmd.set_pipelines.wasm_modules.inspect}"
             if cmd.set_pipelines.wasm_modules.has_key?(step._wasm_id)
               step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
               cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
@@ -189,6 +188,9 @@ module Streamdal
             end
           end
         }
+
+        aud_str = aud_to_str(cmd.audience)
+        @pipelines.key?(aud_str) ? @pipelines[aud_str].push(p) : @pipelines[aud_str] = [p]
       }
     end
 
@@ -199,7 +201,6 @@ module Streamdal
       resp = @stub.get_set_pipelines_commands_by_service(req, metadata: _metadata)
 
       resp.set_pipeline_commands.each do |cmd|
-        # TODO: comment as to why this is
         cmd.set_pipelines.wasm_modules = resp.wasm_modules
         _set_pipelines(cmd)
       end
@@ -216,6 +217,21 @@ module Streamdal
 
       if isr.nil?
         isr = Streamdal::Protos::InterStepResult.new
+      end
+
+      req = Streamdal::Protos::WASMRequest.new
+      req.step = step.clone
+      req.input_payload = data
+      req.inter_step_result = isr
+
+      begin
+        return Streamdal::Protos::WASMResponse.decode(_exec_wasm(req))
+      rescue => e
+        resp = Streamdal::Protos::WASMResponse.new
+        resp.exit_code = Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
+        resp.exit_msg = "Failed to execute WASM: #{e}"
+        resp.output_payload = ""
+        return resp
       end
     end
 
@@ -284,8 +300,9 @@ module Streamdal
 
     def _get_pipelines(aud)
       aud_str = aud_to_str(aud)
+
       if @pipelines.key?(aud_str)
-        @pipelines[aud_str]
+        return @pipelines[aud_str]
       end
 
       []
@@ -371,6 +388,7 @@ module Streamdal
       resp = Streamdal::Protos::SDKResponse.new
       resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
       resp.pipeline_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::PipelineStatus, [])
+      resp.data = data
 
       aud = audience.to_proto(@cfg[:service_name])
       _add_audience(aud)
@@ -388,14 +406,12 @@ module Streamdal
       bytes_processed = Streamdal::Metrics::COUNTER_CONSUME_BYTES
       errors_counter = Streamdal::Metrics::COUNTER_CONSUME_ERRORS
       total_counter = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED
-      rate_bytes = Streamdal::Metrics::COUNTER_CONSUME_BYTES_RATE
       rate_processed = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED_RATE
 
       if aud.operation_type == OPERATION_TYPE_PRODUCER
         bytes_processed = Streamdal::Metrics::COUNTER_PRODUCE_BYTES
         errors_counter = Streamdal::Metrics::COUNTER_PRODUCE_ERRORS
         total_counter = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED
-        rate_bytes = Streamdal::Metrics::COUNTER_PRODUCE_BYTES_RATE
         rate_processed = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED_RATE
       end
 
@@ -417,8 +433,8 @@ module Streamdal
         resp
       end
 
-      @metrics.incr(Streamdal::Metrics::CounterEntry.new(bytes_processed, aud, labels, data.length))
-      @metrics.incr(Streamdal::Metrics::CounterEntry.new(rate_processed, aud, labels, 1))
+      @metrics.incr(CounterEntry.new(bytes_processed, aud, labels, data.length))
+      @metrics.incr(CounterEntry.new(rate_processed, aud, labels, 1))
 
       # Used for passing data between steps
       isr = nil
@@ -427,15 +443,15 @@ module Streamdal
         pipeline_status = Streamdal::Protos::PipelineStatus.new
         pipeline_status.id = pipeline.id
         pipeline_status.name = pipeline.name
-        pipeline_status.step_status = []
+        pipeline_status.step_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::StepStatus, [])
 
         @logger.debug "Running pipeline: '#{pipeline.name}'"
 
         labels[:pipeline_id] = pipeline.id
         labels[:pipeline_name] = pipeline.name
 
-        @metrics.incr(total_counter, 1, {}, aud)
-        @metrics.incr(bytes_processed, 1, {}, aud)
+        @metrics.incr(CounterEntry.new(total_counter, aud, labels, 1))
+        @metrics.incr(CounterEntry.new(bytes_processed, aud, labels, data.length))
 
         pipeline.steps.each do |step|
           step_status = Streamdal::Protos::StepStatus.new
@@ -467,20 +483,20 @@ module Streamdal
           case wasm_resp.exit_code
           when Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_FALSE
             cond = step.on_false
-            cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_FALSE
+            cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_FALSE
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_FALSE
           when Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
             cond = step.on_error
-            cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_ERROR
+            cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_ERROR
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
             isr = nil
 
             # errors_counter, 1, labels, aud
-            @metrics.incr(Streamdal::Metrics::CounterEntry.new(errors_counter, aud, labels, 1))
+            @metrics.incr(CounterEntry.new(errors_counter, aud, labels, 1))
           else
             cond = step.on_true
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
-            cond_type = Streamdal::Protos::NotifyRequestConditionType::CONDITION_TYPE_ON_TRUE
+            cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_TRUE
           end
 
           _notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
@@ -544,20 +560,20 @@ module Streamdal
 
     def _notify_condition(pipeline, step, aud, cond, data, cond_type)
       if cond.nil?
-        nil
+        return nil
       end
 
-      if cond.notify.nil?
-        nil
+      if cond.notification.nil?
+        return nil
       end
 
       @logger.debug "Notifying"
 
       if @cfg[:dry_run]
-        nil
+        return nil
       end
 
-      @metrics.incr(Streamdal::Metrics::CounterEntry.new(Streamdal::Metrics::COUNTER_NOTIFY, aud, {
+      @metrics.incr(CounterEntry.new(Streamdal::Metrics::COUNTER_NOTIFY, aud, {
         "service": @cfg[:service_name],
         "component_name": aud.component_name,
         "pipeline_name": pipeline.name,
@@ -684,7 +700,7 @@ module Streamdal
       t = _remove_paused_tail(cmd.tail.request.audience, cmd.tail.request.tail.id)
       if t.nil?
         @logger.error "Tail '#{cmd.tail.request.tail.id}' not found in paused tails"
-        nil
+        return nil
       end
 
       t.start_tail_workers
