@@ -27,30 +27,37 @@ type IWasm interface {
 var (
 	config = map[string]shared.WasmModule{
 		"detective": {
+			Name:      "detective",
 			Function:  "f",
 			XFilename: "detective.wasm",
 		},
 		"transform": {
+			Name:      "transform",
 			Function:  "f",
 			XFilename: "transform.wasm",
 		},
 		"httprequest": {
+			Name:      "httprequest",
 			Function:  "f",
 			XFilename: "httprequest.wasm",
 		},
 		"kv": {
+			Name:      "kv",
 			Function:  "f",
 			XFilename: "kv.wasm",
 		},
 		"inferschema": {
+			Name:      "inferschema",
 			Function:  "f",
 			XFilename: "inferschema.wasm",
 		},
 		"validjson": {
+			Name:      "validjson",
 			Function:  "f",
 			XFilename: "validjson.wasm",
 		},
 		"schemavalidation": {
+			Name:      "schemavalidation",
 			Function:  "f",
 			XFilename: "schemavalidation.wasm",
 		},
@@ -305,6 +312,9 @@ func preload(ctx context.Context, storeService store.IStore, name string, wasmPr
 	entry.Bytes = data
 	entry.XBundled = true
 	entry.XCreatedAtUnixTsNsUtc = util.NowUnixTsNsUtcPtr()
+	entry.Description = util.Pointer("Bundled Wasm module")
+	entry.Url = util.Pointer("https://github.com/streamdal/streamdal/tree/main/libs/wasm")
+	// TODO: Include version
 
 	// Delete ALL bundled entries
 	if err := storeService.DeleteWasmByName(ctx, name); err != nil {
