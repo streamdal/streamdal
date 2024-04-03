@@ -2,11 +2,9 @@ package wasm
 
 import (
 	"context"
-	"crypto/sha256"
 	"os"
 	"time"
 
-	"github.com/gofrs/uuid"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/redis/go-redis/v9"
@@ -90,7 +88,7 @@ var _ = Describe("Wasm", func() {
 				Expect(diskData).ToNot(BeNil())
 				Expect(len(diskData)).ToNot(BeZero())
 
-				expectedID := DeterminativeUUID(diskData)
+				expectedID := util.DeterminativeUUID(diskData)
 				keyName := store.RedisWasmKey(name, expectedID)
 
 				data, err := redisClient.Get(context.Background(), keyName).Bytes()
@@ -322,7 +320,7 @@ var _ = Describe("Wasm", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(fileData).ToNot(BeNil())
 
-			expectedID := DeterminativeUUID(fileData)
+			expectedID := util.DeterminativeUUID(fileData)
 			keyName := store.RedisWasmKey("detective", expectedID)
 
 			data, err := redisClient.Get(context.Background(), keyName).Result()
@@ -336,65 +334,6 @@ var _ = Describe("Wasm", func() {
 			Expect(module.Name).To(Equal("detective"))
 			Expect(module.Id).To(Equal(expectedID))
 			Expect(len(module.Bytes)).To(Equal(len(fileData)))
-		})
-	})
-
-	Context("DeterminativeUUID()", func() {
-		var (
-			wasmFile = "../../assets/wasm/detective.wasm"
-			modifier = "test"
-		)
-
-		It("should generate a deterministic UUID for a wasm file", func() {
-			fileData, err := os.ReadFile(wasmFile)
-			Expect(err).ToNot(HaveOccurred())
-
-			hash := sha256.Sum256(fileData)
-
-			id, err := uuid.FromBytes(hash[16:])
-			Expect(err).ToNot(HaveOccurred())
-
-			// Load multiple times, id should be the same every time
-			for i := 0; i < 10; i++ {
-				fileData, err = os.ReadFile(wasmFile)
-				Expect(err).ToNot(HaveOccurred())
-
-				hash = sha256.Sum256(fileData)
-
-				id, err = uuid.FromBytes(hash[16:])
-				Expect(err).ToNot(HaveOccurred())
-
-				generatedUUID := DeterminativeUUID(fileData)
-				Expect(generatedUUID).To(Equal(id.String()))
-			}
-		})
-
-		It("has a consistent result using a modifier", func() {
-			fileData, err := os.ReadFile(wasmFile)
-			Expect(err).ToNot(HaveOccurred())
-
-			firstUUID := DeterminativeUUID(fileData, modifier)
-
-			// Load multiple times, id should be the same every time
-			for i := 0; i < 10; i++ {
-				fileData, err = os.ReadFile(wasmFile)
-				Expect(err).ToNot(HaveOccurred())
-
-				generatedUUID := DeterminativeUUID(fileData, modifier)
-				Expect(generatedUUID).To(Equal(firstUUID))
-			}
-		})
-
-		It("modifier usage should change result", func() {
-			fileData, err := os.ReadFile(wasmFile)
-			Expect(err).ToNot(HaveOccurred())
-
-			uuidWithoutModifier := DeterminativeUUID(fileData)
-			uuidWithModifier := DeterminativeUUID(fileData, modifier)
-
-			Expect(uuidWithoutModifier).ToNot(BeEmpty())
-			Expect(uuidWithModifier).ToNot(BeEmpty())
-			Expect(uuidWithoutModifier).ToNot(Equal(uuidWithModifier))
 		})
 	})
 })

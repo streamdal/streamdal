@@ -20,7 +20,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
-	"github.com/streamdal/streamdal/apps/server/services/wasm"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/apps/server/validate"
@@ -1289,7 +1288,7 @@ func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmR
 	}
 
 	// Generate ID
-	id := wasm.DeterminativeUUID(req.Wasm.Bytes, customWasmModifier)
+	id := util.DeterminativeUUID(req.Wasm.Bytes, customWasmModifier)
 
 	// Check if this ID already exists - if it does, return an error - user should use UpdateWasm()
 	existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, id)

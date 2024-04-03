@@ -2,10 +2,8 @@ package wasm
 
 import (
 	"context"
-	"crypto/sha256"
 	"os"
 
-	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -302,7 +300,7 @@ func preload(ctx context.Context, storeService store.IStore, name string, wasmPr
 	// Generate ID
 	// TODO: This probably needs to be updated to use filename or name because
 	// it is currently not deterministic (if the file contents change, the ID will change)
-	wasmID := DeterminativeUUID(data)
+	wasmID := util.DeterminativeUUID(data)
 	if wasmID == "" {
 		return errors.Errorf("unable to generate UUID for wasm file '%s'", fullPath)
 	}
@@ -329,27 +327,4 @@ func preload(ctx context.Context, storeService store.IStore, name string, wasmPr
 	}
 
 	return nil
-}
-
-// DeterminativeUUID generates a deterministic UUID from the given data; accepts
-// an optional modifier string that will be appended to data before hashing.
-//
-// NOT: Modifier is useful if you already have added Wasm with the same data -
-// CreateWasm() would normally error; you can get around this by passing a
-// unique modifier.
-func DeterminativeUUID(data []byte, modifier ...string) string {
-	tmpData := data
-
-	if len(modifier) > 0 {
-		tmpData = append(data, []byte(modifier[0])...)
-	}
-
-	hash := sha256.Sum256(tmpData)
-
-	id, err := uuid.FromBytes(hash[16:])
-	if err != nil {
-		return ""
-	}
-
-	return id.String()
 }

@@ -344,3 +344,26 @@ func GetWasmNameFromKey(key string) (string, error) {
 
 	return split[1], nil
 }
+
+// DeterminativeUUID generates a deterministic UUID from the given data; accepts
+// an optional modifier string that will be appended to data before hashing.
+//
+// NOT: Modifier is useful if you already have added Wasm with the same data -
+// CreateWasm() would normally error; you can get around this by passing a
+// unique modifier.
+func DeterminativeUUID(data []byte, modifier ...string) string {
+	tmpData := data
+
+	if len(modifier) > 0 {
+		tmpData = append(data, []byte(modifier[0])...)
+	}
+
+	hash := sha256.Sum256(tmpData)
+
+	id, err := uuid.FromBytes(hash[16:])
+	if err != nil {
+		return ""
+	}
+
+	return id.String()
+}
