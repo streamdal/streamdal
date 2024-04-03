@@ -15,6 +15,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { WasmModule } from "./shared/sp_shared.js";
 import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
 import { Metric } from "./sp_common.js";
@@ -116,6 +117,8 @@ export interface GetPipelineResponse {
     pipeline?: Pipeline;
 }
 /**
+ * Create a new pipeline; accepts either pipeline object or pipeline as JSON bytes
+ *
  * @generated from protobuf message protos.CreatePipelineRequest
  */
 export interface CreatePipelineRequest {
@@ -123,6 +126,10 @@ export interface CreatePipelineRequest {
      * @generated from protobuf field: protos.Pipeline pipeline = 1;
      */
     pipeline?: Pipeline;
+    /**
+     * @generated from protobuf field: optional bytes pipeline_json = 2;
+     */
+    pipelineJson?: Uint8Array;
 }
 /**
  * @generated from protobuf message protos.CreatePipelineResponse
@@ -514,6 +521,80 @@ export interface ResumeTailRequest {
     tailId: string;
 }
 /**
+ * @generated from protobuf message protos.GetWasmRequest
+ */
+export interface GetWasmRequest {
+    /**
+     * @generated from protobuf field: string id = 1;
+     */
+    id: string;
+}
+/**
+ * @generated from protobuf message protos.GetWasmResponse
+ */
+export interface GetWasmResponse {
+    /**
+     * @generated from protobuf field: protos.shared.WasmModule wasm = 1;
+     */
+    wasm?: WasmModule;
+}
+/**
+ * Nothing needed here
+ *
+ * @generated from protobuf message protos.GetAllWasmRequest
+ */
+export interface GetAllWasmRequest {
+}
+/**
+ * @generated from protobuf message protos.GetAllWasmResponse
+ */
+export interface GetAllWasmResponse {
+    /**
+     * @generated from protobuf field: repeated protos.shared.WasmModule wasm = 1;
+     */
+    wasm: WasmModule[];
+}
+/**
+ * @generated from protobuf message protos.CreateWasmRequest
+ */
+export interface CreateWasmRequest {
+    /**
+     * @generated from protobuf field: protos.shared.WasmModule wasm = 1;
+     */
+    wasm?: WasmModule;
+}
+/**
+ * @generated from protobuf message protos.CreateWasmResponse
+ */
+export interface CreateWasmResponse {
+    /**
+     * @generated from protobuf field: string message = 1;
+     */
+    message: string;
+    /**
+     * @generated from protobuf field: string id = 2;
+     */
+    id: string;
+}
+/**
+ * @generated from protobuf message protos.UpdateWasmRequest
+ */
+export interface UpdateWasmRequest {
+    /**
+     * @generated from protobuf field: protos.shared.WasmModule wasm = 1;
+     */
+    wasm?: WasmModule;
+}
+/**
+ * @generated from protobuf message protos.DeleteWasmRequest
+ */
+export interface DeleteWasmRequest {
+    /**
+     * @generated from protobuf field: repeated string ids = 1;
+     */
+    ids: string[];
+}
+/**
  * @generated from protobuf message protos.TestRequest
  */
 export interface TestRequest {
@@ -850,7 +931,8 @@ export const GetPipelineResponse = new GetPipelineResponse$Type();
 class CreatePipelineRequest$Type extends MessageType<CreatePipelineRequest> {
     constructor() {
         super("protos.CreatePipelineRequest", [
-            { no: 1, name: "pipeline", kind: "message", T: () => Pipeline }
+            { no: 1, name: "pipeline", kind: "message", T: () => Pipeline },
+            { no: 2, name: "pipeline_json", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
         ]);
     }
     create(value?: PartialMessage<CreatePipelineRequest>): CreatePipelineRequest {
@@ -868,6 +950,9 @@ class CreatePipelineRequest$Type extends MessageType<CreatePipelineRequest> {
                 case /* protos.Pipeline pipeline */ 1:
                     message.pipeline = Pipeline.internalBinaryRead(reader, reader.uint32(), options, message.pipeline);
                     break;
+                case /* optional bytes pipeline_json */ 2:
+                    message.pipelineJson = reader.bytes();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -883,6 +968,9 @@ class CreatePipelineRequest$Type extends MessageType<CreatePipelineRequest> {
         /* protos.Pipeline pipeline = 1; */
         if (message.pipeline)
             Pipeline.internalBinaryWrite(message.pipeline, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* optional bytes pipeline_json = 2; */
+        if (message.pipelineJson !== undefined)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.pipelineJson);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2495,6 +2583,368 @@ class ResumeTailRequest$Type extends MessageType<ResumeTailRequest> {
  */
 export const ResumeTailRequest = new ResumeTailRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class GetWasmRequest$Type extends MessageType<GetWasmRequest> {
+    constructor() {
+        super("protos.GetWasmRequest", [
+            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<GetWasmRequest>): GetWasmRequest {
+        const message = { id: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetWasmRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetWasmRequest): GetWasmRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string id */ 1:
+                    message.id = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string id = 1; */
+        if (message.id !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetWasmRequest
+ */
+export const GetWasmRequest = new GetWasmRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetWasmResponse$Type extends MessageType<GetWasmResponse> {
+    constructor() {
+        super("protos.GetWasmResponse", [
+            { no: 1, name: "wasm", kind: "message", T: () => WasmModule }
+        ]);
+    }
+    create(value?: PartialMessage<GetWasmResponse>): GetWasmResponse {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetWasmResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetWasmResponse): GetWasmResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.shared.WasmModule wasm */ 1:
+                    message.wasm = WasmModule.internalBinaryRead(reader, reader.uint32(), options, message.wasm);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetWasmResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.shared.WasmModule wasm = 1; */
+        if (message.wasm)
+            WasmModule.internalBinaryWrite(message.wasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetWasmResponse
+ */
+export const GetWasmResponse = new GetWasmResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAllWasmRequest$Type extends MessageType<GetAllWasmRequest> {
+    constructor() {
+        super("protos.GetAllWasmRequest", []);
+    }
+    create(value?: PartialMessage<GetAllWasmRequest>): GetAllWasmRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetAllWasmRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllWasmRequest): GetAllWasmRequest {
+        return target ?? this.create();
+    }
+    internalBinaryWrite(message: GetAllWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllWasmRequest
+ */
+export const GetAllWasmRequest = new GetAllWasmRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetAllWasmResponse$Type extends MessageType<GetAllWasmResponse> {
+    constructor() {
+        super("protos.GetAllWasmResponse", [
+            { no: 1, name: "wasm", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => WasmModule }
+        ]);
+    }
+    create(value?: PartialMessage<GetAllWasmResponse>): GetAllWasmResponse {
+        const message = { wasm: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetAllWasmResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetAllWasmResponse): GetAllWasmResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.shared.WasmModule wasm */ 1:
+                    message.wasm.push(WasmModule.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetAllWasmResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.shared.WasmModule wasm = 1; */
+        for (let i = 0; i < message.wasm.length; i++)
+            WasmModule.internalBinaryWrite(message.wasm[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetAllWasmResponse
+ */
+export const GetAllWasmResponse = new GetAllWasmResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CreateWasmRequest$Type extends MessageType<CreateWasmRequest> {
+    constructor() {
+        super("protos.CreateWasmRequest", [
+            { no: 1, name: "wasm", kind: "message", T: () => WasmModule }
+        ]);
+    }
+    create(value?: PartialMessage<CreateWasmRequest>): CreateWasmRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CreateWasmRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateWasmRequest): CreateWasmRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.shared.WasmModule wasm */ 1:
+                    message.wasm = WasmModule.internalBinaryRead(reader, reader.uint32(), options, message.wasm);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CreateWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.shared.WasmModule wasm = 1; */
+        if (message.wasm)
+            WasmModule.internalBinaryWrite(message.wasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateWasmRequest
+ */
+export const CreateWasmRequest = new CreateWasmRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CreateWasmResponse$Type extends MessageType<CreateWasmResponse> {
+    constructor() {
+        super("protos.CreateWasmResponse", [
+            { no: 1, name: "message", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<CreateWasmResponse>): CreateWasmResponse {
+        const message = { message: "", id: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CreateWasmResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CreateWasmResponse): CreateWasmResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string message */ 1:
+                    message.message = reader.string();
+                    break;
+                case /* string id */ 2:
+                    message.id = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CreateWasmResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string message = 1; */
+        if (message.message !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.message);
+        /* string id = 2; */
+        if (message.id !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.id);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.CreateWasmResponse
+ */
+export const CreateWasmResponse = new CreateWasmResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class UpdateWasmRequest$Type extends MessageType<UpdateWasmRequest> {
+    constructor() {
+        super("protos.UpdateWasmRequest", [
+            { no: 1, name: "wasm", kind: "message", T: () => WasmModule }
+        ]);
+    }
+    create(value?: PartialMessage<UpdateWasmRequest>): UpdateWasmRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<UpdateWasmRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UpdateWasmRequest): UpdateWasmRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.shared.WasmModule wasm */ 1:
+                    message.wasm = WasmModule.internalBinaryRead(reader, reader.uint32(), options, message.wasm);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: UpdateWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.shared.WasmModule wasm = 1; */
+        if (message.wasm)
+            WasmModule.internalBinaryWrite(message.wasm, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.UpdateWasmRequest
+ */
+export const UpdateWasmRequest = new UpdateWasmRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeleteWasmRequest$Type extends MessageType<DeleteWasmRequest> {
+    constructor() {
+        super("protos.DeleteWasmRequest", [
+            { no: 1, name: "ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<DeleteWasmRequest>): DeleteWasmRequest {
+        const message = { ids: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<DeleteWasmRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteWasmRequest): DeleteWasmRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated string ids */ 1:
+                    message.ids.push(reader.string());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DeleteWasmRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated string ids = 1; */
+        for (let i = 0; i < message.ids.length; i++)
+            writer.tag(1, WireType.LengthDelimited).string(message.ids[i]);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteWasmRequest
+ */
+export const DeleteWasmRequest = new DeleteWasmRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class TestRequest$Type extends MessageType<TestRequest> {
     constructor() {
         super("protos.TestRequest", [
@@ -2622,5 +3072,10 @@ export const External = new ServiceType("protos.External", [
     { name: "AppRegister", options: {}, I: AppRegistrationRequest, O: StandardResponse },
     { name: "AppVerifyRegistration", options: {}, I: AppVerifyRegistrationRequest, O: StandardResponse },
     { name: "AppRegisterReject", options: {}, I: AppRegisterRejectRequest, O: StandardResponse },
+    { name: "GetWasm", options: {}, I: GetWasmRequest, O: GetWasmResponse },
+    { name: "GetAllWasm", options: {}, I: GetAllWasmRequest, O: GetAllWasmResponse },
+    { name: "CreateWasm", options: {}, I: CreateWasmRequest, O: CreateWasmResponse },
+    { name: "UpdateWasm", options: {}, I: UpdateWasmRequest, O: StandardResponse },
+    { name: "DeleteWasm", options: {}, I: DeleteWasmRequest, O: StandardResponse },
     { name: "Test", options: {}, I: TestRequest, O: TestResponse }
 ]);

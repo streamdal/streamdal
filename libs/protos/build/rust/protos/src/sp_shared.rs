@@ -25,22 +25,46 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_4_0;
 
-///  WasmModule is used to ensure we only send the wasm module once per request
+///  Main type representing a wasm module entry. Used by server for external.*Wasm()
+///  methods; also used to ensure we only send the wasm module once per request
 ///  instead of duplicated in every pipeline where it is used. This prevents
-///  over-sized payloads on SDK startup
+///  over-sized payloads on SDK startup.
 // @@protoc_insertion_point(message:protos.shared.WasmModule)
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct WasmModule {
     // message fields
-    ///  ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
+    ///  ID is uuid(sha256(_wasm_bytes)) and is used for referencing the Wasm module
     // @@protoc_insertion_point(field:protos.shared.WasmModule.id)
     pub id: ::std::string::String,
-    ///  WASM module bytes (set by server)
+    ///  Contents of the Wasm module
     // @@protoc_insertion_point(field:protos.shared.WasmModule.bytes)
     pub bytes: ::std::vec::Vec<u8>,
-    ///  WASM function name to execute (set by server)
+    ///  Entry point function name
     // @@protoc_insertion_point(field:protos.shared.WasmModule.function)
     pub function: ::std::string::String,
+    ///  Friendly name for the Wasm module
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.name)
+    pub name: ::std::string::String,
+    ///  Filename of the Wasm module (used only for bundled wasm)
+    // @@protoc_insertion_point(field:protos.shared.WasmModule._filename)
+    pub _filename: ::std::string::String,
+    ///  Indicates whether this wasm entry is for bundled wasm or for wasm added via
+    ///  CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+    // @@protoc_insertion_point(field:protos.shared.WasmModule._bundled)
+    pub _bundled: bool,
+    ///  Informative, debug fields
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.description)
+    pub description: ::std::option::Option<::std::string::String>,
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.version)
+    pub version: ::std::option::Option<::std::string::String>,
+    // @@protoc_insertion_point(field:protos.shared.WasmModule.url)
+    pub url: ::std::option::Option<::std::string::String>,
+    ///  Set by server
+    // @@protoc_insertion_point(field:protos.shared.WasmModule._created_at_unix_ts_ns_utc)
+    pub _created_at_unix_ts_ns_utc: ::std::option::Option<i64>,
+    ///  Set by server
+    // @@protoc_insertion_point(field:protos.shared.WasmModule._updated_at_unix_ts_ns_utc)
+    pub _updated_at_unix_ts_ns_utc: ::std::option::Option<i64>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.shared.WasmModule.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -58,7 +82,7 @@ impl WasmModule {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(3);
+        let mut fields = ::std::vec::Vec::with_capacity(11);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "id",
@@ -74,6 +98,46 @@ impl WasmModule {
             "function",
             |m: &WasmModule| { &m.function },
             |m: &mut WasmModule| { &mut m.function },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "name",
+            |m: &WasmModule| { &m.name },
+            |m: &mut WasmModule| { &mut m.name },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "_filename",
+            |m: &WasmModule| { &m._filename },
+            |m: &mut WasmModule| { &mut m._filename },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "_bundled",
+            |m: &WasmModule| { &m._bundled },
+            |m: &mut WasmModule| { &mut m._bundled },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "description",
+            |m: &WasmModule| { &m.description },
+            |m: &mut WasmModule| { &mut m.description },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "version",
+            |m: &WasmModule| { &m.version },
+            |m: &mut WasmModule| { &mut m.version },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "url",
+            |m: &WasmModule| { &m.url },
+            |m: &mut WasmModule| { &mut m.url },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "_created_at_unix_ts_ns_utc",
+            |m: &WasmModule| { &m._created_at_unix_ts_ns_utc },
+            |m: &mut WasmModule| { &mut m._created_at_unix_ts_ns_utc },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "_updated_at_unix_ts_ns_utc",
+            |m: &WasmModule| { &m._updated_at_unix_ts_ns_utc },
+            |m: &mut WasmModule| { &mut m._updated_at_unix_ts_ns_utc },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<WasmModule>(
             "WasmModule",
@@ -102,6 +166,30 @@ impl ::protobuf::Message for WasmModule {
                 26 => {
                     self.function = is.read_string()?;
                 },
+                34 => {
+                    self.name = is.read_string()?;
+                },
+                42 => {
+                    self._filename = is.read_string()?;
+                },
+                48 => {
+                    self._bundled = is.read_bool()?;
+                },
+                810 => {
+                    self.description = ::std::option::Option::Some(is.read_string()?);
+                },
+                818 => {
+                    self.version = ::std::option::Option::Some(is.read_string()?);
+                },
+                826 => {
+                    self.url = ::std::option::Option::Some(is.read_string()?);
+                },
+                8000 => {
+                    self._created_at_unix_ts_ns_utc = ::std::option::Option::Some(is.read_int64()?);
+                },
+                8008 => {
+                    self._updated_at_unix_ts_ns_utc = ::std::option::Option::Some(is.read_int64()?);
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -123,6 +211,30 @@ impl ::protobuf::Message for WasmModule {
         if !self.function.is_empty() {
             my_size += ::protobuf::rt::string_size(3, &self.function);
         }
+        if !self.name.is_empty() {
+            my_size += ::protobuf::rt::string_size(4, &self.name);
+        }
+        if !self._filename.is_empty() {
+            my_size += ::protobuf::rt::string_size(5, &self._filename);
+        }
+        if self._bundled != false {
+            my_size += 1 + 1;
+        }
+        if let Some(v) = self.description.as_ref() {
+            my_size += ::protobuf::rt::string_size(101, &v);
+        }
+        if let Some(v) = self.version.as_ref() {
+            my_size += ::protobuf::rt::string_size(102, &v);
+        }
+        if let Some(v) = self.url.as_ref() {
+            my_size += ::protobuf::rt::string_size(103, &v);
+        }
+        if let Some(v) = self._created_at_unix_ts_ns_utc {
+            my_size += ::protobuf::rt::int64_size(1000, v);
+        }
+        if let Some(v) = self._updated_at_unix_ts_ns_utc {
+            my_size += ::protobuf::rt::int64_size(1001, v);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -137,6 +249,30 @@ impl ::protobuf::Message for WasmModule {
         }
         if !self.function.is_empty() {
             os.write_string(3, &self.function)?;
+        }
+        if !self.name.is_empty() {
+            os.write_string(4, &self.name)?;
+        }
+        if !self._filename.is_empty() {
+            os.write_string(5, &self._filename)?;
+        }
+        if self._bundled != false {
+            os.write_bool(6, self._bundled)?;
+        }
+        if let Some(v) = self.description.as_ref() {
+            os.write_string(101, v)?;
+        }
+        if let Some(v) = self.version.as_ref() {
+            os.write_string(102, v)?;
+        }
+        if let Some(v) = self.url.as_ref() {
+            os.write_string(103, v)?;
+        }
+        if let Some(v) = self._created_at_unix_ts_ns_utc {
+            os.write_int64(1000, v)?;
+        }
+        if let Some(v) = self._updated_at_unix_ts_ns_utc {
+            os.write_int64(1001, v)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -158,6 +294,14 @@ impl ::protobuf::Message for WasmModule {
         self.id.clear();
         self.bytes.clear();
         self.function.clear();
+        self.name.clear();
+        self._filename.clear();
+        self._bundled = false;
+        self.description = ::std::option::Option::None;
+        self.version = ::std::option::Option::None;
+        self.url = ::std::option::Option::None;
+        self._created_at_unix_ts_ns_utc = ::std::option::Option::None;
+        self._updated_at_unix_ts_ns_utc = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
@@ -166,6 +310,14 @@ impl ::protobuf::Message for WasmModule {
             id: ::std::string::String::new(),
             bytes: ::std::vec::Vec::new(),
             function: ::std::string::String::new(),
+            name: ::std::string::String::new(),
+            _filename: ::std::string::String::new(),
+            _bundled: false,
+            description: ::std::option::Option::None,
+            version: ::std::option::Option::None,
+            url: ::std::option::Option::None,
+            _created_at_unix_ts_ns_utc: ::std::option::Option::None,
+            _updated_at_unix_ts_ns_utc: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -282,56 +434,100 @@ impl KVAction {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x16shared/sp_shared.proto\x12\rprotos.shared\"N\n\nWasmModule\x12\x0e\
-    \n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x14\n\x05bytes\x18\x02\x20\x01(\
-    \x0cR\x05bytes\x12\x1a\n\x08function\x18\x03\x20\x01(\tR\x08function*\
-    \xa4\x01\n\x08KVAction\x12\x13\n\x0fKV_ACTION_UNSET\x10\0\x12\x11\n\rKV_\
-    ACTION_GET\x10\x01\x12\x14\n\x10KV_ACTION_CREATE\x10\x02\x12\x14\n\x10KV\
-    _ACTION_UPDATE\x10\x03\x12\x14\n\x10KV_ACTION_EXISTS\x10\x04\x12\x14\n\
-    \x10KV_ACTION_DELETE\x10\x05\x12\x18\n\x14KV_ACTION_DELETE_ALL\x10\x06BC\
-    ZAgithub.com/streamdal/streamdal/libs/protos/build/go/protos/sharedJ\xdd\
-    \t\n\x06\x12\x04\x01\0\"\x01\nT\n\x01\x0c\x12\x03\x01\0\x12\x1aJ\x20This\
-    \x20has\x20to\x20be\x20a\x20separate\x20pkg\x20to\x20avoid\x20circular\
-    \x20import\x20problems\x20with\x20Go.\n\n\x08\n\x01\x02\x12\x03\x03\0\
-    \x16\n\x08\n\x01\x08\x12\x03\x05\0X\n\t\n\x02\x08\x0b\x12\x03\x05\0X\n\
-    \x9d\x02\n\x02\x05\0\x12\x04\x0c\0\x14\x01\x1a\x90\x02\x20KVAction\x20is\
-    \x20a\x20shared\x20type\x20that\x20is\x20used\x20for\x20protos.KVCommand\
-    \x20and\x20protos.KVStep.\n\x20Note\x20that\x20only\x20a\x20subset\x20of\
-    \x20actions\x20are\x20used\x20for\x20protos.KVCommand\x20(CREATE,\n\x20U\
-    PDATE,\x20DELETE,\x20DELETE_ALL)\x20while\x20protos.KVStep\x20uses\x20mo\
-    st\x20of\x20them.\n\n\x20protolint:disable:next\x20ENUM_FIELD_NAMES_PREF\
-    IX\n\n\n\n\x03\x05\0\x01\x12\x03\x0c\x05\r\n\x0b\n\x04\x05\0\x02\0\x12\
-    \x03\r\x02\x16\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\r\x02\x11\n\x0c\n\x05\
-    \x05\0\x02\0\x02\x12\x03\r\x14\x15\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x0e\
-    \x02\x14\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0e\x02\x0f\n\x0c\n\x05\
-    \x05\0\x02\x01\x02\x12\x03\x0e\x12\x13\n\x0b\n\x04\x05\0\x02\x02\x12\x03\
-    \x0f\x02\x17\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x0f\x02\x12\n\x0c\n\
-    \x05\x05\0\x02\x02\x02\x12\x03\x0f\x15\x16\n\x0b\n\x04\x05\0\x02\x03\x12\
-    \x03\x10\x02\x17\n\x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x10\x02\x12\n\x0c\
-    \n\x05\x05\0\x02\x03\x02\x12\x03\x10\x15\x16\n\x0b\n\x04\x05\0\x02\x04\
-    \x12\x03\x11\x02\x17\n\x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x11\x02\x12\n\
-    \x0c\n\x05\x05\0\x02\x04\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\
-    \x05\x12\x03\x12\x02\x17\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x12\x02\
-    \x12\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\x12\x15\x16\n\x0b\n\x04\x05\0\
-    \x02\x06\x12\x03\x13\x02\x1b\n\x0c\n\x05\x05\0\x02\x06\x01\x12\x03\x13\
-    \x02\x16\n\x0c\n\x05\x05\0\x02\x06\x02\x12\x03\x13\x19\x1a\n\xc6\x01\n\
-    \x02\x04\0\x12\x04\x19\0\"\x01\x1a\xb9\x01\x20WasmModule\x20is\x20used\
-    \x20to\x20ensure\x20we\x20only\x20send\x20the\x20wasm\x20module\x20once\
-    \x20per\x20request\n\x20instead\x20of\x20duplicated\x20in\x20every\x20pi\
-    peline\x20where\x20it\x20is\x20used.\x20This\x20prevents\n\x20over-sized\
-    \x20payloads\x20on\x20SDK\x20startup\n\n\n\n\x03\x04\0\x01\x12\x03\x19\
-    \x08\x12\nP\n\x04\x04\0\x02\0\x12\x03\x1b\x02\x10\x1aC\x20ID\x20is\x20a\
-    \x20uuid(sha256(_wasm_bytes))\x20that\x20is\x20set\x20by\x20streamdal\
-    \x20server\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\x1b\x02\x08\n\x0c\n\x05\
-    \x04\0\x02\0\x01\x12\x03\x1b\t\x0b\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\
-    \x1b\x0e\x0f\n0\n\x04\x04\0\x02\x01\x12\x03\x1e\x02\x12\x1a#\x20WASM\x20\
-    module\x20bytes\x20(set\x20by\x20server)\n\n\x0c\n\x05\x04\0\x02\x01\x05\
-    \x12\x03\x1e\x02\x07\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x1e\x08\r\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1e\x10\x11\n<\n\x04\x04\0\x02\x02\
-    \x12\x03!\x02\x16\x1a/\x20WASM\x20function\x20name\x20to\x20execute\x20(\
-    set\x20by\x20server)\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03!\x02\x08\n\
-    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03!\t\x11\n\x0c\n\x05\x04\0\x02\x02\
-    \x03\x12\x03!\x14\x15b\x06proto3\
+    \n\x16shared/sp_shared.proto\x12\rprotos.shared\"\xd9\x03\n\nWasmModule\
+    \x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x14\n\x05bytes\x18\x02\
+    \x20\x01(\x0cR\x05bytes\x12\x1a\n\x08function\x18\x03\x20\x01(\tR\x08fun\
+    ction\x12\x12\n\x04name\x18\x04\x20\x01(\tR\x04name\x12\x1b\n\t_filename\
+    \x18\x05\x20\x01(\tR\x08Filename\x12\x19\n\x08_bundled\x18\x06\x20\x01(\
+    \x08R\x07Bundled\x12%\n\x0bdescription\x18e\x20\x01(\tH\0R\x0bdescriptio\
+    n\x88\x01\x01\x12\x1d\n\x07version\x18f\x20\x01(\tH\x01R\x07version\x88\
+    \x01\x01\x12\x15\n\x03url\x18g\x20\x01(\tH\x02R\x03url\x88\x01\x01\x12>\
+    \n\x1a_created_at_unix_ts_ns_utc\x18\xe8\x07\x20\x01(\x03H\x03R\x14Creat\
+    edAtUnixTsNsUtc\x88\x01\x01\x12>\n\x1a_updated_at_unix_ts_ns_utc\x18\xe9\
+    \x07\x20\x01(\x03H\x04R\x14UpdatedAtUnixTsNsUtc\x88\x01\x01B\x0e\n\x0c_d\
+    escriptionB\n\n\x08_versionB\x06\n\x04_urlB\x1d\n\x1bX_created_at_unix_t\
+    s_ns_utcB\x1d\n\x1bX_updated_at_unix_ts_ns_utc*\xa4\x01\n\x08KVAction\
+    \x12\x13\n\x0fKV_ACTION_UNSET\x10\0\x12\x11\n\rKV_ACTION_GET\x10\x01\x12\
+    \x14\n\x10KV_ACTION_CREATE\x10\x02\x12\x14\n\x10KV_ACTION_UPDATE\x10\x03\
+    \x12\x14\n\x10KV_ACTION_EXISTS\x10\x04\x12\x14\n\x10KV_ACTION_DELETE\x10\
+    \x05\x12\x18\n\x14KV_ACTION_DELETE_ALL\x10\x06BCZAgithub.com/streamdal/s\
+    treamdal/libs/protos/build/go/protos/sharedJ\xa3\x12\n\x06\x12\x04\x01\0\
+    8\x01\nT\n\x01\x0c\x12\x03\x01\0\x12\x1aJ\x20This\x20has\x20to\x20be\x20\
+    a\x20separate\x20pkg\x20to\x20avoid\x20circular\x20import\x20problems\
+    \x20with\x20Go.\n\n\x08\n\x01\x02\x12\x03\x03\0\x16\n\x08\n\x01\x08\x12\
+    \x03\x05\0X\n\t\n\x02\x08\x0b\x12\x03\x05\0X\n\x9d\x02\n\x02\x05\0\x12\
+    \x04\x0c\0\x14\x01\x1a\x90\x02\x20KVAction\x20is\x20a\x20shared\x20type\
+    \x20that\x20is\x20used\x20for\x20protos.KVCommand\x20and\x20protos.KVSte\
+    p.\n\x20Note\x20that\x20only\x20a\x20subset\x20of\x20actions\x20are\x20u\
+    sed\x20for\x20protos.KVCommand\x20(CREATE,\n\x20UPDATE,\x20DELETE,\x20DE\
+    LETE_ALL)\x20while\x20protos.KVStep\x20uses\x20most\x20of\x20them.\n\n\
+    \x20protolint:disable:next\x20ENUM_FIELD_NAMES_PREFIX\n\n\n\n\x03\x05\0\
+    \x01\x12\x03\x0c\x05\r\n\x0b\n\x04\x05\0\x02\0\x12\x03\r\x02\x16\n\x0c\n\
+    \x05\x05\0\x02\0\x01\x12\x03\r\x02\x11\n\x0c\n\x05\x05\0\x02\0\x02\x12\
+    \x03\r\x14\x15\n\x0b\n\x04\x05\0\x02\x01\x12\x03\x0e\x02\x14\n\x0c\n\x05\
+    \x05\0\x02\x01\x01\x12\x03\x0e\x02\x0f\n\x0c\n\x05\x05\0\x02\x01\x02\x12\
+    \x03\x0e\x12\x13\n\x0b\n\x04\x05\0\x02\x02\x12\x03\x0f\x02\x17\n\x0c\n\
+    \x05\x05\0\x02\x02\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x05\0\x02\x02\x02\
+    \x12\x03\x0f\x15\x16\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x10\x02\x17\n\x0c\
+    \n\x05\x05\0\x02\x03\x01\x12\x03\x10\x02\x12\n\x0c\n\x05\x05\0\x02\x03\
+    \x02\x12\x03\x10\x15\x16\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x11\x02\x17\n\
+    \x0c\n\x05\x05\0\x02\x04\x01\x12\x03\x11\x02\x12\n\x0c\n\x05\x05\0\x02\
+    \x04\x02\x12\x03\x11\x15\x16\n\x0b\n\x04\x05\0\x02\x05\x12\x03\x12\x02\
+    \x17\n\x0c\n\x05\x05\0\x02\x05\x01\x12\x03\x12\x02\x12\n\x0c\n\x05\x05\0\
+    \x02\x05\x02\x12\x03\x12\x15\x16\n\x0b\n\x04\x05\0\x02\x06\x12\x03\x13\
+    \x02\x1b\n\x0c\n\x05\x05\0\x02\x06\x01\x12\x03\x13\x02\x16\n\x0c\n\x05\
+    \x05\0\x02\x06\x02\x12\x03\x13\x19\x1a\n\x98\x02\n\x02\x04\0\x12\x04\x1a\
+    \08\x01\x1a\x8b\x02\x20Main\x20type\x20representing\x20a\x20wasm\x20modu\
+    le\x20entry.\x20Used\x20by\x20server\x20for\x20external.*Wasm()\n\x20met\
+    hods;\x20also\x20used\x20to\x20ensure\x20we\x20only\x20send\x20the\x20wa\
+    sm\x20module\x20once\x20per\x20request\n\x20instead\x20of\x20duplicated\
+    \x20in\x20every\x20pipeline\x20where\x20it\x20is\x20used.\x20This\x20pre\
+    vents\n\x20over-sized\x20payloads\x20on\x20SDK\x20startup.\n\n\n\n\x03\
+    \x04\0\x01\x12\x03\x1a\x08\x12\nZ\n\x04\x04\0\x02\0\x12\x03\x1c\x02\x10\
+    \x1aM\x20ID\x20is\x20uuid(sha256(_wasm_bytes))\x20and\x20is\x20used\x20f\
+    or\x20referencing\x20the\x20Wasm\x20module\n\n\x0c\n\x05\x04\0\x02\0\x05\
+    \x12\x03\x1c\x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1c\t\x0b\n\x0c\
+    \n\x05\x04\0\x02\0\x03\x12\x03\x1c\x0e\x0f\n*\n\x04\x04\0\x02\x01\x12\
+    \x03\x1f\x02\x12\x1a\x1d\x20Contents\x20of\x20the\x20Wasm\x20module\n\n\
+    \x0c\n\x05\x04\0\x02\x01\x05\x12\x03\x1f\x02\x07\n\x0c\n\x05\x04\0\x02\
+    \x01\x01\x12\x03\x1f\x08\r\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1f\x10\
+    \x11\n(\n\x04\x04\0\x02\x02\x12\x03\"\x02\x16\x1a\x1b\x20Entry\x20point\
+    \x20function\x20name\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\"\x02\x08\n\
+    \x0c\n\x05\x04\0\x02\x02\x01\x12\x03\"\t\x11\n\x0c\n\x05\x04\0\x02\x02\
+    \x03\x12\x03\"\x14\x15\n0\n\x04\x04\0\x02\x03\x12\x03%\x02\x12\x1a#\x20F\
+    riendly\x20name\x20for\x20the\x20Wasm\x20module\n\n\x0c\n\x05\x04\0\x02\
+    \x03\x05\x12\x03%\x02\x08\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03%\t\r\n\
+    \x0c\n\x05\x04\0\x02\x03\x03\x12\x03%\x10\x11\n~\n\x04\x04\0\x02\x04\x12\
+    \x03(\x02\x17\x1a:\x20Filename\x20of\x20the\x20Wasm\x20module\x20(used\
+    \x20only\x20for\x20bundled\x20wasm)\n\"5\x20protolint:disable:this\x20FI\
+    ELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\0\x02\x04\x05\x12\x03(\x02\
+    \x08\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03(\t\x12\n\x0c\n\x05\x04\0\x02\
+    \x04\x03\x12\x03(\x15\x16\n\xcb\x01\n\x04\x04\0\x02\x05\x12\x03,\x02\x14\
+    \x1a\x86\x01\x20Indicates\x20whether\x20this\x20wasm\x20entry\x20is\x20f\
+    or\x20bundled\x20wasm\x20or\x20for\x20wasm\x20added\x20via\n\x20CreateWa\
+    sm();\x20ignored\x20in\x20CreateWasm()\x20and\x20UpdateWasm().\n\"5\x20p\
+    rotolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\
+    \0\x02\x05\x05\x12\x03,\x02\x06\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03,\
+    \x07\x0f\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03,\x12\x13\n(\n\x04\x04\0\
+    \x02\x06\x12\x03/\x02$\x1a\x1b\x20Informative,\x20debug\x20fields\n\n\
+    \x0c\n\x05\x04\0\x02\x06\x04\x12\x03/\x02\n\n\x0c\n\x05\x04\0\x02\x06\
+    \x05\x12\x03/\x0b\x11\n\x0c\n\x05\x04\0\x02\x06\x01\x12\x03/\x12\x1d\n\
+    \x0c\n\x05\x04\0\x02\x06\x03\x12\x03/\x20#\n\x0b\n\x04\x04\0\x02\x07\x12\
+    \x030\x02\x20\n\x0c\n\x05\x04\0\x02\x07\x04\x12\x030\x02\n\n\x0c\n\x05\
+    \x04\0\x02\x07\x05\x12\x030\x0b\x11\n\x0c\n\x05\x04\0\x02\x07\x01\x12\
+    \x030\x12\x19\n\x0c\n\x05\x04\0\x02\x07\x03\x12\x030\x1c\x1f\n\x0b\n\x04\
+    \x04\0\x02\x08\x12\x031\x02\x1c\n\x0c\n\x05\x04\0\x02\x08\x04\x12\x031\
+    \x02\n\n\x0c\n\x05\x04\0\x02\x08\x05\x12\x031\x0b\x11\n\x0c\n\x05\x04\0\
+    \x02\x08\x01\x12\x031\x12\x15\n\x0c\n\x05\x04\0\x02\x08\x03\x12\x031\x18\
+    \x1b\nS\n\x04\x04\0\x02\t\x12\x034\x023\x1a\x0f\x20Set\x20by\x20server\n\
+    \"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\
+    \x05\x04\0\x02\t\x04\x12\x034\x02\n\n\x0c\n\x05\x04\0\x02\t\x05\x12\x034\
+    \x0b\x10\n\x0c\n\x05\x04\0\x02\t\x01\x12\x034\x11+\n\x0c\n\x05\x04\0\x02\
+    \t\x03\x12\x034.2\nS\n\x04\x04\0\x02\n\x12\x037\x023\x1a\x0f\x20Set\x20b\
+    y\x20server\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CA\
+    SE\n\n\x0c\n\x05\x04\0\x02\n\x04\x12\x037\x02\n\n\x0c\n\x05\x04\0\x02\n\
+    \x05\x12\x037\x0b\x10\n\x0c\n\x05\x04\0\x02\n\x01\x12\x037\x11+\n\x0c\n\
+    \x05\x04\0\x02\n\x03\x12\x037.2b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

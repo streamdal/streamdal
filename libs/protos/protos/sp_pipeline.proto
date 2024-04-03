@@ -36,6 +36,16 @@ message Pipeline {
 
   // Indicates whether the pipeline is paused or not. Used internally by server.
   optional bool _paused = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  optional  string _description = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  optional string _version = 1002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  optional string _url = 1003; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  optional int64 _created_at_unix_ts_utc = 1004; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  optional int64 _updated_at_unix_ts_utc = 1005; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // Defines the ways in which a pipeline can be aborted
@@ -117,7 +127,10 @@ message PipelineStep {
     steps.TransformStep transform = 1001;
     steps.EncodeStep encode = 1002;
     steps.DecodeStep decode = 1003;
+
+    // If set, _wasm_id MUST be set
     steps.CustomStep custom = 1004;
+
     steps.HttpRequestStep http_request = 1005;
     steps.KVStep kv = 1006;
     steps.InferSchemaStep infer_schema = 1007;
@@ -125,13 +138,21 @@ message PipelineStep {
     steps.SchemaValidationStep schema_validation = 1009;
   }
 
-  // ID is a uuid(sha256(_wasm_bytes)) that is set by server
+  /////////////////////////////////////////////////////////////////////////
+  //                                                                     //
+  //    _wasm_* fields only need to be set IF the step is CustomStep.    //
+  //                                                                     //
+  // For all other steps, the server will fill these out automatically.  //
+  //                                                                     //
+  /////////////////////////////////////////////////////////////////////////
+
+  // Set by server UNLESS step is CustomStep
   optional string _wasm_id = 10000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
-  // WASM module bytes (set by server)
+  // Set by server
   optional bytes _wasm_bytes = 10001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
-  // WASM function name to execute (set by server)
+  // Set by server
   optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
