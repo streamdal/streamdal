@@ -53,7 +53,7 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
   return (
     <div>
       <div
-        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 px-2 hover:border-purple-600 hover:shadow-lg ${
+        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 p-2 hover:border-purple-600 hover:shadow-lg ${
           highlighted
             ? "border-2 border-purple-600"
             : "border-1 border-purple-200"
@@ -71,20 +71,24 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
             };
           }}
         >
-          <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
-          <div
-            className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
-            data-tooltip-target={key}
-          >
-            <ServiceLanguage language={serviceLanguage} />
+          <div class="w-8">
+            <IconGripVertical class="w-6 h-6 text-purple-100" />
           </div>
-          <Tooltip
-            targetId={key}
-            message={serviceLanguage
-              ? titleCase(serviceLanguage)
-              : "Attach a client to see language"}
-          />
-          <div class="flex flex-col ml-3">
+          <div class="mx-2">
+            <div
+              className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
+              data-tooltip-target={key}
+            >
+              <ServiceLanguage language={serviceLanguage} />
+            </div>
+            <Tooltip
+              targetId={key}
+              message={serviceLanguage
+                ? titleCase(serviceLanguage)
+                : "Attach a client to see language"}
+            />
+          </div>
+          <div class="flex flex-col">
             <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
           </div>
         </div>
@@ -179,7 +183,7 @@ export const OperationNode = (
   return (
     <div
       type="button"
-      class={`flex items-center justify-between w-[260px] h-[64px] group bg-white rounded-lg shadow-lg ${
+      class={`flex items-center justify-between w-[260px] min-h-[64px] group bg-white rounded-lg shadow-lg ${
         highlight ? "border-2 border-purple-600" : "border-1 border-purple-200"
       } pl-1 pr-2 mt-2`}
     >
@@ -197,7 +201,7 @@ export const OperationNode = (
         >
           <h2
             data-tooltip-target={key}
-            class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
+            class={"text-[16px] whitespace-normal break-words"}
           >
             {operation.audience.operationName}
           </h2>
@@ -316,18 +320,22 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
       </div>
       <div
         id={`${cKey}-dragHandle`}
-        class={`z-0 flex justify-center items-center bg-web rounded-md hover:shadow-xl hover:border-4 hover:border-purple-600 h-[145px] w-[145px] ${
+        class={`z-0 flex justify-center items-center bg-web rounded-md border-4 hover:shadow-xl hover:border-4 hover:border-purple-600 min-h-[145px] w-[145px] ${
           highlighted && "border-4 border-purple-600"
         }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
       >
-        <div class="flex justify-center flex-col items-center">
+        <div class="flex justify-center flex-col items-center p-2">
           <ComponentImage
             componentName={data.audience.componentName}
             className={"w-[40px]"}
           />
-          <p class={"z-10 mt-2 text-white"}>{data.audience.componentName}</p>
+          <p
+            class={"z-10 text-white"}
+          >
+            {data.audience.componentName}
+          </p>
         </div>
       </div>
     </div>
