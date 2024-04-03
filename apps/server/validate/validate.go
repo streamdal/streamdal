@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
@@ -192,7 +193,29 @@ func CreatePipelineRequest(req *protos.CreatePipelineRequest) error {
 		return ErrNilInput
 	}
 
-	return Pipeline(req.Pipeline, false)
+	if req.Pipeline != nil {
+		return Pipeline(req.Pipeline, false)
+	} else if req.PipelineJson != nil {
+		return PipelineJSON(req.PipelineJson, false)
+	} else {
+		return errors.New("must specify either Pipeline or PipelineJson")
+	}
+}
+
+func PipelineJSON(pipelineJSON []byte, requireID bool) error {
+	if len(pipelineJSON) == 0 {
+		return errors.New("pipeline JSON cannot be empty")
+	}
+
+	pipeline := &protos.Pipeline{
+		Steps: make([]*protos.PipelineStep, 0),
+	}
+
+	if err := proto.Unmarshal(pipelineJSON, pipeline); err != nil {
+		return errors.Wrap(err, "failed to unmarshal pipeline JSON")
+	}
+
+	return Pipeline(pipeline, requireID)
 }
 
 func Pipeline(p *protos.Pipeline, requireId bool) error {
