@@ -388,13 +388,19 @@ class StreamdalClient:
                     cond_type = protos.NotifyRequestConditionType.CONDITION_TYPE_ON_ERROR
                     isr = None  # avoid passing step result on error
 
+                    self.metrics.incr(
+                        CounterEntry(
+                            name=errors_counter, value=1.0, labels=labels, aud=aud
+                        )
+                    )
+
                 # Send notification if necessary
                 self._notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
 
                 # Continue to next step, nothing needed
                 if self.cfg.dry_run:
                     self.log.debug(
-                        f"Step '{step.name}' succeeded, continuing to next step"
+                        f"Step '{step.name}' completed with status '{exec_status.__str__()}', continuing to next step"
                     )
                     continue
 
@@ -404,10 +410,6 @@ class StreamdalClient:
                         resp.metadata[k] = v
 
                 # Failure conditions
-                self.metrics.incr(
-                    CounterEntry(name=errors_counter, value=1.0, labels=labels, aud=aud)
-                )
-
                 if (
                     cond is not None
                     and cond.abort
@@ -426,14 +428,7 @@ class StreamdalClient:
                     cond is not None
                     and cond.abort == protos.AbortCondition.ABORT_CONDITION_ABORT_ALL
                 ):
-                    # Abort all pipelines
-                    self.metrics.incr(
-                        CounterEntry(
-                            name=errors_counter, value=1.0, labels=labels, aud=aud
-                        )
-                    )
-
-                    # Exit function early
+                    # Abort all pipelines, and exit function early
                     resp.status = exec_status
                     resp.status_message = "Step returned: " + wasm_resp.exit_msg
                     step_status.status_message = "Step returned: " + wasm_resp.exit_msg
