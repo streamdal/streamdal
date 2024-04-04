@@ -12,6 +12,7 @@ require_relative 'audiences'
 require_relative 'validation'
 require_relative 'metrics'
 require_relative 'schema'
+require_relative 'tail'
 
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5 # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10 # 100 milliseconds
@@ -58,6 +59,7 @@ module Streamdal
 
     # Aliases
     CounterEntry = Streamdal::Metrics::CounterEntry
+    Metrics = Streamdal::Metrics
 
     def initialize(cfg = {})
       @cfg = cfg
@@ -69,10 +71,11 @@ module Streamdal
       @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
       @tails = {}
       @paused_tails = {}
-      @metrics = Streamdal::Metrics.new(Streamdal::Metrics::Config.new(cfg[:streamdal_url], cfg[:streamdal_token], @logger))
+      @metrics = Metrics.new(Metrics::Config.new(cfg[:streamdal_url], cfg[:streamdal_token], @logger))
+      @workers = []
+      @exit = false
 
       # TODO: kv
-      # TODO: metrics
       # TODO: host funcs
       # TODO: tails
 
@@ -81,298 +84,22 @@ module Streamdal
 
       _pull_initial_pipelines
 
-      Thread.new do
-        _register
-      end
+      @workers << Thread.new { _heartbeat }
+      @workers << Thread.new { _register }
     end
 
-    # def tmp
-    #   det = Streamdal::Protos::DetectiveStep.new
-    #   det.path = ""
-    #   det.args = Google::Protobuf::RepeatedField.new(:string, [])
-    #   det.type = Streamdal::Protos::DetectiveType::DETECTIVE_TYPE_PII_EMAIL
-    #   det.negate = false
-    #
-    #   step = Streamdal::Protos::PipelineStep.new
-    #   step.name = "detective"
-    #   step.detective = det
-    #   step._wasm_function = "f"
-    #   step._wasm_id = SecureRandom.uuid
-    #   step._wasm_bytes = File.read("detective.wasm", mode: "rb")
-    #
-    #   req = Streamdal::Protos::WASMRequest.new
-    #   req.step = step
-    #
-    #   req.input_payload = "{\"email\": \"mark@streamdal.com\", \"some\": \"val\"}"
-    #
-    #   res = _exec_wasm(req)
-    #
-    #   # unserialize into WASMResponse protobuf message
-    #   wasm_resp = Streamdal::Protos::WASMResponse.decode(res)
-    # end
+    def shutdown
+      # Set exit flag so workers exit
+      @exit = true
 
-    def _gen_register_request
-      arch, os = RUBY_PLATFORM.split(/-/)
+      # Let loops exit
+      sleep(1)
 
-      # Register with Streamdal External gRPC API
-      req = Streamdal::Protos::RegisterRequest.new
-      req.service_name = "demo-ruby"
-      req.session_id = @session_id
-      req.dry_run = false
-      req.client_info = Streamdal::Protos::ClientInfo.new
-      req.client_info.client_type = Streamdal::Protos::ClientType::CLIENT_TYPE_SDK
-      req.client_info.library_name = "ruby-sdk"
-      req.client_info.library_version = "0.0.1" # TODO: inject via github action
-      req.client_info.language = "ruby"
-      req.client_info.arch = arch
-      req.client_info.os = os
-      req
-    end
-
-    # Returns metadata for gRPC requests to the internal gRPC API
-    def _metadata
-      { "auth-token" => @cfg[:streamdal_token].to_s }
-    end
-
-    def _register
-      req = _gen_register_request
-
-      # Register with Streamdal External gRPC API
-      resps = @stub.register(req, metadata: _metadata)
-      resps.each do |r|
-        _handle_command(r)
-      end
-
-      @logger.info("REGISTER EXITED")
-    end
-
-    def _handle_command(cmd)
-      case cmd.command.to_s
-      when "kv"
-        _handle_kv(cmd)
-      when "tail"
-        _handle_tail_request(cmd)
-      when "set_pipelines"
-        _set_pipelines(cmd)
-      when "keep_alive"
-        # Do nothing
-      else
-        @logger.error "unknown command type #{cmd.command}"
-      end
-    end
-
-    def _handle_kv(cmd)
-      begin
-        validate_kv_command(cmd)
-      rescue => e
-        @logger.error "KV command validation failed: #{e}"
-        nil
-      end
-
-      # TODO: implement
-    end
-
-    def _set_pipelines(cmd)
-      if cmd.nil?
-        raise "cmd is required"
-      end
-
-      cmd.set_pipelines.pipelines.each_with_index { |p, pIdx|
-        p.steps.each_with_index { |step, idx|
-          if step._wasm_bytes == ""
-            if cmd.set_pipelines.wasm_modules.has_key?(step._wasm_id)
-              step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
-              cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
-            else
-              @logger.error "WASM module not found for step: #{step._wasm_id}"
-            end
-          end
-        }
-
-        aud_str = aud_to_str(cmd.audience)
-        @pipelines.key?(aud_str) ? @pipelines[aud_str].push(p) : @pipelines[aud_str] = [p]
-      }
-    end
-
-    def _pull_initial_pipelines
-      req = Streamdal::Protos::GetSetPipelinesCommandsByServiceRequest.new
-      req.service_name = @cfg[:service_name]
-
-      resp = @stub.get_set_pipelines_commands_by_service(req, metadata: _metadata)
-
-      resp.set_pipeline_commands.each do |cmd|
-        cmd.set_pipelines.wasm_modules = resp.wasm_modules
-        _set_pipelines(cmd)
-      end
-    end
-
-    def call_wasm(step, data, isr)
-      if step.nil?
-        raise "step is required"
-      end
-
-      if data.nil?
-        raise "data is required"
-      end
-
-      if isr.nil?
-        isr = Streamdal::Protos::InterStepResult.new
-      end
-
-      req = Streamdal::Protos::WASMRequest.new
-      req.step = step.clone
-      req.input_payload = data
-      req.inter_step_result = isr
-
-      begin
-        return Streamdal::Protos::WASMResponse.decode(_exec_wasm(req))
-      rescue => e
-        resp = Streamdal::Protos::WASMResponse.new
-        resp.exit_code = Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
-        resp.exit_msg = "Failed to execute WASM: #{e}"
-        resp.output_payload = ""
-        return resp
-      end
-    end
-
-    def _get_function(step)
-      # We cache functions so we can eliminate the wasm bytes from steps to save on memory
-      # And also to avoid re-initializing the same function multiple times
-      if @functions.key?(step._wasm_id)
-        @functions[step._wasm_id]
-      end
-
-      engine = Wasmtime::Engine.new
-      mod = Wasmtime::Module.new(engine, step._wasm_bytes)
-      linker = Wasmtime::Linker.new(engine, wasi: true)
-
-      wasi_ctx = Wasmtime::WasiCtxBuilder.new
-                                         .inherit_stdout
-                                         .inherit_stderr
-                                         .set_argv(ARGV)
-                                         .set_env(ENV)
-                                         .build
-
-      store = Wasmtime::Store.new(engine, wasi_ctx: wasi_ctx)
-      instance = linker.instantiate(store, mod)
-
-      # Store in cache
-      func = WasmFunction.new
-      func.instance = instance
-      func.store = store
-      @functions[step._wasm_id] = func
-
-      func
-    end
-
-    def _exec_wasm(req)
-      wasm_func = _get_function(req.step)
-
-      # Empty out _wasm_bytes, we don't need it anymore
-      # TODO: does this actually update the original object?
-      req.step._wasm_bytes = ""
-
-      data = req.to_proto
-
-      memory = wasm_func.instance.export("memory").to_memory
-      alloc = wasm_func.instance.export("alloc").to_func
-      dealloc = wasm_func.instance.export("dealloc").to_func
-      f = wasm_func.instance.export("f").to_func
-
-      start_ptr = alloc.call(data.length)
-
-      memory.write(start_ptr, data)
-
-      # Result is a 64bit int where the first 32 bits are the pointer to the result
-      # and the last 32 bits are the length of the result. This is due to the fact
-      # that we can only return an integer from a wasm function.
-      result_ptr = f.call(start_ptr, data.length)
-      ptr_true = result_ptr >> 32
-      len_true = result_ptr & 0xFFFFFFFF
-
-      res = memory.read(ptr_true, len_true)
-
-      # Dealloc result memory since we already read it
-      dealloc.call(ptr_true, res.length)
-
-      res
-    end
-
-    def _get_pipelines(aud)
-      aud_str = aud_to_str(aud)
-
-      if @pipelines.key?(aud_str)
-        return @pipelines[aud_str]
-      end
-
-      []
-    end
-
-    def _heartbeat
-      # TODO: figure out how to exit cleanly
-      while true
-        audiences = []
-        @audiences.each do |aud|
-          audiences.push(aud)
+      # Exit any remaining threads
+      @workers.each do |w|
+        if w.running?
+          w.exit
         end
-
-        req = Streamdal::Protos::HeartbeatRequest.new
-        req.session_id = @session_id
-        req.audiences = audiences
-        req.client_info = _gen_client_info
-        req.service_name = @cfg[:service_name]
-
-        @stub.heartbeat(req, metadata: _metadata)
-        sleep(DEFAULT_HEARTBEAT_INTERVAL)
-      end
-    end
-
-    ######################################################################################
-    # Tail methods
-    ######################################################################################
-    def _handle_tail_request(cmd)
-      validate_tail_request(cmd)
-
-      if cmd.tail.request.type == Streamdal::Protos::TailRequest::TailRequestType::TAIL_REQUEST_TYPE_START
-        _start_tail(cmd)
-      elsif cmd.tail.request.type == Streamdal::Protos::TailRequest::TailRequestType::TAIL_REQUEST_TYPE_STOP
-        _stop_tail(cmd)
-      elsif cmd.tail.request.type == Streamdal::Protos::TailRequest::TailRequestType::TAIL_REQUEST_TYPE_PAUSE
-        _pause_tail(cmd)
-      elsif cmd.tail.request.type == Streamdal::Protos::TailRequest::TailRequestType::TAIL_REQUEST_TYPE_RESUME
-        _resume_tail(cmd)
-      else
-        raise "unknown tail request type"
-      end
-    end
-
-    def _get_active_tails_for_audience(aud)
-      aud_str = aud_to_str(aud)
-      if @tails.key?(aud_str)
-        @tails[aud_str]
-      end
-
-      []
-    end
-
-    def _send_tail(aud, pipeline_id, original_data, new_data)
-      tails = _get_active_tails_for_audience(aud)
-      if tails.length == 0
-        nil
-      end
-
-      tails.each do |tail|
-        req = Streamdal::Protos::TailResponse.new
-        req.type = Streamdal::Protos::TailResponseType::TAIL_RESPONSE_TYPE_PAYLOAD
-        req.audience = aud
-        req.pipeline_id = pipeline_id
-        req.session_id = @session_id
-        req.timestamp_ns = Time.now.to_i
-        req.original_data = original_data
-        req.new_data = new_data
-        req._metadata = _metadata
-
-        @stub.send_tail(req, metadata: _metadata)
       end
     end
 
@@ -403,16 +130,16 @@ module Streamdal
       }
 
       # TODO: metrics
-      bytes_processed = Streamdal::Metrics::COUNTER_CONSUME_BYTES
-      errors_counter = Streamdal::Metrics::COUNTER_CONSUME_ERRORS
-      total_counter = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED
-      rate_processed = Streamdal::Metrics::COUNTER_CONSUME_PROCESSED_RATE
+      bytes_processed = Metrics::COUNTER_CONSUME_BYTES
+      errors_counter = Metrics::COUNTER_CONSUME_ERRORS
+      total_counter = Metrics::COUNTER_CONSUME_PROCESSED
+      rate_processed = Metrics::COUNTER_CONSUME_PROCESSED_RATE
 
       if aud.operation_type == OPERATION_TYPE_PRODUCER
-        bytes_processed = Streamdal::Metrics::COUNTER_PRODUCE_BYTES
-        errors_counter = Streamdal::Metrics::COUNTER_PRODUCE_ERRORS
-        total_counter = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED
-        rate_processed = Streamdal::Metrics::COUNTER_PRODUCE_PROCESSED_RATE
+        bytes_processed = Metrics::COUNTER_PRODUCE_BYTES
+        errors_counter = Metrics::COUNTER_PRODUCE_ERRORS
+        total_counter = Metrics::COUNTER_PRODUCE_PROCESSED
+        rate_processed = Metrics::COUNTER_PRODUCE_PROCESSED_RATE
       end
 
       payload_size = data.length
@@ -459,7 +186,7 @@ module Streamdal
           step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
 
           begin
-            wasm_resp = call_wasm(step, data, isr)
+            wasm_resp = _call_wasm(step, data, isr)
           rescue => e
             @logger.error "Error running step '#{step.name}': #{e}"
             step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
@@ -558,6 +285,311 @@ module Streamdal
       resp
     end
 
+    private
+
+    # def tmp
+    #   det = Streamdal::Protos::DetectiveStep.new
+    #   det.path = ""
+    #   det.args = Google::Protobuf::RepeatedField.new(:string, [])
+    #   det.type = Streamdal::Protos::DetectiveType::DETECTIVE_TYPE_PII_EMAIL
+    #   det.negate = false
+    #
+    #   step = Streamdal::Protos::PipelineStep.new
+    #   step.name = "detective"
+    #   step.detective = det
+    #   step._wasm_function = "f"
+    #   step._wasm_id = SecureRandom.uuid
+    #   step._wasm_bytes = File.read("detective.wasm", mode: "rb")
+    #
+    #   req = Streamdal::Protos::WASMRequest.new
+    #   req.step = step
+    #
+    #   req.input_payload = "{\"email\": \"mark@streamdal.com\", \"some\": \"val\"}"
+    #
+    #   res = _exec_wasm(req)
+    #
+    #   # unserialize into WASMResponse protobuf message
+    #   wasm_resp = Streamdal::Protos::WASMResponse.decode(res)
+    # end
+
+    def _handle_command(cmd)
+      case cmd.command.to_s
+      when "kv"
+        _handle_kv(cmd)
+      when "tail"
+        _handle_tail_request(cmd)
+      when "set_pipelines"
+        _set_pipelines(cmd)
+      when "keep_alive"
+        # Do nothing
+      else
+        @logger.error "unknown command type #{cmd.command}"
+      end
+    end
+
+    def _handle_kv(cmd)
+      begin
+        validate_kv_command(cmd)
+      rescue => e
+        @logger.error "KV command validation failed: #{e}"
+        nil
+      end
+
+      # TODO: implement
+    end
+
+    def _set_pipelines(cmd)
+      if cmd.nil?
+        raise "cmd is required"
+      end
+
+      cmd.set_pipelines.pipelines.each_with_index { |p, pIdx|
+        p.steps.each_with_index { |step, idx|
+          if step._wasm_bytes == ""
+            if cmd.set_pipelines.wasm_modules.has_key?(step._wasm_id)
+              step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
+              cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
+            else
+              @logger.error "WASM module not found for step: #{step._wasm_id}"
+            end
+          end
+        }
+
+        aud_str = aud_to_str(cmd.audience)
+        @pipelines.key?(aud_str) ? @pipelines[aud_str].push(p) : @pipelines[aud_str] = [p]
+      }
+    end
+
+    def _pull_initial_pipelines
+      req = Streamdal::Protos::GetSetPipelinesCommandsByServiceRequest.new
+      req.service_name = @cfg[:service_name]
+
+      resp = @stub.get_set_pipelines_commands_by_service(req, metadata: _metadata)
+
+      resp.set_pipeline_commands.each do |cmd|
+        cmd.set_pipelines.wasm_modules = resp.wasm_modules
+        _set_pipelines(cmd)
+      end
+    end
+
+    def _get_function(step)
+      # We cache functions so we can eliminate the wasm bytes from steps to save on memory
+      # And also to avoid re-initializing the same function multiple times
+      if @functions.key?(step._wasm_id)
+        @functions[step._wasm_id]
+      end
+
+      engine = Wasmtime::Engine.new
+      mod = Wasmtime::Module.new(engine, step._wasm_bytes)
+      linker = Wasmtime::Linker.new(engine, wasi: true)
+
+      wasi_ctx = Wasmtime::WasiCtxBuilder.new
+                                         .inherit_stdout
+                                         .inherit_stderr
+                                         .set_argv(ARGV)
+                                         .set_env(ENV)
+                                         .build
+
+      store = Wasmtime::Store.new(engine, wasi_ctx: wasi_ctx)
+      instance = linker.instantiate(store, mod)
+
+      # Store in cache
+      func = WasmFunction.new
+      func.instance = instance
+      func.store = store
+      @functions[step._wasm_id] = func
+
+      func
+    end
+
+    def _call_wasm(step, data, isr)
+      if step.nil?
+        raise "step is required"
+      end
+
+      if data.nil?
+        raise "data is required"
+      end
+
+      if isr.nil?
+        isr = Streamdal::Protos::InterStepResult.new
+      end
+
+      req = Streamdal::Protos::WASMRequest.new
+      req.step = step.clone
+      req.input_payload = data
+      req.inter_step_result = isr
+
+      begin
+        return Streamdal::Protos::WASMResponse.decode(_exec_wasm(req))
+      rescue => e
+        resp = Streamdal::Protos::WASMResponse.new
+        resp.exit_code = Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
+        resp.exit_msg = "Failed to execute WASM: #{e}"
+        resp.output_payload = ""
+        return resp
+      end
+    end
+
+    def _gen_register_request
+      req = Streamdal::Protos::RegisterRequest.new
+      req.service_name = "demo-ruby"
+      req.session_id = @session_id
+      req.dry_run = @cfg[:dry_run] || false
+      req.client_info = _gen_client_info
+
+      req
+    end
+
+    def _gen_client_info
+      arch, os = RUBY_PLATFORM.split(/-/)
+
+      ci = Streamdal::Protos::ClientInfo.new
+      ci.client_type = Streamdal::Protos::ClientType::CLIENT_TYPE_SDK
+      ci.library_name = "ruby-sdk"
+      ci.library_version = "0.0.1" # TODO: inject via github action
+      ci.language = "ruby"
+      ci.arch = arch
+      ci.os = os
+
+      ci
+    end
+
+    # Returns metadata for gRPC requests to the internal gRPC API
+    def _metadata
+      { "auth-token" => @cfg[:streamdal_token].to_s }
+    end
+
+    def _register
+      req = _gen_register_request
+
+      # Register with Streamdal External gRPC API
+      @logger.info("--------------- REGISTER BEGAN")
+      resps = @stub.register(req, metadata: _metadata)
+      resps.each do |r|
+        if @exit
+          break
+        end
+
+        _handle_command(r)
+      end
+
+      @logger.info("--------------- REGISTER EXITED")
+    end
+
+    def _exec_wasm(req)
+      wasm_func = _get_function(req.step)
+
+      # Empty out _wasm_bytes, we don't need it anymore
+      # TODO: does this actually update the original object?
+      req.step._wasm_bytes = ""
+
+      data = req.to_proto
+
+      memory = wasm_func.instance.export("memory").to_memory
+      alloc = wasm_func.instance.export("alloc").to_func
+      dealloc = wasm_func.instance.export("dealloc").to_func
+      f = wasm_func.instance.export("f").to_func
+
+      start_ptr = alloc.call(data.length)
+
+      memory.write(start_ptr, data)
+
+      # Result is a 64bit int where the first 32 bits are the pointer to the result
+      # and the last 32 bits are the length of the result. This is due to the fact
+      # that we can only return an integer from a wasm function.
+      result_ptr = f.call(start_ptr, data.length)
+      ptr_true = result_ptr >> 32
+      len_true = result_ptr & 0xFFFFFFFF
+
+      res = memory.read(ptr_true, len_true)
+
+      # Dealloc result memory since we already read it
+      dealloc.call(ptr_true, res.length)
+
+      res
+    end
+
+    def _get_pipelines(aud)
+      aud_str = aud_to_str(aud)
+
+      if @pipelines.key?(aud_str)
+        return @pipelines[aud_str]
+      end
+
+      []
+    end
+
+    def _heartbeat
+      until @exit
+        req = Streamdal::Protos::HeartbeatRequest.new
+        req.session_id = @session_id
+        req.audiences = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Audience, [])
+
+        @audiences.each do |_, aud|
+          req.audiences.push(aud)
+        end
+
+        req.client_info = _gen_client_info
+        req.service_name = @cfg[:service_name]
+
+        @stub.heartbeat(req, metadata: _metadata)
+        sleep(DEFAULT_HEARTBEAT_INTERVAL)
+      end
+    end
+
+    ######################################################################################
+    # Tail methods
+    ######################################################################################
+
+    def _handle_tail_request(cmd)
+      validate_tail_request(cmd)
+
+      case cmd.tail.request.type
+      when :TAIL_REQUEST_TYPE_START
+        _start_tail(cmd)
+      when :TAIL_REQUEST_TYPE_STOP
+        _stop_tail(cmd)
+      when :TAIL_REQUEST_TYPE_PAUSE
+        _pause_tail(cmd)
+      when :TAIL_REQUEST_TYPE_RESUME
+        _resume_tail(cmd)
+      else
+        raise "unknown tail request type: '#{cmd.tail.request.type.inspect}'"
+      end
+    end
+
+    def _get_active_tails_for_audience(aud)
+      aud_str = aud_to_str(aud)
+      if @tails.key?(aud_str)
+        return @tails[aud_str].values
+      end
+
+      []
+    end
+
+    def _send_tail(aud, pipeline_id, original_data, new_data)
+      tails = _get_active_tails_for_audience(aud)
+      if tails.length == 0
+        puts @tails.inspect
+        @logger.debug " No active tails for audience '#{aud_to_str(aud)}'"
+        nil
+      end
+
+      tails.each do |tail|
+        req = Streamdal::Protos::TailResponse.new
+        req.type = Streamdal::Protos::TailResponseType::TAIL_RESPONSE_TYPE_PAYLOAD
+        req.audience = aud
+        req.pipeline_id = pipeline_id
+        req.session_id = @session_id
+        req.timestamp_ns = Time.now.to_i
+        req.original_data = original_data
+        req.new_data = new_data
+        req.tail_request_id = tail.request.id
+        tail.queue.push(req)
+      end
+    end
+
     def _notify_condition(pipeline, step, aud, cond, data, cond_type)
       if cond.nil?
         return nil
@@ -573,7 +605,7 @@ module Streamdal
         return nil
       end
 
-      @metrics.incr(CounterEntry.new(Streamdal::Metrics::COUNTER_NOTIFY, aud, {
+      @metrics.incr(CounterEntry.new(Metrics::COUNTER_NOTIFY, aud, {
         "service": @cfg[:service_name],
         "component_name": aud.component_name,
         "pipeline_name": pipeline.name,
@@ -598,30 +630,30 @@ module Streamdal
       validate_tail_request(cmd)
 
       req = cmd.tail.request
+      @logger.debug "Starting tail '#{req.id}'"
 
-      aud_str = aud_to_str(req)
+      aud_str = aud_to_str(cmd.tail.request.audience)
 
       # Do we already have a tail for this audience
-      if @tails.key?(aud_str) && if @tails[aud_str].key?(req.id)
-                                   @logger.error "Tail '#{req.id}' already exists, skipping TailCommand"
-                                   return
-                                 end
-
-        @logger.debug "Tailing audience: #{aud_str}"
-
-        t = Streamdal::Protos::Tail.new(
-          req,
-          @cfg[:streamdal_url],
-          @cfg[:streamdal_token],
-          @logger,
-          @metrics
-        )
-
-        t.start_tail_workers
-
-        _set_active_tail(t)
-
+      if @tails.key?(aud_str) && @tails[aud_str].key?(req.id)
+        @logger.error "Tail '#{req.id}' already exists, skipping TailCommand"
+        return
       end
+
+      @logger.debug "Tailing audience: #{aud_str}"
+
+      t = Streamdal::Tail.new(
+        req,
+        @cfg[:streamdal_url],
+        @cfg[:streamdal_token],
+        @logger,
+        @metrics
+      )
+
+      t.start_tail_workers
+
+      _set_active_tail(t)
+
     end
 
     def _set_active_tail(tail)
@@ -644,22 +676,23 @@ module Streamdal
       @paused_tails[key][tail.request.id] = tail
     end
 
-    def _stop_tail(tail)
-      key = aud_to_str(tail.request.audience)
+    def _stop_tail(cmd)
+      @logger.debug "Stopping tail '#{cmd.tail.request.id}'"
+      key = aud_to_str(cmd.tail.request.audience)
 
-      if @tails.key?(key) && @tails[key].key?(tail.request.id)
-        @tails[key][tail.request.id].stop_tail
+      if @tails.key?(key) && @tails[key].key?(cmd.tail.request.id)
+        @tails[key][cmd.tail.request.id].stop_tail
 
         # Remove from active tails
-        @tails[key].delete(tail.request.id)
+        @tails[key].delete(cmd.tail.request.id)
 
         if @tails[key].length == 0
           @tails.delete(key)
         end
       end
 
-      if @paused_tails.key?(key) && @paused_tails[key].key?(tail.request.id)
-        @paused_tails[key].delete(tail.request.id)
+      if @paused_tails.key?(key) && @paused_tails[key].key?(cmd.tail.request.id)
+        @paused_tails[key].delete(cmd.tail.request.id)
 
         if @paused_tails[key].length == 0
           @paused_tails.delete(key)

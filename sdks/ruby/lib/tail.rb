@@ -12,15 +12,16 @@ module Streamdal
       @request = request
       @streamdal_url = streamdal_url
       @auth_token = auth_token
-      @log = log
+      @logger = log
       @metrics = metrics
       @active = active
       @last_msg = Time::at(0)
       @queue = Queue.new
+      @workers = []
 
       # Only use rate limiting if sample_options is set
       unless request.sample_options.nil?
-        @limiter = BozosBuckets::Bucket(
+        @limiter = BozosBuckets::Bucket.new(
           initial_token_count: request.sample_options.sample_rate,
           refill_rate: request.sample_options.sample_interval_seconds,
           max_token_count: request.sample_options.sample_rate
@@ -30,16 +31,23 @@ module Streamdal
 
     def start_tail_workers
       NUM_TAIL_WORKERS.times do |worker_id|
-        Thread.new do
-          start_tail_worker(worker_id + 1)
-        end
+        @workers << Thread.new { start_tail_worker(worker_id + 1) }
       end
+
       @active = true
     end
 
     def stop_tail
-      @logger.debug("Stopping tail for '#{@request.id}'")
       @active = false
+
+      sleep(1)
+
+      @workers.each do |worker|
+        if worker.active?
+          worker.exit
+        end
+      end
+
     end
 
     def start_tail_worker(worker_id)
@@ -64,9 +72,9 @@ module Streamdal
         end
 
         unless stub.nil?
-          @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
           tail_response = @queue.pop(non_block = false)
-          stub.tail(tail_response, metadata: { "auth-token" => @auth_token })
+          @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
+          stub.send_tail([tail_response], metadata: { "auth-token" => @auth_token })
         end
       end
 

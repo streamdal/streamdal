@@ -8,12 +8,16 @@ audience.component_name = "kafka"
 audience.operation_name = "consume"
 audience.operation_type = Streamdal::OPERATION_TYPE_CONSUMER
 
-resp = a.process('{"email": "mark@streamdal.com"}', audience)
-puts "Response: "
-puts "-----------------------------------"
-puts resp.inspect.gsub(/\\n/, "\n")
-puts "-----------------------------------"
+while true
+  resp = a.process('{"email": "mark@streamdal.com"}', audience)
+  puts "Response: "
+  puts "-----------------------------------"
+  puts resp.inspect.gsub(/\\n/, "\n")
+  puts "-----------------------------------"
 
-puts "done demo"
+  puts "done demo"
 
-sleep(10)
+  sleep(3)
+end
+
+a.shutdown
