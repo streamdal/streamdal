@@ -345,34 +345,36 @@ module Streamdal
       end
     end
 
-    def kv_exists
+    def kv_exists(caller, params)
       puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
+
+      0
     end
 
-    def http_request
+    def http_request(caller, params)
       puts "HTTPREQUEST HIT!!!!!!!!!!!!!!!!!!"
+
+      0
     end
 
     def _get_function(step)
       # We cache functions so we can eliminate the wasm bytes from steps to save on memory
       # And also to avoid re-initializing the same function multiple times
       if @functions.key?(step._wasm_id)
-        @functions[step._wasm_id]
+        return @functions[step._wasm_id]
       end
 
       engine = Wasmtime::Engine.new
       mod = Wasmtime::Module.new(engine, step._wasm_bytes)
       linker = Wasmtime::Linker.new(engine, wasi: true)
 
-      funcs = {
-        "httpRequest": http_request,
-        "kvExists": kv_exists,
-      }
-
-      funcs.each do |name, func|
-        linker.define(name) do |caller, params, results|
-          func.call(caller, params, results)
-        end
+      # TODO: figure out host functions
+      # linker.func_new("env", "kvExists", [:i32, :i32], :i64) do |caller, params, results|
+      #   results = kv_exists(caller, params)
+      # end
+      #
+      linker.func_new("env", "httpRequest", [:i32, :i32], :i64) do |caller, params, results|
+        results = http_request(caller, params)
       end
 
       wasi_ctx = Wasmtime::WasiCtxBuilder.new
@@ -562,9 +564,7 @@ module Streamdal
     def _send_tail(aud, pipeline_id, original_data, new_data)
       tails = _get_active_tails_for_audience(aud)
       if tails.length == 0
-        puts @tails.inspect
-        @logger.debug " No active tails for audience '#{aud_to_str(aud)}'"
-        nil
+        return nil
       end
 
       tails.each do |tail|
