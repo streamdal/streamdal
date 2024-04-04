@@ -12,25 +12,25 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * WIP -- Custom WASM exec?
- *
  * @generated from protobuf message protos.steps.CustomStep
  */
 export interface CustomStep {
     /**
-     * @generated from protobuf field: string id = 1;
+     * @generated from protobuf field: map<string, bytes> args = 1;
      */
-    id: string;
+    args: {
+        [key: string]: Uint8Array;
+    };
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class CustomStep$Type extends MessageType<CustomStep> {
     constructor() {
         super("protos.steps.CustomStep", [
-            { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "args", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } }
         ]);
     }
     create(value?: PartialMessage<CustomStep>): CustomStep {
-        const message = { id: "" };
+        const message = { args: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<CustomStep>(this, message, value);
@@ -41,8 +41,8 @@ class CustomStep$Type extends MessageType<CustomStep> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* string id */ 1:
-                    message.id = reader.string();
+                case /* map<string, bytes> args */ 1:
+                    this.binaryReadMap1(message.args, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -55,10 +55,26 @@ class CustomStep$Type extends MessageType<CustomStep> {
         }
         return message;
     }
+    private binaryReadMap1(map: CustomStep["args"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof CustomStep["args"] | undefined, val: CustomStep["args"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.bytes();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.steps.CustomStep.args");
+            }
+        }
+        map[key ?? ""] = val ?? new Uint8Array(0);
+    }
     internalBinaryWrite(message: CustomStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string id = 1; */
-        if (message.id !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.id);
+        /* map<string, bytes> args = 1; */
+        for (let k of Object.keys(message.args))
+            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).bytes(message.args[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

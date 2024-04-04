@@ -21,16 +21,38 @@ enum KVAction {
   KV_ACTION_DELETE_ALL = 6;
 }
 
-// WasmModule is used to ensure we only send the wasm module once per request
+// Main type representing a wasm module entry. Used by server for external.*Wasm()
+// methods; also used to ensure we only send the wasm module once per request
 // instead of duplicated in every pipeline where it is used. This prevents
-// over-sized payloads on SDK startup
+// over-sized payloads on SDK startup.
 message WasmModule {
-  // ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
+  // ID is uuid(sha256(_wasm_bytes)) and is used for referencing the Wasm module
   string id = 1;
 
-  // WASM module bytes (set by server)
+  // Contents of the Wasm module
   bytes bytes = 2;
 
-  // WASM function name to execute (set by server)
+  // Entry point function name
   string function = 3;
+
+  // Friendly name for the Wasm module
+  string name = 4;
+
+  // Filename of the Wasm module (used only for bundled wasm)
+  string _filename = 5; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Indicates whether this wasm entry is for bundled wasm or for wasm added via
+  // CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+  bool _bundled = 6; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Informative, debug fields
+  optional string description = 101;
+  optional string version = 102;
+  optional string url = 103;
+
+  // Set by server
+  optional int64 _created_at_unix_ts_ns_utc = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Set by server
+  optional int64 _updated_at_unix_ts_ns_utc = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

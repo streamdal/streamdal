@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "shared/sp_shared.proto";
 import "sp_common.proto";
 import "sp_info.proto";
 import "sp_notify.proto";
@@ -97,6 +98,18 @@ service External {
 
   rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
 
+  // BEGIN Wasm methods
+  rpc GetWasm(GetWasmRequest) returns (GetWasmResponse);
+
+  rpc GetAllWasm(GetAllWasmRequest) returns (GetAllWasmResponse);
+
+  rpc CreateWasm(CreateWasmRequest) returns (CreateWasmResponse);
+
+  rpc UpdateWasm(UpdateWasmRequest) returns (StandardResponse);
+
+  rpc DeleteWasm(DeleteWasmRequest) returns (StandardResponse);
+  // END Wasm methods
+
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
 }
@@ -145,8 +158,10 @@ message GetPipelineResponse {
   protos.Pipeline pipeline = 1;
 }
 
+// Create a new pipeline; accepts either pipeline object or pipeline as JSON bytes
 message CreatePipelineRequest {
   protos.Pipeline pipeline = 1;
+  optional bytes pipeline_json = 2;
 }
 
 message CreatePipelineResponse {
@@ -156,6 +171,7 @@ message CreatePipelineResponse {
 
 message UpdatePipelineRequest {
   protos.Pipeline pipeline = 1;
+  optional bytes pipeline_json = 2;
 }
 
 message DeletePipelineRequest {
@@ -322,6 +338,39 @@ message PauseTailRequest {
 
 message ResumeTailRequest {
   string tail_id = 1;
+}
+
+message GetWasmRequest {
+  string id = 1;
+}
+
+message GetWasmResponse {
+  protos.shared.WasmModule wasm = 1;
+}
+
+message GetAllWasmRequest {
+  // Nothing needed here
+}
+
+message GetAllWasmResponse {
+  repeated protos.shared.WasmModule wasm = 1;
+}
+
+message CreateWasmRequest {
+  protos.shared.WasmModule wasm = 1;
+}
+
+message CreateWasmResponse {
+  string message = 1;
+  string id = 2;
+}
+
+message UpdateWasmRequest {
+  protos.shared.WasmModule wasm = 1;
+}
+
+message DeleteWasmRequest {
+  repeated string ids = 1;
 }
 
 message TestRequest {
