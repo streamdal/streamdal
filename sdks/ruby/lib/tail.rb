@@ -65,8 +65,7 @@ module Streamdal
 
         if Time::now - @last_msg < MIN_TAIL_RESPONSE_INTERVAL_MS
           sleep(MIN_TAIL_RESPONSE_INTERVAL_MS)
-
-          # TODO: metric for COUNTER_DROPPED_TAIL_MESSAGES
+          @metrics.incr(Metrics::CounterEntry.new(COUNTER_DROPPED_TAIL_MESSAGES, nil, {}, 1))
           @logger.debug("Dropped tail message for '#{@request.id}' due to rate limiting")
           next
         end
@@ -74,7 +73,12 @@ module Streamdal
         unless stub.nil?
           tail_response = @queue.pop(non_block = false)
           @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
-          stub.send_tail([tail_response], metadata: { "auth-token" => @auth_token })
+
+          begin
+            stub.send_tail([tail_response], metadata: { "auth-token" => @auth_token })
+          rescue => e
+            @logger.error("Error sending tail request: #{e}")
+          end
         end
       end
 

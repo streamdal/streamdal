@@ -75,9 +75,7 @@ module Streamdal
       @workers = []
       @exit = false
 
-      # TODO: kv
       # TODO: host funcs
-      # TODO: tails
 
       # # Connect to Streamdal External gRPC API
       @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
@@ -287,31 +285,6 @@ module Streamdal
 
     private
 
-    # def tmp
-    #   det = Streamdal::Protos::DetectiveStep.new
-    #   det.path = ""
-    #   det.args = Google::Protobuf::RepeatedField.new(:string, [])
-    #   det.type = Streamdal::Protos::DetectiveType::DETECTIVE_TYPE_PII_EMAIL
-    #   det.negate = false
-    #
-    #   step = Streamdal::Protos::PipelineStep.new
-    #   step.name = "detective"
-    #   step.detective = det
-    #   step._wasm_function = "f"
-    #   step._wasm_id = SecureRandom.uuid
-    #   step._wasm_bytes = File.read("detective.wasm", mode: "rb")
-    #
-    #   req = Streamdal::Protos::WASMRequest.new
-    #   req.step = step
-    #
-    #   req.input_payload = "{\"email\": \"mark@streamdal.com\", \"some\": \"val\"}"
-    #
-    #   res = _exec_wasm(req)
-    #
-    #   # unserialize into WASMResponse protobuf message
-    #   wasm_resp = Streamdal::Protos::WASMResponse.decode(res)
-    # end
-
     def _handle_command(cmd)
       case cmd.command.to_s
       when "kv"
@@ -372,6 +345,14 @@ module Streamdal
       end
     end
 
+    def kv_exists
+      puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
+    end
+
+    def http_request
+      puts "HTTPREQUEST HIT!!!!!!!!!!!!!!!!!!"
+    end
+
     def _get_function(step)
       # We cache functions so we can eliminate the wasm bytes from steps to save on memory
       # And also to avoid re-initializing the same function multiple times
@@ -382,6 +363,17 @@ module Streamdal
       engine = Wasmtime::Engine.new
       mod = Wasmtime::Module.new(engine, step._wasm_bytes)
       linker = Wasmtime::Linker.new(engine, wasi: true)
+
+      funcs = {
+        "httpRequest": http_request,
+        "kvExists": kv_exists,
+      }
+
+      funcs.each do |name, func|
+        linker.define(name) do |caller, params, results|
+          func.call(caller, params, results)
+        end
+      end
 
       wasi_ctx = Wasmtime::WasiCtxBuilder.new
                                          .inherit_stdout
@@ -461,11 +453,10 @@ module Streamdal
     end
 
     def _register
-      req = _gen_register_request
+      @logger.info("register started")
 
       # Register with Streamdal External gRPC API
-      @logger.info("--------------- REGISTER BEGAN")
-      resps = @stub.register(req, metadata: _metadata)
+      resps = @stub.register(_gen_register_request, metadata: _metadata)
       resps.each do |r|
         if @exit
           break
@@ -474,7 +465,7 @@ module Streamdal
         _handle_command(r)
       end
 
-      @logger.info("--------------- REGISTER EXITED")
+      @logger.info("register exited")
     end
 
     def _exec_wasm(req)

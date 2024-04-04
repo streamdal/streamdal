@@ -172,7 +172,11 @@ module Streamdal
       req = Streamdal::Protos::MetricsRequest.new
       req.metrics = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Metric, [metric])
 
-      @cfg.stub.metrics(req, metadata: _metadata)
+      begin
+        @cfg.stub.metrics(req, metadata: _metadata)
+      rescue => e
+        @cfg.log.error("Failed to publish metrics: #{e}")
+      end
     end
 
     def _run_publisher
