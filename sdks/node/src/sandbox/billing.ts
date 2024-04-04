@@ -1,8 +1,7 @@
 import { readFileSync } from "node:fs";
 
-import { Audience } from "@streamdal/protos/protos/sp_common";
-
 import {
+  Audience,
   OperationType,
   registerStreamdal,
   StreamdalConfigs,
@@ -38,42 +37,36 @@ const serviceWelcomeConfig: StreamdalConfigs = {
 };
 
 const billingConsumer: Audience = {
-  serviceName: "billing-service",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
   operationName: "processor",
 };
 
 const billingProducer: Audience = {
-  serviceName: "billing-service",
   componentName: "stripe",
   operationType: OperationType.PRODUCER,
   operationName: "stripe-register",
 };
 
 const signupProducer: Audience = {
-  serviceName: "signup-service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
   operationName: "recorder",
 };
 
 const signupProducer1: Audience = {
-  serviceName: "signup-service",
   componentName: "database",
   operationType: OperationType.PRODUCER,
   operationName: "verifier",
 };
 
 const welcomeConsumer: Audience = {
-  serviceName: "welcome-service",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
   operationName: "reader",
 };
 
 const welcomeProducer: Audience = {
-  serviceName: "welcome-service",
   componentName: "aws-ses",
   operationType: OperationType.PRODUCER,
   operationName: "emailer",

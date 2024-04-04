@@ -1,11 +1,14 @@
-import { Audience, ResponseCode } from "@streamdal/protos/protos/sp_common";
+import {
+  Audience as InternalAudience,
+  ResponseCode,
+} from "@streamdal/protos/protos/sp_common";
 
 import { InternalConfigs } from "../index.js";
 import { audienceKey, internal, Tail } from "./register.js";
 
 export interface AddAudience {
   configs: InternalConfigs;
-  audience: Audience;
+  audience: InternalAudience;
 }
 
 export const addAudiences = async (configs: InternalConfigs) => {
@@ -14,7 +17,10 @@ export const addAudiences = async (configs: InternalConfigs) => {
   }
 
   for (const audience of configs.audiences) {
-    await addAudience({ configs, audience });
+    await addAudience({
+      configs,
+      audience,
+    });
   }
 };
 

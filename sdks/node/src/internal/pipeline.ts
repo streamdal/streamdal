@@ -95,6 +95,8 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
     return;
   }
 
+  const key = audienceKey(audience);
+
   switch (request.type) {
     case TailRequestType.START: {
       console.debug(
@@ -102,15 +104,14 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         audience
       );
       // Create inner map if it doesn't exist
-      if (!internal.audiences.has(audienceKey(audience))) {
-        internal.audiences.set(audienceKey(audience), {
+      if (!internal.audiences.has(key)) {
+        internal.audiences.set(key, {
           audience,
           tails: new Map<string, Tail>(),
         });
       }
-      // Add entry (@JH, OK if overwritten?)
       request.id &&
-        internal.audiences.get(audienceKey(audience))?.tails.set(request.id, {
+        internal.audiences.get(key)?.tails.set(request.id, {
           tailStatus: request.type === TailRequestType.START,
           tailRequestId: request.id,
           sampleBucket: new TokenBucket(
@@ -125,8 +126,7 @@ export const tailPipeline = (audience: Audience, { request }: TailCommand) => {
         "received a STOP tail: removing entry from audiences for tail id",
         request.id
       );
-      request.id &&
-        internal.audiences.get(audienceKey(audience))?.tails.delete(request.id);
+      request.id && internal.audiences.get(key)?.tails.delete(request.id);
       break;
     }
     default:
