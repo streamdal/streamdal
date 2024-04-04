@@ -327,15 +327,27 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		}, nil
 	}
 
+	var pipeline *protos.Pipeline
+
+	if req.Pipeline != nil {
+		pipeline = req.Pipeline
+	} else if len(req.PipelineJson) > 0 {
+		pipeline = &protos.Pipeline{}
+
+		if err := jsonpb.UnmarshalString(string(req.PipelineJson), pipeline); err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal pipeline JSON")
+		}
+	}
+
 	// Create ID for pipeline
-	req.Pipeline.Id = util.GenerateUUID()
+	pipeline.Id = util.GenerateUUID()
 
 	// Populate WASM fields
-	if err := s.Options.WasmService.PopulateWASMFields(ctx, req.Pipeline); err != nil {
+	if err := s.Options.WasmService.PopulateWASMFields(ctx, pipeline); err != nil {
 		return nil, errors.Wrap(err, "unable to populate WASM fields")
 	}
 
-	if err := s.Options.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
+	if err := s.Options.StoreService.CreatePipeline(ctx, pipeline); err != nil {
 		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
@@ -346,10 +358,10 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	}
 	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
 
-	for _, step := range req.Pipeline.Steps {
+	for _, step := range pipeline.Steps {
 		stepTags := []statsd.Tag{
 			{"install_id", s.Options.InstallID},
-			{"pipeline_id", req.Pipeline.Id},
+			{"pipeline_id", pipeline.Id},
 			{"step_type", util.GetStepType(step)},
 		}
 
@@ -358,7 +370,7 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 
 	return &protos.CreatePipelineResponse{
 		Message:    "Pipeline created successfully",
-		PipelineId: req.Pipeline.Id,
+		PipelineId: pipeline.Id,
 	}, nil
 }
 
