@@ -18,6 +18,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/types"
@@ -327,16 +328,9 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		}, nil
 	}
 
-	var pipeline *protos.Pipeline
-
-	if req.Pipeline != nil {
-		pipeline = req.Pipeline
-	} else if len(req.PipelineJson) > 0 {
-		pipeline = &protos.Pipeline{}
-
-		if err := jsonpb.UnmarshalString(string(req.PipelineJson), pipeline); err != nil {
-			return nil, errors.Wrap(err, "unable to unmarshal pipeline JSON")
-		}
+	pipeline, err := getPipelineFromRequest(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline from request")
 	}
 
 	// Create ID for pipeline
@@ -386,8 +380,13 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return demoResponse(ctx)
 	}
 
+	pipeline, err := getPipelineFromRequest(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline from request")
+	}
+
 	// Is this a known pipeline?
-	originalPipeline, err := s.Options.StoreService.GetPipeline(ctx, req.Pipeline.Id)
+	originalPipeline, err := s.Options.StoreService.GetPipeline(ctx, pipeline.Id)
 	if err != nil {
 		if errors.Is(err, store.ErrPipelineNotFound) {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
@@ -397,17 +396,17 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}
 
 	// Re-populate WASM bytes (since they are stripped for UI)
-	if err := s.Options.WasmService.PopulateWASMFields(ctx, req.Pipeline); err != nil {
+	if err := s.Options.WasmService.PopulateWASMFields(ctx, pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, errors.Wrap(err, "unable to repopulate WASM data").Error()), nil
 	}
 
 	// Update pipeline in storage
-	if err := s.Options.StoreService.UpdatePipeline(ctx, req.Pipeline); err != nil {
+	if err := s.Options.StoreService.UpdatePipeline(ctx, pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	// Send telemetry
-	s.sendStepDeltaTelemetry(originalPipeline, req.Pipeline)
+	s.sendStepDeltaTelemetry(originalPipeline, pipeline)
 
 	// Pipeline exists - broadcast the update; handlers will emit updated
 	// SetPipelines command to any connected SDKs.
@@ -418,7 +417,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' updated", req.Pipeline.Id),
+		Message: fmt.Sprintf("pipeline '%s' updated", pipeline.Id),
 	}, nil
 }
 
@@ -1508,4 +1507,44 @@ func demoResponse(ctx context.Context) (*protos.StandardResponse, error) {
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: "Demo mode, request ignored",
 	}, nil
+}
+
+type GenericPipelineRequest interface {
+	~*protos.CreatePipelineRequest | ~*protos.UpdatePipelineRequest
+}
+
+func getPipelineFromRequest[T GenericPipelineRequest](req T) (*protos.Pipeline, error) {
+	var (
+		reqPipeline     *protos.Pipeline
+		reqPipelineJSON []byte
+	)
+
+	switch p := any(req).(type) {
+	case *protos.CreatePipelineRequest:
+		reqPipeline = p.Pipeline
+		reqPipelineJSON = p.PipelineJson
+	case *protos.UpdatePipelineRequest:
+		reqPipeline = p.Pipeline
+		reqPipelineJSON = p.PipelineJson
+	default:
+		return nil, errors.New("unknown request type")
+	}
+
+	// Is it a regular pipeline?
+	if reqPipeline != nil {
+		return reqPipeline, nil
+	}
+
+	// Not a regular pipeline, is it specified as JSON?
+	if len(reqPipelineJSON) != 0 {
+		pipeline := &protos.Pipeline{}
+
+		if err := protojson.Unmarshal(reqPipelineJSON, pipeline); err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal pipeline JSON")
+		}
+
+		return pipeline, nil
+	}
+
+	return nil, errors.New("pipeline not found in request")
 }

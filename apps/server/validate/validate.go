@@ -5,11 +5,10 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
-	"google.golang.org/protobuf/proto"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var (
@@ -207,12 +206,10 @@ func PipelineJSON(pipelineJSON []byte, requireID bool) error {
 		return errors.New("pipeline JSON cannot be empty")
 	}
 
-	pipeline := &protos.Pipeline{
-		Steps: make([]*protos.PipelineStep, 0),
-	}
+	pipeline := &protos.Pipeline{}
 
-	if err := proto.Unmarshal(pipelineJSON, pipeline); err != nil {
-		return errors.Wrap(err, "failed to unmarshal pipeline JSON")
+	if err := protojson.Unmarshal(pipelineJSON, pipeline); err != nil {
+		return errors.Wrap(err, "unable to unmarshal pipeline JSON for validate")
 	}
 
 	return Pipeline(pipeline, requireID)
@@ -276,7 +273,13 @@ func UpdatePipelineRequest(req *protos.UpdatePipelineRequest) error {
 		return ErrNilInput
 	}
 
-	return Pipeline(req.Pipeline, true)
+	if req.Pipeline != nil {
+		return Pipeline(req.Pipeline, true)
+	} else if req.PipelineJson != nil {
+		return PipelineJSON(req.PipelineJson, true)
+	} else {
+		return errors.New("must specify either Pipeline or PipelineJson")
+	}
 }
 
 func DeletePipelineRequest(req *protos.DeletePipelineRequest) error {
