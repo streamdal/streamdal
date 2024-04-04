@@ -373,9 +373,9 @@ module Streamdal
       #   results = kv_exists(caller, params)
       # end
       #
-      linker.func_new("env", "httpRequest", [:i32, :i32], :i64) do |caller, params, results|
-        results = http_request(caller, params)
-      end
+      # linker.func_new("env", "httpRequest", [:i32, :i32], :i64) do |caller, params, results|
+      #   results = http_request(caller, params)
+      # end
 
       wasi_ctx = Wasmtime::WasiCtxBuilder.new
                                          .inherit_stdout
