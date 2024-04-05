@@ -3,12 +3,14 @@ package manage
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/charmbracelet/log"
 	"github.com/dselans/go-prettyjson-tview"
 	"github.com/pkg/errors"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -65,7 +67,23 @@ func (m *Manage) CreatePipeline(cfg *config.Config) error {
 		return errors.Wrap(err, "unable to validate manage create pipeline params")
 	}
 
-	return nil
+	pipelineJSON, err := os.ReadFile(cfg.Manage.Create.Pipeline.JSON)
+	if err != nil {
+		return errors.Wrapf(err, "failed to read pipeline JSON file '%s'", cfg.Manage.Create.Pipeline.JSON)
+	}
+
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs(AuthTokenMetadata, cfg.Auth))
+
+	req := &protos.CreatePipelineRequest{
+		PipelineJson: pipelineJSON,
+	}
+
+	resp, err := m.client.CreatePipeline(ctx, req)
+	if err != nil {
+		return errors.Wrap(err, "failed to create pipeline")
+	}
+
+	return m.prettyPrint(resp)
 }
 
 func (m *Manage) GetPipeline(cfg *config.Config) error {
@@ -117,9 +135,25 @@ func (m *Manage) DeletePipeline(cfg *config.Config) error {
 		return errors.Wrap(err, "unable to validate manage delete pipeline params")
 	}
 
-	fmt.Println("Deleting pipeline")
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs(AuthTokenMetadata, cfg.Auth))
 
-	return nil
+	resp, err := m.client.DeletePipeline(ctx, &protos.DeletePipelineRequest{
+		PipelineId: cfg.Manage.Delete.Pipeline.ID,
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "failed to get wasm module(s)")
+	}
+
+	return m.prettyPrint(resp)
+}
+
+func stringPointer(s string) *string {
+	if s == "" {
+		return nil
+	}
+
+	return &s
 }
 
 func (m *Manage) CreateWasm(cfg *config.Config) error {
@@ -127,9 +161,30 @@ func (m *Manage) CreateWasm(cfg *config.Config) error {
 		return errors.Wrap(err, "unable to validate manage create wasm params")
 	}
 
-	fmt.Println("Creating Wasm module")
+	wasmData, err := os.ReadFile(cfg.Manage.Create.Wasm.File)
+	if err != nil {
+		return errors.Wrapf(err, "failed to read wasm file '%s'", cfg.Manage.Create.Wasm.File)
+	}
 
-	return nil
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs(AuthTokenMetadata, cfg.Auth))
+
+	req := &protos.CreateWasmRequest{
+		Wasm: &shared.WasmModule{
+			Bytes:       wasmData,
+			Function:    cfg.Manage.Create.Wasm.Function,
+			Name:        cfg.Manage.Create.Wasm.Name,
+			Description: stringPointer(cfg.Manage.Create.Wasm.ModuleDescription),
+			Version:     stringPointer(cfg.Manage.Create.Wasm.ModuleVersion),
+			Url:         stringPointer(cfg.Manage.Create.Wasm.ModuleURL),
+		},
+	}
+
+	resp, err := m.client.CreateWasm(ctx, req)
+	if err != nil {
+		return errors.Wrap(err, "failed to create wasm module")
+	}
+
+	return m.prettyPrint(resp)
 }
 
 func (m *Manage) GetWasm(cfg *config.Config) error {
@@ -144,7 +199,7 @@ func (m *Manage) GetWasm(cfg *config.Config) error {
 		err  error
 	)
 
-	if cfg.Manage.Get.Pipeline.ID == "" {
+	if cfg.Manage.Get.Wasm.ID == "" {
 		resp, err = m.client.GetAllWasm(ctx, &protos.GetAllWasmRequest{})
 	} else {
 		resp, err = m.client.GetWasm(ctx, &protos.GetWasmRequest{
@@ -164,9 +219,17 @@ func (m *Manage) DeleteWasm(cfg *config.Config) error {
 		return errors.Wrap(err, "unable to validate manage delete wasm params")
 	}
 
-	fmt.Println("Deleting Wasm module")
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs(AuthTokenMetadata, cfg.Auth))
 
-	return nil
+	resp, err := m.client.DeleteWasm(ctx, &protos.DeleteWasmRequest{
+		Ids: []string{cfg.Manage.Delete.Wasm.ID},
+	})
+
+	if err != nil {
+		return errors.Wrap(err, "failed to get wasm module(s)")
+	}
+
+	return m.prettyPrint(resp)
 }
 
 func validateParams(cfg *config.Config, logger *log.Logger, t statsd.Statter) error {
