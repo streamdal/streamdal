@@ -28,6 +28,46 @@ type Config struct {
 	TelemetryDisable  bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
 	TelemetryAddress  string           `help:"Address to send telemetry to" default:"telemetry.streamdal.com:8125" hidden:"true"`
 
+	CLI struct {
+	} `cmd:"cli" help:"Interactive CLI"`
+
+	Manage struct {
+		Create struct {
+			Pipeline struct {
+				JSON string `name:"json" help:"Pipeline JSON file" type:"path" required:"true"`
+			} `cmd:"pipeline" help:"Create a new pipeline"`
+
+			Wasm struct {
+				File              string `help:"Wasm module file" type:"path" required:"true"`
+				Name              string `help:"Wasm module name" required:"true"`
+				Function          string `help:"Wasm module entry function name" required:"true"`
+				ModuleVersion     string `help:"Wasm module version" required:"false"`
+				ModuleDescription string `help:"Wasm module description" required:"false"`
+				ModuleURL         string `help:"Wasm module URL" required:"false"`
+			} `cmd:"wasm" help:"Create a custom Wasm module"`
+		} `cmd:"create" help:"Create resources"`
+
+		Get struct {
+			Pipeline struct {
+				ID string `help:"Pipeline ID (do not specify to list all)" required:"false"`
+			} `cmd:"pipeline" help:"List pipeline(s)"`
+
+			Wasm struct {
+				ID string `help:"Wasm module ID (do not specify to list all)" required:"false"`
+			} `cmd:"wasm" help:"List custom Wasm module(s)"`
+		} `cmd:"get" help:"Get resources"`
+
+		Delete struct {
+			Pipeline struct {
+				ID string `help:"Pipeline ID" required:"true"`
+			} `cmd:"pipeline" help:"Delete pipeline(s)"`
+
+			Wasm struct {
+				ID string `help:"Wasm module ID" required:"true"`
+			} `cmd:"wasm" help:"Delete custom Wasm module(s)"`
+		} `cmd:"delete" help:"Delete resources"`
+	} `cmd:"manage" help:"Use manage to create, get, or delete resources in Streamdal server"`
+
 	InstallID   string        `kong:"-"`
 	KongContext *kong.Context `kong:"-"`
 }
@@ -42,6 +82,11 @@ func New(version string) *Config {
 		kong.Name("streamdal"),
 		kong.Description("Streamdal CLI"),
 		kong.DefaultEnvars(EnvConfigPrefix),
+		kong.ShortUsageOnError(),
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact:             true,
+			NoExpandSubcommands: true,
+		}),
 		kong.Vars{
 			"version": version,
 		},
