@@ -38,7 +38,6 @@ const config = {
 };
 
 const audience = {
-  serviceName: "test-service-name",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
   operationName: "test-kafka-consumer",
