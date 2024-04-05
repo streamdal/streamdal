@@ -38,8 +38,6 @@ func main() {
 
 		logger.SetOutput(f)
 		logger.SetFormatter(log.JSONFormatter)
-	} else {
-		logger = log.Default()
 	}
 
 	if cfg.Debug {

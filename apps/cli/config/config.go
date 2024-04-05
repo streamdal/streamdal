@@ -18,17 +18,17 @@ const (
 type Config struct {
 	Version           kong.VersionFlag `help:"Show version and exit" short:"v" env:"-"`
 	Debug             bool             `help:"Enable debug logging" short:"d" default:"false"`
-	Auth              string           `help:"Authentication token" required:"true" short:"a"`
+	Auth              string           `help:"Authentication token used for communicating with server" short:"a" default:"1234"`
 	Server            string           `help:"Streamdal server URL (gRPC)" default:"localhost:8082"`
-	ConnectTimeout    time.Duration    `help:"Initial gRPC connection timeout in seconds" default:"5s"`
-	DisableTLS        bool             `help:"Disable TLS" default:"false"`
 	EnableFileLogging bool             `help:"Enable file logging" default:"false"`
 	LogFile           string           `help:"Log file" default:"./streamdal-cli.log"`
-	MaxOutputLines    int              `help:"Maximum number of output lines" default:"5000"`
+	ConnectTimeout    time.Duration    `help:"Initial gRPC connection timeout in seconds" default:"5s"`
+	DisableTLS        bool             `help:"Disable TLS" default:"false"`
 	TelemetryDisable  bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
 	TelemetryAddress  string           `help:"Address to send telemetry to" default:"telemetry.streamdal.com:8125" hidden:"true"`
 
 	CLI struct {
+		MaxOutputLines int `help:"Maximum number of output lines" default:"5000"`
 	} `cmd:"cli" help:"Interactive CLI"`
 
 	Manage struct {
