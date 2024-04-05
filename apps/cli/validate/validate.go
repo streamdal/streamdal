@@ -15,10 +15,6 @@ func ManageGetPipeline(cfg *config.Config) error {
 		return ErrMissingConfig
 	}
 
-	if cfg.Manage.Get.Pipeline.ID == "" {
-		return errors.New("missing pipeline name")
-	}
-
 	return nil
 }
 
