@@ -1,9 +1,16 @@
 {
   "name": "@streamdal/node-sdk",
-  "workspaces": ["examples"],
-  "version": "0.2.24",
+  "workspaces": [
+    "examples"
+  ],
+  "version": "0.2.25",
   "description": "Streamdal's Node SDK",
-  "keywords": ["streamdal", "typescript", "node", "data quality"],
+  "keywords": [
+    "streamdal",
+    "typescript",
+    "node",
+    "data quality"
+  ],
   "type": "module",
   "exports": {
     ".": {
