@@ -41,19 +41,19 @@ type Config struct {
 				File              string `help:"Wasm module file" type:"path" required:"true"`
 				Name              string `help:"Wasm module name" required:"true"`
 				Function          string `help:"Wasm module entry function name" required:"true"`
-				ModuleVersion     string `help:"Wasm module version" required:"false"`
-				ModuleDescription string `help:"Wasm module description" required:"false"`
-				ModuleURL         string `help:"Wasm module URL" required:"false"`
+				ModuleVersion     string `help:"Wasm module version"`
+				ModuleDescription string `help:"Wasm module description"`
+				ModuleURL         string `help:"Wasm module URL"`
 			} `cmd:"wasm" help:"Create a custom Wasm module"`
 		} `cmd:"create" help:"Create resources"`
 
 		Get struct {
 			Pipeline struct {
-				ID string `help:"Pipeline ID (do not specify to list all)" required:"false"`
+				ID string `help:"Pipeline ID (do not specify to list all)"`
 			} `cmd:"pipeline" help:"List pipeline(s)"`
 
 			Wasm struct {
-				ID string `help:"Wasm module ID (do not specify to list all)" required:"false"`
+				ID string `help:"Wasm module ID (do not specify to list all)"`
 			} `cmd:"wasm" help:"List custom Wasm module(s)"`
 		} `cmd:"get" help:"Get resources"`
 
