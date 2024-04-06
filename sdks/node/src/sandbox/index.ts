@@ -1,7 +1,7 @@
-import { Audience } from "@streamdal/protos/protos/sp_common";
 import { ExecStatus } from "@streamdal/protos/protos/sp_sdk";
 
 import {
+  Audience,
   OperationType,
   registerStreamdal,
   StreamdalConfigs,
@@ -65,42 +65,36 @@ const serviceCConfig: StreamdalConfigs = {
 };
 
 const audienceAConsumer: Audience = {
-  serviceName: "test-service",
   componentName: "kafka",
   operationType: OperationType.CONSUMER,
   operationName: "kafka-consumer",
 };
 
 const audienceAProducer: Audience = {
-  serviceName: "test-service",
   componentName: "kafka",
   operationType: OperationType.PRODUCER,
   operationName: "kafka-producer",
 };
 
 const audienceBConsumer: Audience = {
-  serviceName: "another-test-service",
   componentName: "another-kafka",
   operationType: OperationType.CONSUMER,
   operationName: "test-kafka-consumer",
 };
 
 const audienceBProducer: Audience = {
-  serviceName: "another-test-service",
   componentName: "another-kafka",
   operationType: OperationType.PRODUCER,
   operationName: "test-kafka-producer",
 };
 
 const audienceCConsumer: Audience = {
-  serviceName: "third-service",
   componentName: "third-kafka",
   operationType: OperationType.CONSUMER,
   operationName: "kafka-consumer",
 };
 
 const audienceCProducer: Audience = {
-  serviceName: "third-service",
   componentName: "third-kafka",
   operationType: OperationType.PRODUCER,
   operationName: "kafka-consumer",
@@ -118,7 +112,7 @@ const logPipeline = async (
   console.debug("--------------------------------");
   console.debug("pipeline request start", new Date());
   console.debug(
-    `sending pipeline request for ${audience.serviceName} - ${OperationType[
+    `sending pipeline request for ${audience.operationName} - ${OperationType[
       audience.operationType
     ].toLowerCase()}`
   );
@@ -410,7 +404,6 @@ export const openAIExample = async () => {
   };
 
   const openAIProducer: Audience = {
-    serviceName: "chat-gpt",
     componentName: "chat-gpt",
     operationType: OperationType.PRODUCER,
     operationName: "customer-service-prompt",
