@@ -10,10 +10,9 @@ import {
   PipelineStatus,
   StepStatus,
 } from "@streamdal/protos/protos/sp_sdk";
-import { SDKResponse } from "../index.js";
 import { InterStepResult, WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
 
-import { InternalConfigs, StreamdalRequest } from "../index.js";
+import { InternalConfigs, SDKResponse, StreamdalRequest } from "../index.js";
 import { addAudience } from "./audience.js";
 import { httpRequest } from "./httpRequest.js";
 import { audienceMetrics, stepMetrics } from "./metrics.js";
@@ -182,12 +181,16 @@ export const processPipelines = async ({
   data,
 }: { configs: InternalConfigs } & StreamdalRequest): Promise<SDKResponse> => {
   await initPipelines(configs);
-  await addAudience({ configs: configs, audience });
+  const internalAudience = { serviceName: configs.serviceName, ...audience };
+  await addAudience({
+    configs: configs,
+    audience: internalAudience,
+  });
 
-  const key = audienceKey(audience);
+  const key = audienceKey(internalAudience);
   const pipelines = internal.pipelines.get(key);
 
-  void audienceMetrics(audience, data.length);
+  void audienceMetrics(internalAudience, data.length);
 
   if (!pipelines) {
     const statusMessage =
@@ -196,7 +199,7 @@ export const processPipelines = async ({
 
     sendTail({
       configs,
-      audience,
+      audience: internalAudience,
       originalData: data,
     });
 
@@ -221,7 +224,7 @@ export const processPipelines = async ({
   for (const pipeline of pipelines.values()) {
     const { data, pipelineStatus } = await processPipeline({
       originalData: response.data,
-      audience,
+      audience: internalAudience,
       configs,
       pipeline,
     });
@@ -240,7 +243,7 @@ export const processPipelines = async ({
 
   sendTail({
     configs,
-    audience,
+    audience: internalAudience,
     originalData: data,
     newData: response.data,
   });

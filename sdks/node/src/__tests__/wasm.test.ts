@@ -1,6 +1,7 @@
 import { Command } from "@streamdal/protos/protos/sp_command";
 import { InternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
+import { ExecStatus } from "@streamdal/protos/protos/sp_sdk";
 import * as fs from "fs";
 import sinon from "sinon";
 import { v4 as uuidv4 } from "uuid";
@@ -9,7 +10,6 @@ import { describe, expect, it } from "vitest";
 import { initPipelines } from "../internal/pipeline.js";
 import { processPipeline } from "../internal/process.js";
 import { audienceKey, internal } from "../internal/register.js";
-import { ExecStatus } from "../index";
 
 const testData = {
   boolean_t: true,
@@ -26,7 +26,7 @@ const testData = {
     empty_string: "",
     null_field: null,
     empty_array: [],
-    email: "test@streamdal.com"
+    email: "test@streamdal.com",
   },
   array: ["value1", "value2"],
   number_int: 100,
@@ -71,7 +71,12 @@ const testPipeline: Pipeline = {
       dynamic: false,
       step: {
         oneofKind: "detective",
-        detective: { args: [], type: 1001, path: "object.field", negate: false },
+        detective: {
+          args: [],
+          type: 1001,
+          path: "object.field",
+          negate: false,
+        },
       },
       WasmId: "testDetectiveWasm",
       WasmFunction: "f",
@@ -81,24 +86,34 @@ const testPipeline: Pipeline = {
 };
 
 const testAttachCommand: Command = {
+  audience: testAudience,
   command: {
     oneofKind: "setPipelines",
     setPipelines: {
       pipelines: [testPipeline],
+      wasmModules: {
+        testDetectiveWasm: {
+          id: "testDetectiveWasm",
+
+          bytes: new Uint8Array(),
+          function: "f",
+          name: "",
+          Filename: "",
+          Bundled: false,
+        },
+      },
     },
   },
-  audience: testAudience,
 };
 
 const testGetSetPipelinesCommandsByServiceResponse = {
   response: {
-    setPipelineCommands : [testAttachCommand],
+    setPipelineCommands: [testAttachCommand],
     wasmModules: { testDetectiveWasm: { id: "test", bytes: new Uint8Array() } },
   },
 };
 
-
-describe("wasm tests", async () => {
+describe("wasm tests", () => {
   const key = audienceKey(testAudience);
   const wasm = fs.readFileSync("./src/__tests__/wasm/detective.wasm");
 
@@ -124,7 +139,8 @@ describe("wasm tests", async () => {
       pipeline: testPipeline,
     });
 
-    expect(result?.pipelineStatus?.stepStatus?.at(-1)?.status).toEqual(ExecStatus.TRUE);
+    expect(result.pipelineStatus.stepStatus.at(-1)?.status).toEqual(
+      ExecStatus.TRUE
+    );
   });
-
 });

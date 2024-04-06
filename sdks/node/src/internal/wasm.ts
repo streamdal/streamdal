@@ -1,3 +1,4 @@
+import { WasmModule } from "@streamdal/protos/protos/shared/sp_shared";
 import { PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
 import {
   InterStepResult,
@@ -28,6 +29,12 @@ const wasi = new WASI({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const hostFunctionNOOP = (_: any, __: number, ____: number): bigint =>
   BigInt(0);
+
+export const setWASM = async (wasmModules: Record<string, WasmModule>) => {
+  for await (const [k, v] of Object.entries(wasmModules)) {
+    await instantiateWasm(k, v.bytes);
+  }
+};
 
 export const instantiateWasm = async (
   wasmId?: string,
