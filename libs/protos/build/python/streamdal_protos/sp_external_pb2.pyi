@@ -365,10 +365,12 @@ class UpdateNotificationRequest(_message.Message):
     def __init__(self, notification: _Optional[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class UpdatePipelineRequest(_message.Message):
-    __slots__ = ["pipeline"]
+    __slots__ = ["pipeline", "pipeline_json"]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_JSON_FIELD_NUMBER: _ClassVar[int]
     pipeline: _sp_pipeline_pb2.Pipeline
-    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
+    pipeline_json: bytes
+    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ..., pipeline_json: _Optional[bytes] = ...) -> None: ...
 
 class UpdateWasmRequest(_message.Message):
     __slots__ = ["wasm"]

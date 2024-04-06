@@ -671,6 +671,9 @@ class CreatePipelineResponse(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class UpdatePipelineRequest(betterproto.Message):
     pipeline: "Pipeline" = betterproto.message_field(1)
+    pipeline_json: Optional[bytes] = betterproto.bytes_field(
+        2, optional=True, group="_pipeline_json"
+    )
 
 
 @dataclass(eq=False, repr=False)
