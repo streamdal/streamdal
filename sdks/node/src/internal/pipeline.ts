@@ -1,13 +1,13 @@
 import { Command, TailCommand } from "@streamdal/protos/protos/sp_command";
 import { Audience, TailRequestType } from "@streamdal/protos/protos/sp_common";
 import { GetSetPipelinesCommandsByServiceResponse } from "@streamdal/protos/protos/sp_internal";
-import { Pipeline, PipelineStep } from "@streamdal/protos/protos/sp_pipeline";
+import { Pipeline } from "@streamdal/protos/protos/sp_pipeline";
 
 import { InternalConfigs } from "../index.js";
 import { kvCommand } from "./kv.js";
 import { audienceKey, internal, Tail } from "./register.js";
 import { TokenBucket } from "./utils/tokenBucket.js";
-import { instantiateWasm } from "./wasm.js";
+import { setWASM } from "./wasm.js";
 
 export const initPipelines = async (configs: InternalConfigs) => {
   try {
@@ -24,9 +24,7 @@ export const initPipelines = async (configs: InternalConfigs) => {
         { meta: { "auth-token": configs.streamdalToken } }
       );
 
-    for await (const [k, v] of Object.entries(response.wasmModules)) {
-      await instantiateWasm(k, v.bytes);
-    }
+    await setWASM(response.wasmModules);
 
     for await (const command of response.setPipelineCommands) {
       await processResponse(command);
@@ -51,10 +49,8 @@ export const processResponse = async (response: Command) => {
 
   switch (response.command.oneofKind) {
     case "setPipelines":
-      await setPipelines(
-        response.audience,
-        response.command.setPipelines.pipelines
-      );
+      await setWASM(response.command.setPipelines.wasmModules);
+      setPipelines(response.audience, response.command.setPipelines.pipelines);
       break;
     case "tail":
       tailPipeline(response.audience, response.command.tail);
@@ -62,29 +58,9 @@ export const processResponse = async (response: Command) => {
   }
 };
 
-export const buildPipeline = async (pipeline: Pipeline): Promise<Pipeline> => {
-  return {
-    ...pipeline,
-    steps: await Promise.all(
-      pipeline.steps.map(async (step: PipelineStep) => {
-        await instantiateWasm(step.WasmId, step.WasmBytes);
-        return {
-          ...step,
-          WasmBytes: undefined,
-        };
-      })
-    ),
-  };
-};
-
-export const setPipelines = async (
-  audience: Audience,
-  pipelines: Pipeline[]
-) => {
+export const setPipelines = (audience: Audience, pipelines: Pipeline[]) => {
   const key = audienceKey(audience);
-  const mappedPipelines: [string, Pipeline][] = await Promise.all(
-    pipelines.map(async (p) => [p.id, await buildPipeline(p)])
-  );
+  const mappedPipelines: [string, Pipeline][] = pipelines.map((p) => [p.id, p]);
   internal.pipelines.set(key, new Map<string, Pipeline>(mappedPipelines));
 };
 
