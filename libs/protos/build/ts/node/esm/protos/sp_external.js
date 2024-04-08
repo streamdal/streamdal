@@ -367,8 +367,7 @@ export const GetPipelineResponse = new GetPipelineResponse$Type();
 class CreatePipelineRequest$Type extends MessageType {
     constructor() {
         super("protos.CreatePipelineRequest", [
-            { no: 1, name: "pipeline", kind: "message", T: () => Pipeline },
-            { no: 2, name: "pipeline_json", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "pipeline", kind: "message", T: () => Pipeline }
         ]);
     }
     create(value) {
@@ -386,9 +385,6 @@ class CreatePipelineRequest$Type extends MessageType {
                 case /* protos.Pipeline pipeline */ 1:
                     message.pipeline = Pipeline.internalBinaryRead(reader, reader.uint32(), options, message.pipeline);
                     break;
-                case /* optional bytes pipeline_json */ 2:
-                    message.pipelineJson = reader.bytes();
-                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -404,9 +400,6 @@ class CreatePipelineRequest$Type extends MessageType {
         /* protos.Pipeline pipeline = 1; */
         if (message.pipeline)
             Pipeline.internalBinaryWrite(message.pipeline, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* optional bytes pipeline_json = 2; */
-        if (message.pipelineJson !== undefined)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.pipelineJson);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
