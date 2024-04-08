@@ -30,7 +30,7 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_4_0;
 pub struct CustomStep {
     // message fields
     // @@protoc_insertion_point(field:protos.steps.CustomStep.args)
-    pub args: ::std::collections::HashMap<::std::string::String, ::std::vec::Vec<u8>>,
+    pub args: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.CustomStep.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -81,7 +81,7 @@ impl ::protobuf::Message for CustomStep {
                     while let Some(tag) = is.read_raw_tag_or_eof()? {
                         match tag {
                             10 => key = is.read_string()?,
-                            18 => value = is.read_bytes()?,
+                            18 => value = is.read_string()?,
                             _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
                         };
                     }
@@ -103,7 +103,7 @@ impl ::protobuf::Message for CustomStep {
         for (k, v) in &self.args {
             let mut entry_size = 0;
             entry_size += ::protobuf::rt::string_size(1, &k);
-            entry_size += ::protobuf::rt::bytes_size(2, &v);
+            entry_size += ::protobuf::rt::string_size(2, &v);
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
@@ -115,11 +115,11 @@ impl ::protobuf::Message for CustomStep {
         for (k, v) in &self.args {
             let mut entry_size = 0;
             entry_size += ::protobuf::rt::string_size(1, &k);
-            entry_size += ::protobuf::rt::bytes_size(2, &v);
+            entry_size += ::protobuf::rt::string_size(2, &v);
             os.write_raw_varint32(10)?; // Tag.
             os.write_raw_varint32(entry_size as u32)?;
             os.write_string(1, &k)?;
-            os.write_bytes(2, &v)?;
+            os.write_string(2, &v)?;
         };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -169,14 +169,14 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x1bsteps/sp_steps_custom.proto\x12\x0cprotos.steps\"}\n\nCustomStep\
     \x126\n\x04args\x18\x01\x20\x03(\x0b2\".protos.steps.CustomStep.ArgsEntr\
     yR\x04args\x1a7\n\tArgsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\
-    \x12\x14\n\x05value\x18\x02\x20\x01(\x0cR\x05value:\x028\x01BBZ@github.c\
-    om/streamdal/streamdal/libs/protos/build/go/protos/stepsJ\x80\x01\n\x06\
+    \x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01BBZ@github.com\
+    /streamdal/streamdal/libs/protos/build/go/protos/stepsJ\x80\x01\n\x06\
     \x12\x04\0\0\x08\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
     \x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\x03\
     \x04\0W\n\n\n\x02\x04\0\x12\x04\x06\0\x08\x01\n\n\n\x03\x04\0\x01\x12\
-    \x03\x06\x08\x12\n\x0b\n\x04\x04\0\x02\0\x12\x03\x07\x02\x1e\n\x0c\n\x05\
-    \x04\0\x02\0\x06\x12\x03\x07\x02\x14\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
-    \x07\x15\x19\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x07\x1c\x1db\x06proto3\
+    \x03\x06\x08\x12\n\x0b\n\x04\x04\0\x02\0\x12\x03\x07\x02\x1f\n\x0c\n\x05\
+    \x04\0\x02\0\x06\x12\x03\x07\x02\x15\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
+    \x07\x16\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x07\x1d\x1eb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
