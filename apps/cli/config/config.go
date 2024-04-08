@@ -57,6 +57,22 @@ type Config struct {
 			} `cmd:"wasm" help:"List custom Wasm module(s)"`
 		} `cmd:"get" help:"Get resources"`
 
+		Update struct {
+			Pipeline struct {
+				JSON string `name:"json" help:"Pipeline JSON file (must specify id)" type:"path" required:"true"`
+			} `cmd:"pipeline" help:"Update an existing pipeline"`
+
+			Wasm struct {
+				ID                string `help:"Wasm module ID" required:"true"`
+				File              string `help:"Wasm module file" type:"path" required:"true"`
+				Name              string `help:"Wasm module name" required:"true"`
+				Function          string `help:"Wasm module entry function name" required:"true"`
+				ModuleVersion     string `help:"Wasm module version"`
+				ModuleDescription string `help:"Wasm module description"`
+				ModuleURL         string `help:"Wasm module URL"`
+			} `cmd:"wasm" help:"Update a custom Wasm module"`
+		} `cmd:"update" help:"Update resources"`
+
 		Delete struct {
 			Pipeline struct {
 				ID string `help:"Pipeline ID" required:"true"`
