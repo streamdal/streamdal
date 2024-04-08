@@ -42,8 +42,8 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
         }
     };
 
-    println!("Input payload: {}", str_json);
-    println!("Input args: {:?}", wasm_request.step.custom().args);
+    println!("<CUSTOM WASM> Payload: {}", str_json);
+    println!("<CUSTOM WASM> Args: {:?}", wasm_request.step.custom().args);
 
     return common::write_response(
         None,

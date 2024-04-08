@@ -65,11 +65,7 @@ dependencies = [
 
 [[package]]
 name = "streamdal-protos"
-<<<<<<< HEAD
-version = "0.1.36"
-=======
 version = "0.1.39"
->>>>>>> 28470e59 (conflict fix: adding custom wasm)
 dependencies = [
  "protobuf",
 ]
