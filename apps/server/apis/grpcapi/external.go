@@ -1397,7 +1397,23 @@ func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmR
 		}
 	}
 
-	// TODO: Emit a SetPipelines command to anyone that used the original Wasm
+	// Emit a SetPipelines command to anyone that used the original Wasm
+	pipelines, err := s.Options.StoreService.GetPipelinesByWasmID(ctx, req.Wasm.Id)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get pipelines by Wasm ID: "+err.Error()), nil
+	}
+
+	for _, p := range pipelines {
+		pipelineUpdateReq := &protos.UpdatePipelineRequest{
+			Pipeline: p,
+		}
+
+		if err := s.Options.BusService.BroadcastUpdatePipeline(ctx, pipelineUpdateReq); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to broadcast pipeline update for wasm update: "+err.Error()), nil
+		}
+	}
 
 	return util.StandardResponse(
 		ctx,
@@ -1444,6 +1460,22 @@ func (s *ExternalServer) DeleteWasm(ctx context.Context, req *protos.DeleteWasmR
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
 				fmt.Sprintf("cannot delete bundled wasm module with ID '%s'", id)), nil
 		}
+
+		// Do not allow deleting wasm modules that are used in pipelines
+		pipelines, err := s.Options.StoreService.GetPipelines(ctx)
+		if err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to get pipelines for delete wasm validation: "+err.Error()), nil
+		}
+
+		for pID, p := range pipelines {
+			for _, s := range p.Steps {
+				if s.GetXWasmId() == id {
+					return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+						fmt.Sprintf("cannot delete wasm module with ID '%s', it is used by pipeline '%s'", id, pID)), nil
+				}
+			}
+		}
 	}
 
 	// All validation has passed, we can safely delete the Wasm modules
@@ -1453,9 +1485,6 @@ func (s *ExternalServer) DeleteWasm(ctx context.Context, req *protos.DeleteWasmR
 				"unable to delete Wasm module: "+err.Error()), nil
 		}
 	}
-
-	// TODO: If this wasm was used in any pipelines, we must emit an updated
-	// SetPipelines command.
 
 	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK,
 		fmt.Sprintf("Successfully deleted '%d' asm module(s)", len(req.Ids))), nil

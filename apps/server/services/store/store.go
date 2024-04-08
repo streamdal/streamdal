@@ -179,6 +179,9 @@ type IStore interface {
 	DeleteWasmByID(ctx context.Context, id string) error
 	DeleteWasmByName(ctx context.Context, name string) error
 	// END Wasm-related methods
+
+	// GetPipelinesByWasmID returns a slice of pipelines that use a given Wasm ID
+	GetPipelinesByWasmID(ctx context.Context, wasmID string) ([]*protos.Pipeline, error)
 }
 
 // Option contains settings that can influence read, write or delete operations.
@@ -1803,4 +1806,23 @@ func (s *Store) SetCreationDate(ctx context.Context, ts int64) error {
 	}
 
 	return nil
+}
+
+func (s *Store) GetPipelinesByWasmID(ctx context.Context, wasmID string) ([]*protos.Pipeline, error) {
+	pipelines, err := s.GetPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching all pipelines in GetPipelinesByWasmID")
+	}
+
+	pipelinesWithWasmID := make([]*protos.Pipeline, 0)
+
+	for _, p := range pipelines {
+		for _, step := range p.Steps {
+			if step.GetXWasmId() == wasmID {
+				pipelinesWithWasmID = append(pipelinesWithWasmID, p)
+			}
+		}
+	}
+
+	return pipelinesWithWasmID, nil
 }
