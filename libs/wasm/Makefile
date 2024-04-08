@@ -25,7 +25,7 @@ setup/darwin:
 
 .PHONY: build
 build: description = Build all targets
-build: clean build/detective build/transform build/httprequest build/kv build/inferschema build/validjson build/schemavalidation
+build: clean build/detective build/transform build/httprequest build/kv build/inferschema build/validjson build/schemavalidation build/custom
 
 .PHONY: build/detective
 build/detective: description = Build WASM target for detective
@@ -38,6 +38,19 @@ build/detective: clean/detective
 clean/detective: description = Remove detective WASM artifacts
 clean/detective:
 	rm -rf detective/target build/detective.wasm
+
+.PHONY: build/custom
+build/custom: description = Build WASM target for custom (example)
+build/custom: clean/custom
+	cd custom && \
+	cargo build --target=wasm32-wasi --release && \
+	wasm-opt -Os -o ../build/custom.wasm target/wasm32-wasi/release/custom.wasm
+
+.PHONY: clean/custom
+clean/custom: description = Remove custom WASM artifact
+clean/custom:
+	rm -rf custom/target build/custom.wasm
+
 
 .PHONY: build/transform
 build/transform: description = Build WASM target for transform
