@@ -1,8 +1,11 @@
 package util
 
 import (
+	"crypto/sha256"
+	"os"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/onsi/gomega"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -68,6 +71,9 @@ var (
 			Audience:    nil,
 		},
 	}
+
+	wasmFile = "../assets/wasm/detective.wasm"
+	modifier = "test"
 )
 
 func TestAudienceFromStr(t *testing.T) {
@@ -77,15 +83,6 @@ func TestAudienceFromStr(t *testing.T) {
 		testAud := AudienceFromStr(entry.StrAudience)
 		g.Expect(testAud).To(gomega.Equal(entry.Audience), "test audience '%+v' does not equal expected audience '%+v'", testAud, entry.Audience)
 	}
-}
-
-func TestInjectSchemaInferenceForSetPipelinesCommands(t *testing.T) {
-	g := gomega.NewWithT(t)
-
-	// Empty commands should return empty commands
-	numInjected, err := InjectSchemaInferenceForSetPipelinesCommands(make([]*protos.Command, 0), "wasmDir")
-	g.Expect(err).ToNot(gomega.HaveOccurred())
-	g.Expect(numInjected).To(gomega.Equal(0))
 }
 
 func TestAudienceToStr(t *testing.T) {
@@ -173,4 +170,85 @@ func TestGetStepType(t *testing.T) {
 	}
 
 	g.Expect(GetStepType(step)).To(gomega.Equal("detective"))
+}
+
+func TestDeterminativeUUID(t *testing.T) {
+	// Should generate a deterministic UUID for a wasm file
+	fileData, err := os.ReadFile(wasmFile)
+	if err != nil {
+		t.Errorf("should be able to read file: %v", err)
+	}
+
+	hash := sha256.Sum256(fileData)
+
+	id, err := uuid.FromBytes(hash[16:])
+	if err != nil {
+		t.Errorf("should be able to generate UUID: %v", err)
+	}
+
+	// Load multiple times, id should be the same every time
+	for i := 0; i < 10; i++ {
+		fileData, err = os.ReadFile(wasmFile)
+		if err != nil {
+			t.Errorf("should be able to read file: %v", err)
+		}
+
+		hash = sha256.Sum256(fileData)
+
+		id, err = uuid.FromBytes(hash[16:])
+		if err != nil {
+			t.Errorf("should be able to generate UUID: %v", err)
+		}
+
+		generatedUUID := DeterminativeUUID(fileData)
+		if generatedUUID != id.String() {
+			t.Errorf("expected %s, got %s", id.String(), generatedUUID)
+		}
+	}
+}
+
+func TestDeterminativeUUIDWithModifier(t *testing.T) {
+	// Has a consistent result using a modifier
+	fileData, err := os.ReadFile(wasmFile)
+	if err != nil {
+		t.Errorf("should be able to read file: %v", err)
+	}
+
+	firstUUID := DeterminativeUUID(fileData, modifier)
+
+	// Load multiple times, id should be the same every time
+	for i := 0; i < 10; i++ {
+		fileData, err = os.ReadFile(wasmFile)
+		if err != nil {
+			t.Errorf("should be able to read file: %v", err)
+		}
+
+		generatedUUID := DeterminativeUUID(fileData, modifier)
+		if generatedUUID != firstUUID {
+			t.Errorf("expected %s, got %s", firstUUID, generatedUUID)
+		}
+	}
+}
+
+func TestDeterminativeUUIDShouldChangeResult(t *testing.T) {
+	// Modifier usage should change result
+	fileData, err := os.ReadFile(wasmFile)
+	if err != nil {
+		t.Errorf("should be able to read file: %v", err)
+	}
+
+	uuidWithoutModifier := DeterminativeUUID(fileData)
+	uuidWithModifier := DeterminativeUUID(fileData, modifier)
+
+	if len(uuidWithoutModifier) == 0 {
+		t.Errorf("without modifier: expected non-empty UUID , got %s", uuidWithoutModifier)
+	}
+
+	if len(uuidWithModifier) == 0 {
+		t.Errorf("with modifier: expected non-empty UUID, got %s", uuidWithModifier)
+	}
+
+	if uuidWithoutModifier == uuidWithModifier {
+		t.Errorf("generated UUIDs should be different, but they are the same: %s VS %s", uuidWithoutModifier, uuidWithModifier)
+	}
 }

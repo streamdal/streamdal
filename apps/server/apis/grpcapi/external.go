@@ -15,8 +15,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/types"
@@ -30,6 +32,9 @@ const (
 
 	// streamKeepaliveInterval is how often we send a keepalive on gRPC streams
 	streamKeepaliveInterval = 10 * time.Second
+
+	// customWasmModifier is the modifier string we use when generating an ID for a custom WASM module
+	customWasmModifier = "~custom~"
 )
 
 // ExternalServer implements the external GRPC API interface
@@ -323,15 +328,20 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		}, nil
 	}
 
+	pipeline, err := getPipelineFromRequest(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline from request")
+	}
+
 	// Create ID for pipeline
-	req.Pipeline.Id = util.GenerateUUID()
+	pipeline.Id = util.GenerateUUID()
 
 	// Populate WASM fields
-	if err := util.PopulateWASMFields(req.Pipeline, s.Options.Config.WASMDir); err != nil {
+	if err := s.Options.WasmService.PopulateWASMFields(ctx, pipeline); err != nil {
 		return nil, errors.Wrap(err, "unable to populate WASM fields")
 	}
 
-	if err := s.Options.StoreService.CreatePipeline(ctx, req.Pipeline); err != nil {
+	if err := s.Options.StoreService.CreatePipeline(ctx, pipeline); err != nil {
 		return nil, errors.Wrap(err, "unable to store pipeline")
 	}
 
@@ -342,10 +352,10 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 	}
 	_ = s.Options.Telemetry.GaugeDelta(types.GaugeUsageNumPipelines, 1, 1.0, telTags...)
 
-	for _, step := range req.Pipeline.Steps {
+	for _, step := range pipeline.Steps {
 		stepTags := []statsd.Tag{
 			{"install_id", s.Options.InstallID},
-			{"pipeline_id", req.Pipeline.Id},
+			{"pipeline_id", pipeline.Id},
 			{"step_type", util.GetStepType(step)},
 		}
 
@@ -354,7 +364,7 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 
 	return &protos.CreatePipelineResponse{
 		Message:    "Pipeline created successfully",
-		PipelineId: req.Pipeline.Id,
+		PipelineId: pipeline.Id,
 	}, nil
 }
 
@@ -370,8 +380,13 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return demoResponse(ctx)
 	}
 
+	pipeline, err := getPipelineFromRequest(req)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipeline from request")
+	}
+
 	// Is this a known pipeline?
-	originalPipeline, err := s.Options.StoreService.GetPipeline(ctx, req.Pipeline.Id)
+	originalPipeline, err := s.Options.StoreService.GetPipeline(ctx, pipeline.Id)
 	if err != nil {
 		if errors.Is(err, store.ErrPipelineNotFound) {
 			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND, err.Error()), nil
@@ -381,17 +396,17 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	}
 
 	// Re-populate WASM bytes (since they are stripped for UI)
-	if err := util.PopulateWASMFields(req.Pipeline, s.Options.Config.WASMDir); err != nil {
+	if err := s.Options.WasmService.PopulateWASMFields(ctx, pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, errors.Wrap(err, "unable to repopulate WASM data").Error()), nil
 	}
 
 	// Update pipeline in storage
-	if err := s.Options.StoreService.UpdatePipeline(ctx, req.Pipeline); err != nil {
+	if err := s.Options.StoreService.UpdatePipeline(ctx, pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
 	}
 
 	// Send telemetry
-	s.sendStepDeltaTelemetry(originalPipeline, req.Pipeline)
+	s.sendStepDeltaTelemetry(originalPipeline, pipeline)
 
 	// Pipeline exists - broadcast the update; handlers will emit updated
 	// SetPipelines command to any connected SDKs.
@@ -402,7 +417,7 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 	return &protos.StandardResponse{
 		Id:      util.CtxRequestId(ctx),
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
-		Message: fmt.Sprintf("pipeline '%s' updated", req.Pipeline.Id),
+		Message: fmt.Sprintf("pipeline '%s' updated", pipeline.Id),
 	}, nil
 }
 
@@ -1237,6 +1252,244 @@ func (s *ExternalServer) AppRegisterReject(ctx context.Context, req *protos.AppR
 	return s.uibffPostRequest("/v1/app/register/reject", req)
 }
 
+// WARNING: All of the CRUD wasm methods have possible races when multiple gRPC
+// clients perform changes. This can be fixed by using a distributed lock.
+
+func (s *ExternalServer) GetWasm(ctx context.Context, req *protos.GetWasmRequest) (*protos.GetWasmResponse, error) {
+	if err := validate.GetWasmRequest(req); err != nil {
+		return nil, errors.Wrap(err, "unable to validate GetWasm request")
+	}
+
+	module, err := s.Options.StoreService.GetWasmByID(ctx, req.Id)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get Wasm entry")
+	}
+
+	// Strip bytes in each module to save b/w and avoid max message size limits
+	module.Bytes = nil
+
+	return &protos.GetWasmResponse{
+		Wasm: module,
+	}, nil
+}
+
+func (s *ExternalServer) GetAllWasm(ctx context.Context, req *protos.GetAllWasmRequest) (*protos.GetAllWasmResponse, error) {
+	if err := validate.GetAllWasmRequest(req); err != nil {
+		return nil, errors.Wrap(err, "unable to validate GetAllWasm request")
+	}
+
+	modules, err := s.Options.StoreService.GetAllWasm(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get all Wasm entries")
+	}
+
+	// Strip bytes in each module to save b/w and avoid max message size limits
+	for _, module := range modules {
+		module.Bytes = nil
+	}
+
+	return &protos.GetAllWasmResponse{
+		Wasm: modules,
+	}, nil
+}
+
+func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmRequest) (*protos.CreateWasmResponse, error) {
+	if err := validate.CreateWasmRequest(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "unable to validate CreateWasm request: %s", err.Error())
+	}
+
+	// Generate ID
+	id := util.DeterminativeUUID(req.Wasm.Bytes, customWasmModifier)
+
+	// Check if this ID already exists - if it does, return an error - user should use UpdateWasm()
+	existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, id)
+	if err != nil {
+		if err != store.ErrWasmNotFound {
+			return nil, status.Errorf(codes.Internal, "unable to complete existing Wasm module check: %s", err.Error())
+		}
+
+		// Wasm not found - great!
+	}
+
+	if existingWasm != nil {
+		// Return a more helpful error message
+		if existingWasm.Name == req.Wasm.Name {
+			return nil, status.Error(codes.AlreadyExists, "Wasm module with this 'id' and 'name' already exists, use external.UpdateWasm() to update")
+		}
+
+		return nil, status.Error(codes.AlreadyExists, "Wasm module with this ID already exists, use external.UpdateWasm() instead")
+	}
+
+	// ID cannot be set by user
+	req.Wasm.Id = id
+
+	// CreatedAt timestamp can only be created by server
+	req.Wasm.XCreatedAtUnixTsNsUtc = util.Pointer(time.Now().UTC().UnixNano())
+
+	// Cannot create bundled wasm modules
+	req.Wasm.XBundled = false
+
+	// Ignore possible UpdatedAt - it is only set by server in UpdateWasm()
+	req.Wasm.XUpdatedAtUnixTsNsUtc = nil
+
+	if err := s.Options.StoreService.SetWasm(ctx, req.Wasm.Name, req.Wasm.Id, req.Wasm); err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to store Wasm module: %s", err.Error())
+	}
+
+	return &protos.CreateWasmResponse{
+		Message: "Wasm module created",
+		Id:      id,
+	}, nil
+}
+
+// UpdateWasm will update _existing_ wasm. Updating bundled wasm modules is not allowed.
+func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmRequest) (*protos.StandardResponse, error) {
+	if err := validate.UpdateWasmRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			"unable to validate UpdateWasm request: "+err.Error()), nil
+	}
+
+	// Wasm with this ID and Name should exist
+	existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, req.Wasm.Id)
+	if err != nil {
+		// Helpful error message
+		if err == store.ErrWasmNotFound {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND,
+				"Existing wasm module not found"), nil
+		}
+
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get existing Wasm module: "+err.Error()), nil
+	}
+
+	// Existing wasm module should exist at this point but let's double check jic
+	if existingWasm == nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_GENERIC_ERROR,
+			"bug? existing Wasm module not found"), nil
+	}
+
+	// Do not allow updating bundled wasm modules
+	if existingWasm.XBundled {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			fmt.Sprintf("cannot update bundled wasm module with ID '%s'", req.Wasm.Id)), nil
+	}
+
+	// New Wasm cannot be set as bundled
+	req.Wasm.XBundled = false
+
+	// Keep the old created at timestamp
+	req.Wasm.XCreatedAtUnixTsNsUtc = existingWasm.XCreatedAtUnixTsNsUtc
+
+	// Update the updated_at timestamp
+	req.Wasm.XUpdatedAtUnixTsNsUtc = util.Pointer(time.Now().UTC().UnixNano())
+
+	// Let's update it
+	if err := s.Options.StoreService.SetWasm(ctx, req.Wasm.Name, req.Wasm.Id, req.Wasm); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to update Wasm module: "+err.Error()), nil
+	}
+
+	// If the name has changed, we need to delete the old entry
+	if req.Wasm.Name != existingWasm.Name {
+		if err := s.Options.StoreService.DeleteWasm(ctx, existingWasm.Name, existingWasm.Id); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to delete old Wasm module': "+err.Error()), nil
+		}
+	}
+
+	// Emit a SetPipelines command to anyone that used the original Wasm
+	pipelines, err := s.Options.StoreService.GetPipelinesByWasmID(ctx, req.Wasm.Id)
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+			"unable to get pipelines by Wasm ID: "+err.Error()), nil
+	}
+
+	for _, p := range pipelines {
+		pipelineUpdateReq := &protos.UpdatePipelineRequest{
+			Pipeline: p,
+		}
+
+		if err := s.Options.BusService.BroadcastUpdatePipeline(ctx, pipelineUpdateReq); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to broadcast pipeline update for wasm update: "+err.Error()), nil
+		}
+	}
+
+	return util.StandardResponse(
+		ctx,
+		protos.ResponseCode_RESPONSE_CODE_OK,
+		fmt.Sprintf("successfully updated wasm module with id '%s', name '%s'", req.Wasm.Id, req.Wasm.Name),
+	), nil
+}
+
+// DeleteWasm will delete a Wasm module by ID. Deleting bundled Wasm modules is
+// not allowed.
+func (s *ExternalServer) DeleteWasm(ctx context.Context, req *protos.DeleteWasmRequest) (*protos.StandardResponse, error) {
+	if err := validate.DeleteWasmRequest(req); err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+			"unable to validate DeleteWasm request: "+err.Error()), nil
+	}
+
+	// Do this in two passes - start with pre-validation.
+	//
+	// NOTE: If we did this in one go and if any, non-first ID fails - the user
+	// would have to keep updating their delete request as subsequent validation
+	// calls will fail because we will have already deleted the Wasm module with
+	// the given ID.
+	for _, id := range req.Ids {
+		// Is there wasm with this ID?
+		existingWasm, err := s.Options.StoreService.GetWasmByID(ctx, id)
+		if err != nil {
+			// Try to be a bit more helpful
+			if err == store.ErrWasmNotFound {
+				return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+					fmt.Sprintf("wasm module with ID '%s' not found", id)), nil
+			}
+
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				fmt.Sprintf("unable to get Wasm module with ID '%s': %s", id, err)), nil
+		}
+
+		if existingWasm == nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_NOT_FOUND,
+				fmt.Sprintf("bug? wasm module with ID '%s' not found", id)), nil
+		}
+
+		// Do not allow deletion of bundled wasm modules
+		if existingWasm.XBundled {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+				fmt.Sprintf("cannot delete bundled wasm module with ID '%s'", id)), nil
+		}
+
+		// Do not allow deleting wasm modules that are used in pipelines
+		pipelines, err := s.Options.StoreService.GetPipelines(ctx)
+		if err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to get pipelines for delete wasm validation: "+err.Error()), nil
+		}
+
+		for pID, p := range pipelines {
+			for _, s := range p.Steps {
+				if s.GetXWasmId() == id {
+					return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_BAD_REQUEST,
+						fmt.Sprintf("cannot delete wasm module with ID '%s', it is used by pipeline '%s'", id, pID)), nil
+				}
+			}
+		}
+	}
+
+	// All validation has passed, we can safely delete the Wasm modules
+	for _, id := range req.Ids {
+		if err := s.Options.StoreService.DeleteWasmByID(ctx, id); err != nil {
+			return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR,
+				"unable to delete Wasm module: "+err.Error()), nil
+		}
+	}
+
+	return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_OK,
+		fmt.Sprintf("Successfully deleted '%d' asm module(s)", len(req.Ids))), nil
+}
+
 func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*protos.StandardResponse, error) {
 	u, err := url.Parse(types.UibffEndpoint + endpoint)
 	if err != nil {
@@ -1283,4 +1536,44 @@ func demoResponse(ctx context.Context) (*protos.StandardResponse, error) {
 		Code:    protos.ResponseCode_RESPONSE_CODE_OK,
 		Message: "Demo mode, request ignored",
 	}, nil
+}
+
+type GenericPipelineRequest interface {
+	~*protos.CreatePipelineRequest | ~*protos.UpdatePipelineRequest
+}
+
+func getPipelineFromRequest[T GenericPipelineRequest](req T) (*protos.Pipeline, error) {
+	var (
+		reqPipeline     *protos.Pipeline
+		reqPipelineJSON []byte
+	)
+
+	switch p := any(req).(type) {
+	case *protos.CreatePipelineRequest:
+		reqPipeline = p.Pipeline
+		reqPipelineJSON = p.PipelineJson
+	case *protos.UpdatePipelineRequest:
+		reqPipeline = p.Pipeline
+		reqPipelineJSON = p.PipelineJson
+	default:
+		return nil, errors.New("unknown request type")
+	}
+
+	// Is it a regular pipeline?
+	if reqPipeline != nil {
+		return reqPipeline, nil
+	}
+
+	// Not a regular pipeline, is it specified as JSON?
+	if len(reqPipelineJSON) != 0 {
+		pipeline := &protos.Pipeline{}
+
+		if err := protojson.Unmarshal(reqPipelineJSON, pipeline); err != nil {
+			return nil, errors.Wrap(err, "unable to unmarshal pipeline JSON")
+		}
+
+		return pipeline, nil
+	}
+
+	return nil, errors.New("pipeline not found in request")
 }

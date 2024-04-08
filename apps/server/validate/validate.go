@@ -5,10 +5,10 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var (
@@ -192,7 +192,27 @@ func CreatePipelineRequest(req *protos.CreatePipelineRequest) error {
 		return ErrNilInput
 	}
 
-	return Pipeline(req.Pipeline, false)
+	if req.Pipeline != nil {
+		return Pipeline(req.Pipeline, false)
+	} else if req.PipelineJson != nil {
+		return PipelineJSON(req.PipelineJson, false)
+	} else {
+		return errors.New("must specify either Pipeline or PipelineJson")
+	}
+}
+
+func PipelineJSON(pipelineJSON []byte, requireID bool) error {
+	if len(pipelineJSON) == 0 {
+		return errors.New("pipeline JSON cannot be empty")
+	}
+
+	pipeline := &protos.Pipeline{}
+
+	if err := protojson.Unmarshal(pipelineJSON, pipeline); err != nil {
+		return errors.Wrap(err, "unable to unmarshal pipeline JSON for validate")
+	}
+
+	return Pipeline(pipeline, requireID)
 }
 
 func Pipeline(p *protos.Pipeline, requireId bool) error {
@@ -253,7 +273,13 @@ func UpdatePipelineRequest(req *protos.UpdatePipelineRequest) error {
 		return ErrNilInput
 	}
 
-	return Pipeline(req.Pipeline, true)
+	if req.Pipeline != nil {
+		return Pipeline(req.Pipeline, true)
+	} else if req.PipelineJson != nil {
+		return PipelineJSON(req.PipelineJson, true)
+	} else {
+		return errors.New("must specify either Pipeline or PipelineJson")
+	}
 }
 
 func DeletePipelineRequest(req *protos.DeletePipelineRequest) error {
@@ -821,6 +847,153 @@ func GetSchemaRequest(r *protos.GetSchemaRequest) error {
 
 	if err := Audience(r.Audience); err != nil {
 		return errors.Wrap(err, "invalid audience")
+	}
+
+	return nil
+}
+
+func GetWasmRequest(r *protos.GetWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if r.Id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	return nil
+}
+
+func GetAllWasmRequest(r *protos.GetAllWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	return nil
+}
+
+func CreateWasmRequest(r *protos.CreateWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if err := Wasm(r.Wasm, false); err != nil {
+		return errors.Wrap(err, "invalid custom wasm")
+	}
+
+	// TODO: Should wasm names be unique?
+	// PROS:
+	//	1. Allow public methods like "UpdateWasmByName" instead of "UpdateWasmByID"
+	//     This simplifies API usage.
+	//  2. Preloading bundled wasm is easy - UpdateWasmByName() and that's it
+	// CONS:
+	//  1. If a user re-uses a Wasm name, it might get confusing
+	//  2. API usage becomes more complex -- DeleteWasmByName() will no longer be possible
+	//  3. ^ Pre-loading Wasm becomes (slightly) more complex
+
+	return nil
+}
+
+func UpdateWasmRequest(r *protos.UpdateWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if err := Wasm(r.Wasm, true); err != nil {
+		return errors.Wrap(err, "invalid custom wasm")
+	}
+
+	return nil
+}
+
+func DeleteWasmRequest(r *protos.DeleteWasmRequest) error {
+	if r == nil {
+		return ErrNilInput
+	}
+
+	if len(r.Ids) < 1 {
+		return errors.New("must specify at least one ID")
+	}
+
+	return nil
+}
+
+func Wasm(w *shared.WasmModule, mustContainID bool) error {
+	if w == nil {
+		return ErrNilInput
+	}
+
+	if mustContainID && w.Id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if w.Name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	// Name should be alpha-numeric + dashes and underscores
+	if !ValidCharactersRegex.MatchString(w.Name) {
+		return ErrInvalidCharacters("Name")
+	}
+
+	if w.Bytes == nil {
+		return ErrNilField("WasmBytes")
+	}
+
+	if len(w.Bytes) == 0 {
+		return errors.New("Bytes cannot be empty")
+	}
+
+	return nil
+}
+
+func SetWasm(name, id string, wasm *shared.WasmModule) error {
+	if name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if err := Wasm(wasm, true); err != nil {
+		return errors.Wrap(err, "invalid custom wasm")
+	}
+
+	return nil
+}
+
+func SetWasmByName(name string, wasm *shared.WasmModule) error {
+	if name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if err := Wasm(wasm, true); err != nil {
+		return errors.Wrap(err, "invalid wasm")
+	}
+
+	return nil
+}
+
+func SetWasmByID(id string, wasm *shared.WasmModule) error {
+	if id == "" {
+		return ErrEmptyField("Id")
+	}
+
+	if err := Wasm(wasm, true); err != nil {
+		return errors.Wrap(err, "invalid wasm")
+	}
+
+	return nil
+}
+
+func DeleteWasm(name, id string) error {
+	if name == "" {
+		return ErrEmptyField("Name")
+	}
+
+	if id == "" {
+		return ErrEmptyField("Id")
 	}
 
 	return nil

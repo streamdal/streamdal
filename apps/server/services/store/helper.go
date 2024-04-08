@@ -47,7 +47,14 @@ const (
 
 	RedisTelemetryAudiencePrefix = "streamdal_telemetry:audience"
 	RedisTelemetryAudienceFormat = "streamdal_telemetry:audience:%x"
+
+	RedisWasmPrefix    = "streamdal_wasm"
+	RedisWasmKeyFormat = "streamdal_wasm:%s:%s" // k: streamdal_wasm:$wasm-name:$wasm-id v: serialized protos.Wasm
 )
+
+func RedisWasmKey(wasmName, wasmID string) string {
+	return strings.ToLower(fmt.Sprintf(RedisWasmKeyFormat, wasmName, wasmID))
+}
 
 func RedisRegisterKey(session, node string) string {
 	return strings.ToLower(fmt.Sprintf(RedisRegisterFormat, session, node))

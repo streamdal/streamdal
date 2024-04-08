@@ -11,13 +11,6 @@ import (
 const (
 	EnvFile         = ".env"
 	EnvConfigPrefix = "STREAMDAL_SERVER"
-
-	// TODO: needed?
-	//// ConfigDir is the directory where we store persistent file configs
-	//ConfigDir = ".streamdal"
-	//
-	//// ConfigFileName is the persistent config's file name under ConfigDir
-	//ConfigFileName = "server.json"
 )
 
 type Config struct {

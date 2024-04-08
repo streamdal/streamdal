@@ -25,6 +25,7 @@ import (
 	"github.com/streamdal/streamdal/apps/server/services/notify"
 	"github.com/streamdal/streamdal/apps/server/services/pubsub"
 	"github.com/streamdal/streamdal/apps/server/services/store"
+	"github.com/streamdal/streamdal/apps/server/services/wasm"
 	"github.com/streamdal/streamdal/apps/server/types"
 	"github.com/streamdal/streamdal/apps/server/util"
 )
@@ -62,6 +63,7 @@ type Options struct {
 	PubSubService   pubsub.IPubSub
 	KVService       kv.IKV
 	Telemetry       statsd.Statter
+	WasmService     wasm.IWasm
 	DemoMode        bool
 	InstallID       string
 	NodeID          string
@@ -320,6 +322,10 @@ func validateOptions(o *Options) error {
 
 	if o.KVService == nil {
 		return errors.New("options.KVService cannot be nil")
+	}
+
+	if o.WasmService == nil {
+		return errors.New("options.WasmService cannot be nil")
 	}
 
 	return nil
