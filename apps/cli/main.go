@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 	"time"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
@@ -11,6 +12,7 @@ import (
 	"github.com/streamdal/streamdal/apps/cli/cmd"
 	"github.com/streamdal/streamdal/apps/cli/config"
 	"github.com/streamdal/streamdal/apps/cli/console"
+	"github.com/streamdal/streamdal/apps/cli/manage"
 	"github.com/streamdal/streamdal/apps/cli/telemetry"
 	"github.com/streamdal/streamdal/apps/cli/types"
 	"github.com/streamdal/streamdal/apps/cli/util"
@@ -36,8 +38,6 @@ func main() {
 
 		logger.SetOutput(f)
 		logger.SetFormatter(log.JSONFormatter)
-	} else {
-		logger = log.Default()
 	}
 
 	if cfg.Debug {
@@ -68,6 +68,31 @@ func main() {
 	_ = t.Gauge(types.GaugeArgsNum, int64(len(cfg.KongContext.Args)), 1.0, cfg.GetStatsdTags()...)
 	_ = t.Inc(types.CounterExecTotal, 1, 1.0, cfg.GetStatsdTags()...)
 
+	command := cfg.KongContext.Command()
+
+	switch {
+	case command == "cli":
+		handleCLICommand(cfg, logger, t)
+	case strings.HasPrefix(command, "manage"):
+		handleManageCommand(cfg, logger, t)
+	default:
+		util.ReportErrorAndExit(t, cfg, errors.Errorf("unknown command: %s", command))
+	}
+}
+
+func handleCLICommand(cfg *config.Config, logger *log.Logger, t statsd.Statter) {
+	if cfg == nil {
+		util.ReportErrorAndExit(t, cfg, errors.New("config cannot be nil"))
+	}
+
+	if logger == nil {
+		util.ReportErrorAndExit(t, cfg, errors.New("logger cannot be nil"))
+	}
+
+	if t == nil {
+		util.ReportErrorAndExit(t, cfg, errors.New("telemetry cannot be nil"))
+	}
+
 	// Initialize console components
 	ui, err := console.New(&console.Options{
 		Config: cfg,
@@ -91,5 +116,45 @@ func main() {
 	// Do the dance
 	if err := c.Run(); err != nil {
 		util.ReportErrorAndExit(t, cfg, errors.Wrap(err, "error during cmd run"))
+	}
+}
+
+func handleManageCommand(cfg *config.Config, logger *log.Logger, t statsd.Statter) {
+	if cfg == nil {
+		util.ReportErrorAndExit(t, cfg, errors.New("config cannot be nil"))
+	}
+
+	if logger == nil {
+		util.ReportErrorAndExit(t, cfg, errors.New("logger cannot be nil"))
+	}
+
+	if t == nil {
+		util.ReportErrorAndExit(t, cfg, errors.New("telemetry cannot be nil"))
+	}
+
+	m, err := manage.New(cfg, logger, t)
+	if err != nil {
+		util.ReportErrorAndExit(t, cfg, errors.Wrap(err, "unable to initialize manage"))
+	}
+
+	switch cfg.KongContext.Command() {
+	case "manage create pipeline":
+		err = m.CreatePipeline(cfg)
+	case "manage create wasm":
+		err = m.CreateWasm(cfg)
+	case "manage get pipeline":
+		err = m.GetPipeline(cfg)
+	case "manage get wasm":
+		err = m.GetWasm(cfg)
+	case "manage delete pipeline":
+		err = m.DeletePipeline(cfg)
+	case "manage delete wasm":
+		err = m.DeleteWasm(cfg)
+	default:
+		util.ReportErrorAndExit(t, cfg, errors.Errorf("unknown manage command: %s", cfg.KongContext.Command()))
+	}
+
+	if err != nil {
+		util.ReportErrorAndExit(t, cfg, errors.Wrap(err, "error during manage command"))
 	}
 }
