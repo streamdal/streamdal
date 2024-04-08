@@ -9,10 +9,10 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface CustomStep {
     /**
-     * @generated from protobuf field: map<string, bytes> args = 1;
+     * @generated from protobuf field: map<string, string> args = 1;
      */
     args: {
-        [key: string]: Uint8Array;
+        [key: string]: string;
     };
 }
 declare class CustomStep$Type extends MessageType<CustomStep> {

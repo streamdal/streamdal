@@ -16,17 +16,17 @@ import { MessageType } from "@protobuf-ts/runtime";
  */
 export interface CustomStep {
     /**
-     * @generated from protobuf field: map<string, bytes> args = 1;
+     * @generated from protobuf field: map<string, string> args = 1;
      */
     args: {
-        [key: string]: Uint8Array;
+        [key: string]: string;
     };
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class CustomStep$Type extends MessageType<CustomStep> {
     constructor() {
         super("protos.steps.CustomStep", [
-            { no: 1, name: "args", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } }
+            { no: 1, name: "args", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
         ]);
     }
     create(value?: PartialMessage<CustomStep>): CustomStep {
@@ -41,7 +41,7 @@ class CustomStep$Type extends MessageType<CustomStep> {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* map<string, bytes> args */ 1:
+                case /* map<string, string> args */ 1:
                     this.binaryReadMap1(message.args, reader, options);
                     break;
                 default:
@@ -64,17 +64,17 @@ class CustomStep$Type extends MessageType<CustomStep> {
                     key = reader.string();
                     break;
                 case 2:
-                    val = reader.bytes();
+                    val = reader.string();
                     break;
                 default: throw new globalThis.Error("unknown map entry field for field protos.steps.CustomStep.args");
             }
         }
-        map[key ?? ""] = val ?? new Uint8Array(0);
+        map[key ?? ""] = val ?? "";
     }
     internalBinaryWrite(message: CustomStep, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* map<string, bytes> args = 1; */
+        /* map<string, string> args = 1; */
         for (let k of Object.keys(message.args))
-            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).bytes(message.args[k]).join();
+            writer.tag(1, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.args[k]).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
