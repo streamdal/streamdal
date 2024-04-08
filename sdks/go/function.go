@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -162,9 +163,20 @@ func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
 
+	stdoutOutput := io.Discard
+	stderrOutput := io.Discard
+
+	if s.config != nil && s.config.EnableStdout {
+		stdoutOutput = os.Stdout
+	}
+
+	if s.config != nil && s.config.EnableStderr {
+		stderrOutput = os.Stderr
+	}
+
 	cfg := wazero.NewModuleConfig().
-		WithStderr(io.Discard).
-		WithStdout(io.Discard).
+		WithStderr(stderrOutput).
+		WithStdout(stdoutOutput).
 		WithSysNanotime().
 		WithSysNanosleep().
 		WithSysWalltime().
