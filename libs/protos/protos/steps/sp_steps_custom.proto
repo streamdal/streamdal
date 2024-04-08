@@ -5,5 +5,5 @@ package protos.steps;
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos/steps";
 
 message CustomStep {
-  map<string, bytes> args = 1;
+  map<string, string> args = 1;
 }

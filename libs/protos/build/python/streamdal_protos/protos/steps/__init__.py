@@ -229,8 +229,8 @@ class TransformTruncateType(betterproto.Enum):
 
 @dataclass(eq=False, repr=False)
 class CustomStep(betterproto.Message):
-    args: Dict[str, bytes] = betterproto.map_field(
-        1, betterproto.TYPE_STRING, betterproto.TYPE_BYTES
+    args: Dict[str, str] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
 
 
