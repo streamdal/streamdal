@@ -1,5 +1,5 @@
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { OP_MODAL_WIDTH } from "./infoDrawer.tsx";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
@@ -8,31 +8,20 @@ import IconX from "tabler-icons/tsx/x.tsx";
 import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
-import { signal, useSignalEffect } from "@preact/signals";
+import { useEffect, useRef, useState } from "preact/hooks";
+import { useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { defaultTailSampleRate } from "../../components/modals/tailRateModal.tsx";
-
-export const MAX_TAIL_SIZE = 100;
-
-export type TailSampleRate = {
-  rate: number;
-  intervalSeconds: number;
-};
-
-export const tailSignal = signal<TailData[] | null>(null);
-export const tailSocketSignal = signal<WebSocket | null>(null);
-export const tailEnabledSignal = signal<boolean>(false);
-export const tailPausedSignal = signal<boolean>(false);
-export const tailSamplingSignal = signal<TailSampleRate>({
-  rate: defaultTailSampleRate.rate,
-  intervalSeconds: defaultTailSampleRate.intervalSeconds,
-});
-export const tailDiffSignal = signal<boolean>(false);
-
-export type TailData = { timestamp: Date; data: string; originalData: string };
+import { initFlowBite } from "../../components/flowbite/init.tsx";
+import {
+  TailData,
+  tailDiffSignal,
+  tailPausedSignal,
+  tailSignal,
+  tailSocketSignal,
+} from "root/components/tail/signals.ts";
+import { tailEnabledSignal } from "../../components/tail/signals.ts";
 
 export const TailRow = ({ row }: { row: TailData }) => {
   return (
@@ -94,6 +83,8 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   };
 
   useEffect(() => {
+    void initFlowBite();
+
     tailSignal.value = [];
     if (
       tailPausedSignal.value
@@ -119,11 +110,6 @@ export const Tail = ({ audience }: { audience: Audience }) => {
         inline: "start",
       });
   }, [tailSignal.value]);
-
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
 
   return (
     <div

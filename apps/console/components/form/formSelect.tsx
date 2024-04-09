@@ -1,5 +1,6 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
 import { isNumeric } from "../../lib/utils.ts";
+import { ChangeEvent, ReactNode } from "react";
 
 export type FormSelectProps = {
   name: string;
@@ -8,7 +9,7 @@ export type FormSelectProps = {
   placeHolder?: string;
   label?: string;
   errors: ErrorType;
-  children: React.ReactNode;
+  children: ReactNode;
   inputClass?: string;
   wrapperClass?: string;
 };
@@ -42,8 +43,8 @@ export const FormSelect = ({
           errors[name] ? "streamdalRed" : "twilight"
         } ${inputClass}`}
         value={value}
-        onChange={(e) =>
-          updateData(data, setData, parsePath(name), e.target.value)}
+        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+          updateData(data, setData, parsePath(name), e.currentTarget.value)}
         placeholder={placeHolder}
       >
         {children}
@@ -59,7 +60,7 @@ export const FormSelect = ({
 export const optionsFromEnum = (optionsEnum: any) =>
   Object.entries(optionsEnum).filter((
     [k, _],
-  ) => isNumeric(k) && k > 0)
+  ) => isNumeric(k) && Number(k) > 0)
     .map(([
       k,
       v,
@@ -74,7 +75,7 @@ export const optionsFromEnum = (optionsEnum: any) =>
 export const kvActionFromEnum = (optionsEnum: any) =>
   Object.entries(optionsEnum).filter((
     [k, _],
-  ) => isNumeric(k) && k > 0)
+  ) => isNumeric(k) && Number(k) > 0)
     .map(([
       k,
       v,
@@ -83,7 +84,7 @@ export const kvActionFromEnum = (optionsEnum: any) =>
         key={`option-type-key-${i}-${k}`}
         value={k}
         disabled={v !== "KV_ACTION_EXISTS"}
-        label={`${v.replace("KV_ACTION_", "")}${
+        label={`${(v as string).replace("KV_ACTION_", "")}${
           v !== "KV_ACTION_EXISTS" ? " - coming soon" : ""
         }`}
       />
@@ -92,7 +93,7 @@ export const kvActionFromEnum = (optionsEnum: any) =>
 export const kvModeFromEnum = (optionsEnum: any) =>
   Object.entries(optionsEnum).filter((
     [k, _],
-  ) => isNumeric(k) && k > 0)
+  ) => isNumeric(k) && Number(k) > 0)
     .map(([
       k,
       v,
@@ -100,14 +101,14 @@ export const kvModeFromEnum = (optionsEnum: any) =>
       <option
         key={`option-type-key-${i}-${k}`}
         value={k}
-        label={v.replace("KV_MODE_", "")}
+        label={(v as string).replace("KV_MODE_", "")}
       />
     ));
 
 export const payloadIncludeEnum = (optionsEnum: any) =>
   Object.entries(optionsEnum).filter((
     [k, _],
-  ) => isNumeric(k) && k > 0)
+  ) => isNumeric(k) && Number(k) > 0)
     .map(([
       k,
       v,
@@ -115,6 +116,6 @@ export const payloadIncludeEnum = (optionsEnum: any) =>
       <option
         key={`option-type-key-${i}-${k}`}
         value={k}
-        label={v.replace("_", " ")}
+        label={(v as string).replace("_", " ")}
       />
     ));

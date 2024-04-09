@@ -1,7 +1,7 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { NotificationsType } from "../index.tsx";
 import { getNotifications } from "../../../lib/fetch.ts";
-import { Notifications } from "../../../islands/notifications.tsx";
+import Notifications from "../../../islands/notifications.tsx";
 
 export const handler: Handlers<NotificationsType> = {
   async GET(_req, ctx) {
@@ -10,7 +10,7 @@ export const handler: Handlers<NotificationsType> = {
     });
   },
   async POST(req, ctx) {
-    const { session } = ctx.state;
+    const { session }: any = ctx.state;
     const success = session.flash("success");
     return ctx.render({
       success,

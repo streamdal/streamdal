@@ -1,4 +1,4 @@
-import { Handlers } from "$fresh/src/server/types.ts";
+import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { handler as pipelineHandler, PipelineRoute } from "./index.tsx";
 import Pipelines from "../../islands/pipelines.tsx";
 

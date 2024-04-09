@@ -4,8 +4,8 @@
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-console-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-console-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-_**Streamdal UI component (console) for visualizing, interacting with and managing
-pipelines and services.**_
+_**Streamdal UI component (console) for visualizing, interacting with and
+managing pipelines and services.**_
 
 ![Console](./console-screenshot.png)
 
@@ -15,6 +15,7 @@ pipelines and services.**_
 ---
 
 ### Development
+
 [![Made with Fresh](https://fresh.deno.dev/fresh-badge.svg)](https://fresh.deno.dev)
 
 The Console is a Deno + Fresh project that uses Preact, ReactFlow and Twind:
@@ -41,16 +42,19 @@ gets confused, you can force update the Deno lib cache with
 **By default, the console will be viewable at: `http://localhost:8080`**
 
 ### Server
+
 This console needs a streamdal-server to run against. See
 [streamdal/server](https://github.com/streamdal/streamdal/blob/main/apps/server/README.md)
 for instructions on running it locally.
 
 ### Running (non-development)
+
 If you just want to run the console and the server together for non-development
 purposes, you can use the install to bring them both up, see:
 https://github.com/streamdal/streamdal#getting-started
 
 ### Dependencies
+
 The console depends on the following dependencies (direct and indirect):
 
 - [streamdal/server](https://github.com/streamdal/streamdal/tree/main/apps/server)
@@ -60,9 +64,11 @@ The console depends on the following dependencies (direct and indirect):
 ## Release
 
 Any push or merge to the `main` branch with any changes in `/apps/console/*`
-will automatically tag and release a new console version with `apps/console/vX.Y.Z`.
+will automatically tag and release a new console version with
+`apps/console/vX.Y.Z`.
 
-In addition, the `VERSION` file will be automatically bumped for display in the console.
+In addition, the `VERSION` file will be automatically bumped for display in the
+console.
 
 <sub>If you'd like to skip running the release action on push/merge to `main`,
 include "norelease" anywhere in the commit message.</sub>

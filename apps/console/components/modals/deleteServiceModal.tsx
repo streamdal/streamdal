@@ -2,10 +2,8 @@ import IconX from "tabler-icons/tsx/x.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
-import { opUpdateSignal } from "../../islands/serviceMap.tsx";
 import { Toast, toastSignal } from "../toasts/toast.tsx";
 import { useState } from "preact/hooks";
-import { serviceSignal } from "../serviceMap/serviceSignal.ts";
 
 export const DeleteServiceModal = (
   { audience, pipeline }: {
@@ -33,9 +31,8 @@ export const DeleteServiceModal = (
         type: success.status ? "success" : "error",
         message: success.message,
       };
-      opModal.value = {};
+      opModal.value = { clients: 0 };
       setOpen(false);
-      // opUpdateSignal.value = null;
     }
   };
 

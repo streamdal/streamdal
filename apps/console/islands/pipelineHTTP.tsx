@@ -54,7 +54,6 @@ export const PipelineHTTP = (
       <FormStringKV
         name={`steps.${stepNumber}.step.httpRequest.request.headers`}
         data={data}
-        setData={setData}
         label="Headers"
         description="Key/value pairs that will be sent along as HTTP request headers"
         errors={errors}

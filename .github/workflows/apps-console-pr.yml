@@ -22,5 +22,5 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Test
-        run: deno task test
+      - name: Check Formatting, Linting, Types & run Test
+        run: deno task ok

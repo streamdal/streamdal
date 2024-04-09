@@ -27,8 +27,8 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Test
-        run: deno task test
+      - name: Check Formatting, Linting, Types & run Test
+        run: deno task ok
 
       - name: Generate new tag (dry run)
         uses: mathieudutour/github-tag-action@v6.1

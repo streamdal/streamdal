@@ -35,26 +35,25 @@ import * as $29 from "./routes/ws/demo/http-request.tsx";
 import * as $30 from "./routes/ws/server-error.tsx";
 import * as $31 from "./routes/ws/service-map.tsx";
 import * as $32 from "./routes/ws/tail.tsx";
-import * as $$0 from "./islands/customNodes.tsx";
-import * as $$1 from "./islands/demo/http-request.tsx";
-import * as $$2 from "./islands/drawer/component.tsx";
-import * as $$3 from "./islands/drawer/infoDrawer.tsx";
-import * as $$4 from "./islands/drawer/operation.tsx";
-import * as $$5 from "./islands/drawer/schema.tsx";
-import * as $$6 from "./islands/drawer/service.tsx";
-import * as $$7 from "./islands/drawer/tail.tsx";
-import * as $$8 from "./islands/emailCollectionForm.tsx";
-import * as $$9 from "./islands/nav.tsx";
-import * as $$10 from "./islands/notification.tsx";
-import * as $$11 from "./islands/notifications.tsx";
-import * as $$12 from "./islands/pipeline.tsx";
-import * as $$13 from "./islands/pipelineActionMenu.tsx";
-import * as $$14 from "./islands/pipelineHTTP.tsx";
-import * as $$15 from "./islands/pipelineSchemaValidation.tsx";
-import * as $$16 from "./islands/pipelineTransform.tsx";
-import * as $$17 from "./islands/pipelines.tsx";
-import * as $$18 from "./islands/serviceMap.tsx";
-import * as $$19 from "./islands/sockets.tsx";
+import * as $$0 from "./islands/demo/http-request.tsx";
+import * as $$1 from "./islands/drawer/component.tsx";
+import * as $$2 from "./islands/drawer/infoDrawer.tsx";
+import * as $$3 from "./islands/drawer/operation.tsx";
+import * as $$4 from "./islands/drawer/schema.tsx";
+import * as $$5 from "./islands/drawer/service.tsx";
+import * as $$6 from "./islands/drawer/tail.tsx";
+import * as $$7 from "./islands/emailCollectionForm.tsx";
+import * as $$8 from "./islands/nav.tsx";
+import * as $$9 from "./islands/notification.tsx";
+import * as $$10 from "./islands/notifications.tsx";
+import * as $$11 from "./islands/pipeline.tsx";
+import * as $$12 from "./islands/pipelineActionMenu.tsx";
+import * as $$13 from "./islands/pipelineHTTP.tsx";
+import * as $$14 from "./islands/pipelineSchemaValidation.tsx";
+import * as $$15 from "./islands/pipelineTransform.tsx";
+import * as $$16 from "./islands/pipelines.tsx";
+import * as $$17 from "./islands/serviceMap.tsx";
+import * as $$18 from "./islands/sockets.tsx";
 
 const manifest = {
   routes: {
@@ -99,26 +98,25 @@ const manifest = {
     "./routes/ws/tail.tsx": $32,
   },
   islands: {
-    "./islands/customNodes.tsx": $$0,
-    "./islands/demo/http-request.tsx": $$1,
-    "./islands/drawer/component.tsx": $$2,
-    "./islands/drawer/infoDrawer.tsx": $$3,
-    "./islands/drawer/operation.tsx": $$4,
-    "./islands/drawer/schema.tsx": $$5,
-    "./islands/drawer/service.tsx": $$6,
-    "./islands/drawer/tail.tsx": $$7,
-    "./islands/emailCollectionForm.tsx": $$8,
-    "./islands/nav.tsx": $$9,
-    "./islands/notification.tsx": $$10,
-    "./islands/notifications.tsx": $$11,
-    "./islands/pipeline.tsx": $$12,
-    "./islands/pipelineActionMenu.tsx": $$13,
-    "./islands/pipelineHTTP.tsx": $$14,
-    "./islands/pipelineSchemaValidation.tsx": $$15,
-    "./islands/pipelineTransform.tsx": $$16,
-    "./islands/pipelines.tsx": $$17,
-    "./islands/serviceMap.tsx": $$18,
-    "./islands/sockets.tsx": $$19,
+    "./islands/demo/http-request.tsx": $$0,
+    "./islands/drawer/component.tsx": $$1,
+    "./islands/drawer/infoDrawer.tsx": $$2,
+    "./islands/drawer/operation.tsx": $$3,
+    "./islands/drawer/schema.tsx": $$4,
+    "./islands/drawer/service.tsx": $$5,
+    "./islands/drawer/tail.tsx": $$6,
+    "./islands/emailCollectionForm.tsx": $$7,
+    "./islands/nav.tsx": $$8,
+    "./islands/notification.tsx": $$9,
+    "./islands/notifications.tsx": $$10,
+    "./islands/pipeline.tsx": $$11,
+    "./islands/pipelineActionMenu.tsx": $$12,
+    "./islands/pipelineHTTP.tsx": $$13,
+    "./islands/pipelineSchemaValidation.tsx": $$14,
+    "./islands/pipelineTransform.tsx": $$15,
+    "./islands/pipelines.tsx": $$16,
+    "./islands/serviceMap.tsx": $$17,
+    "./islands/sockets.tsx": $$18,
   },
   baseUrl: import.meta.url,
 };

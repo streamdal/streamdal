@@ -30,6 +30,16 @@ export const togglePausePipeline = (
 
 export const PausePipelineModal = ({ audience }: { audience: Audience }) => {
   const pipeline = opModal.value.pausePipeline;
+
+  if (!pipeline) {
+    toastSignal.value = {
+      id: "pipelineCrud",
+      type: "error",
+      message: "Pipeline not found",
+    };
+    return null;
+  }
+
   const close = () => opModal.value = { ...opModal.value, pausePipeline: null };
 
   const pause = async () => {

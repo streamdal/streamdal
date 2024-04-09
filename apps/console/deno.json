@@ -5,7 +5,11 @@
     "test": "deno test -A --parallel tests/*",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "build": "deno run -A dev.ts build",
-    "preview": "deno run -A main.ts"
+    "preview": "deno run -A main.ts",
+    "check:types": "deno check **/*.ts && deno check **/*.tsx",
+    "fmt": "deno fmt --check **/*.ts && deno fmt --check **/*.tsx",
+    "lint": "deno lint **/*.ts && deno lint **/*.tsx",
+    "ok": "deno task fmt && deno task lint && deno task check:types && deno task test"
   },
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
   "lint": {
@@ -34,11 +38,8 @@
     "@protobuf-ts/runtime": "https://esm.sh/v132/@protobuf-ts/runtime@2.9.4",
     "@protobuf-ts/runtime-rpc": "https://esm.sh/v132/@protobuf-ts/runtime-rpc@2.9.4",
     "@protobuf-ts/grpcweb-transport": "https://esm.sh/v132/@protobuf-ts/grpcweb-transport@2.9.4",
-    "streamdal-protos/": "https://deno.land/x/streamdal_protos@v0.1.32/",
-    "zod": "https://deno.land/x/zod@v3.21.4",
-    "zod/": "https://deno.land/x/zod@v3.21.4/",
-    "zod-form-data": "https://esm.sh/v132/zod-form-data@2.0.1",
-    "zod-validation-error": "https://esm.sh/v132/zod-validation-error@1.3.1",
+    "streamdal-protos/": "https://deno.land/x/streamdal_protos@v0.1.38/",
+    "zod/": "https://deno.land/x/zod@v3.22.4/",
     "tabler-icons/": "https://deno.land/x/tabler_icons_tsx@0.0.5/",
     "fresh-session/": "https://deno.land/x/fresh_session@0.2.2/"
   },

@@ -1,33 +1,24 @@
-import { HandlerContext, Handlers, RouteConfig } from "$fresh/server.ts";
-import { AppRegistrationRequest } from "streamdal-protos/protos/sp_external.ts";
-import { ErrorType, validate } from "../components/form/validate.ts";
-import {
-  EmailCollectionForm,
-  EmailSchema,
-} from "../islands/emailCollectionForm.tsx";
+import { Handlers, RouteConfig } from "$fresh/server.ts";
+import { validate } from "../components/form/validate.ts";
 import { rejectEmailCollection, sendEmail } from "../lib/mutation.ts";
-import { WithSession } from "fresh-session/mod.ts";
-import { SuccessType } from "./_middleware.ts";
+import { SuccessRoute, SuccessType } from "./_middleware.ts";
 import { setCookie } from "$std/http/cookie.ts";
-
-export type SessionData = { session: Record<string, string>; message?: string };
+import { EmailCollectionForm } from "root/islands/emailCollectionForm.tsx";
+import { EmailSchema } from "root/components/account/email.ts";
 
 export const config: RouteConfig = {
   skipInheritedLayouts: true,
 };
 
-export const handler: Handlers<SuccessType> = {
-  async POST(req: Request, ctx: HandlerContext<SessionData, WithSession>) {
+export const handler: Handlers<SuccessRoute> = {
+  async POST(req, ctx) {
     const emailData = await req.formData();
 
     if (emailData.get("decline")) {
       void rejectEmailCollection();
     } else {
-      const { session } = ctx.state;
-      const { data: email, errors }: {
-        email: AppRegistrationRequest;
-        errors: ErrorType;
-      } = validate(EmailSchema, emailData);
+      const { session }: any = ctx.state;
+      const { data, errors } = validate(EmailSchema, emailData);
 
       if (errors) {
         session.flash("success", {
@@ -38,7 +29,7 @@ export const handler: Handlers<SuccessType> = {
         return new Response("", { status: 400 });
       }
 
-      void sendEmail(email.email);
+      data?.email && void sendEmail(data.email);
       session.flash("success", {
         status: true,
         message: "Thanks!",
@@ -55,7 +46,7 @@ export const handler: Handlers<SuccessType> = {
 
     setCookie(resp.headers, {
       name: "emailPrompted",
-      value: true,
+      value: "true",
       //
       //https://developer.chrome.com/blog/cookie-max-age-expires/
       maxAge: 400 * 24 * 60 * 60,

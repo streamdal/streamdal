@@ -10,14 +10,15 @@ import {
   GroupNode,
   OperationNode,
   ServiceNode,
-} from "./customNodes.tsx";
+} from "../components/serviceMap/customNodes.tsx";
 import { signal, useSignalEffect } from "@preact/signals";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
+import { useRef, useState } from "preact/hooks";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
+
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 import {
   ComponentEdge,
@@ -31,16 +32,14 @@ import { ServerError } from "../components/error/server.tsx";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { showNav } from "./nav.tsx";
+import { showNav } from "root/components/nav/signals.ts";
 
 export type OpUpdate = {
   audience: Audience;
   attachedPipelines?: Pipeline[];
 };
 
-export const opUpdateSignal = signal<OpUpdate | null>(null);
-
-export const nodeTypes = {
+const nodeTypes = {
   service: ServiceNode,
   component: ComponentNode,
   consumerGroup: GroupNode,
@@ -52,49 +51,6 @@ export const nodeTypes = {
 const edgeTypes: EdgeTypes = {
   serviceEdge: ServiceEdge,
   componentEdge: ComponentEdge,
-};
-
-//
-// Todo updates in the ui need some work
-export const updateNodes = (
-  nodes: FlowNode[],
-  nodesMap: Map<string, FlowNode>,
-) => {
-  if (nodes?.length === 0) {
-    return Array.from(serviceSignal.value.nodesMap.values());
-  }
-
-  const newNodes = nodes.filter((n: FlowNode) => nodesMap.has(n.id)).map((
-    n: FlowNode,
-  ) => {
-    const node = {
-      ...nodesMap.get(n.id),
-      position: n.position,
-    };
-    //
-    // remove updated node so only new nodes remain for adding afterwards
-    nodesMap.delete(n.id);
-    return node;
-  });
-  return [...newNodes, ...Array.from(nodesMap.values())];
-};
-
-export const updateEdges = (
-  edges: FlowEdge[],
-  edgesMap: Map<string, FlowEdge>,
-) => {
-  if (edges?.length === 0) {
-    return Array.from(serviceSignal.value.edgesMap.values());
-  }
-
-  const newEdges = edges.filter((e: FlowEdge) => edgesMap.has(e.id)).map((
-    e: FlowEdge,
-  ) => {
-    const edge = edgesMap.get(e.id);
-    edgesMap.delete(e.id);
-    return edge;
-  });
-  return [...newEdges, ...Array.from(edgesMap.values())];
 };
 
 export default function ServiceMapComponent(
@@ -115,7 +71,7 @@ export default function ServiceMapComponent(
     zoom: .85,
   };
 
-  if (success?.message && window?.location?.pathname === "/") {
+  if (success?.message && globalThis?.location?.pathname === "/") {
     toastSignal.value = {
       id: "global",
       type: success.status ? "success" : "error",
@@ -181,13 +137,13 @@ export default function ServiceMapComponent(
         nodeTypes={nodeTypes}
         defaultViewport={defaultViewport}
         edgeTypes={edgeTypes}
-        onClick={(e: React.ChangeEvent<HTMLDivElement>) => clearModal(e)}
+        onClick={(e: any) => clearModal(e)}
       >
         {serverErrorSignal.value === "" &&
           (serviceSignal.value.browserInitialized && nodes.length === 0 ||
             !serviceSignal.value.browserInitialized &&
               initNodes.length === 0) &&
-          <EmptyService error={serverErrorSignal.value} />}
+          <EmptyService />}
 
         <Background
           style={{ height: "100vh" }}

@@ -1,17 +1,15 @@
 import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
 import IconListCheck from "tabler-icons/tsx/list-check.tsx";
 import IconBell from "tabler-icons/tsx/bell.tsx";
-import { signal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
-import { tailEnabledSignal } from "./drawer/tail.tsx";
-
-export const showNav = signal<boolean>(false);
+import { tailEnabledSignal } from "root/components/tail/signals.ts";
+import { showNav } from "root/components/nav/signals.ts";
 
 export const NavBar = () => {
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const clickAway = (event) => {
+    const clickAway = (event: any) => {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target)
@@ -113,7 +111,7 @@ export const NavBar = () => {
       >
         <IconMenu2
           class="w-6 h-6 ml-4 cursor-pointer"
-          onClick={(e) => {
+          onClick={(e: MouseEvent) => {
             e.stopPropagation();
             showNav.value = !showNav.value;
           }}

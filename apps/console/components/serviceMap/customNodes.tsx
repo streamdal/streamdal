@@ -5,8 +5,8 @@ import IconBrandStripe from "tabler-icons/tsx/brand-stripe.tsx";
 import IconBrandAws from "tabler-icons/tsx/brand-aws.tsx";
 import "twind";
 import { OperationType } from "streamdal-protos/protos/sp_common.ts";
-import { ProducerIcon } from "../components/icons/producer.tsx";
-import { ConsumerIcon } from "../components/icons/consumer.tsx";
+import { ProducerIcon } from "../icons/producer.tsx";
+import { ConsumerIcon } from "../icons/consumer.tsx";
 import {
   audienceKey,
   componentKey,
@@ -15,12 +15,12 @@ import {
   setOperationHoverGroup,
   setServiceGroup,
   titleCase,
-} from "../lib/utils.ts";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { NodeData, Operation } from "../lib/nodeMapper.ts";
-import { opModal } from "../components/serviceMap/opModalSignal.ts";
+} from "../../lib/utils.ts";
+import { Tooltip } from "../tooltip/tooltip.tsx";
+import { NodeData, Operation } from "../../lib/nodeMapper.ts";
+import { opModal } from "./opModalSignal.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { ServiceLanguage } from "../components/icons/serviceLanguages.tsx";
+import { ServiceLanguage } from "../icons/serviceLanguages.tsx";
 
 export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
@@ -68,6 +68,7 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
             opModal.value = {
               audience: data.audience,
               displayType: "service",
+              clients: 0,
             };
           }}
         >
@@ -98,6 +99,7 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
               audience: data.audience,
               displayType: "service",
               deleteService: true,
+              clients: 0,
             }}
           className={"p-2 rounded"}
         >
@@ -150,10 +152,9 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
         {`${titleCase(op)}s`}
       </div>
       <div class="flex flex-col items-center justify-center mb w-full">
-        {data.ops.map((o: Operation, i: number) => (
+        {data.ops?.map((o: Operation, i: number) => (
           <OperationNode
             operation={o}
-            css={`${data.ops.length === i + 1 ? "" : "mb-2"}`}
           />
         ))}
       </div>
@@ -193,7 +194,7 @@ export const OperationNode = (
           opModal.value = {
             audience: operation.audience,
             displayType: "operation",
-            clients: operation.clients,
+            clients: operation.clients?.length || 0,
           }}
       >
         <div
@@ -221,7 +222,7 @@ export const OperationNode = (
           opModal.value = {
             audience: operation.audience,
             displayType: "operation",
-            clients: operation.clients,
+            clients: operation.clients?.length || 0,
             deleteOperation: true,
           };
         }}
@@ -303,6 +304,7 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
         opModal.value = {
           audience: data.audience,
           displayType: "component",
+          clients: 0,
         };
       }}
     >

@@ -1,14 +1,14 @@
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { audienceMetricsSignal } from "../components/serviceMap/customEdge.tsx";
-import {
-  MAX_TAIL_SIZE,
-  tailSamplingSignal,
-  tailSignal,
-} from "../islands/drawer/tail.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { demoHttpRequestSignal } from "../routes/demo/http/index.tsx";
+import { MAX_TAIL_SIZE } from "./const.ts";
+import {
+  tailSamplingSignal,
+  tailSignal,
+} from "root/components/tail/signals.ts";
 
 const SOCKET_KEEPALIVE = 30000;
 const socketPing = (webSocket: WebSocket) =>

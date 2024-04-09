@@ -1,24 +1,20 @@
 import IconX from "tabler-icons/tsx/x.tsx";
+
+import { useEffect, useRef, useState } from "preact/hooks";
+import { z } from "zod/mod.ts";
+import { opModal } from "../serviceMap/opModalSignal.ts";
+import { ErrorType, validate } from "../form/validate.ts";
+import { logFormData } from "../../lib/utils.ts";
 import {
+  defaultTailSampleRate,
   tailEnabledSignal,
   tailPausedSignal,
   tailSamplingSignal,
-} from "../../islands/drawer/tail.tsx";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { zfd } from "zod-form-data";
-import * as z from "zod/index.ts";
-import { opModal } from "../serviceMap/opModalSignal.ts";
-import { validate } from "../form/validate.ts";
+} from "root/components/tail/signals.ts";
 
-export const defaultTailSampleRate = {
-  rate: 1,
-  intervalSeconds: 1,
-  maxRate: 25,
-};
-
-export const SampleRateSchema = zfd.formData({
-  rate: zfd.numeric(z.number().min(1)),
-  intervalSeconds: zfd.numeric(z.number().min(1)),
+export const SampleRateSchema = z.object({
+  rate: z.coerce.number().int().min(1),
+  intervalSeconds: z.coerce.number().int().min(1),
 }).refine(
   (data) => {
     return data.rate / data.intervalSeconds <=
@@ -31,10 +27,10 @@ export const SampleRateSchema = zfd.formData({
 );
 
 export const TailRateModal = () => {
-  const modalRef = useRef(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const clickAway = (event) => {
+    const clickAway = (event: any) => {
       if (
         modalRef.current &&
         !modalRef.current.contains(event.target)
@@ -48,14 +44,15 @@ export const TailRateModal = () => {
     };
   }, [modalRef]);
 
-  const [sampleErrors, setSampleErrors] = useState({});
+  const [sampleErrors, setSampleErrors] = useState<ErrorType | null>(null);
 
   const submitSampleRate = async (e: any) => {
     e.preventDefault();
 
     const data = new FormData(e.target);
+    logFormData(data);
     const { errors } = validate(SampleRateSchema, data);
-    setSampleErrors(errors || {});
+    errors && setSampleErrors(errors);
 
     if (errors) {
       return;
@@ -108,7 +105,7 @@ export const TailRateModal = () => {
               <label
                 htmlFor="rate"
                 className={`text-left text-xs mb-[3px] ${
-                  sampleErrors["rate"] && "text-streamdalRed"
+                  sampleErrors && sampleErrors.rate && "text-streamdalRed"
                 }`}
               >
                 Rate
@@ -116,18 +113,20 @@ export const TailRateModal = () => {
               <input
                 name="rate"
                 className={`h-[32px] border mr-2 px-1 ${
-                  sampleErrors["rate"] ? "border-streamdalRed" : ""
+                  sampleErrors && sampleErrors["rate"]
+                    ? "border-streamdalRed"
+                    : ""
                 }`}
-                defaultValue={tailSamplingSignal.value.rate}
+                defaultValue={String(tailSamplingSignal.value.rate)}
               />
               <div className="text-left h-6 text-[12px] mt-1 font-semibold text-streamdalRed">
-                {sampleErrors["rate"]}
+                {sampleErrors?.rate}
               </div>
 
               <label
                 htmlFor="intervalSeconds"
                 className={`text-left text-xs mb-[3px] ${
-                  sampleErrors["intervalSeconds"] && "text-streamdalRed"
+                  sampleErrors?.intervalSeconds && "text-streamdalRed"
                 }`}
               >
                 Interval in seconds
@@ -136,12 +135,12 @@ export const TailRateModal = () => {
               <input
                 name="intervalSeconds"
                 className={`h-[32px] border mr-1 text-sm px-1 ${
-                  sampleErrors["intervalSeconds"] ? "border-streamdalRed" : ""
+                  sampleErrors?.intervalSeconds ? "border-streamdalRed" : ""
                 }`}
-                defaultValue={tailSamplingSignal.value.intervalSeconds}
+                defaultValue={String(tailSamplingSignal.value.intervalSeconds)}
               />
               <div className="text-left h-6 text-[12px] mt-1 font-semibold text-streamdalRed">
-                {sampleErrors["intervalSeconds"]}
+                {sampleErrors?.intervalSeconds}
               </div>
             </div>
             <button

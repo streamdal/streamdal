@@ -4,15 +4,14 @@ import {
   OperationType,
   ResponseCode,
 } from "streamdal-protos/protos/sp_common.ts";
-import { HandlerContext } from "$fresh/server.ts";
-import { resumePipeline } from "../../../../../../../../../../lib/mutation.ts";
+import { resumePipeline } from "root/lib/mutation.ts";
 
 export const handler: Handlers<SuccessType> = {
-  async POST(req, { params }: HandlerContext) {
+  async POST(req, { params }: any) {
     const response = await resumePipeline(params.id, {
       serviceName: params.service,
       componentName: params.component,
-      operationType: OperationType[params.operationType],
+      operationType: OperationType[params.operationType] as any,
       operationName: params.operationName,
     });
 
@@ -22,7 +21,7 @@ export const handler: Handlers<SuccessType> = {
           status: response.code === ResponseCode.OK,
           message: response.code === ResponseCode.OK
             ? "Pipeline successfully resumed"
-            : response.message,
+            : (response as any).error,
         },
       }),
       { status: response.code === ResponseCode.OK ? 200 : 400 },
