@@ -6,7 +6,7 @@ export default function Service(
   { serviceMap }: { serviceMap: ServiceSignal },
 ) {
   const liveServiceInfo = serviceMap.live.find((service) =>
-    service.client?.ServiceName === opModal.value?.audience.serviceName
+    service.client?.ServiceName === opModal.value?.audience?.serviceName
   );
   const serviceLanguage = liveServiceInfo?.client?.language;
 
@@ -22,7 +22,7 @@ export default function Service(
         </div>
         <div class="flex flex-col">
           <h3 class="text-lg text-cloud mx-2">
-            {opModal.value.audience.serviceName}
+            {opModal.value.audience?.serviceName}
           </h3>
         </div>
       </div>

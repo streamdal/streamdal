@@ -3,7 +3,6 @@ import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
-import { opUpdateSignal } from "../../islands/serviceMap.tsx";
 import { Toast, toastSignal } from "../toasts/toast.tsx";
 import { useState } from "preact/hooks";
 
@@ -14,7 +13,7 @@ export const DeleteOperationModal = (
   },
 ) => {
   const [open, setOpen] = useState(true);
-  const close = () => opModal.value = {};
+  const close = () => opModal.value = { clients: 0 };
 
   const deleteOp = async () => {
     const response = await fetch(
@@ -32,9 +31,8 @@ export const DeleteOperationModal = (
         type: success.status ? "success" : "error",
         message: success.message,
       };
-      opModal.value.delete = false;
+      opModal.value.deleteOperation = false;
       setOpen(false);
-      opUpdateSignal.value = null;
     }
     setTimeout(() => {
       close();

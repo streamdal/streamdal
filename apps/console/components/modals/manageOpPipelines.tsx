@@ -2,7 +2,7 @@ import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { PipelineActionMenu } from "../../islands/pipelineActionMenu.tsx";
-import { tailEnabledSignal } from "../../islands/drawer/tail.tsx";
+import { tailEnabledSignal } from "root/components/tail/clientSignals.ts";
 
 export const ManageOpPipelines = (
   { pipelines }: { pipelines: PipelineInfo[] },

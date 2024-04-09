@@ -8,6 +8,16 @@ import { togglePausePipeline } from "./pausePipelineModal.tsx";
 
 export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
   const pipeline = opModal.value.resumePipeline;
+
+  if (!pipeline) {
+    toastSignal.value = {
+      id: "pipelineCrud",
+      type: "error",
+      message: "Pipeline not found",
+    };
+    return null;
+  }
+
   const close = () =>
     opModal.value = { ...opModal.value, resumePipeline: null };
 

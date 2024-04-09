@@ -2,7 +2,7 @@ import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 
 export const DeleteModal = (
-  { id, entityType, entityName, onDelete, onClose }: {
+  { entityType, entityName, onDelete, onClose }: {
     entityType: string;
     entityName: string;
     onDelete: () => void;

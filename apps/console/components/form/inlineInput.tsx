@@ -1,4 +1,5 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
+import { ChangeEvent } from "react";
 
 // An unadorned input for use in non-traditional form placements
 export type FormInputProps = {
@@ -33,8 +34,8 @@ export const InlineInput = ({
           errors[name] ? "streamdalRed" : "white"
         } ${inputClass}`}
         value={value}
-        onChange={(e) =>
-          updateData(data, setData, parsePath(name), e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          updateData(data, setData, parsePath(name), e.currentTarget.value)}
         placeholder={placeHolder}
         size={value?.length}
       />

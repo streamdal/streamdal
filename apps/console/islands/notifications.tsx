@@ -1,45 +1,52 @@
 import { SuccessType } from "../routes/_middleware.ts";
-import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import {
+  NotificationConfig,
+  NotificationType,
+} from "streamdal-protos/protos/sp_notify.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import IconPencil from "tabler-icons/tsx/pencil.tsx";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import NotificationDetail from "./notification.tsx";
-import { useLayoutEffect } from "preact/hooks";
+import { useEffect } from "preact/hooks";
+import { initFlowBite } from "../components/flowbite/init.tsx";
+import IconPencil from "tabler-icons/tsx/pencil.tsx";
 
 const slack = {
   botToken: "",
   channel: "",
 };
 
-const newNotificationConfig = {
+const newNotificationConfig: NotificationConfig = {
   name: "",
-  type: "1",
+  type: NotificationType.SLACK,
   config: {
     oneofKind: "slack",
     slack,
   },
 };
 
-export const Notifications = (
+export default function Notifications(
   { id, notifications, success, add = false }: {
     id?: string;
     notifications?: NotificationConfig[];
-    success: SuccessType;
+    success?: SuccessType;
     add?: boolean;
   },
-) => {
+) {
+  useEffect(() => {
+    void initFlowBite();
+  }, []);
+
   //
   // wrapper supports adding a new entry
   const wrapper = [
-    ...notifications,
-    ...notifications.length === 0 || add ? [newNotificationConfig] : [],
+    ...notifications ? notifications : [],
+    ...notifications?.length === 0 || add ? [newNotificationConfig] : [],
   ];
 
-  const index = id && wrapper?.findIndex((p) => p.id === id);
-  const selected = add ? wrapper.length - 1 : index > -1 ? index : 0;
+  const index = id && wrapper?.findIndex((n) => n.id === id);
+  const selected = add ? wrapper.length - 1 : index && index > -1 ? index : 0;
 
   if (success?.message) {
     toastSignal.value = {
@@ -48,11 +55,6 @@ export const Notifications = (
       message: success.message,
     };
   }
-
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
 
   return (
     <>
@@ -93,10 +95,7 @@ export const Notifications = (
               ))}
             </div>
             <div class="w-full max-h-[80vh] overflow-y-auto">
-              <NotificationDetail
-                notification={wrapper[selected]}
-                success={success}
-              />
+              <NotificationDetail notification={wrapper[selected]} />
             </div>
           </div>
         </div>
@@ -104,4 +103,4 @@ export const Notifications = (
       <Toast id="notifications" />
     </>
   );
-};
+}

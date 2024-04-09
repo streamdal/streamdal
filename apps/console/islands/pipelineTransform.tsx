@@ -197,11 +197,10 @@ export const TransformOptions = (
             label="Value"
             placeHolder={`Truncate after ${
               (step.step.oneofKind === "transform" &&
-                    Number(
-                      step?.step?.transform?.options?.truncateOptions?.type,
-                    ) ||
-                  TransformTruncateType.LENGTH) ===
-                  TransformTruncateType.LENGTH
+                  step?.step.transform?.options?.oneofKind ===
+                    "truncateOptions" &&
+                  step?.step.transform?.options.truncateOptions.type ===
+                    TransformTruncateType.LENGTH)
                 ? "this many bytes"
                 : "this percentage"
             } of the original value `}

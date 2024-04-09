@@ -3,7 +3,7 @@
 window.Sentry && Sentry.onLoad(() => {
   Sentry.init({
     dsn: `https://${
-      document.currentScript.getAttribute("sentryKey")
+      document.currentScript.getAttribute("data-sentryKe")
     }@o464670.ingest.sentry.io/4506161671897088`,
     integrations: [
       new Sentry.BrowserTracing(),

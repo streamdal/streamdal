@@ -11,6 +11,7 @@ import {
   CreateNotificationRequest,
   CreatePipelineRequest,
   DeleteAudienceRequest,
+  DeletePipelineRequest,
   DeleteServiceRequest,
   PausePipelineRequest,
   ResumePipelineRequest,
@@ -90,7 +91,7 @@ export const deletePipeline = async (
 ): Promise<StandardResponse> => {
   const { response }: { response: StandardResponse } = await client
     .deletePipeline(
-      { pipelineId },
+      DeletePipelineRequest.create({ pipelineId }),
       meta,
     );
 
@@ -200,10 +201,8 @@ export const createNotification = async (
     const { response } = await client.createNotification(request, meta);
     //
     // monkey patch a success code in here so we can check for success
-    // downstream just like we do for udpates
-    response.code = ResponseCode.OK;
-
-    return response;
+    // downstream just like we do for updates
+    return { ...response, code: ResponseCode.OK, error: "" };
   } catch (error) {
     console.error("error creating notification", error);
     return {

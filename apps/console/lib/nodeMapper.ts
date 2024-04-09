@@ -2,7 +2,10 @@ import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
 import { audienceKey, componentKey, groupKey, serviceKey } from "./utils.ts";
 import { ServiceMapper } from "./serviceMapper.ts";
-import { GROUP_MARGIN, GROUP_WIDTH } from "../islands/customNodes.tsx";
+import {
+  GROUP_MARGIN,
+  GROUP_WIDTH,
+} from "../components/serviceMap/customNodes.tsx";
 import { CoordinateExtent, MarkerType } from "reactflow";
 import { Position } from "reactflow";
 

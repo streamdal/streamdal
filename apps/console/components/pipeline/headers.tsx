@@ -4,6 +4,7 @@ import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
+import { ChangeEvent } from "react";
 
 export type HeadersType = {
   name: string;
@@ -57,7 +58,7 @@ export const Headers = (
                   <input
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight `}
                     value={k}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setHeaders(
                         headers.map(([k, v], ki) =>
                           ki === i
@@ -82,12 +83,10 @@ export const Headers = (
                       errors[`${name}.${k}`] && "border-streamdalRed"
                     } `}
                     value={v as string}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setHeaders(
                         headers.map(([k, v], ki) =>
-                          ki === i
-                            ? [k, (e.target as HTMLInputElement).value]
-                            : [k, v]
+                          ki === i ? [k, e.currentTarget.value] : [k, v]
                         ),
                       )}
                     disabled={!k}

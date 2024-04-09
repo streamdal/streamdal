@@ -18,6 +18,12 @@ export type PipelineSchemaValidationType = {
 export const SchemaValidationOptions = (
   { stepNumber, step, data, setData, errors }: PipelineSchemaValidationType,
 ) => {
+  if (step?.step?.oneofKind !== "schemaValidation") {
+    return null;
+  }
+  if (step.step?.schemaValidation?.options.oneofKind === undefined) {
+    return null;
+  }
   const type = step.step?.schemaValidation?.type ||
     SchemaValidationType.JSONSCHEMA;
 
@@ -61,6 +67,8 @@ export const SchemaValidationOptions = (
           />
         </>
       );
+    default:
+      return null;
   }
 };
 

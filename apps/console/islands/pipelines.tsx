@@ -3,27 +3,29 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import PipelineDetail, { newPipeline } from "./pipeline.tsx";
+import PipelineDetail from "./pipeline.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
-import { useLayoutEffect } from "preact/hooks";
+import { useEffect } from "preact/hooks";
+import { initFlowBite } from "../components/flowbite/init.tsx";
+import { newPipeline } from "root/components/pipeline/pipeline.ts";
 
 const Pipelines = (
   { id, pipelines, notifications, success, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
-    notifications?: NotificationConfig[];
-    success: SuccessType;
+    notifications: NotificationConfig[];
+    success?: SuccessType;
     add?: boolean;
   },
 ) => {
   //
   // wrapper supports adding a new entry
   const wrapper = [
-    ...pipelines,
-    ...pipelines.length === 0 || add ? [newPipeline] : [],
+    ...pipelines ? pipelines : [],
+    ...pipelines?.length === 0 || add ? [newPipeline] : [],
   ];
 
   const index = id ? wrapper?.findIndex((p) => p.id === id) : 0;
@@ -37,10 +39,9 @@ const Pipelines = (
     };
   }
 
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
+  useEffect(() => {
+    void initFlowBite();
+  }, []);
 
   return (
     <>
@@ -84,7 +85,6 @@ const Pipelines = (
               <PipelineDetail
                 pipeline={wrapper[selected]}
                 notifications={notifications}
-                success={success}
               />
             </div>
           </div>
