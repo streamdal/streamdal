@@ -27,7 +27,7 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Test
+      - name: Check Formatting, Linting, Types & run Test
         run: deno task ok
 
       - name: Generate new tag (dry run)
