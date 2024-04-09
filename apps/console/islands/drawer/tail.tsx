@@ -20,8 +20,8 @@ import {
   tailPausedSignal,
   tailSignal,
   tailSocketSignal,
-} from "root/components/tail/clientSignals.ts";
-import { tailEnabledSignal } from "../../components/tail/clientSignals.ts";
+} from "root/components/tail/signals.ts";
+import { tailEnabledSignal } from "../../components/tail/signals.ts";
 
 export const TailRow = ({ row }: { row: TailData }) => {
   return (

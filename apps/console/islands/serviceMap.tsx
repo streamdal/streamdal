@@ -32,7 +32,7 @@ import { ServerError } from "../components/error/server.tsx";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { showNav } from "root/components/nav/clientSignals.ts";
+import { showNav } from "root/components/nav/signals.ts";
 
 export type OpUpdate = {
   audience: Audience;

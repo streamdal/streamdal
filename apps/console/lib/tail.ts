@@ -14,7 +14,7 @@ import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
   defaultTailSampleRate,
   TailSampleRate,
-} from "root/components/tail/clientSignals.ts";
+} from "root/components/tail/signals.ts";
 
 export const tailAbortSignal = signal<boolean>(false);
 

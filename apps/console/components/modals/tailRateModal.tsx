@@ -10,7 +10,7 @@ import {
   tailEnabledSignal,
   tailPausedSignal,
   tailSamplingSignal,
-} from "root/components/tail/clientSignals.ts";
+} from "root/components/tail/signals.ts";
 
 export const SampleRateSchema = z.object({
   rate: z.coerce.number().int().min(1),

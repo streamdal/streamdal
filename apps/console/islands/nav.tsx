@@ -2,8 +2,8 @@ import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
 import IconListCheck from "tabler-icons/tsx/list-check.tsx";
 import IconBell from "tabler-icons/tsx/bell.tsx";
 import { useEffect, useRef } from "preact/hooks";
-import { tailEnabledSignal } from "root/components/tail/clientSignals.ts";
-import { showNav } from "root/components/nav/clientSignals.ts";
+import { tailEnabledSignal } from "root/components/tail/signals.ts";
+import { showNav } from "root/components/nav/signals.ts";
 
 export const NavBar = () => {
   const menuRef = useRef<HTMLDivElement>(null);

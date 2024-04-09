@@ -17,7 +17,7 @@ import { TailRateModal } from "../../components/modals/tailRateModal.tsx";
 import { useEffect } from "preact/hooks";
 import { initFlowBite } from "../../components/flowbite/init.tsx";
 import { OP_MODAL_WIDTH } from "root/lib/const.ts";
-import { tailEnabledSignal } from "root/components/tail/clientSignals.ts";
+import { tailEnabledSignal } from "root/components/tail/signals.ts";
 import { Tail } from "root/islands/drawer/tail.tsx";
 
 const EmptyDrawer = () => (

@@ -14,7 +14,7 @@ import {
   tailEnabledSignal,
   tailSamplingSignal,
   tailSignal,
-} from "root/components/tail/clientSignals.ts";
+} from "root/components/tail/signals.ts";
 
 export default function Operation(
   { serviceMap }: { serviceMap: ServiceSignal },

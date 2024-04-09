@@ -8,7 +8,7 @@ import { MAX_TAIL_SIZE } from "./const.ts";
 import {
   tailSamplingSignal,
   tailSignal,
-} from "root/components/tail/clientSignals.ts";
+} from "root/components/tail/signals.ts";
 
 const SOCKET_KEEPALIVE = 30000;
 const socketPing = (webSocket: WebSocket) =>
