@@ -1,14 +1,13 @@
-import { opModal } from "../components/serviceMap/opModalSignal.ts";
+import { useEffect, useState } from "preact/hooks";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import IconPlayerPlay from "tabler-icons/tsx/player-play.tsx";
+import { opModal } from "../components/serviceMap/opModalSignal.ts";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import IconAdjustmentsHorizontal from "tabler-icons/tsx/adjustments-horizontal.tsx";
-import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { audienceKey } from "../lib/utils.ts";
-import { useEffect, useState } from "preact/hooks";
 
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
+import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 
 const AttachDetach = (
   { pipeline, attached }: { pipeline: Pipeline; attached: boolean },
@@ -144,18 +143,15 @@ export const PipelineActionMenu = (
         <a
           href={`/pipelines/${pipeline.id}`}
           className="flex items-center"
+          f-partial={`/partials/pipelines/${pipeline.id}`}
+          data-tooltip-target="pipeline-edit"
         >
-          <button
-            type="button"
-            data-tooltip-target="pipeline-edit"
-          >
-            <IconAdjustmentsHorizontal class="w-4 h-4 text-gray-400" />
-          </button>
-          <Tooltip
-            targetId="pipeline-edit"
-            message={"Edit Pipeline"}
-          />
+          <img src="/images/edit.svg" className="w-[24px]" />
         </a>
+        <Tooltip
+          targetId="pipeline-edit"
+          message={"Edit Pipeline"}
+        />
       </div>
     </div>
   );

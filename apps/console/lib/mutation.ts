@@ -185,7 +185,8 @@ export const updateNotification = async (
     return {
       id: "updateNotification",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
-      error,
+      message:
+        "There was a problem updating the notification, please try again later",
     };
   }
 };
@@ -202,13 +203,18 @@ export const createNotification = async (
     //
     // monkey patch a success code in here so we can check for success
     // downstream just like we do for updates
-    return { ...response, code: ResponseCode.OK, error: "" };
+    return {
+      ...response,
+      code: ResponseCode.OK,
+      message: "Notification created!",
+    };
   } catch (error) {
     console.error("error creating notification", error);
     return {
       id: "createNotification",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
-      error,
+      message:
+        "There was a problem creating the notification, please try again later",
     };
   }
 };

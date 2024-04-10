@@ -14,7 +14,9 @@ import { InlineInput } from "../components/form/inlineInput.tsx";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
 import { FormBoolean } from "../components/form/formBoolean.tsx";
 import { NotificationSchema } from "root/components/notifications/schema.ts";
-import { validate } from "root/components/form/validate.ts";
+import { resolveValue, validate } from "root/components/form/validate.ts";
+import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
+import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
 
 export default function NotificationDetail({
   notification,
@@ -22,7 +24,7 @@ export default function NotificationDetail({
   notification: NotificationConfig;
 }) {
   const [errors, setErrors] = useState({});
-  const [data, setData] = useState<any>(notification);
+  const [data, setData] = useState<any>();
 
   useEffect(() => {
     setData({
@@ -31,26 +33,41 @@ export default function NotificationDetail({
   }, [notification]);
 
   const onSubmit = async (e: any) => {
+    e.preventDefault();
     const notificationFormData = new FormData(e.target);
     const { errors } = validate(NotificationSchema, notificationFormData);
     setErrors(errors || {});
 
     if (errors) {
-      e.preventDefault();
       return;
     }
-  };
 
-  useEffect(() => {
-    const oneofKind = NotificationType[data.type].toLowerCase();
-    setData({
-      ...data,
-      config: {
-        ...data.config,
-        oneofKind,
-      },
-    });
-  }, [data.type]);
+    try {
+      const response = await fetch("/notifications/save", {
+        method: "POST",
+        body: notificationFormData,
+      });
+      const json = await response.json();
+
+      toastSignal.value = {
+        id: "notificationSave",
+        type: json.code === ResponseCode.OK ? "success" : "error",
+        message: json.message,
+      };
+
+      if (json.notification?.id) {
+        setData({ ...data, id: json?.notification?.id });
+      }
+    } catch (e) {
+      console.error("form error", e);
+
+      toastSignal.value = {
+        id: "notificationSave",
+        type: "error",
+        message: "There was a problem. Please try again later.",
+      };
+    }
+  };
 
   const addRecipient = () => {
     setData({
@@ -67,7 +84,8 @@ export default function NotificationDetail({
 
   return (
     <>
-      <form onSubmit={onSubmit} action="/notifications/save" method="post">
+      <Toast id={"notificationSave"} />
+      <form onSubmit={onSubmit}>
         <div class="flex items-center justify-between rounded-t px-[18px] pb-[8px] pt-[18px]">
           <div class="flex flex-row items-center">
             <div class="mr-2 h-[54px] text-[30px] font-medium">
@@ -78,6 +96,7 @@ export default function NotificationDetail({
                 data={data}
                 setData={setData}
                 errors={errors}
+                defaultValue={resolveValue(data, "name")}
               />
             </div>
             {<NotificationMenu id={notification?.id} />}
@@ -101,7 +120,7 @@ export default function NotificationDetail({
               />
               <FormHidden
                 name={`config.oneofKind`}
-                value={data.config.oneofKind}
+                value={data?.config?.oneofKind || NotificationType.SLACK}
               />
 
               {data?.type == NotificationType.SLACK && (
@@ -162,23 +181,22 @@ export default function NotificationDetail({
                     <IconPlus class="h-5 w-5 cursor-pointer" />
                   </div>
 
-                  {data?.config?.email?.recipients?.length
-                    ? (
-                      data?.config?.email?.recipients?.map((
-                        r: any,
-                        i: number,
-                      ) => (
-                        <FormInput
-                          name={`config.email.recipients.${i}`}
-                          data={data}
-                          label={`Recipient ${i + 1}.`}
-                          setData={setData}
-                          placeHolder={""}
-                          errors={errors}
-                        />
-                      ))
-                    )
-                    : (
+                  {(
+                    data?.config?.email?.recipients?.map((
+                      r: any,
+                      i: number,
+                    ) => (
+                      <FormInput
+                        name={`config.email.recipients.${i}`}
+                        data={data}
+                        label={`Recipient ${i + 1}.`}
+                        setData={setData}
+                        placeHolder={""}
+                        errors={errors}
+                      />
+                    ))
+                  ) ||
+                    (
                       <FormInput
                         name={`config.email.recipients.0`}
                         data={data}

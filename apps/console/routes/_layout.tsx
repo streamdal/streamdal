@@ -1,4 +1,4 @@
-import { LayoutContext } from "$fresh/server.ts";
+import { FreshContext, LayoutContext } from "$fresh/server.ts";
 import ServiceMapComponent from "../islands/serviceMap.tsx";
 import { NavBar } from "../islands/nav.tsx";
 import { ReactFlowProvider } from "reactflow";
@@ -6,9 +6,9 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { initAllServices } from "../lib/fetch.ts";
 import { GRPC_TOKEN } from "../lib/configs.ts";
 import { CustomError } from "../components/error/custom.tsx";
-import { Partial } from "$fresh/runtime.ts";
 import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
 import { Sockets } from "../islands/sockets.tsx";
+import { Partial } from "$fresh/runtime.ts";
 
 const tokenError = () => (
   <CustomError
@@ -27,7 +27,7 @@ const tokenError = () => (
   />
 );
 
-export default async function Layout(req: Request, ctx: LayoutContext) {
+export default async function Layout(req: Request, ctx: FreshContext) {
   if (!GRPC_TOKEN) {
     return (
       <>
@@ -48,9 +48,10 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
         <InfoDrawer serviceMap={serviceSignal.value} />
       )}
       <div className="flex flex-col w-screen text-web">
-        <Partial name="main-content">
+        <Partial name="overlay-content">
           <ctx.Component />
         </Partial>
+
         <ReactFlowProvider>
           <ServiceMapComponent
             initNodes={serviceSignal.value

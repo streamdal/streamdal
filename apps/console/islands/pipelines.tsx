@@ -56,11 +56,12 @@ const Pipelines = (
             <div class="border-r w-1/3 flex flex-col pb-[16px] overflow-y-auto">
               <div class="flex justify-between items-center pt-[26px] pb-[16px] px-[14px]">
                 <div class="text-[16px] font-bold">Pipelines</div>
-                <a href="/pipelines/add">
-                  <IconPlus
-                    data-tooltip-target="pipeline-add"
-                    class="w-5 h-5 cursor-pointer"
-                  />
+                <a
+                  href="/pipelines/add"
+                  f-partial="/partials/pipelines/add"
+                  data-tooltip-target="pipeline-add"
+                >
+                  <img src="/images/plus.svg" class="w-[20px]" />
                 </a>
                 <Tooltip
                   targetId="pipeline-add"
@@ -68,7 +69,10 @@ const Pipelines = (
                 />
               </div>
               {wrapper?.map((p: Pipeline, i: number) => (
-                <a href={`/pipelines/${p.id}`}>
+                <a
+                  href={`/pipelines/${p.id}`}
+                  f-partial={`/partials/pipelines/${p.id}`}
+                >
                   <div
                     class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
                       i === selected && "bg-sunset"

@@ -1,16 +1,15 @@
-import { SuccessType } from "../routes/_middleware.ts";
+import { useEffect } from "preact/hooks";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import {
   NotificationConfig,
   NotificationType,
 } from "streamdal-protos/protos/sp_notify.ts";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import NotificationDetail from "./notification.tsx";
-import { useEffect } from "preact/hooks";
-import { initFlowBite } from "../components/flowbite/init.tsx";
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
+import { initFlowBite } from "../components/flowbite/init.tsx";
+import { Toast, toastSignal } from "../components/toasts/toast.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
+import NotificationDetail from "./notification.tsx";
 
 const slack = {
   botToken: "",
@@ -18,6 +17,7 @@ const slack = {
 };
 
 const newNotificationConfig: NotificationConfig = {
+  id: "",
   name: "",
   type: NotificationType.SLACK,
   config: {
@@ -69,11 +69,12 @@ export default function Notifications(
             <div class="border-r w-1/3 flex flex-col pb-[16px] overflow-y-auto">
               <div class="flex justify-between items-center pt-[26px] pb-[16px] px-[14px]">
                 <div class="text-[16px] font-bold">Notifications</div>
-                <a href="/notifications/add">
-                  <IconPlus
-                    data-tooltip-target="notification-add"
-                    class="w-5 h-5 cursor-pointer"
-                  />
+                <a
+                  href="/notifications/add"
+                  f-partial="/partials/notifications/add"
+                  data-tooltip-target="notification-add"
+                >
+                  <img src="/images/plus.svg" class="w-[20px]" />
                 </a>
                 <Tooltip
                   targetId="notification-add"
@@ -81,7 +82,10 @@ export default function Notifications(
                 />
               </div>
               {wrapper?.map((n: NotificationConfig, i: number) => (
-                <a href={`/notifications/${n.id}`}>
+                <a
+                  href={`/notifications/${n.id}`}
+                  f-partial={`/partials/notifications/${n.id}`}
+                >
                   <div
                     class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
                       i === selected && "bg-sunset"

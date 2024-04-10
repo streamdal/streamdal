@@ -1,5 +1,6 @@
-import { AppContext } from "$fresh/server.ts";
+import { FreshContext } from "$fresh/server.ts";
 import { Head } from "$fresh/src/runtime/head.ts";
+import { Partial } from "$fresh/runtime.ts";
 import { DEMO, GOOGLE_ANALYTICS_KEY, SENTRY_KEY } from "../lib/configs.ts";
 
 export const GTM_SCRIPT =
@@ -11,7 +12,7 @@ export const GTM_SCRIPT =
 
 export default async function App(
   req: Request,
-  ctx: AppContext,
+  ctx: FreshContext,
 ) {
   return (
     <html lang="en">
