@@ -1,0 +1,12 @@
+apiVersion: crds.streamdal.com/v1
+kind: Notification
+metadata:
+  name: test-notification-email-ses
+spec:
+  notificationName: test-notification
+  notificationConfig: pagerduty
+  notificationConfigPagerduty:
+    notificationConfigPagerdutyToken: "token"
+    notificationConfigPagerdutyServiceEmail: "service@email.com"
+    notificationConfigPagerdutyServiceID: "service-id"
+    notificationConfigPagerdutyUrgency: "high"

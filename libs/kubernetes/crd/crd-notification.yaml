@@ -1,0 +1,129 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: notifications.crds.streamdal.com
+spec:
+  group: crds.streamdal.com
+  scope: Namespaced
+  names:
+    kind: Notification
+    listKind: NotificationList
+    plural: notifications
+    singular: notification
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                # Top-level fields
+                notificationName:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                notificationConfig:
+                  type: string
+                  enum:
+                    - email
+                    - slack
+                    - pagerduty
+
+                # Must be set if notificationConfig is "email"
+                notificationConfigEmail:
+                  type: object
+                  properties:
+                    notificationConfigEmailType:
+                      type: string
+                      enum:
+                        - smtp
+                        - ses
+                    notificationConfigEmailTo:
+                      type: array
+                      items:
+                        type: string
+                        format: email
+                    notificationConfigEmailFrom:
+                      type: string
+                      format: email
+
+                    # Must be set if notificationConfigEmailType is "smtp"
+                    notificationConfigEmailSMTP:
+                      type: object
+                      properties:
+                        notificationConfigEmailSMTPHost:
+                          type: string
+                        notificationConfigEmailSMTPPort:
+                          type: integer
+                        notificationConfigEmailSMTPUsername:
+                          type: string
+                        notificationConfigEmailSMTPPassword:
+                          type: string
+                          format: password
+                        notificationConfigEmailSMTPTLS:
+                          type: boolean
+                      required:
+                        - notificationConfigEmailSMTPHost
+                        - notificationConfigEmailSMTPPort
+                        - notificationConfigEmailSMTPUsername
+                        - notificationConfigEmailSMTPPassword
+                        - notificationConfigEmailSMTPTLS
+
+                    # Must be set if notificationConfigEmailType is "ses"
+                    notificationConfigEmailSES:
+                      type: object
+                      properties:
+                        notificationConfigEmailSESRegion:
+                          type: string
+                          default: us-east-1
+                        notificationConfigEmailSESAccessKey:
+                          type: string
+                        notificationConfigEmailSESSecretKey:
+                          type: string
+                          format: password
+                      required:
+                        - notificationConfigEmailSESAccessKey
+                        - notificationConfigEmailSESSecretKey
+
+                # Must be set if notificationConfig is "slack"
+                notificationConfigSlack:
+                  type: object
+                  properties:
+                    notificationConfigSlackBotToken:
+                      type: string
+                      format: password
+                    notificationConfigSlackChannel:
+                      type: string
+                  required:
+                    - notificationConfigSlackBotToken
+                    - notificationConfigSlackChannel
+
+                # Must be set if notificationConfig is "pagerduty"
+                notificationConfigPagerduty:
+                  type: object
+                  properties:
+                    notificationConfigPagerdutyToken:
+                      type: string
+                      format: password
+                    notificationConfigPagerdutyServiceEmail:
+                      type: string
+                      format: email
+                    notificationConfigPagerdutyServiceID:
+                      type: string
+                    notificationConfigPagerdutyUrgency:
+                      type: string
+                      enum:
+                        - low
+                        - high
+                  required:
+                    - notificationConfigPagerdutyToken
+                    - notificationConfigPagerdutyServiceEmail
+                    - notificationConfigPagerdutyServiceID
+                    - notificationConfigPagerdutyUrgency
+
+              required:
+                - notificationName
+                - notificationConfig

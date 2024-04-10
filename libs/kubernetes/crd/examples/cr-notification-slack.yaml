@@ -1,0 +1,10 @@
+apiVersion: crds.streamdal.com/v1
+kind: Notification
+metadata:
+  name: test-notification-email-ses
+spec:
+  notificationName: test-notification
+  notificationConfig: slack
+  notificationConfigSlack:
+    notificationConfigSlackBotToken: "token"
+    notificationConfigSlackChannel: "channel"

@@ -1,0 +1,39 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: audiences.crds.streamdal.com
+spec:
+  group: crds.streamdal.com
+  scope: Namespaced
+  names:
+    kind: Audience
+    plural: audiences
+    singular: audience
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                audienceServiceName:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                audienceComponentName:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                audienceOperationType:
+                  type: string
+                  enum: ["read", "write"]
+                audienceOperationName:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+              required:
+                - audienceServiceName
+                - audienceComponentName
+                - audienceOperationType
+                - audienceOperationName

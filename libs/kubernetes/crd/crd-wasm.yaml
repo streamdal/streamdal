@@ -1,0 +1,43 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: wasms.crds.streamdal.com
+spec:
+  group: crds.streamdal.com
+  scope: Namespaced
+  names:
+    kind: Wasm
+    plural: wasms
+    singular: wasm
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                wasmName:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                wasmBytes:
+                  type: string
+                  format: byte
+                wasmFunction:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                wasmDescription:
+                  type: string
+                wasmVersion:
+                  type: string
+                  pattern: "^[a-zA-Z0-9_-]+$"
+                wasmUrl:
+                  type: string
+                  format: uri
+              required:
+                - wasmName
+                - wasmBytes
+                - wasmFunction

@@ -1,0 +1,9 @@
+apiVersion: crds.streamdal.com/v1
+kind: Audience
+metadata:
+  name: test
+spec:
+  audienceServiceName: test-service-name
+  audienceComponentName: test-component-name
+  audienceOperationType: read
+  audienceOperationName: test-operation-name

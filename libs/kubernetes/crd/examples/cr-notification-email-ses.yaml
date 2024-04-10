@@ -1,0 +1,15 @@
+apiVersion: crds.streamdal.com/v1
+kind: Notification
+metadata:
+  name: test-notification-email-ses
+spec:
+  notificationName: test-notification
+  notificationConfig: email
+  notificationConfigEmail:
+    notificationConfigEmailType: ses
+    notificationConfigEmailTo: ["to@email.com"]
+    notificationConfigEmailFrom: "from@email.com"
+    notificationConfigEmailSES:
+      notificationConfigEmailSESRegion: "us-west-2"
+      notificationConfigEmailSESAccessKey: "access-key-id"
+      notificationConfigEmailSESSecretKey: "secret-key"

@@ -1,0 +1,8 @@
+apiVersion: crds.streamdal.com/v1
+kind: Wasm
+metadata:
+  name: test
+spec:
+  wasmName: test-name
+  wasmBytes: test-bytes
+  wasmFunction: f

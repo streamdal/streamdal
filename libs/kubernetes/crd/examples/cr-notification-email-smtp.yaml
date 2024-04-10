@@ -1,0 +1,17 @@
+apiVersion: crds.streamdal.com/v1
+kind: Notification
+metadata:
+  name: test-notification-email-smtp
+spec:
+  notificationName: test-notification
+  notificationConfig: email
+  notificationConfigEmail:
+    notificationConfigEmailType: smtp
+    notificationConfigEmailTo: ["to@email.com"]
+    notificationConfigEmailFrom: "from@email.com"
+    notificationConfigEmailSMTP:
+      notificationConfigEmailSMTPHost: "smtp.gmail.com"
+      notificationConfigEmailSMTPPort: 587
+      notificationConfigEmailSMTPUsername: "username"
+      notificationConfigEmailSMTPPassword: "password"
+      notificationConfigEmailSMTPTLS: true
