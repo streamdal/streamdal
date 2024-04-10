@@ -1,5 +1,5 @@
-import { AppContext } from "$fresh/server.ts";
 import { Head } from "$fresh/src/runtime/head.ts";
+import { AppContext } from "$fresh/server.ts";
 import { DEMO, GOOGLE_ANALYTICS_KEY, SENTRY_KEY } from "../lib/configs.ts";
 
 export const GTM_SCRIPT =

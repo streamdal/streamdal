@@ -40,6 +40,8 @@ import {
   newStep,
   PipelineSchema,
 } from "../components/pipeline/pipeline.ts";
+import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
+import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 
 export default function PipelineDetail({
   pipeline,
@@ -99,14 +101,40 @@ export default function PipelineDetail({
   };
 
   const onSubmit = async (e: any) => {
+    e.preventDefault();
     const formData = new FormData(e.target);
 
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
 
     if (errors) {
-      e.preventDefault();
       return;
+    }
+
+    try {
+      const response = await fetch("/pipelines/save", {
+        method: "POST",
+        body: formData,
+      });
+      const json = await response.json();
+
+      toastSignal.value = {
+        id: "pipelineSave",
+        type: json.code === ResponseCode.OK ? "success" : "error",
+        message: json.code === ResponseCode.OK ? "Success!" : json.message,
+      };
+
+      if (json.pipelineId) {
+        setData({ ...data, id: json?.pipelineId });
+      }
+    } catch (e) {
+      console.error("form error", e);
+
+      toastSignal.value = {
+        id: "pipelineSave",
+        type: "error",
+        message: "There was a problem. Please try again later.",
+      };
     }
   };
 
@@ -142,7 +170,12 @@ export default function PipelineDetail({
 
   return (
     <>
-      <form onSubmit={onSubmit} action="/pipelines/save" method="post">
+      <Toast id="pipelineSave" />
+      <form
+        onSubmit={onSubmit}
+        action="/pipelines/save"
+        method="POST"
+      >
         <div class="flex items-center justify-between rounded-t px-[18px] pb-[8px] pt-[18px]">
           <div class="flex flex-row items-center">
             <div class="mr-2 h-[54px] text-[30px] font-medium">

@@ -1,9 +1,9 @@
 import { Handlers } from "$fresh/src/server/types.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { ErrorType, validate } from "../../components/form/validate.ts";
+import { ErrorType, validate } from "../../../components/form/validate.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { upsertPipeline } from "../../lib/mutation.ts";
-import { SuccessType } from "../_middleware.ts";
+import { upsertPipeline } from "../../../lib/mutation.ts";
+import { SuccessType } from "../../_middleware.ts";
 import { PipelineSchema } from "root/components/pipeline/pipeline.ts";
 
 export const handler: Handlers<SuccessType> = {
