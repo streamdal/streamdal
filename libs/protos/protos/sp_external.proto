@@ -67,7 +67,7 @@ service External {
     option deprecated = true;
   }
 
-  // Create an audience. Used for terraform purposes
+  // Create an audience. Used for automation tooling (terraform, k8s cr's)
   rpc CreateAudience(CreateAudienceRequest) returns (protos.StandardResponse);
 
   // Delete an audience
