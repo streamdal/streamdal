@@ -8,6 +8,7 @@ import { audienceKey } from "../lib/utils.ts";
 
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
+import { tailEnabledSignal } from "root/components/tail/signals.ts";
 
 const AttachDetach = (
   { pipeline, attached }: { pipeline: Pipeline; attached: boolean },
@@ -145,6 +146,7 @@ export const PipelineActionMenu = (
           className="flex items-center"
           f-partial={`/partials/pipelines/${pipeline.id}`}
           data-tooltip-target="pipeline-edit"
+          onClick={() => tailEnabledSignal.value = false}
         >
           <img src="/images/edit.svg" className="w-[24px]" />
         </a>
