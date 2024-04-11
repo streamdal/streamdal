@@ -146,7 +146,7 @@ export const processPipeline = async ({
       stepStatus,
       interStepResult,
     } = await runStep({
-      originalData,
+      originalData: data,
       audience,
       configs,
       step,
