@@ -1,22 +1,20 @@
 import { useEffect, useState } from "preact/hooks";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 
-import { FormInput } from "../components/form/formInput.tsx";
-import { FormHidden } from "../components/form/formHidden.tsx";
-import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
+import { resolveValue, validate } from "root/components/form/validate.ts";
+import { NotificationSchema } from "root/components/notifications/schema.ts";
 import {
   NotificationConfig,
   NotificationEmail_Type,
   NotificationPagerDuty_Urgency,
   NotificationType,
 } from "streamdal-protos/protos/sp_notify.ts";
+import { FormBoolean } from "../components/form/formBoolean.tsx";
+import { FormHidden } from "../components/form/formHidden.tsx";
+import { FormInput } from "../components/form/formInput.tsx";
+import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
-import { FormBoolean } from "../components/form/formBoolean.tsx";
-import { NotificationSchema } from "root/components/notifications/schema.ts";
-import { resolveValue, validate } from "root/components/form/validate.ts";
-import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
 
 export default function NotificationDetail({
   notification,
@@ -33,39 +31,13 @@ export default function NotificationDetail({
   }, [notification]);
 
   const onSubmit = async (e: any) => {
-    e.preventDefault();
     const notificationFormData = new FormData(e.target);
     const { errors } = validate(NotificationSchema, notificationFormData);
     setErrors(errors || {});
 
     if (errors) {
+      e.preventDefault();
       return;
-    }
-
-    try {
-      const response = await fetch("/notifications/save", {
-        method: "POST",
-        body: notificationFormData,
-      });
-      const json = await response.json();
-
-      toastSignal.value = {
-        id: "notificationSave",
-        type: json.code === ResponseCode.OK ? "success" : "error",
-        message: json.message,
-      };
-
-      if (json.notification?.id) {
-        setData({ ...data, id: json?.notification?.id });
-      }
-    } catch (e) {
-      console.error("form error", e);
-
-      toastSignal.value = {
-        id: "notificationSave",
-        type: "error",
-        message: "There was a problem. Please try again later.",
-      };
     }
   };
 
@@ -84,8 +56,7 @@ export default function NotificationDetail({
 
   return (
     <>
-      <Toast id={"notificationSave"} />
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} action="/notifications/save" method="post">
         <div class="flex items-center justify-between rounded-t px-[18px] pb-[8px] pt-[18px]">
           <div class="flex flex-row items-center">
             <div class="mr-2 h-[54px] text-[30px] font-medium">

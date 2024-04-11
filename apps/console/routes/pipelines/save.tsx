@@ -18,13 +18,20 @@ export const handler: Handlers<SuccessType> = {
       formData,
     );
 
+    const { session }: any = ctx.state;
+
     if (errors) {
-      return new Response(
-        JSON.stringify({
-          code: ResponseCode.BAD_REQUEST,
-          message: JSON.stringify(errors),
-        }),
-      );
+      session.flash("success", {
+        status: false,
+        message: "Validation failed",
+        errors,
+      });
+      return new Response("", {
+        status: 307,
+        headers: {
+          Location: `/pipelines/${pipeline?.id ? pipeline.id : ""}`,
+        },
+      });
     }
 
     const response = pipeline ? await upsertPipeline(pipeline) : {
@@ -33,6 +40,25 @@ export const handler: Handlers<SuccessType> = {
       message: "There was a problem processing your request",
     };
 
-    return new Response(JSON.stringify(response));
+    session.flash("success", {
+      status: response.code === ResponseCode.OK,
+      message: response.code === ResponseCode.OK
+        ? "Success!"
+        : "Save pipeline failed. Please try again later",
+      ...(response.code !== ResponseCode.OK
+        ? { errors: { apiError: response.message } }
+        : {}),
+    });
+
+    return new Response("", {
+      status: 307,
+      headers: {
+        Location: `/pipelines/${response?.pipelineId}`,
+      },
+    });
   },
 };
+
+export default function PipelineSaveRoute() {
+  return null;
+}
