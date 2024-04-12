@@ -4,11 +4,8 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { z } from "zod/mod.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { ErrorType, validate } from "../form/validate.ts";
-import { logFormData } from "../../lib/utils.ts";
 import {
   defaultTailSampleRate,
-  tailEnabledSignal,
-  tailPausedSignal,
   tailSamplingSignal,
 } from "root/components/tail/signals.ts";
 
@@ -50,7 +47,6 @@ export const TailRateModal = () => {
     e.preventDefault();
 
     const data = new FormData(e.target);
-    logFormData(data);
     const { errors } = validate(SampleRateSchema, data);
     errors && setSampleErrors(errors);
 
@@ -58,17 +54,14 @@ export const TailRateModal = () => {
       return;
     }
 
-    tailSamplingSignal.value.rate = Number(data.get("rate"));
-    tailSamplingSignal.value.intervalSeconds = Number(
-      data.get("intervalSeconds"),
-    );
+    tailSamplingSignal.value = {
+      rate: Number(data.get("rate")),
+      intervalSeconds: Number(
+        data.get("intervalSeconds"),
+      ),
+      default: false,
+    };
 
-    //
-    // restart tail if it's running
-    if (tailEnabledSignal.value && !tailPausedSignal.value) {
-      tailPausedSignal.value = true;
-      setTimeout(() => tailPausedSignal.value = false, 1000);
-    }
     opModal.value = { ...opModal.value, tailRateModal: false };
   };
 

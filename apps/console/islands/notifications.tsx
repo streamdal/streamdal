@@ -59,7 +59,7 @@ export default function Notifications(
   return (
     <>
       <div
-        className={`relative flex flex-col h-screen w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+        className={`relative flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
       >
         <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
           <span className="opacity-50">Home</span> / Manage Notifications

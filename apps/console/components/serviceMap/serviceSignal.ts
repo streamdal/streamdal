@@ -1,8 +1,8 @@
 import { signal } from "@preact/signals";
 import {
-  DisplayServiceMap,
   mapServiceDisplay,
   mapServiceResponse,
+  ServiceDisplay,
   ServiceMapper,
 } from "../../lib/serviceMapper.ts";
 import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
@@ -10,18 +10,18 @@ import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
 export type ServiceSignal =
   & GetAllResponse
   & ServiceMapper
-  & DisplayServiceMap;
+  & ServiceDisplay;
 
 export const initServiceSignal: ServiceSignal = {
   audiences: [],
   configs: {},
-  edgesMap: new Map(),
+  displayEdges: [],
   generatedAtUnixTsNsUtc: "",
   live: [],
   liveAudiences: new Map(),
-  nodesMap: new Map(),
+  displayNodes: [],
   pipelines: {},
-  browserInitialized: false,
+  streamingUpdate: false,
 };
 
 //

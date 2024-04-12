@@ -2,7 +2,6 @@ import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
 import IconListCheck from "tabler-icons/tsx/list-check.tsx";
 import IconBell from "tabler-icons/tsx/bell.tsx";
 import { useEffect, useRef } from "preact/hooks";
-import { tailEnabledSignal } from "root/components/tail/signals.ts";
 import { showNav } from "root/components/nav/signals.ts";
 
 export const NavBar = () => {
@@ -24,7 +23,7 @@ export const NavBar = () => {
   }, [menuRef]);
 
   return (
-    <div ref={menuRef} onClick={() => tailEnabledSignal.value = false}>
+    <div ref={menuRef}>
       <ul
         class={`${
           showNav.value ? "" : "hidden"

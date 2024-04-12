@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals";
 
 export type TailSampleRate = {
+  default?: boolean;
   rate: number;
   intervalSeconds: number;
 };
@@ -14,10 +15,9 @@ export const defaultTailSampleRate = {
 };
 
 export const tailSignal = signal<TailData[] | null>(null);
-export const tailSocketSignal = signal<WebSocket | null>(null);
-export const tailEnabledSignal = signal<boolean>(false);
-export const tailPausedSignal = signal<boolean>(false);
+export const tailRunningSignal = signal<boolean>(false);
 export const tailSamplingSignal = signal<TailSampleRate>({
+  default: true,
   rate: defaultTailSampleRate.rate,
   intervalSeconds: defaultTailSampleRate.intervalSeconds,
 });

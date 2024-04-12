@@ -17,8 +17,6 @@ import { TailRateModal } from "../../components/modals/tailRateModal.tsx";
 import { useEffect } from "preact/hooks";
 import { initFlowBite } from "../../components/flowbite/init.tsx";
 import { OP_MODAL_WIDTH } from "root/lib/const.ts";
-import { tailEnabledSignal } from "root/components/tail/signals.ts";
-import { Tail } from "root/islands/drawer/tail.tsx";
 
 const EmptyDrawer = () => (
   <div class="h-full bg-white">
@@ -33,12 +31,14 @@ const EmptyDrawer = () => (
 
 export const DrawerContents = ({
   serviceMap,
+  audience,
 }: {
   serviceMap: ServiceSignal;
+  audience: Audience;
 }) => {
   switch (opModal.value?.displayType) {
     case "operation":
-      return <Operation serviceMap={serviceMap} />;
+      return <Operation serviceMap={serviceMap} audience={audience} />;
     case "service":
       return <Service serviceMap={serviceMap} />;
     case "component":
@@ -74,7 +74,6 @@ export const Modals = ({ audience }: { audience?: Audience }) => {
         {opModal.value.deleteService && (
           <DeleteServiceModal audience={audience} />
         )}
-        {tailEnabledSignal.value && <Tail audience={audience} />}
         {opModal.value.tailRateModal && <TailRateModal />}
       </>
     )
@@ -101,7 +100,7 @@ export const InfoDrawer = ({
       >
         <div class={`h-full bg-white w-[${OP_MODAL_WIDTH}]`}>
           {audience && opModal.value?.displayType && serviceMap
-            ? <DrawerContents serviceMap={serviceMap} />
+            ? <DrawerContents serviceMap={serviceMap} audience={audience} />
             : <EmptyDrawer />}
         </div>
       </div>

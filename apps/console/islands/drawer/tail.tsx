@@ -4,12 +4,10 @@ import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
 import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
-import IconX from "tabler-icons/tsx/x.tsx";
 import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useSignalEffect } from "@preact/signals";
 import { longDateFormat } from "../../lib/utils.ts";
 import { tailSocket } from "../../lib/sockets.ts";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
@@ -17,11 +15,10 @@ import { initFlowBite } from "../../components/flowbite/init.tsx";
 import {
   TailData,
   tailDiffSignal,
-  tailPausedSignal,
+  tailSamplingSignal,
   tailSignal,
-  tailSocketSignal,
 } from "root/components/tail/signals.ts";
-import { tailEnabledSignal } from "../../components/tail/signals.ts";
+import { tailRunningSignal } from "../../components/tail/signals.ts";
 
 export const TailRow = ({ row }: { row: TailData }) => {
   return (
@@ -68,39 +65,41 @@ export const TailRow = ({ row }: { row: TailData }) => {
 export const Tail = ({ audience }: { audience: Audience }) => {
   const scrollBottom = useRef<HTMLDivElement | null>(null);
   const [fullScreen, setFullScreen] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const socketRef = useRef<WebSocket | null>();
 
   const start = () => {
     if (
-      tailSocketSignal.value == null ||
-      tailSocketSignal.value?.readyState === WebSocket.CLOSED
+      socketRef.current == null ||
+      socketRef.current.readyState === WebSocket.CLOSED
     ) {
-      tailSocketSignal.value = tailSocket("/ws/tail", audience);
+      socketRef.current = tailSocket("/ws/tail", audience);
+      tailRunningSignal.value = true;
     }
   };
 
   const stop = () => {
-    tailSocketSignal.value?.close();
+    socketRef.current?.close();
+    tailRunningSignal.value = false;
   };
 
   useEffect(() => {
     void initFlowBite();
-
     tailSignal.value = [];
-    if (
-      tailPausedSignal.value
-    ) {
-      tailPausedSignal.value = false;
-    }
-    return () => stop();
+    start();
+    return () => {
+      stop();
+      tailSignal.value = [];
+    };
   }, []);
 
-  useSignalEffect(() => {
-    if (tailPausedSignal.value) {
+  useEffect(() => {
+    if (paused) {
       stop();
     } else {
       start();
     }
-  });
+  }, [paused]);
 
   useEffect(() => {
     scrollBottom.current &&
@@ -111,18 +110,28 @@ export const Tail = ({ audience }: { audience: Audience }) => {
       });
   }, [tailSignal.value]);
 
+  useEffect(() => {
+    //
+    // When the tail sample rate changes, we need to restart the websocket
+    if (tailSamplingSignal.value.default === false) {
+      stop();
+      setTimeout(() => {
+      }, 1000);
+    }
+  }, [tailSamplingSignal.value.rate, tailSamplingSignal.value.intervalSeconds]);
+
   return (
     <div
-      class={`relative flex h-screen flex-col w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+      className={`${
+        fullScreen ? "absolute top-0" : "relative"
+      } flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
     >
-      <div class="h-46 bg-streamdalPurple w-full p-4 text-sm font-semibold text-white">
-        <span class="opacity-50">Home</span> / Tail
+      <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
+        <span className="opacity-50">Home</span> / Tail
       </div>
       <div
         class={`flex h-full flex-col bg-white p-4 ${
-          fullScreen
-            ? "absolute bottom-0 left-0 right-0 top-0 z-[51] h-screen w-screen"
-            : ""
+          fullScreen ? "absolute top-0 z-[51] h-screen w-screen" : ""
         }`}
       >
         <div
@@ -139,22 +148,20 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             <div
               class="bg-streamdalPurple flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-pause-play"
-              onClick={() => (tailPausedSignal.value = !tailPausedSignal.value)}
+              onClick={() => (setPaused(!paused))}
             >
-              {tailPausedSignal.value
+              {paused
                 ? <IconPlayerPlayFilled class="h-6 w-6 text-white" />
                 : <IconPlayerPauseFilled class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-pause-play"
-                message={tailPausedSignal.value ? "Resume Tail" : "Pause Tail"}
+                message={paused ? "Resume Tail" : "Pause Tail"}
               />
             </div>
             <div
               class="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-diff"
-              onClick={() => {
-                tailDiffSignal.value = !tailDiffSignal.value;
-              }}
+              onClick={() => tailDiffSignal.value = !tailDiffSignal.value}
             >
               {tailDiffSignal.value
                 ? <IconColumns1 class="h-6 w-6 text-white" />
@@ -179,21 +186,26 @@ export const Tail = ({ audience }: { audience: Audience }) => {
                 message={fullScreen ? "Smaller" : "Fullscreen"}
               />
             </div>
-            <div
-              className="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
-              data-tooltip-target="tail-close"
-              onClick={() => (tailEnabledSignal.value = false)}
-            >
-              <IconX class="h-6 w-6 text-white" />
-              <Tooltip targetId="tail-close" message="Close Tail" />
-            </div>
+
+            <a href="/" f-partial="/partials">
+              <div
+                className="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
+                data-tooltip-target="tail-close"
+              >
+                <img
+                  src="/images/x-white.svg"
+                  class="w-[14px]"
+                />
+                <Tooltip targetId="tail-close" message="Close Tail" />
+              </div>
+            </a>
           </div>
         </div>
         <div
           class={`mx-auto flex flex-col w-[${
             fullScreen ? "100" : "90"
           }%] h-[calc(100vh-${
-            fullScreen ? "200" : "260"
+            fullScreen ? "0" : "260"
           }px)] dark-scrollbar overflow-y-scroll rounded-md bg-black text-white`}
         >
           {tailSignal.value?.map((tail: TailData) => <TailRow row={tail} />)}
