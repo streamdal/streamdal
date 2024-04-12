@@ -7,10 +7,10 @@ export type ServiceMapper = GetAllResponse & {
   liveAudiences: Map<string, ClientInfo[]>;
 };
 
-export type DisplayServiceMap = {
-  nodesMap: Map<string, FlowNode>;
-  edgesMap: Map<string, FlowEdge>;
-  browserInitialized?: boolean;
+export type ServiceDisplay = {
+  displayNodes: FlowNode[];
+  displayEdges: FlowEdge[];
+  streamingUpdate?: boolean;
 };
 
 export const mapLiveAudiences = (live: LiveInfo[]) => {
@@ -39,12 +39,7 @@ export const mapServiceResponse = (
 
 export const mapServiceDisplay = (
   serviceMap: ServiceMapper,
-): DisplayServiceMap => {
-  const nodesMap = mapNodes(serviceMap);
-  const edgesMap = mapEdges(serviceMap.audiences);
-
-  return {
-    nodesMap,
-    edgesMap,
-  };
-};
+): ServiceDisplay => ({
+  displayNodes: Array.from(mapNodes(serviceMap).values()),
+  displayEdges: Array.from(mapEdges(serviceMap.audiences).values()),
+});

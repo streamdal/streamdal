@@ -108,6 +108,18 @@ export const audienceKey = (audience: Audience) =>
     OperationType[audience.operationType]
   }:${audience.operationName}:${audience.componentName}`.toLowerCase();
 
+export const audienceFromKey = (key: string): Audience => {
+  const a = key.split(":");
+  return {
+    serviceName: a[0],
+    operationType: a[1].substring(a[1].lastIndexOf("_") + 1) === "consumer"
+      ? OperationType.CONSUMER
+      : OperationType.PRODUCER,
+    componentName: a[3],
+    operationName: a[2],
+  };
+};
+
 export const edgeKey = (audience: Audience) =>
   `${audience.serviceName}/operation_type_${
     OperationType[audience.operationType]

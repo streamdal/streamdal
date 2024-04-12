@@ -1,7 +1,6 @@
 import ReactFlow, {
   Background,
   EdgeTypes,
-  ReactFlowInstance,
   useEdgesState,
   useNodesState,
 } from "reactflow";
@@ -11,13 +10,14 @@ import {
   OperationNode,
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
-import { signal, useSignalEffect } from "@preact/signals";
+import { useSignalEffect } from "@preact/signals";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
-import { useRef, useState } from "preact/hooks";
+import { useRef } from "preact/hooks";
 import { OP_MODAL_WIDTH } from "root/lib/const.ts";
+import { ServerError } from "../components/error/server.tsx";
 
 import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 import {
@@ -28,10 +28,7 @@ import {
   OP_MODAL_KEY,
   opModal,
 } from "../components/serviceMap/opModalSignal.ts";
-import { ServerError } from "../components/error/server.tsx";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
-import { SuccessType } from "../routes/_middleware.ts";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { showNav } from "root/components/nav/signals.ts";
 
 export type OpUpdate = {
@@ -53,43 +50,20 @@ const edgeTypes: EdgeTypes = {
   componentEdge: ComponentEdge,
 };
 
-export default function ServiceMapComponent(
-  { initNodes, initEdges, success }: {
+export default function ServiceDisplay(
+  { initNodes, initEdges }: {
     initNodes: FlowNode[];
     initEdges: FlowEdge[];
-    success?: SuccessType;
   },
 ) {
   const wrapper = useRef<HTMLDivElement | null>(null);
-  const [rfInstance, setRfInstance] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges);
 
   const defaultViewport = {
     x: 0,
     y: 150,
-    zoom: .85,
-  };
-
-  if (success?.message && globalThis?.location?.pathname === "/") {
-    toastSignal.value = {
-      id: "global",
-      type: success.status ? "success" : "error",
-      message: success.message,
-    };
-  }
-
-  const fit = (nodes: FlowNode[], rfInstance: any) => {
-    const rect = wrapper?.current?.getBoundingClientRect();
-    if (
-      rect?.right && rfInstance &&
-      nodes.find((n: FlowNode) => n.position.x > rect.right)
-    ) {
-      //
-      // TODO, use useNodesInitialized instead of a timeout hack,
-      // which doesn't currently work in our deno fresh setup
-      setTimeout(() => rfInstance.fitView(), 100);
-    }
+    zoom: .65,
   };
 
   useSignalEffect(() => {
@@ -97,15 +71,9 @@ export default function ServiceMapComponent(
   });
 
   useSignalEffect(() => {
-    if (serviceSignal.value) {
-      const nodes: FlowNode[] = Array.from(
-        serviceSignal.value.nodesMap.values(),
-      );
-      setNodes(Array.from(serviceSignal.value.nodesMap.values()));
-      serviceSignal.value.edgesMap &&
-        setEdges(Array.from(serviceSignal.value.edgesMap.values()));
-
-      fit(nodes, rfInstance);
+    if (serviceSignal.value?.streamingUpdate) {
+      setNodes(serviceSignal.value.displayNodes);
+      setEdges(serviceSignal.value.displayEdges);
     }
   });
 
@@ -121,15 +89,7 @@ export default function ServiceMapComponent(
       ref={wrapper}
       onClick={() => showNav.value = false}
     >
-      {serverErrorSignal.value
-        ? <ServerError message={serverErrorSignal.value} />
-        : null}
-      <Toast id={"global"} />
       <ReactFlow
-        onInit={(reactFlowInstance: ReactFlowInstance) => {
-          fit(nodes, reactFlowInstance);
-          setRfInstance(reactFlowInstance as any);
-        }}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -139,11 +99,12 @@ export default function ServiceMapComponent(
         edgeTypes={edgeTypes}
         onClick={(e: any) => clearModal(e)}
       >
-        {serverErrorSignal.value === "" &&
-          (serviceSignal.value.browserInitialized && nodes.length === 0 ||
-            !serviceSignal.value.browserInitialized &&
-              initNodes.length === 0) &&
-          <EmptyService />}
+        {serverErrorSignal.value
+          ? <ServerError message={serverErrorSignal.value} />
+          : nodes.length === 0 &&
+              initNodes.length === 0
+          ? <EmptyService />
+          : null}
 
         <Background
           style={{ height: "100vh" }}

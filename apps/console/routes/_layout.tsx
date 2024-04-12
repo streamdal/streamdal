@@ -5,10 +5,12 @@ import { CustomError } from "../components/error/custom.tsx";
 import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
 import { NavBar } from "../islands/nav.tsx";
-import ServiceMapComponent from "../islands/serviceMap.tsx";
+
 import { Sockets } from "../islands/sockets.tsx";
 import { GRPC_TOKEN } from "../lib/configs.ts";
 import { initAllServices } from "../lib/fetch.ts";
+import ServiceDisplay from "../islands/serviceDisplay.tsx";
+import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 
 const tokenError = () => (
   <CustomError
@@ -40,27 +42,33 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
   await initAllServices();
   const success = ctx.data?.success;
 
+  if (success?.message && globalThis?.location?.pathname === "/") {
+    toastSignal.value = {
+      id: "global",
+      type: success.status ? "success" : "error",
+      message: success.message,
+    };
+  }
+
   return (
     <>
       <Sockets />
+      <Toast id={"global"} />
       <NavBar />
-      {!req.url.includes("/email") && (
-        <InfoDrawer serviceMap={serviceSignal.value} />
-      )}
-      <div className="flex flex-col w-screen text-web">
-        <Partial name="overlay-content">
-          <ctx.Component />
-        </Partial>
+      <div className="flex flex-col w-full text-web">
+        <div className="flex flex-row w-full justify-between">
+          <Partial name="overlay-content">
+            <ctx.Component />
+          </Partial>
+          {!req.url.includes("/email") && (
+            <InfoDrawer serviceMap={serviceSignal.value} />
+          )}
+        </div>
 
         <ReactFlowProvider>
-          <ServiceMapComponent
-            initNodes={serviceSignal.value
-              ? Array.from(serviceSignal.value.nodesMap.values())
-              : []}
-            initEdges={serviceSignal.value
-              ? Array.from(serviceSignal.value.edgesMap.values())
-              : []}
-            success={success}
+          <ServiceDisplay
+            initNodes={serviceSignal.value?.displayNodes || []}
+            initEdges={serviceSignal.value?.displayEdges || []}
           />
         </ReactFlowProvider>
 

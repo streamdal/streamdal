@@ -1,35 +1,38 @@
 import { ConsumerIcon } from "../../components/icons/consumer.tsx";
 import { ProducerIcon } from "../../components/icons/producer.tsx";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
-import { OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { useState } from "preact/hooks";
-import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
+import {
+  ServiceSignal,
+  serviceSignal,
+} from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
 import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
 import { Schema } from "./schema.tsx";
 import IconEdit from "tabler-icons/tsx/edit.tsx";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { effect } from "@preact/signals";
-import {
-  tailEnabledSignal,
-  tailSamplingSignal,
-  tailSignal,
-} from "root/components/tail/signals.ts";
+import { useSignalEffect } from "@preact/signals";
+import { tailSamplingSignal } from "root/components/tail/signals.ts";
+import { audienceKey } from "../../lib/utils.ts";
+import { tailRunningSignal } from "../../components/tail/signals.ts";
 
 export default function Operation(
-  { serviceMap }: { serviceMap: ServiceSignal },
+  { serviceMap, audience }: { serviceMap: ServiceSignal; audience: Audience },
 ) {
   const [managePipelines, setManagePipelines] = useState(true);
   const [tailNavOpen, setTailNavOpen] = useState(true);
   const [schemaNavOpen, setSchemaNavOpen] = useState(true);
-  const pipelines = Object.values(serviceMap?.pipelines);
+  const [pipelines, setPipelines] = useState(
+    Object.values(serviceMap?.pipelines),
+  );
+  const [clients, setClients] = useState(opModal.value.clients);
+  const key = audienceKey(audience);
 
-  const audience = opModal.value.audience;
-  const clients = opModal.value.clients;
-
-  effect(() => {
-    if (!tailEnabledSignal.value) {
-      tailSignal.value = [];
+  useSignalEffect(() => {
+    if (serviceSignal.value?.streamingUpdate) {
+      setPipelines(Object.values(serviceSignal.value.pipelines));
+      setClients(serviceSignal.value.liveAudiences?.get(key)?.length || 0);
     }
   });
 
@@ -134,13 +137,17 @@ export default function Operation(
                         message={"Change sample rate."}
                       />
                     </div>
-                    <button
+                    <a
+                      href={tailRunningSignal.value
+                        ? "/"
+                        : `/tail/${encodeURIComponent(key)}`}
+                      f-partial={tailRunningSignal.value
+                        ? "/partials"
+                        : `/partials/tail/${encodeURIComponent(key)}`}
                       className={`mt-2 text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
-                      onClick={() =>
-                        tailEnabledSignal.value = !tailEnabledSignal.value}
                     >
-                      {tailEnabledSignal.value ? "Stop Tail" : "Start Tail"}
-                    </button>
+                      {tailRunningSignal.value ? "Stop Tail" : "Start Tail"}
+                    </a>
                   </div>
                 )
                 : null}
