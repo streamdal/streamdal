@@ -26,7 +26,7 @@ export const TailRow = ({ row }: { row: TailData }) => {
       <div className="text-stormCloud w-full">
         {row.timestamp?.toLocaleDateString("en-us", longDateFormat)}
       </div>
-      <div class="item-center flex w-full flex-row justify-between">
+      <div class="item-center flex flex-row justify-between">
         {tailDiffSignal.value && (
           <div class="w-[49%] overflow-x-scroll">
             <div className="text-stormCloud text-sm">Before:</div>
@@ -122,22 +122,22 @@ export const Tail = ({ audience }: { audience: Audience }) => {
 
   return (
     <div
-      className={`${
-        fullScreen ? "absolute top-0" : "relative"
-      } flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
+      className={`flex flex-col h-screen ${
+        fullScreen
+          ? "z-[51] absolute top-0 bottom-0 left-0 right-0"
+          : `relative w-[calc(100vw-${OP_MODAL_WIDTH})]`
+      }`}
     >
-      <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
-        <span className="opacity-50">Home</span> / Tail
-      </div>
+      {!fullScreen && (
+        <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
+          <span className="opacity-50">Home</span> / Tail
+        </div>
+      )}
       <div
-        class={`flex h-full flex-col bg-white p-4 ${
-          fullScreen ? "absolute top-0 z-[51] h-screen w-screen" : ""
-        }`}
+        class={`flex h-full flex-col bg-white px-12`}
       >
         <div
-          class={`flew-row item-center mx-auto my-4 mt-6 flex justify-between text-3xl font-medium w-[${
-            fullScreen ? "100" : "90"
-          }%]`}
+          class={`flex flew-row item-center my-4 mt-6 justify-between text-3xl font-medium`}
         >
           <div class="flex flex-row items-center justify-start">
             <span class="mr-1">Tail</span>
@@ -202,11 +202,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
           </div>
         </div>
         <div
-          class={`mx-auto flex flex-col w-[${
-            fullScreen ? "100" : "90"
-          }%] h-[calc(100vh-${
-            fullScreen ? "0" : "260"
-          }px)] dark-scrollbar overflow-y-scroll rounded-md bg-black text-white`}
+          class={`flex flex-col ${
+            fullScreen ? "h-[calc(100vh-120px)]" : "h-[calc(100vh-240px)]"
+          } dark-scrollbar overflow-y-scroll rounded-md bg-black text-white`}
         >
           {tailSignal.value?.map((tail: TailData) => <TailRow row={tail} />)}
           <div ref={scrollBottom} />
