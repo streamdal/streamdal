@@ -66,7 +66,7 @@ const edgeTypes: EdgeTypes = {
   componentEdge: ComponentEdge,
 };
 
-export const mergeNodes = (
+const mergeNodes = (
   left: FlowNode[],
   right: FlowNode[],
 ) =>
@@ -84,7 +84,8 @@ const serializeDisplay = debounce(
 
 const deserializeDisplay = () => {
   try {
-    return JSON.parse(localStorage.getItem(LAYOUT_KEY));
+    const layout = localStorage.getItem(LAYOUT_KEY);
+    return layout ? JSON.parse(layout) : null;
   } catch (e) {
     console.error("failed to deserialize and parse saved service layout", e);
   }
@@ -132,7 +133,7 @@ export default function ServiceDisplay(
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={(change) => {
+        onNodesChange={(change: any) => {
           onNodesChange(change);
           rfInstance && serializeDisplay(rfInstance);
         }}
@@ -155,7 +156,7 @@ export default function ServiceDisplay(
         <Controls position="bottom-right" style={{ marginBottom: "80px" }}>
           <ControlButton
             onClick={() => {
-              localStorage.setItem(LAYOUT_KEY, null);
+              localStorage.removeItem(LAYOUT_KEY);
               setNodes(serviceSignal.value.displayNodes);
             }}
             title="reset view"
