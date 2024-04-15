@@ -1,23 +1,15 @@
 import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
-import { ClientInfo } from "streamdal-protos/protos/sp_info.ts";
-import { audienceKey, componentKey, groupKey, serviceKey } from "./utils.ts";
+import { componentKey, groupKey, serviceKey } from "./utils.ts";
 import { ServiceMapper } from "./serviceMapper.ts";
 import {
   GROUP_MARGIN,
   GROUP_WIDTH,
 } from "../components/serviceMap/customNodes.tsx";
-import { CoordinateExtent, MarkerType } from "reactflow";
-import { Position } from "reactflow";
-
-export type Operation = {
-  audience: Audience;
-  clients?: ClientInfo[];
-};
+import { CoordinateExtent, MarkerType, Position } from "reactflow";
 
 export type NodeData = {
   audience: Audience;
-  ops?: Operation[];
-  serviceMap: ServiceMapper;
+  group?: Audience[];
 };
 
 export type FlowNode = {
@@ -101,7 +93,6 @@ export const componentOffset = (
 export const mapOperation = (
   nodesMap: NodesMap,
   a: Audience,
-  serviceMap: ServiceMapper,
 ) => {
   const gKey = groupKey(a);
   nodesMap.operationGroups.set(
@@ -116,10 +107,7 @@ export const mapOperation = (
       ...node,
       data: {
         ...node.data,
-        ops: [...node.data.ops!, {
-          audience: a,
-          clients: serviceMap.liveAudiences.get(audienceKey(a)),
-        }] as Operation[],
+        group: [...node.data.group ? node.data.group : [], ...[a]],
       },
     });
   } else {
@@ -138,11 +126,7 @@ export const mapOperation = (
       },
       data: {
         audience: a,
-        ops: [{
-          audience: a,
-          clients: serviceMap.liveAudiences.get(audienceKey(a)),
-        }],
-        serviceMap,
+        group: [a],
       },
     });
   }
@@ -178,10 +162,10 @@ export const mapNodes = (
           ),
           y: 0,
         },
-        data: { audience: a, serviceMap },
+        data: { audience: a },
       });
 
-      mapOperation(nodesMap, a, serviceMap);
+      mapOperation(nodesMap, a);
 
       const max = Math.max(...Array.from(nodesMap.operationGroups.values()));
 
@@ -193,7 +177,7 @@ export const mapNodes = (
           x: componentOffset(cKey, nodesMap.components),
           y: 550 + (max - 1) * 76,
         },
-        data: { audience: a, serviceMap },
+        data: { audience: a },
       });
     },
   );
