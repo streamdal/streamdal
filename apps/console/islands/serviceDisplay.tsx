@@ -161,7 +161,7 @@ export default function ServiceDisplay(
             }}
             title="reset view"
           >
-            <IconSquareX class="w-[500px]" />
+            <img src="/images/x.svg" className="max-w-[12px]" />
           </ControlButton>
         </Controls>
       </ReactFlow>
