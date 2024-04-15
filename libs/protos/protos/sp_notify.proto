@@ -23,6 +23,9 @@ message NotificationConfig {
     NotificationEmail email = 1001;
     NotificationPagerDuty pagerduty = 1002;
   }
+
+  // Used internally by server and k8s operator to determine who manages this resource
+  optional string _created_by = 10000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message NotificationSlack {

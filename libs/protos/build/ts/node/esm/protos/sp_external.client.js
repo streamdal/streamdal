@@ -164,7 +164,7 @@ export class ExternalClient {
         return stackIntercept("unary", this._transport, method, opt, input);
     }
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */

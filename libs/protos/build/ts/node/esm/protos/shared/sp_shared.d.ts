@@ -76,6 +76,12 @@ export interface WasmModule {
      * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
      */
     UpdatedAtUnixTsNsUtc?: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1002;
+     */
+    CreatedBy?: string;
 }
 /**
  * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.

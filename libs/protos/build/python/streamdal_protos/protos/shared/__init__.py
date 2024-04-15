@@ -76,3 +76,11 @@ class WasmModule(betterproto.Message):
         1001, optional=True, group="X_updated_at_unix_ts_ns_utc"
     )
     """Set by server"""
+
+    created_by: Optional[str] = betterproto.string_field(
+        1002, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource
+    """

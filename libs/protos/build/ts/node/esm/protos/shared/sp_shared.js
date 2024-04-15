@@ -57,7 +57,8 @@ class WasmModule$Type extends MessageType {
             { no: 102, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 103, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1000, name: "_created_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
+            { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1002, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -105,6 +106,9 @@ class WasmModule$Type extends MessageType {
                 case /* optional int64 _updated_at_unix_ts_ns_utc */ 1001:
                     message.UpdatedAtUnixTsNsUtc = reader.int64().toString();
                     break;
+                case /* optional string _created_by */ 1002:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -150,6 +154,9 @@ class WasmModule$Type extends MessageType {
         /* optional int64 _updated_at_unix_ts_ns_utc = 1001; */
         if (message.UpdatedAtUnixTsNsUtc !== undefined)
             writer.tag(1001, WireType.Varint).int64(message.UpdatedAtUnixTsNsUtc);
+        /* optional string _created_by = 1002; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1002, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

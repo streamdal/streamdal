@@ -56,6 +56,12 @@ export interface Audience {
      * @generated from protobuf field: string operation_name = 4;
      */
     operationName: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1000;
+     */
+    CreatedBy?: string;
 }
 /**
  * @generated from protobuf message protos.Metric

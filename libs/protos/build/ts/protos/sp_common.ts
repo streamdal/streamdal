@@ -63,6 +63,12 @@ export interface Audience {
      * @generated from protobuf field: string operation_name = 4;
      */
     operationName: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1000;
+     */
+    CreatedBy?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.Metric
@@ -383,7 +389,8 @@ class Audience$Type extends MessageType<Audience> {
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "component_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "operation_type", kind: "enum", T: () => ["protos.OperationType", OperationType, "OPERATION_TYPE_"] },
-            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<Audience>): Audience {
@@ -410,6 +417,9 @@ class Audience$Type extends MessageType<Audience> {
                 case /* string operation_name */ 4:
                     message.operationName = reader.string();
                     break;
+                case /* optional string _created_by */ 1000:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -434,6 +444,9 @@ class Audience$Type extends MessageType<Audience> {
         /* string operation_name = 4; */
         if (message.operationName !== "")
             writer.tag(4, WireType.LengthDelimited).string(message.operationName);
+        /* optional string _created_by = 1000; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1000, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
