@@ -21,11 +21,12 @@ ABORT_CONDITION_UNSET: AbortCondition
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Pipeline(_message.Message):
-    __slots__ = ["_created_at_unix_ts_utc", "_description", "_notification_configs", "_paused", "_updated_at_unix_ts_utc", "_url", "_version", "id", "name", "steps"]
+    __slots__ = ["_created_at_unix_ts_utc", "_created_by", "_description", "_notification_configs", "_paused", "_updated_at_unix_ts_utc", "_url", "_version", "id", "name", "steps"]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STEPS_FIELD_NUMBER: _ClassVar[int]
     _CREATED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
     _DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     _NOTIFICATION_CONFIGS_FIELD_NUMBER: _ClassVar[int]
     _PAUSED_FIELD_NUMBER: _ClassVar[int]
@@ -33,6 +34,7 @@ class Pipeline(_message.Message):
     _URL_FIELD_NUMBER: _ClassVar[int]
     _VERSION_FIELD_NUMBER: _ClassVar[int]
     _created_at_unix_ts_utc: int
+    _created_by: str
     _description: str
     _notification_configs: _containers.RepeatedCompositeFieldContainer[_sp_notify_pb2.NotificationConfig]
     _paused: bool
@@ -42,7 +44,7 @@ class Pipeline(_message.Message):
     id: str
     name: str
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ..., _description: _Optional[str] = ..., _version: _Optional[str] = ..., _url: _Optional[str] = ..., _created_at_unix_ts_utc: _Optional[int] = ..., _updated_at_unix_ts_utc: _Optional[int] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ..., _description: _Optional[str] = ..., _version: _Optional[str] = ..., _url: _Optional[str] = ..., _created_at_unix_ts_utc: _Optional[int] = ..., _updated_at_unix_ts_utc: _Optional[int] = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class PipelineConfig(_message.Message):
     __slots__ = ["created_at_unix_ts_utc", "id", "paused"]

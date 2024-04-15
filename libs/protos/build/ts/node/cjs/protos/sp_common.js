@@ -170,7 +170,8 @@ class Audience$Type extends runtime_5.MessageType {
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "component_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "operation_type", kind: "enum", T: () => ["protos.OperationType", OperationType, "OPERATION_TYPE_"] },
-            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -197,6 +198,9 @@ class Audience$Type extends runtime_5.MessageType {
                 case /* string operation_name */ 4:
                     message.operationName = reader.string();
                     break;
+                case /* optional string _created_by */ 1000:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -221,6 +225,9 @@ class Audience$Type extends runtime_5.MessageType {
         /* string operation_name = 4; */
         if (message.operationName !== "")
             writer.tag(4, runtime_1.WireType.LengthDelimited).string(message.operationName);
+        /* optional string _created_by = 1000; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1000, runtime_1.WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

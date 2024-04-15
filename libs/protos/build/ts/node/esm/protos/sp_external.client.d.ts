@@ -162,7 +162,7 @@ export interface IExternalClient {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */
@@ -366,7 +366,7 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */

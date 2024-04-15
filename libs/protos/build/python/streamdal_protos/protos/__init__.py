@@ -212,6 +212,14 @@ class Audience(betterproto.Message):
     operation_name: str = betterproto.string_field(4)
     """Name for the consumer or producer"""
 
+    created_by: Optional[str] = betterproto.string_field(
+        1000, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource
+    """
+
 
 @dataclass(eq=False, repr=False)
 class Metric(betterproto.Message):
@@ -304,6 +312,13 @@ class NotificationConfig(betterproto.Message):
     slack: "NotificationSlack" = betterproto.message_field(1000, group="config")
     email: "NotificationEmail" = betterproto.message_field(1001, group="config")
     pagerduty: "NotificationPagerDuty" = betterproto.message_field(1002, group="config")
+    created_by: Optional[str] = betterproto.string_field(
+        10000, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource
+    """
 
 
 @dataclass(eq=False, repr=False)
@@ -397,6 +412,13 @@ class Pipeline(betterproto.Message):
     updated_at_unix_ts_utc: Optional[int] = betterproto.int64_field(
         1005, optional=True, group="X_updated_at_unix_ts_utc"
     )
+    created_by: Optional[str] = betterproto.string_field(
+        1006, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource
+    """
 
     def __post_init__(self) -> None:
         super().__post_init__()

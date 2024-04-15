@@ -76,6 +76,12 @@ export interface Pipeline {
      * @generated from protobuf field: optional int64 _updated_at_unix_ts_utc = 1005;
      */
     UpdatedAtUnixTsUtc?: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1006;
+     */
+    CreatedBy?: string;
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.

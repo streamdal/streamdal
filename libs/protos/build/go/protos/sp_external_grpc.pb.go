@@ -96,7 +96,7 @@ type ExternalClient interface {
 	// Deprecated: Do not use.
 	// Detach a notification config from a pipeline
 	DetachNotification(ctx context.Context, in *DetachNotificationRequest, opts ...grpc.CallOption) (*StandardResponse, error)
-	// Create an audience. Used for terraform purposes
+	// Create an audience. Used for automation tooling (terraform, k8s cr's)
 	CreateAudience(ctx context.Context, in *CreateAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
 	// Delete an audience
 	DeleteAudience(ctx context.Context, in *DeleteAudienceRequest, opts ...grpc.CallOption) (*StandardResponse, error)
@@ -588,7 +588,7 @@ type ExternalServer interface {
 	// Deprecated: Do not use.
 	// Detach a notification config from a pipeline
 	DetachNotification(context.Context, *DetachNotificationRequest) (*StandardResponse, error)
-	// Create an audience. Used for terraform purposes
+	// Create an audience. Used for automation tooling (terraform, k8s cr's)
 	CreateAudience(context.Context, *CreateAudienceRequest) (*StandardResponse, error)
 	// Delete an audience
 	DeleteAudience(context.Context, *DeleteAudienceRequest) (*StandardResponse, error)

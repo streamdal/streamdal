@@ -54,4 +54,7 @@ message WasmModule {
 
   // Set by server
   optional int64 _updated_at_unix_ts_ns_utc = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Used internally by server and k8s operator to determine who manages this resource
+  optional string _created_by = 1002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }

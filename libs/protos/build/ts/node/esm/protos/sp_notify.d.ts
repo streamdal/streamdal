@@ -44,6 +44,12 @@ export interface NotificationConfig {
     } | {
         oneofKind: undefined;
     };
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 10000;
+     */
+    CreatedBy?: string;
 }
 /**
  * @generated from protobuf message protos.NotificationSlack

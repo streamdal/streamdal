@@ -24,16 +24,18 @@ TAIL_RESPONSE_TYPE_PAYLOAD: TailResponseType
 TAIL_RESPONSE_TYPE_UNSET: TailResponseType
 
 class Audience(_message.Message):
-    __slots__ = ["component_name", "operation_name", "operation_type", "service_name"]
+    __slots__ = ["_created_by", "component_name", "operation_name", "operation_type", "service_name"]
     COMPONENT_NAME_FIELD_NUMBER: _ClassVar[int]
     OPERATION_NAME_FIELD_NUMBER: _ClassVar[int]
     OPERATION_TYPE_FIELD_NUMBER: _ClassVar[int]
     SERVICE_NAME_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    _created_by: str
     component_name: str
     operation_name: str
     operation_type: OperationType
     service_name: str
-    def __init__(self, service_name: _Optional[str] = ..., component_name: _Optional[str] = ..., operation_type: _Optional[_Union[OperationType, str]] = ..., operation_name: _Optional[str] = ...) -> None: ...
+    def __init__(self, service_name: _Optional[str] = ..., component_name: _Optional[str] = ..., operation_type: _Optional[_Union[OperationType, str]] = ..., operation_name: _Optional[str] = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class AudienceRate(_message.Message):
     __slots__ = ["bytes", "processed"]

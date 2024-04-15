@@ -43,6 +43,9 @@ message Audience {
 
   // Name for the consumer or producer
   string operation_name = 4;
+
+  // Used internally by server and k8s operator to determine who manages this resource
+  optional string _created_by = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message Metric {
