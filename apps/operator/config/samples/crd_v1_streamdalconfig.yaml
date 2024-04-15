@@ -6,4 +6,16 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: streamdalconfig-sample
 spec:
-  # TODO(user): Add fields here
+  serverAddress: "streamdal-address"
+  serverAuth: "streamdal-auth"
+  configs:
+    - name: "config1"
+      config: >
+        {
+          "foo": "bar"
+        }
+    - name: "config2"
+      config: >
+        {
+          "foo": "baz"
+        }

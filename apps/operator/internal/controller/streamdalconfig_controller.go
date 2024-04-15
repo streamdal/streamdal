@@ -18,7 +18,10 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -31,6 +34,9 @@ import (
 type StreamdalConfigReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+
+	// Used by periodic reconciler to detect shutdown
+	ShutdownCtx context.Context
 }
 
 //+kubebuilder:rbac:groups=crd.streamdal.com,resources=streamdalconfigs,verbs=get;list;watch;create;update;patch;delete
@@ -47,16 +53,79 @@ type StreamdalConfigReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.17.2/pkg/reconcile
 func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx).WithValues(
+		"method", "Reconcile",
+		"namespace", req.Namespace,
+		"name", req.Name,
+	)
 
-	// TODO(user): your logic here
+	log.Info("received request")
+
+	var cfg crdv1.StreamdalConfig
+
+	if err := r.Get(ctx, req.NamespacedName, &cfg); err != nil {
+		if errors.IsNotFound(err) {
+			// Resource not found. It could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			log.Info("Resource not found. Ignoring since object must be deleted")
+			return ctrl.Result{}, nil
+		}
+
+		// Error reading the object - requeue the request.
+		log.Error(err, "Failed to get resource")
+		return ctrl.Result{}, err
+	}
+
+	// Check if the object is being deleted
+	if cfg.DeletionTimestamp != nil {
+		// The object is being deleted
+		log.Info("resource is being deleted")
+
+		cfg.SetFinalizers([]string{})
+		if err := r.Update(ctx, &cfg); err != nil {
+			log.Error(err, "Failed to update finalizers for delete")
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
+
+	// Resource is being created / updated
+	cfg.SetFinalizers([]string{"streamdal.com/finalizer"})
+
+	if err := r.Update(ctx, &cfg); err != nil {
+		log.Error(err, "Failed to update resource with finalizer for create/update")
+		return ctrl.Result{}, err
+	}
+
+	fmt.Printf("cfg contents: %+v\n", cfg)
 
 	return ctrl.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// Launch periodic reconciler
+	go r.runPeriodicReconciler()
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&crdv1.StreamdalConfig{}).
 		Complete(r)
+}
+
+func (r *StreamdalConfigReconciler) runPeriodicReconciler() {
+	// TODO: No need for any of the select stuff
+
+MAIN:
+	for {
+		select {
+		case <-r.ShutdownCtx.Done():
+			fmt.Println("periodic reconciler detected shutdown")
+			break MAIN
+		default:
+			fmt.Println("performing periodic run")
+			time.Sleep(3 * time.Second)
+		}
+	}
+
+	fmt.Println("periodic reconciler exiting...")
 }

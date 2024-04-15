@@ -122,9 +122,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	shutdownCtx := ctrl.SetupSignalHandler()
+
 	if err = (&controller.StreamdalConfigReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:      mgr.GetClient(),
+		Scheme:      mgr.GetScheme(),
+		ShutdownCtx: shutdownCtx,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "StreamdalConfig")
 		os.Exit(1)
@@ -141,7 +144,7 @@ func main() {
 	}
 
 	setupLog.Info("starting manager")
-	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+	if err := mgr.Start(shutdownCtx); err != nil {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
