@@ -1,0 +1,27 @@
+# permissions for end users to view streamdalconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: streamdalconfig-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: operator
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: streamdalconfig-viewer-role
+rules:
+- apiGroups:
+  - crd.streamdal.com
+  resources:
+  - streamdalconfigs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - crd.streamdal.com
+  resources:
+  - streamdalconfigs/status
+  verbs:
+  - get
