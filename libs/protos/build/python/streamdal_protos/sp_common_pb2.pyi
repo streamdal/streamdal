@@ -1,8 +1,11 @@
+from shared import sp_shared_pb2 as _sp_shared_pb2
+import sp_notify_pb2 as _sp_notify_pb2
+import sp_pipeline_pb2 as _sp_pipeline_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 OPERATION_TYPE_CONSUMER: OperationType
@@ -44,6 +47,18 @@ class AudienceRate(_message.Message):
     bytes: float
     processed: float
     def __init__(self, bytes: _Optional[float] = ..., processed: _Optional[float] = ...) -> None: ...
+
+class Config(_message.Message):
+    __slots__ = ["audiences", "notifications", "pipelines", "wasm_modules"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    NOTIFICATIONS_FIELD_NUMBER: _ClassVar[int]
+    PIPELINES_FIELD_NUMBER: _ClassVar[int]
+    WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
+    audiences: _containers.RepeatedCompositeFieldContainer[Audience]
+    notifications: _containers.RepeatedCompositeFieldContainer[_sp_notify_pb2.NotificationConfig]
+    pipelines: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
+    wasm_modules: _containers.RepeatedCompositeFieldContainer[_sp_shared_pb2.WasmModule]
+    def __init__(self, audiences: _Optional[_Iterable[_Union[Audience, _Mapping]]] = ..., pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ..., notifications: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., wasm_modules: _Optional[_Iterable[_Union[_sp_shared_pb2.WasmModule, _Mapping]]] = ...) -> None: ...
 
 class Metric(_message.Message):
     __slots__ = ["audience", "labels", "name", "value"]

@@ -51,6 +51,8 @@ import type { GetPipelineRequest } from "./sp_external";
 import type { GetPipelinesResponse } from "./sp_external";
 import type { GetPipelinesRequest } from "./sp_external";
 import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { GetConfigResponse } from "./sp_external";
+import type { GetConfigRequest } from "./sp_external";
 import type { GetAllResponse } from "./sp_external";
 import type { GetAllRequest } from "./sp_external";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
@@ -65,6 +67,12 @@ export interface IExternalClient {
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
+    /**
+     * Returns the current _full_ configuration of the server
+     *
+     * @generated from protobuf rpc: GetConfig(protos.GetConfigRequest) returns (protos.GetConfigResponse);
+     */
+    getConfig(input: GetConfigRequest, options?: RpcOptions): UnaryCall<GetConfigRequest, GetConfigResponse>;
     /**
      * Used by console to stream updates to UI; called after initial GetAll()
      *
@@ -269,6 +277,12 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
+    /**
+     * Returns the current _full_ configuration of the server
+     *
+     * @generated from protobuf rpc: GetConfig(protos.GetConfigRequest) returns (protos.GetConfigResponse);
+     */
+    getConfig(input: GetConfigRequest, options?: RpcOptions): UnaryCall<GetConfigRequest, GetConfigResponse>;
     /**
      * Used by console to stream updates to UI; called after initial GetAll()
      *

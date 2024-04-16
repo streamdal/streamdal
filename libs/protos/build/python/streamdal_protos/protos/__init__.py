@@ -31,39 +31,6 @@ if TYPE_CHECKING:
     from grpclib.metadata import Deadline
 
 
-class ResponseCode(betterproto.Enum):
-    """Common status codes used in gRPC method responses"""
-
-    RESPONSE_CODE_UNSET = 0
-    RESPONSE_CODE_OK = 1
-    RESPONSE_CODE_BAD_REQUEST = 2
-    RESPONSE_CODE_NOT_FOUND = 3
-    RESPONSE_CODE_INTERNAL_SERVER_ERROR = 4
-    RESPONSE_CODE_GENERIC_ERROR = 5
-
-
-class OperationType(betterproto.Enum):
-    """Each SDK client is a $service + $component + $operation_type"""
-
-    OPERATION_TYPE_UNSET = 0
-    OPERATION_TYPE_CONSUMER = 1
-    OPERATION_TYPE_PRODUCER = 2
-
-
-class TailResponseType(betterproto.Enum):
-    TAIL_RESPONSE_TYPE_UNSET = 0
-    TAIL_RESPONSE_TYPE_PAYLOAD = 1
-    TAIL_RESPONSE_TYPE_ERROR = 2
-
-
-class TailRequestType(betterproto.Enum):
-    TAIL_REQUEST_TYPE_UNSET = 0
-    TAIL_REQUEST_TYPE_START = 1
-    TAIL_REQUEST_TYPE_STOP = 2
-    TAIL_REQUEST_TYPE_PAUSE = 3
-    TAIL_REQUEST_TYPE_RESUME = 4
-
-
 class NotificationType(betterproto.Enum):
     NOTIFICATION_TYPE_UNSET = 0
     NOTIFICATION_TYPE_SLACK = 1
@@ -106,6 +73,39 @@ class PipelineStepNotificationPayloadType(betterproto.Enum):
     Only specified paths of payload content included in notification Only works
     on JSON. Plaintext payloads will be ignored.
     """
+
+
+class ResponseCode(betterproto.Enum):
+    """Common status codes used in gRPC method responses"""
+
+    RESPONSE_CODE_UNSET = 0
+    RESPONSE_CODE_OK = 1
+    RESPONSE_CODE_BAD_REQUEST = 2
+    RESPONSE_CODE_NOT_FOUND = 3
+    RESPONSE_CODE_INTERNAL_SERVER_ERROR = 4
+    RESPONSE_CODE_GENERIC_ERROR = 5
+
+
+class OperationType(betterproto.Enum):
+    """Each SDK client is a $service + $component + $operation_type"""
+
+    OPERATION_TYPE_UNSET = 0
+    OPERATION_TYPE_CONSUMER = 1
+    OPERATION_TYPE_PRODUCER = 2
+
+
+class TailResponseType(betterproto.Enum):
+    TAIL_RESPONSE_TYPE_UNSET = 0
+    TAIL_RESPONSE_TYPE_PAYLOAD = 1
+    TAIL_RESPONSE_TYPE_ERROR = 2
+
+
+class TailRequestType(betterproto.Enum):
+    TAIL_REQUEST_TYPE_UNSET = 0
+    TAIL_REQUEST_TYPE_START = 1
+    TAIL_REQUEST_TYPE_STOP = 2
+    TAIL_REQUEST_TYPE_PAUSE = 3
+    TAIL_REQUEST_TYPE_RESUME = 4
 
 
 class ClientType(betterproto.Enum):
@@ -178,130 +178,6 @@ class WasmExitCode(betterproto.Enum):
     WASM_EXIT_CODE_TRUE = 1
     WASM_EXIT_CODE_FALSE = 2
     WASM_EXIT_CODE_ERROR = 3
-
-
-@dataclass(eq=False, repr=False)
-class StandardResponse(betterproto.Message):
-    """Common response message for many gRPC methods"""
-
-    id: str = betterproto.string_field(1)
-    """Co-relation ID for the request / response"""
-
-    code: "ResponseCode" = betterproto.enum_field(2)
-    message: str = betterproto.string_field(3)
-
-
-@dataclass(eq=False, repr=False)
-class Audience(betterproto.Message):
-    """Used to indicate who a command is intended for"""
-
-    service_name: str = betterproto.string_field(1)
-    """
-    Name of the service -- let's include the service name on all calls, we can
-    optimize later ~DS
-    """
-
-    component_name: str = betterproto.string_field(2)
-    """
-    Name of the component the SDK is interacting with (ie. kafka-$topic-name)
-    """
-
-    operation_type: "OperationType" = betterproto.enum_field(3)
-    """Consumer or Producer"""
-
-    operation_name: str = betterproto.string_field(4)
-    """Name for the consumer or producer"""
-
-    created_by: Optional[str] = betterproto.string_field(
-        1000, optional=True, group="X_created_by"
-    )
-    """
-    Used internally by server and k8s operator to determine who manages this
-    resource
-    """
-
-
-@dataclass(eq=False, repr=False)
-class Metric(betterproto.Message):
-    name: str = betterproto.string_field(1)
-    labels: Dict[str, str] = betterproto.map_field(
-        2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
-    )
-    value: float = betterproto.double_field(3)
-    audience: "Audience" = betterproto.message_field(4)
-
-
-@dataclass(eq=False, repr=False)
-class TailRequest(betterproto.Message):
-    type: "TailRequestType" = betterproto.enum_field(1)
-    id: str = betterproto.string_field(2)
-    audience: "Audience" = betterproto.message_field(3)
-    pipeline_id: Optional[str] = betterproto.string_field(
-        4, optional=True, group="_pipeline_id"
-    )
-    sample_options: "SampleOptions" = betterproto.message_field(5)
-    metadata: Dict[str, str] = betterproto.map_field(
-        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
-    )
-
-    def __post_init__(self) -> None:
-        super().__post_init__()
-        if self.is_set("pipeline_id"):
-            warnings.warn("TailRequest.pipeline_id is deprecated", DeprecationWarning)
-
-
-@dataclass(eq=False, repr=False)
-class TailResponse(betterproto.Message):
-    """
-    TailResponse originates in the SDK and then is sent to streamdal servers
-    where it is forwarded to the correct frontend streaming gRPC connection
-    """
-
-    type: "TailResponseType" = betterproto.enum_field(1)
-    tail_request_id: str = betterproto.string_field(2)
-    audience: "Audience" = betterproto.message_field(3)
-    pipeline_id: str = betterproto.string_field(4)
-    session_id: str = betterproto.string_field(5)
-    timestamp_ns: int = betterproto.int64_field(6)
-    """Timestamp in nanoseconds"""
-
-    original_data: bytes = betterproto.bytes_field(7)
-    """
-    Payload data. For errors, this will be the error message For payloads, this
-    will be JSON of the payload data, post processing
-    """
-
-    new_data: bytes = betterproto.bytes_field(8)
-    """For payloads, this will be the new data, post processing"""
-
-    metadata: Dict[str, str] = betterproto.map_field(
-        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
-    )
-    keepalive: Optional[bool] = betterproto.bool_field(
-        1001, optional=True, group="X_keepalive"
-    )
-    """Set by server to indicate that the response is a keepalive message"""
-
-
-@dataclass(eq=False, repr=False)
-class AudienceRate(betterproto.Message):
-    bytes: float = betterproto.double_field(1)
-    processed: float = betterproto.double_field(2)
-
-
-@dataclass(eq=False, repr=False)
-class Schema(betterproto.Message):
-    json_schema: bytes = betterproto.bytes_field(1)
-    version: int = betterproto.int32_field(100)
-    metadata: Dict[str, str] = betterproto.map_field(
-        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
-    )
-
-
-@dataclass(eq=False, repr=False)
-class SampleOptions(betterproto.Message):
-    sample_rate: int = betterproto.uint32_field(1)
-    sample_interval_seconds: int = betterproto.uint32_field(2)
 
 
 @dataclass(eq=False, repr=False)
@@ -565,6 +441,142 @@ class PipelineConfig(betterproto.Message):
     id: str = betterproto.string_field(1)
     paused: bool = betterproto.bool_field(2)
     created_at_unix_ts_utc: int = betterproto.int64_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class StandardResponse(betterproto.Message):
+    """Common response message for many gRPC methods"""
+
+    id: str = betterproto.string_field(1)
+    """Co-relation ID for the request / response"""
+
+    code: "ResponseCode" = betterproto.enum_field(2)
+    message: str = betterproto.string_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class Audience(betterproto.Message):
+    """Used to indicate who a command is intended for"""
+
+    service_name: str = betterproto.string_field(1)
+    """
+    Name of the service -- let's include the service name on all calls, we can
+    optimize later ~DS
+    """
+
+    component_name: str = betterproto.string_field(2)
+    """
+    Name of the component the SDK is interacting with (ie. kafka-$topic-name)
+    """
+
+    operation_type: "OperationType" = betterproto.enum_field(3)
+    """Consumer or Producer"""
+
+    operation_name: str = betterproto.string_field(4)
+    """Name for the consumer or producer"""
+
+    created_by: Optional[str] = betterproto.string_field(
+        1000, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource
+    """
+
+
+@dataclass(eq=False, repr=False)
+class Metric(betterproto.Message):
+    name: str = betterproto.string_field(1)
+    labels: Dict[str, str] = betterproto.map_field(
+        2, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+    value: float = betterproto.double_field(3)
+    audience: "Audience" = betterproto.message_field(4)
+
+
+@dataclass(eq=False, repr=False)
+class TailRequest(betterproto.Message):
+    type: "TailRequestType" = betterproto.enum_field(1)
+    id: str = betterproto.string_field(2)
+    audience: "Audience" = betterproto.message_field(3)
+    pipeline_id: Optional[str] = betterproto.string_field(
+        4, optional=True, group="_pipeline_id"
+    )
+    sample_options: "SampleOptions" = betterproto.message_field(5)
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        if self.is_set("pipeline_id"):
+            warnings.warn("TailRequest.pipeline_id is deprecated", DeprecationWarning)
+
+
+@dataclass(eq=False, repr=False)
+class TailResponse(betterproto.Message):
+    """
+    TailResponse originates in the SDK and then is sent to streamdal servers
+    where it is forwarded to the correct frontend streaming gRPC connection
+    """
+
+    type: "TailResponseType" = betterproto.enum_field(1)
+    tail_request_id: str = betterproto.string_field(2)
+    audience: "Audience" = betterproto.message_field(3)
+    pipeline_id: str = betterproto.string_field(4)
+    session_id: str = betterproto.string_field(5)
+    timestamp_ns: int = betterproto.int64_field(6)
+    """Timestamp in nanoseconds"""
+
+    original_data: bytes = betterproto.bytes_field(7)
+    """
+    Payload data. For errors, this will be the error message For payloads, this
+    will be JSON of the payload data, post processing
+    """
+
+    new_data: bytes = betterproto.bytes_field(8)
+    """For payloads, this will be the new data, post processing"""
+
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+    keepalive: Optional[bool] = betterproto.bool_field(
+        1001, optional=True, group="X_keepalive"
+    )
+    """Set by server to indicate that the response is a keepalive message"""
+
+
+@dataclass(eq=False, repr=False)
+class AudienceRate(betterproto.Message):
+    bytes: float = betterproto.double_field(1)
+    processed: float = betterproto.double_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class Schema(betterproto.Message):
+    json_schema: bytes = betterproto.bytes_field(1)
+    version: int = betterproto.int32_field(100)
+    metadata: Dict[str, str] = betterproto.map_field(
+        1000, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
+
+
+@dataclass(eq=False, repr=False)
+class SampleOptions(betterproto.Message):
+    sample_rate: int = betterproto.uint32_field(1)
+    sample_interval_seconds: int = betterproto.uint32_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class Config(betterproto.Message):
+    """
+    Config is returned by external.GetConfig() and is used by the K8S operator
+    """
+
+    audiences: List["Audience"] = betterproto.message_field(1)
+    pipelines: List["Pipeline"] = betterproto.message_field(2)
+    notifications: List["NotificationConfig"] = betterproto.message_field(3)
+    wasm_modules: List["shared.WasmModule"] = betterproto.message_field(4)
 
 
 @dataclass(eq=False, repr=False)
@@ -942,6 +954,16 @@ class TestRequest(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TestResponse(betterproto.Message):
     output: str = betterproto.string_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class GetConfigRequest(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class GetConfigResponse(betterproto.Message):
+    config: "Config" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)
@@ -1431,6 +1453,23 @@ class ExternalStub(betterproto.ServiceStub):
             "/protos.External/GetAll",
             get_all_request,
             GetAllResponse,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
+        )
+
+    async def get_config(
+        self,
+        get_config_request: "GetConfigRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None
+    ) -> "GetConfigResponse":
+        return await self._unary_unary(
+            "/protos.External/GetConfig",
+            get_config_request,
+            GetConfigResponse,
             timeout=timeout,
             deadline=deadline,
             metadata=metadata,
@@ -2182,6 +2221,11 @@ class ExternalBase(ServiceBase):
     async def get_all(self, get_all_request: "GetAllRequest") -> "GetAllResponse":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
+    async def get_config(
+        self, get_config_request: "GetConfigRequest"
+    ) -> "GetConfigResponse":
+        raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
+
     async def get_all_stream(
         self, get_all_request: "GetAllRequest"
     ) -> AsyncIterator["GetAllResponse"]:
@@ -2360,6 +2404,13 @@ class ExternalBase(ServiceBase):
     ) -> None:
         request = await stream.recv_message()
         response = await self.get_all(request)
+        await stream.send_message(response)
+
+    async def __rpc_get_config(
+        self, stream: "grpclib.server.Stream[GetConfigRequest, GetConfigResponse]"
+    ) -> None:
+        request = await stream.recv_message()
+        response = await self.get_config(request)
         await stream.send_message(response)
 
     async def __rpc_get_all_stream(
@@ -2638,6 +2689,12 @@ class ExternalBase(ServiceBase):
                 grpclib.const.Cardinality.UNARY_UNARY,
                 GetAllRequest,
                 GetAllResponse,
+            ),
+            "/protos.External/GetConfig": grpclib.const.Handler(
+                self.__rpc_get_config,
+                grpclib.const.Cardinality.UNARY_UNARY,
+                GetConfigRequest,
+                GetConfigResponse,
             ),
             "/protos.External/GetAllStream": grpclib.const.Handler(
                 self.__rpc_get_all_stream,
