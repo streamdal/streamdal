@@ -39,6 +39,7 @@ export const PipelineHTTP = (
         setData={setData}
         label="URL"
         placeHolder={"https://www.example.com/entity"}
+        inputClass="w-full"
         errors={errors}
       />
 

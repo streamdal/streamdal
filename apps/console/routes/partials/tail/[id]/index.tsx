@@ -1,8 +1,14 @@
-import { Handlers, PageProps } from "$fresh/src/server/types.ts";
+import { Handlers, PageProps, RouteConfig } from "$fresh/src/server/types.ts";
+import { Partial } from "$fresh/runtime.ts";
 import { Tail } from "root/islands/drawer/tail.tsx";
 import { audienceFromKey } from "root/lib/utils.ts";
 
-export const handler: Handlers = {};
+export const config: RouteConfig = {
+  skipAppWrapper: true,
+  skipInheritedLayouts: true,
+};
+
+const handler: Handlers = {};
 
 export const PartialTailRoute = (
   props: PageProps<
@@ -11,9 +17,11 @@ export const PartialTailRoute = (
     }
   >,
 ) => (
-  <Tail
-    audience={audienceFromKey(decodeURIComponent(props?.params?.id))}
-  />
+  <Partial name="overlay-content">
+    <Tail
+      audience={audienceFromKey(decodeURIComponent(props?.params?.id))}
+    />
+  </Partial>
 );
 
 export default PartialTailRoute;

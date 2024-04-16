@@ -75,6 +75,7 @@ const TransformPath = (
                 setData={setData}
                 label="Path"
                 placeHolder="ex: object.field"
+                inputClass="w-full"
                 errors={errors}
               />
             )
@@ -112,6 +113,7 @@ export const TransformOptions = (
             setData={setData}
             label="Value"
             placeHolder="value to use as a replacement"
+            inputClass="w-full"
             errors={errors}
           />
         </>
@@ -204,6 +206,7 @@ export const TransformOptions = (
                 ? "this many bytes"
                 : "this percentage"
             } of the original value `}
+            inputClass="w-full"
             errors={errors}
           />
         </>

@@ -40,6 +40,8 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { PipelineHTTP } from "./pipelineHTTP.tsx";
 import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
 import { PipelineTransform } from "./pipelineTransform.tsx";
+import { FormStringKV } from "root/components/form/formStringKV.tsx";
+import { logFormData } from "root/lib/utils.ts";
 
 export default function PipelineDetail({
   pipeline,
@@ -153,12 +155,13 @@ export default function PipelineDetail({
                 data={data}
                 setData={setData}
                 errors={errors}
+                inputClass="w-full"
                 defaultValue={resolveValue(data, "name")}
               />
             </div>
             <PipelineMenu id={pipeline?.id} />
           </div>
-          <div>
+          <div class="ml-2">
             <a href="/" f-partial="/partials">
               <img src="/images/x.svg" className="w-[14px]" />
             </a>
@@ -214,6 +217,7 @@ export default function PipelineDetail({
                           data={data}
                           setData={setData}
                           errors={errors}
+                          inputClass="w-full"
                           defaultValue={`Step #${i + 1}`}
                         />
                       </div>
@@ -259,11 +263,13 @@ export default function PipelineDetail({
                       label="Step Type"
                       errors={errors}
                       inputClass="w-64"
+                      readonly={step.step.oneofKind === "custom"}
                       children={kinds.map((kind, i) => (
                         <option
                           key={`step-kind-key-${i}`}
                           value={kind.value}
                           label={kind.label}
+                          disabled={kind.value === "custom"}
                         />
                       ))}
                     />
@@ -274,6 +280,7 @@ export default function PipelineDetail({
                           data={data}
                           setData={setData}
                           label="Path"
+                          inputClass="w-full"
                           placeHolder={["HAS_FIELD", "IS_TYPE"].includes(
                               DetectiveType[data.steps[i].step.detective?.type],
                             )
@@ -353,6 +360,7 @@ export default function PipelineDetail({
                           data={data}
                           setData={setData}
                           label="Key"
+                          inputClass="w-full"
                           errors={errors}
                         />
                       </>
@@ -365,13 +373,36 @@ export default function PipelineDetail({
                         errors={errors}
                       />
                     )}
-                    <StepConditions
-                      notifications={notifications}
-                      stepIndex={i}
-                      data={data}
-                      setData={setData}
-                      errors={errors}
-                    />
+
+                    {"custom" === step.step.oneofKind
+                      ? (
+                        <>
+                          <div class="p-2 text-sm text-stormCloud">
+                            Custom Wasm steps are not editable in the console.
+                          </div>
+                          <FormHidden
+                            name={`steps.${i}.WasmId`}
+                            value={resolveValue(data, `steps.${i}.WasmId`)}
+                          />
+                          <FormStringKV
+                            name={`steps.${i}.step.custom.args`}
+                            data={data}
+                            label="Args"
+                            description="Custom step arguments"
+                            errors={errors}
+                            readonly={true}
+                          />
+                        </>
+                      )
+                      : (
+                        <StepConditions
+                          notifications={notifications}
+                          stepIndex={i}
+                          data={data}
+                          setData={setData}
+                          errors={errors}
+                        />
+                      )}
                   </div>
                 </div>
               </div>

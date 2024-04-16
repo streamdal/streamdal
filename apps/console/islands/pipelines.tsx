@@ -1,16 +1,15 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
 
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import PipelineDetail from "./pipeline.tsx";
-import { SuccessType } from "../routes/_middleware.ts";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
+import { useEffect } from "preact/hooks";
+import { newPipeline } from "root/components/pipeline/pipeline.ts";
 import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
-import { useEffect } from "preact/hooks";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { initFlowBite } from "../components/flowbite/init.tsx";
-import { newPipeline } from "root/components/pipeline/pipeline.ts";
+import { Toast, toastSignal } from "../components/toasts/toast.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
+import PipelineDetail from "./pipeline.tsx";
 
 const Pipelines = (
   { id, pipelines, notifications, success, add = false }: {
