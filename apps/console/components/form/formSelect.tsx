@@ -1,6 +1,7 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
 import { isNumeric } from "../../lib/utils.ts";
 import { ChangeEvent, ReactNode } from "react";
+import { FormHidden } from "./formHidden.tsx";
 
 export type FormSelectProps = {
   name: string;
@@ -12,6 +13,7 @@ export type FormSelectProps = {
   children: ReactNode;
   inputClass?: string;
   wrapperClass?: string;
+  readonly?: boolean;
 };
 
 export const FormSelect = ({
@@ -24,6 +26,7 @@ export const FormSelect = ({
   placeHolder,
   inputClass,
   wrapperClass,
+  readonly,
 }: FormSelectProps) => {
   const value = resolveValue(data, name);
   return (
@@ -36,9 +39,12 @@ export const FormSelect = ({
           {label}
         </label>
       )}
+      {readonly && <FormHidden name={name} value={value} />}
+
       <select
         id={name}
         name={name}
+        disabled={readonly}
         class={`cursor-pointer rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
           errors[name] ? "streamdalRed" : "twilight"
         } ${inputClass}`}

@@ -79,6 +79,7 @@ export const kinds = [
   { label: "Key/Value", value: "kv" },
   { label: "Schema Validation", value: "schemaValidation" },
   { label: "HTTP Request", value: "httpRequest" },
+  { label: "Custom Wasm", value: "custom" },
 ];
 
 const transformOptions = z.discriminatedUnion("oneofKind", [
@@ -265,6 +266,17 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
     }),
   }),
   z.object({
+    oneofKind: z.literal("custom"),
+    custom: z.object({
+      args: z
+        .record(
+          z.string().min(1, { message: "Required" }),
+          z.string().min(1, { message: "Required" }),
+        )
+        .optional(),
+    }),
+  }),
+  z.object({
     oneofKind: z.literal("encode"),
     encode: z.object({
       id: z.string().min(1, { message: "Required" }),
@@ -274,13 +286,6 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
   z.object({
     oneofKind: z.literal("decode"),
     decode: z.object({
-      id: z.string().min(1, { message: "Required" }),
-      negate: z.boolean().default(false),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("custom"),
-    custom: z.object({
       id: z.string().min(1, { message: "Required" }),
       negate: z.boolean().default(false),
     }),
@@ -321,6 +326,7 @@ const resultConditionSchema = z.object({
 const stepSchema = z
   .object({
     id: z.string().optional(),
+    WasmId: z.string().optional(),
     name: z.string().min(1, { message: "Required" }),
     dynamic: z.preprocess((v) => v === "true", z.boolean()),
     onTrue: resultConditionSchema.optional(),

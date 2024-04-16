@@ -38,7 +38,7 @@
     "@protobuf-ts/runtime": "https://esm.sh/v132/@protobuf-ts/runtime@2.9.4",
     "@protobuf-ts/runtime-rpc": "https://esm.sh/v132/@protobuf-ts/runtime-rpc@2.9.4",
     "@protobuf-ts/grpcweb-transport": "https://esm.sh/v132/@protobuf-ts/grpcweb-transport@2.9.4",
-    "streamdal-protos/": "https://deno.land/x/streamdal_protos@v0.1.38/",
+    "streamdal-protos/": "https://deno.land/x/streamdal_protos@v0.1.39/",
     "zod/": "https://deno.land/x/zod@v3.22.4/",
     "tabler-icons/": "https://deno.land/x/tabler_icons_tsx@0.0.5/",
     "fresh-session/": "https://deno.land/x/fresh_session@0.2.2/"
