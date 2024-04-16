@@ -73,3 +73,25 @@ func ManageDeleteWasm(cfg *config.Config) error {
 
 	return nil
 }
+
+func ManageUpdateWasm(cfg *config.Config) error {
+	if cfg == nil {
+		return ErrMissingConfig
+	}
+
+	if cfg.Manage.Update.Wasm.ID == "" {
+		return errors.New("missing ID of wasm module to update")
+	}
+
+	// TODO: At minimum, one field must only be specified; currently need to specify all fields
+
+	return nil
+}
+
+func ManageUpdatePipeline(cfg *config.Config) error {
+	if cfg == nil {
+		return ErrMissingConfig
+	}
+
+	return nil
+}

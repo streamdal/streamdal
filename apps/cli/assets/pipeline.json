@@ -1,0 +1,29 @@
+{
+    "id": "256d663a-aff6-4a8c-a200-1f692b2a10d3",
+    "name": "Pipeline_Name",
+    "steps": [
+        {
+            "name": "detective has step field",
+            "onFalse": {
+                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+            },
+            "detective": {
+                "path": "birthdate",
+                "negate": false,
+                "type": "DETECTIVE_TYPE_HAS_FIELD"
+            }
+        },
+        {
+            "name": "custom wasm step",
+            "onFalse": {
+                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+            },
+            "custom": {
+                "args": {
+                    "arg1": "foobar"
+                }
+            },
+            "WasmId": "58d91a09-b944-d367-884d-ef652e74d69f"
+        }
+    ]
+}

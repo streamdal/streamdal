@@ -150,6 +150,10 @@ func handleManageCommand(cfg *config.Config, logger *log.Logger, t statsd.Statte
 		err = m.DeletePipeline(cfg)
 	case "manage delete wasm":
 		err = m.DeleteWasm(cfg)
+	case "manage update pipeline":
+		err = m.UpdatePipeline(cfg)
+	case "manage update wasm":
+		err = m.UpdateWasm(cfg)
 	default:
 		util.ReportErrorAndExit(t, cfg, errors.Errorf("unknown manage command: %s", cfg.KongContext.Command()))
 	}

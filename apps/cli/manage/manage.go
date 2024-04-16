@@ -86,6 +86,31 @@ func (m *Manage) CreatePipeline(cfg *config.Config) error {
 	return m.prettyPrint(resp)
 }
 
+func (m *Manage) UpdatePipeline(cfg *config.Config) error {
+	if err := validate.ManageUpdatePipeline(cfg); err != nil {
+		return errors.Wrap(err, "unable to validate manage update pipeline params")
+	}
+
+	pipelineJSON, err := os.ReadFile(cfg.Manage.Create.Pipeline.JSON)
+	if err != nil {
+		return errors.Wrapf(err, "failed to read pipeline JSON file '%s'", cfg.Manage.Create.Pipeline.JSON)
+	}
+
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs(AuthTokenMetadata, cfg.Auth))
+
+	// JSON must contain the pipeline ID
+	req := &protos.UpdatePipelineRequest{
+		PipelineJson: pipelineJSON,
+	}
+
+	resp, err := m.client.UpdatePipeline(ctx, req)
+	if err != nil {
+		return errors.Wrap(err, "failed to update pipeline")
+	}
+
+	return m.prettyPrint(resp)
+}
+
 func (m *Manage) GetPipeline(cfg *config.Config) error {
 	if err := validate.ManageGetPipeline(cfg); err != nil {
 		return errors.Wrap(err, "unable to validate manage get pipeline params")
@@ -182,6 +207,38 @@ func (m *Manage) CreateWasm(cfg *config.Config) error {
 	resp, err := m.client.CreateWasm(ctx, req)
 	if err != nil {
 		return errors.Wrap(err, "failed to create wasm module")
+	}
+
+	return m.prettyPrint(resp)
+}
+
+func (m *Manage) UpdateWasm(cfg *config.Config) error {
+	if err := validate.ManageUpdateWasm(cfg); err != nil {
+		return errors.Wrap(err, "unable to validate manage update wasm params")
+	}
+
+	wasmData, err := os.ReadFile(cfg.Manage.Create.Wasm.File)
+	if err != nil {
+		return errors.Wrapf(err, "failed to read wasm file '%s'", cfg.Manage.Create.Wasm.File)
+	}
+
+	ctx := metadata.NewOutgoingContext(context.Background(), metadata.Pairs(AuthTokenMetadata, cfg.Auth))
+
+	req := &protos.UpdateWasmRequest{
+		Wasm: &shared.WasmModule{
+			Id:          cfg.Manage.Update.Wasm.ID,
+			Bytes:       wasmData,
+			Function:    cfg.Manage.Create.Wasm.Function,
+			Name:        cfg.Manage.Create.Wasm.Name,
+			Description: stringPointer(cfg.Manage.Create.Wasm.ModuleDescription),
+			Version:     stringPointer(cfg.Manage.Create.Wasm.ModuleVersion),
+			Url:         stringPointer(cfg.Manage.Create.Wasm.ModuleURL),
+		},
+	}
+
+	resp, err := m.client.UpdateWasm(ctx, req)
+	if err != nil {
+		return errors.Wrap(err, "failed to update wasm module")
 	}
 
 	return m.prettyPrint(resp)
