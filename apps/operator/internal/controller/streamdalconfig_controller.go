@@ -21,6 +21,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-logr/logr"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"google.golang.org/protobuf/encoding/protojson"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -28,7 +31,11 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	crdv1 "github.com/streamdal/streamdal/apps/operator/api/v1"
+	"github.com/streamdal/streamdal/apps/operator/util"
+	"github.com/streamdal/streamdal/apps/operator/validate"
 )
+
+const FinalizerName = "streamdal.com/finalizer"
 
 // StreamdalConfigReconciler reconciles a StreamdalConfig object
 type StreamdalConfigReconciler struct {
@@ -38,6 +45,20 @@ type StreamdalConfigReconciler struct {
 	// Used by periodic reconciler to detect shutdown
 	ShutdownCtx context.Context
 }
+
+type ReconcileRequest struct {
+	Action ReconcileAction
+	Config *crdv1.StreamdalConfig
+	Client protos.ExternalClient
+}
+
+type ReconcileAction string
+
+const (
+	ReconcileActionCreate ReconcileAction = "create"
+	ReconcileActionDelete ReconcileAction = "delete"
+	ReconcileActionSkip   ReconcileAction = "skip"
+)
 
 //+kubebuilder:rbac:groups=crd.streamdal.com,resources=streamdalconfigs,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=crd.streamdal.com,resources=streamdalconfigs/status,verbs=get;update;patch
@@ -53,58 +74,58 @@ type StreamdalConfigReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.17.2/pkg/reconcile
 func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx).WithValues(
+	llog := log.FromContext(ctx).WithValues(
 		"method", "Reconcile",
 		"namespace", req.Namespace,
 		"name", req.Name,
 	)
 
-	log.Info("received request")
+	llog.Info("Received reconcile request")
 
-	var cfg crdv1.StreamdalConfig
-
-	if err := r.Get(ctx, req.NamespacedName, &cfg); err != nil {
+	rr, err := r.setupReconcileAction(ctx, &req, &llog)
+	if err != nil {
 		if errors.IsNotFound(err) {
-			// Resource not found. It could have been deleted after reconcile request.
-			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-			log.Info("Resource not found. Ignoring since object must be deleted")
+			llog.Info("Resource not found - nothing to do - object is probably deleted")
 			return ctrl.Result{}, nil
 		}
 
-		// Error reading the object - requeue the request.
-		log.Error(err, "Failed to get resource")
+		llog.Error(err, "Failed to determine reconcile action")
+
 		return ctrl.Result{}, err
 	}
 
-	// Check if the object is being deleted
-	if cfg.DeletionTimestamp != nil {
-		// The object is being deleted
-		log.Info("resource is being deleted")
+	var result ctrl.Result
 
-		cfg.SetFinalizers([]string{})
-		if err := r.Update(ctx, &cfg); err != nil {
-			log.Error(err, "Failed to update finalizers for delete")
-			return ctrl.Result{}, err
-		}
+	switch rr.Action {
+	case ReconcileActionCreate:
+		result, err = r.createResource(ctx, rr)
+	case ReconcileActionDelete:
+		result, err = r.deleteResource(ctx, rr)
+	case ReconcileActionSkip:
+		llog.Info("Skipping reconcile action")
 		return ctrl.Result{}, nil
-	}
-
-	// Resource is being created / updated
-	cfg.SetFinalizers([]string{"streamdal.com/finalizer"})
-
-	if err := r.Update(ctx, &cfg); err != nil {
-		log.Error(err, "Failed to update resource with finalizer for create/update")
+	default:
+		err = fmt.Errorf("unknown reconcile action '%s'", rr.Action)
+		llog.Error(err, "Unable to determine action")
 		return ctrl.Result{}, err
 	}
 
-	fmt.Printf("cfg contents: %+v\n", cfg)
+	if err != nil {
+		llog.Error(err, "Failed to complete reconcile action", "action", rr.Action)
+		return ctrl.Result{}, err
+	}
 
-	return ctrl.Result{}, nil
+	llog.Info("Reconcile action completed", "action", rr.Action)
+
+	return result, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	// Launch periodic reconciler
+	llog := log.Log.WithValues("method", "SetupWithManager")
+	llog.Info("Starting periodic reconciler")
+
 	go r.runPeriodicReconciler()
 
 	return ctrl.NewControllerManagedBy(mgr).
@@ -112,20 +133,88 @@ func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+// createResource will attempt to create resources specified in the CR on the
+// streamdal server. If the resource already exists, the method will update the
+// resource instead.
+func (r *StreamdalConfigReconciler) createResource(ctx context.Context, rr *ReconcileRequest) (ctrl.Result, error) {
+	llog := log.Log.WithValues("method", "createResource")
+	llog.Info("Creating resource in streamdal server")
+
+	for _, cfgItem := range rr.Config.Spec.Configs {
+		if err := validate.StreamdalConfigItem(&cfgItem); err != nil {
+			llog.Error(err, fmt.Sprintf("Failed to validate streamdal config item '%s'", cfg.Name))
+			return ctrl.Result{}, err
+		}
+
+		// TODO: Load config
+		protosCfg := &protos.``
+
+		if err := protojson.Unmarshal([]byte(cfgItem.Config), protosCfg); err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to unmarshal config: %s", err)
+		}
+	}
+
+	return ctrl.Result{}, nil
+}
+
+// TODO: Implement
+func (r *StreamdalConfigReconciler) deleteResource(ctx context.Context, rr *ReconcileRequest) (ctrl.Result, error) {
+	return ctrl.Result{}, nil
+}
+
+// setupReconcileAction will validate the request, determine the type of action
+// it is (create or delete) and create a grpc client that can be used for talking
+// to the streamdal server.
+func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, req *ctrl.Request, log *logr.Logger) (*ReconcileRequest, error) {
+	var cfg crdv1.StreamdalConfig
+
+	if err := r.Get(ctx, req.NamespacedName, &cfg); err != nil {
+		return nil, err
+	}
+
+	if err := validate.StreamdalConfig(&cfg); err != nil {
+		return nil, fmt.Errorf("failed to validate streamdal config: %s", err)
+	}
+
+	// This is a valid request for a valid resource, we know we will definitely
+	// need to talk to the streamdal server.
+	grpcClient, err := util.NewGrpcExternalClient(ctx, cfg.Spec.ServerAddress, cfg.Spec.ServerAuth)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create grpc client: %s", err)
+	}
+
+	reconcileAction := &ReconcileRequest{
+		Config: &cfg,
+		Client: grpcClient,
+	}
+
+	if cfg.DeletionTimestamp != nil {
+		reconcileAction.Action = ReconcileActionDelete
+		return reconcileAction, nil
+	}
+
+	// Not a delete - either a create or an update
+	reconcileAction.Action = ReconcileActionCreate
+
+	return reconcileAction, nil
+}
+
 func (r *StreamdalConfigReconciler) runPeriodicReconciler() {
 	// TODO: No need for any of the select stuff
+	llog := log.Log.WithValues("method", "runPeriodicReconciler")
+	llog.Info("Starting")
 
 MAIN:
 	for {
 		select {
 		case <-r.ShutdownCtx.Done():
-			fmt.Println("periodic reconciler detected shutdown")
+			llog.Info("Caught shutdown signal - stopping")
 			break MAIN
 		default:
-			fmt.Println("performing periodic run")
+			llog.Info("Run")
 			time.Sleep(3 * time.Second)
 		}
 	}
 
-	fmt.Println("periodic reconciler exiting...")
+	llog.Info("Stopped")
 }
