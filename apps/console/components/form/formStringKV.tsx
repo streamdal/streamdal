@@ -12,6 +12,7 @@ export type FormKVType = {
   description: string;
   data: any;
   errors: ErrorType;
+  readonly?: boolean;
 };
 
 /**
@@ -23,7 +24,7 @@ export type FormKVType = {
  *     };
  */
 export const FormStringKV = (
-  { name, label, description, data, errors }: FormKVType,
+  { name, label, description, data, errors, readonly }: FormKVType,
 ) => {
   const existingData = resolveValue(data, name);
   const [pairs, setPairs] = useState(
@@ -58,7 +59,11 @@ export const FormStringKV = (
               className="flex flex-row justify-between items-center w-full"
               key={`${name}-key-${i}`}
             >
-              <div className="flex flex-row justify-start items-start w-[80%]">
+              <div
+                className={`flex flex-row justify-start items-start w-[${
+                  readonly ? "100" : "80"
+                }%]`}
+              >
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
                   <label
                     className={`text-xs mb-[3px] `}
@@ -75,6 +80,7 @@ export const FormStringKV = (
                         ),
                       )}
                     placeholder="key"
+                    readOnly={readonly}
                   />
                   <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
                   </div>
@@ -99,6 +105,7 @@ export const FormStringKV = (
                       )}
                     disabled={!k}
                     placeholder={k ? "value" : "enter key first"}
+                    readOnly={readonly}
                   />
                   <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
                     <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
@@ -108,22 +115,29 @@ export const FormStringKV = (
                 </div>
               </div>
 
-              <IconTrash
-                class="w-5 h-5 mt-3 ml-2 text-eyelid cursor-pointer"
-                onClick={() =>
-                  pairs.length === 1
-                    ? setPairs([["", ""]])
-                    : setPairs(pairs.filter((_, index) => index !== i))}
-              />
-              <IconPlus
-                data-tooltip-target={`${name}-add-${i}`}
-                class="w-5 h-5 mt-3 mx-2 cursor-pointer"
-                onClick={() => setPairs([...pairs, ["", ""]])}
-              />
-              <Tooltip
-                targetId={`${name}-add-${i}`}
-                message={`Add ${label}`}
-              />
+              {!readonly && (
+                <IconTrash
+                  class="w-5 h-5 mt-3 ml-2 text-eyelid cursor-pointer"
+                  onClick={() =>
+                    pairs.length === 1
+                      ? setPairs([["", ""]])
+                      : setPairs(pairs.filter((_, index) => index !== i))}
+                />
+              )}
+              {!readonly &&
+                (
+                  <>
+                    <IconPlus
+                      data-tooltip-target={`${name}-add-${i}`}
+                      class="w-5 h-5 mt-3 mx-2 cursor-pointer"
+                      onClick={() => setPairs([...pairs, ["", ""]])}
+                    />
+                    <Tooltip
+                      targetId={`${name}-add-${i}`}
+                      message={`Add ${label}`}
+                    />
+                  </>
+                )}
             </div>
           );
         })}
