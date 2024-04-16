@@ -20,7 +20,7 @@
             },
             "custom": {
                 "args": {
-                    "arg1": "dmFsdWUxCg=="
+                    "arg1": "string arg1"
                 }
             },
             "WasmId": "6a068195-f2da-8d71-4779-2e8ee59f2d78"
