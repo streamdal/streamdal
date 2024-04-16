@@ -14,6 +14,9 @@ service External {
   // Returns all data needed for UI; called on initial console load
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
 
+  // Returns the current _full_ configuration of the server
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
+
   // Used by console to stream updates to UI; called after initial GetAll()
   rpc GetAllStream(GetAllRequest) returns (stream GetAllResponse);
 
@@ -378,4 +381,12 @@ message TestRequest {
 
 message TestResponse {
   string output = 2;
+}
+
+message GetConfigRequest {
+   // Nothing needed here
+}
+
+message GetConfigResponse {
+  protos.Config config = 1;
 }

@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	External_GetAll_FullMethodName                = "/protos.External/GetAll"
+	External_GetConfig_FullMethodName             = "/protos.External/GetConfig"
 	External_GetAllStream_FullMethodName          = "/protos.External/GetAllStream"
 	External_GetPipelines_FullMethodName          = "/protos.External/GetPipelines"
 	External_GetPipeline_FullMethodName           = "/protos.External/GetPipeline"
@@ -63,6 +64,8 @@ const (
 type ExternalClient interface {
 	// Returns all data needed for UI; called on initial console load
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	// Returns the current _full_ configuration of the server
+	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
 	// Used by console to stream updates to UI; called after initial GetAll()
 	GetAllStream(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (External_GetAllStreamClient, error)
 	// Returns pipelines (_wasm_bytes field is stripped)
@@ -134,6 +137,15 @@ func NewExternalClient(cc grpc.ClientConnInterface) ExternalClient {
 func (c *externalClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
 	out := new(GetAllResponse)
 	err := c.cc.Invoke(ctx, External_GetAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *externalClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error) {
+	out := new(GetConfigResponse)
+	err := c.cc.Invoke(ctx, External_GetConfig_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -555,6 +567,8 @@ func (c *externalClient) Test(ctx context.Context, in *TestRequest, opts ...grpc
 type ExternalServer interface {
 	// Returns all data needed for UI; called on initial console load
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	// Returns the current _full_ configuration of the server
+	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
 	// Used by console to stream updates to UI; called after initial GetAll()
 	GetAllStream(*GetAllRequest, External_GetAllStreamServer) error
 	// Returns pipelines (_wasm_bytes field is stripped)
@@ -622,6 +636,9 @@ type UnimplementedExternalServer struct {
 
 func (UnimplementedExternalServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedExternalServer) GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
 }
 func (UnimplementedExternalServer) GetAllStream(*GetAllRequest, External_GetAllStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetAllStream not implemented")
@@ -755,6 +772,24 @@ func _External_GetAll_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ExternalServer).GetAll(ctx, req.(*GetAllRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _External_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExternalServer).GetConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: External_GetConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExternalServer).GetConfig(ctx, req.(*GetConfigRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1411,6 +1446,10 @@ var External_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAll",
 			Handler:    _External_GetAll_Handler,
+		},
+		{
+			MethodName: "GetConfig",
+			Handler:    _External_GetConfig_Handler,
 		},
 		{
 			MethodName: "GetPipelines",

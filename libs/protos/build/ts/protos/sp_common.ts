@@ -11,6 +11,9 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { WasmModule } from "./shared/sp_shared.js";
+import { NotificationConfig } from "./sp_notify.js";
+import { Pipeline } from "./sp_pipeline.js";
 /**
  * Common response message for many gRPC methods
  *
@@ -228,6 +231,29 @@ export interface SampleOptions {
      * @generated from protobuf field: uint32 sample_interval_seconds = 2;
      */
     sampleIntervalSeconds: number;
+}
+/**
+ * Config is returned by external.GetConfig() and is used by the K8S operator
+ *
+ * @generated from protobuf message protos.Config
+ */
+export interface Config {
+    /**
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
+     */
+    audiences: Audience[];
+    /**
+     * @generated from protobuf field: repeated protos.Pipeline pipelines = 2;
+     */
+    pipelines: Pipeline[];
+    /**
+     * @generated from protobuf field: repeated protos.NotificationConfig notifications = 3;
+     */
+    notifications: NotificationConfig[];
+    /**
+     * @generated from protobuf field: repeated protos.shared.WasmModule wasm_modules = 4;
+     */
+    wasmModules: WasmModule[];
 }
 /**
  * Common status codes used in gRPC method responses
@@ -950,3 +976,71 @@ class SampleOptions$Type extends MessageType<SampleOptions> {
  * @generated MessageType for protobuf message protos.SampleOptions
  */
 export const SampleOptions = new SampleOptions$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Config$Type extends MessageType<Config> {
+    constructor() {
+        super("protos.Config", [
+            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 2, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline },
+            { no: 3, name: "notifications", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
+            { no: 4, name: "wasm_modules", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => WasmModule }
+        ]);
+    }
+    create(value?: PartialMessage<Config>): Config {
+        const message = { audiences: [], pipelines: [], notifications: [], wasmModules: [] };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<Config>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Config): Config {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.Audience audiences */ 1:
+                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.Pipeline pipelines */ 2:
+                    message.pipelines.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.NotificationConfig notifications */ 3:
+                    message.notifications.push(NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.shared.WasmModule wasm_modules */ 4:
+                    message.wasmModules.push(WasmModule.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Config, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.Audience audiences = 1; */
+        for (let i = 0; i < message.audiences.length; i++)
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Pipeline pipelines = 2; */
+        for (let i = 0; i < message.pipelines.length; i++)
+            Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.NotificationConfig notifications = 3; */
+        for (let i = 0; i < message.notifications.length; i++)
+            NotificationConfig.internalBinaryWrite(message.notifications[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.shared.WasmModule wasm_modules = 4; */
+        for (let i = 0; i < message.wasmModules.length; i++)
+            WasmModule.internalBinaryWrite(message.wasmModules[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Config
+ */
+export const Config = new Config$Type();
