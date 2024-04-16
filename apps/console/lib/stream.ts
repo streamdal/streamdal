@@ -38,7 +38,6 @@ export const streamServiceMap = async () => {
     const { status } = await call;
     status && console.info("received grpc getAllStream status", status);
   } catch (e) {
-    serviceSignal.value = initServiceSignal;
     //
     // User generated abort signals present as cancelled exceptions, don't reconnect
     if (e?.code === "CANCELLED") {

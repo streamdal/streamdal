@@ -15,30 +15,26 @@ import {
   ServiceNode,
 } from "../components/serviceMap/customNodes.tsx";
 
-import IconSquareX from "tabler-icons/tsx/square-x.tsx";
 import { useSignalEffect } from "@preact/signals";
+import { useState } from "preact/hooks";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
-import { useEffect, useRef, useState } from "preact/hooks";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { ServerError } from "../components/error/server.tsx";
+import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
+import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 
-import { EmptyService } from "../components/serviceMap/emptyService.tsx";
+import { showNav } from "root/components/nav/signals.ts";
 import {
   ComponentEdge,
   ServiceEdge,
 } from "../components/serviceMap/customEdge.tsx";
+import { EmptyService } from "../components/serviceMap/emptyService.tsx";
 import {
-  initOpModal,
   OP_MODAL_KEY,
   opModal,
-  OpModalType,
 } from "../components/serviceMap/opModalSignal.ts";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
-import { showNav } from "root/components/nav/signals.ts";
-import { initFlowBite } from "../components/flowbite/init.tsx";
 const LAYOUT_KEY = "service-display-layout";
 
 const DEFAULT_VIEWPORT = {
@@ -99,13 +95,12 @@ export default function ServiceDisplay(
 ) {
   const savedDisplay = deserializeDisplay();
   const savedNodes = savedDisplay?.nodes || [];
-  const saveEdges = savedDisplay?.edges || [];
   const viewPort = savedDisplay?.viewPort || DEFAULT_VIEWPORT;
-
   const [rfInstance, setRfInstance] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
     mergeNodes(initNodes, savedNodes),
   );
+
   const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges);
 
   useSignalEffect(() => {
