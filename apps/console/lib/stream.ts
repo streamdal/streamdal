@@ -1,15 +1,11 @@
-import {
-  initServiceSignal,
-  serviceSignal,
-  setServiceSignal,
-} from "../components/serviceMap/serviceSignal.ts";
-import { client, meta } from "./grpc.ts";
+import { effect, signal } from "@preact/signals";
 import { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
   GetAllRequest,
   GetAllResponse,
 } from "streamdal-protos/protos/sp_external.ts";
-import { effect, signal } from "@preact/signals";
+import { setServiceSignal } from "../components/serviceMap/serviceSignal.ts";
+import { client, meta } from "./grpc.ts";
 import { SERVER_ERROR, serverErrorSignal } from "./serverError.ts";
 
 export const CONNECT_RETRY_INTERVAL = 3000;
