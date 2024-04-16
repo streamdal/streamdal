@@ -81,7 +81,8 @@ class Pipeline$Type extends runtime_5.MessageType {
             { no: 1002, name: "_version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1003, name: "_url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1004, name: "_created_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
+            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1006, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -126,6 +127,9 @@ class Pipeline$Type extends runtime_5.MessageType {
                 case /* optional int64 _updated_at_unix_ts_utc */ 1005:
                     message.UpdatedAtUnixTsUtc = reader.int64().toString();
                     break;
+                case /* optional string _created_by */ 1006:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -168,6 +172,9 @@ class Pipeline$Type extends runtime_5.MessageType {
         /* optional int64 _updated_at_unix_ts_utc = 1005; */
         if (message.UpdatedAtUnixTsUtc !== undefined)
             writer.tag(1005, runtime_1.WireType.Varint).int64(message.UpdatedAtUnixTsUtc);
+        /* optional string _created_by = 1006; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1006, runtime_1.WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

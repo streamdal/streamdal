@@ -2,6 +2,10 @@ syntax = "proto3";
 
 package protos;
 
+import "shared/sp_shared.proto";
+import "sp_notify.proto";
+import "sp_pipeline.proto";
+
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 
 // Common response message for many gRPC methods
@@ -43,6 +47,9 @@ message Audience {
 
   // Name for the consumer or producer
   string operation_name = 4;
+
+  // Used internally by server and k8s operator to determine who manages this resource
+  optional string _created_by = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message Metric {
@@ -121,4 +128,12 @@ message SampleOptions {
   uint32 sample_rate = 1;
 
   uint32 sample_interval_seconds = 2;
+}
+
+// Config is returned by external.GetConfig() and is used by the K8S operator
+message Config {
+  repeated Audience audiences = 1;
+  repeated protos.Pipeline pipelines = 2;
+  repeated protos.NotificationConfig notifications = 3;
+  repeated shared.WasmModule wasm_modules = 4;
 }

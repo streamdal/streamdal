@@ -73,7 +73,8 @@ class NotificationConfig$Type extends runtime_5.MessageType {
             { no: 3, name: "type", kind: "enum", T: () => ["protos.NotificationType", NotificationType, "NOTIFICATION_TYPE_"] },
             { no: 1000, name: "slack", kind: "message", oneof: "config", T: () => exports.NotificationSlack },
             { no: 1001, name: "email", kind: "message", oneof: "config", T: () => exports.NotificationEmail },
-            { no: 1002, name: "pagerduty", kind: "message", oneof: "config", T: () => exports.NotificationPagerDuty }
+            { no: 1002, name: "pagerduty", kind: "message", oneof: "config", T: () => exports.NotificationPagerDuty },
+            { no: 10000, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -115,6 +116,9 @@ class NotificationConfig$Type extends runtime_5.MessageType {
                         pagerduty: exports.NotificationPagerDuty.internalBinaryRead(reader, reader.uint32(), options, message.config.pagerduty)
                     };
                     break;
+                case /* optional string _created_by */ 10000:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -145,6 +149,9 @@ class NotificationConfig$Type extends runtime_5.MessageType {
         /* protos.NotificationPagerDuty pagerduty = 1002; */
         if (message.config.oneofKind === "pagerduty")
             exports.NotificationPagerDuty.internalBinaryWrite(message.config.pagerduty, writer.tag(1002, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* optional string _created_by = 10000; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(10000, runtime_1.WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

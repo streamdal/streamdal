@@ -46,6 +46,9 @@ message Pipeline {
   optional int64 _created_at_unix_ts_utc = 1004; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
   optional int64 _updated_at_unix_ts_utc = 1005; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Used internally by server and k8s operator to determine who manages this resource
+  optional string _created_by = 1006; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // Defines the ways in which a pipeline can be aborted

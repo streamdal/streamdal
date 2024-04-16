@@ -216,6 +216,16 @@ class GetAudienceRatesResponse(_message.Message):
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
     def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _keepalive: bool = ...) -> None: ...
 
+class GetConfigRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetConfigResponse(_message.Message):
+    __slots__ = ["config"]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    config: _sp_common_pb2.Config
+    def __init__(self, config: _Optional[_Union[_sp_common_pb2.Config, _Mapping]] = ...) -> None: ...
+
 class GetMetricsRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
