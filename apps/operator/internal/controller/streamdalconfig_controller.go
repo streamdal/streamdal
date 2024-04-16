@@ -133,6 +133,17 @@ func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
+type HandleFunc struct {
+	Name     string
+	Function func(ctx context.Context, client protos.ExternalClient, cfg *protos.Config) (*HandleStatus, error)
+}
+
+type HandleStatus struct {
+	Resource   string
+	NumCreated int
+	NumUpdated int
+}
+
 // createResource will attempt to create resources specified in the CR on the
 // streamdal server. If the resource already exists, the method will update the
 // resource instead.
@@ -141,20 +152,65 @@ func (r *StreamdalConfigReconciler) createResource(ctx context.Context, rr *Reco
 	llog.Info("Creating resource in streamdal server")
 
 	for _, cfgItem := range rr.Config.Spec.Configs {
-		if err := validate.StreamdalConfigItem(&cfgItem); err != nil {
-			llog.Error(err, fmt.Sprintf("Failed to validate streamdal config item '%s'", cfg.Name))
+		// Attempt to load config
+		protosCfg := &protos.Config{}
+		if err := protojson.Unmarshal([]byte(cfgItem.Config), protosCfg); err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to unmarshal config '%s': %s", cfgItem.Name, err)
+		}
+
+		if err := validate.StreamdalProtosConfig(protosCfg); err != nil {
+			llog.Error(err, fmt.Sprintf("Failed to validate streamdal JSON config '%s'", cfgItem.Name))
 			return ctrl.Result{}, err
 		}
 
-		// TODO: Load config
-		protosCfg := &protos.``
+		// NOTE: Pipelines should be created last as they will reference other resources
 
-		if err := protojson.Unmarshal([]byte(cfgItem.Config), protosCfg); err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to unmarshal config: %s", err)
+		handleFuncs := []HandleFunc{
+			{
+				Name:     "audience(s)",
+				Function: r.handleAudiences,
+			},
+			{
+				Name:     "notification(s)",
+				Function: r.handleNotifications,
+			},
+
+			// Punting on support for wasm modules for now ~DS 04.16.2024
+			//{
+			//	Name:     "wasm module(s)",
+			//	Function: r.handleWasmModules,
+			//},
+
+			{
+				Name:     "pipeline(s)",
+				Function: r.handlePipelines,
+			},
+		}
+
+		for _, f := range handleFuncs {
+			llog.Info("Running handle function", "resource", f.Name)
+			status, err := f.Function(ctx, rr.Client, protosCfg)
+			if err != nil {
+				return ctrl.Result{}, fmt.Errorf("failed to handle resource '%s': %s", f.Name, err)
+			}
+
+			llog.Info("Handle function completed", "resource", f.Name, "numCreated", status.NumCreated, "numUpdated", status.NumUpdated)
 		}
 	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, client protos.ExternalClient, cfg *protos.Config) (*HandleStatus, error) {
+	return &HandleStatus{}, nil
+}
+
+func (r *StreamdalConfigReconciler) handleNotifications(ctx context.Context, client protos.ExternalClient, cfg *protos.Config) (*HandleStatus, error) {
+	return &HandleStatus{}, nil
+}
+
+func (r *StreamdalConfigReconciler) handlePipelines(ctx context.Context, client protos.ExternalClient, cfg *protos.Config) (*HandleStatus, error) {
+	return &HandleStatus{}, nil
 }
 
 // TODO: Implement
@@ -203,6 +259,13 @@ func (r *StreamdalConfigReconciler) runPeriodicReconciler() {
 	// TODO: No need for any of the select stuff
 	llog := log.Log.WithValues("method", "runPeriodicReconciler")
 	llog.Info("Starting")
+
+	// TODO: How do we know what streamdal server to talk to?
+	// IDEA: What if we look through all K8S objects and look for streamdal servers?
+	// ^ Not a good idea - maybe we don't want to have some streamdal servers be
+	// managed by the K8S operator.
+	// IDEA 2: As resources are created, k8s operator adds the server to a map
+	// of "known servers".
 
 MAIN:
 	for {
