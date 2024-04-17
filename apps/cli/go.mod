@@ -12,7 +12,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/tview v0.0.0-20230909130259-ba6a2a345459
-	github.com/streamdal/streamdal/libs/protos v0.1.40
+	github.com/streamdal/streamdal/libs/protos v0.1.38
 	google.golang.org/grpc v1.60.0
 )
 
