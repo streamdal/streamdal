@@ -136,4 +136,5 @@ message Config {
   repeated protos.Pipeline pipelines = 2;
   repeated protos.NotificationConfig notifications = 3;
   repeated shared.WasmModule wasm_modules = 4;
+  map<string, PipelineConfigs> audience_mappings = 5; // key == audience as string
 }
