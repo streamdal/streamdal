@@ -74,7 +74,7 @@ type IStore interface {
 	SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
-	GetAllConfig(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error)
+	GetAudienceMappings(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error)
 	GetPipelineConfigsByAudience(ctx context.Context, aud *protos.Audience) (*protos.PipelineConfigs, error)
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
@@ -296,7 +296,7 @@ func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]
 	llog.Debug("received request to delete pipeline configs by pipeline ID")
 
 	// Fetch all pipeline configs
-	pipelineConfigs, err := s.GetAllConfig(ctx)
+	pipelineConfigs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		llog.Errorf("unable to fetch pipeline configs: %s", err)
 		return nil, errors.Wrap(err, "error fetching pipeline configs")
@@ -378,7 +378,7 @@ func (s *Store) GetAudiencesByPipelineID(ctx context.Context, pipelineID string)
 	llog.Debug("received request to get audiences by pipeline ID")
 
 	// Get all pipeline configs
-	pipelineConfigs, err := s.GetAllConfig(ctx)
+	pipelineConfigs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		llog.Errorf("unable to fetch pipeline configs: %s", err)
 		return nil, errors.Wrap(err, "error fetching pipeline configs")
@@ -897,8 +897,8 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	return nil
 }
 
-// GetAllConfig returns all audience -> *protos.PipelineConfigs
-func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error) {
+// GetAudienceMappings returns all audience -> *protos.PipelineConfigs assignments
+func (s *Store) GetAudienceMappings(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error) {
 	cfgs := make(map[*protos.Audience]*protos.PipelineConfigs)
 
 	audienceKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":*").Result()
@@ -1069,7 +1069,7 @@ func (s *Store) GetSetPipelinesCommandsByService(ctx context.Context, serviceNam
 
 	cmds := make([]*protos.Command, 0)
 
-	allConfigs, err := s.GetAllConfig(ctx)
+	allConfigs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching all configs")
 	}
@@ -1350,7 +1350,7 @@ func (s *Store) IsPipelineAttachedAny(ctx context.Context, pipelineID string) bo
 	}
 
 	// Get all configs
-	cfgs, err := s.GetAllConfig(ctx)
+	cfgs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		llog.Errorf("error getting all configs: %s", err)
 		return false
@@ -1382,7 +1382,7 @@ func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) 
 	usage := make([]*PipelineUsage, 0)
 
 	// Get config for all usage & audiences
-	cfgs, err := s.GetAllConfig(ctx)
+	cfgs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting configs")
 	}
