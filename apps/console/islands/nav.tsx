@@ -1,8 +1,11 @@
 import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
+import IconFileDownload from "tabler-icons/tsx/file-download.tsx";
 import IconListCheck from "tabler-icons/tsx/list-check.tsx";
 import IconBell from "tabler-icons/tsx/bell.tsx";
 import { useEffect, useRef } from "preact/hooks";
 import { showNav } from "root/components/nav/signals.ts";
+import { serviceSignal } from "root/components/serviceMap/serviceSignal.ts";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
 
 export const NavBar = () => {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -27,7 +30,7 @@ export const NavBar = () => {
       <ul
         class={`${
           showNav.value ? "" : "hidden"
-        } z-50 fixed mt-[70px] top-0 left-0 font-medium bg-white ml-4 w-64 rounded border shadow`}
+        } z-50 fixed mt-[70px] top-0 left-0 font-medium bg-white ml-4 w-72 rounded border shadow`}
         onClick={() => showNav.value = false}
       >
         <li>
@@ -68,6 +71,47 @@ export const NavBar = () => {
             <IconBell class="w-6 h-6" />
             <span class="ml-3 text-gray-900">Notifications</span>
           </a>
+        </li>
+        <li>
+          {serviceSignal.value.pipelines &&
+              Object.keys(serviceSignal.value.pipelines)?.length
+            ? (
+              <a
+                className="flex items-center p-2 text-gray-500 hover:bg-sunset group"
+                href={`data:text/json;charset=utf-8,${
+                  encodeURIComponent(
+                    JSON.stringify(
+                      serviceSignal.value.pipelines,
+                      undefined,
+                      2,
+                    ),
+                  )
+                }`}
+                download="pipelines.json"
+              >
+                <IconFileDownload class="w-6 h-6" />
+                <span class="ml-3 text-gray-900">
+                  Download Pipeline Configs
+                </span>
+              </a>
+            )
+            : (
+              <>
+                <div
+                  className="flex items-center p-2 text-gray-400 hover:bg-sunset group cursor-not-allowed"
+                  data-tooltip-target="pipeline-download"
+                >
+                  <IconFileDownload class="w-6 h-6" />
+                  <span class="ml-3">
+                    Download Pipeline Configs
+                  </span>
+                </div>
+                <Tooltip
+                  targetId="pipeline-download"
+                  message={"No pipelines are configured"}
+                />
+              </>
+            )}
         </li>
         <li className="cursor-not-allowed">
           <div className="flex items-center p-2 text-gray-400 hover:bg-sunset group ">

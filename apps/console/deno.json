@@ -31,7 +31,6 @@
     "react-dom": "https://esm.sh/v132/preact/compat",
     "react/jsx-runtime": "https://esm.sh/v132/preact/jsx-runtime",
     "reactflow": "https://esm.sh/v132/reactflow@11.8.2?alias=react:preact/compat,react-dom:preact/compat,@types/react:preact/compat&external=preact/compat&deps=preact@10.17.1",
-    "$std/": "https://deno.land/std@0.190.0/",
     "twind": "https://esm.sh/v132/twind@0.16.19",
     "twind/": "https://esm.sh/v132/twind@0.16.19/",
     "flowbite": "https://esm.sh/v132/flowbite@1.7.0",
