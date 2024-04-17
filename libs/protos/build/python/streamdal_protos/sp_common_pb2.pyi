@@ -49,16 +49,25 @@ class AudienceRate(_message.Message):
     def __init__(self, bytes: _Optional[float] = ..., processed: _Optional[float] = ...) -> None: ...
 
 class Config(_message.Message):
-    __slots__ = ["audiences", "notifications", "pipelines", "wasm_modules"]
+    __slots__ = ["audience_mappings", "audiences", "notifications", "pipelines", "wasm_modules"]
+    class AudienceMappingsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: _sp_pipeline_pb2.PipelineConfigs
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[_sp_pipeline_pb2.PipelineConfigs, _Mapping]] = ...) -> None: ...
     AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    AUDIENCE_MAPPINGS_FIELD_NUMBER: _ClassVar[int]
     NOTIFICATIONS_FIELD_NUMBER: _ClassVar[int]
     PIPELINES_FIELD_NUMBER: _ClassVar[int]
     WASM_MODULES_FIELD_NUMBER: _ClassVar[int]
+    audience_mappings: _containers.MessageMap[str, _sp_pipeline_pb2.PipelineConfigs]
     audiences: _containers.RepeatedCompositeFieldContainer[Audience]
     notifications: _containers.RepeatedCompositeFieldContainer[_sp_notify_pb2.NotificationConfig]
     pipelines: _containers.RepeatedCompositeFieldContainer[_sp_pipeline_pb2.Pipeline]
     wasm_modules: _containers.RepeatedCompositeFieldContainer[_sp_shared_pb2.WasmModule]
-    def __init__(self, audiences: _Optional[_Iterable[_Union[Audience, _Mapping]]] = ..., pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ..., notifications: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., wasm_modules: _Optional[_Iterable[_Union[_sp_shared_pb2.WasmModule, _Mapping]]] = ...) -> None: ...
+    def __init__(self, audiences: _Optional[_Iterable[_Union[Audience, _Mapping]]] = ..., pipelines: _Optional[_Iterable[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]]] = ..., notifications: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., wasm_modules: _Optional[_Iterable[_Union[_sp_shared_pb2.WasmModule, _Mapping]]] = ..., audience_mappings: _Optional[_Mapping[str, _sp_pipeline_pb2.PipelineConfigs]] = ...) -> None: ...
 
 class Metric(_message.Message):
     __slots__ = ["audience", "labels", "name", "value"]

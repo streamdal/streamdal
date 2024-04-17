@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { PipelineConfigs } from "./sp_pipeline";
 import { WasmModule } from "./shared/sp_shared";
 import { NotificationConfig } from "./sp_notify";
 import { Pipeline } from "./sp_pipeline";
@@ -247,6 +248,12 @@ export interface Config {
      * @generated from protobuf field: repeated protos.shared.WasmModule wasm_modules = 4;
      */
     wasmModules: WasmModule[];
+    /**
+     * @generated from protobuf field: map<string, protos.PipelineConfigs> audience_mappings = 5;
+     */
+    audienceMappings: {
+        [key: string]: PipelineConfigs;
+    };
 }
 /**
  * Common status codes used in gRPC method responses
@@ -428,6 +435,7 @@ declare class Config$Type extends MessageType<Config> {
     constructor();
     create(value?: PartialMessage<Config>): Config;
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Config): Config;
+    private binaryReadMap5;
     internalBinaryWrite(message: Config, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
