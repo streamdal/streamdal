@@ -102,6 +102,7 @@ export default function PipelineDetail({
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
+    logFormData(formData);
 
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
