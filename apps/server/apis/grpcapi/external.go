@@ -1541,9 +1541,17 @@ func (s *ExternalServer) GetConfig(ctx context.Context, _ *protos.GetConfigReque
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
+	// GetPipelines returns a map - need to convert for easier display
 	pipelinesSlice := make([]*protos.Pipeline, 0)
 	for _, p := range pipelines {
 		pipelinesSlice = append(pipelinesSlice, p)
+	}
+
+	// Pipeline steps contain wasm bytes - strip to reduce size
+	for _, p := range pipelinesSlice {
+		for _, s := range p.Steps {
+			s.XWasmBytes = nil
+		}
 	}
 
 	wasm, err := s.Options.StoreService.GetAllWasm(ctx)
@@ -1551,9 +1559,23 @@ func (s *ExternalServer) GetConfig(ctx context.Context, _ *protos.GetConfigReque
 		return nil, errors.Wrap(err, "unable to get wasm")
 	}
 
+	// Strip bytes to reduce message size
+	for _, w := range wasm {
+		w.Bytes = nil
+	}
+
+	// GetAudienceMappings returns a map[*protos.Audience]*protos.PipelineConfigs
+	// but Config.AudienceMappings expects a map[string]*protos.PipelineConfigs.
+	// Need to convert the keys to strings.
 	mappings, err := s.Options.StoreService.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get mappings")
+	}
+
+	stringMappings := make(map[string]*protos.PipelineConfigs)
+
+	for k, v := range mappings {
+		stringMappings[util.AudienceToStr(k)] = v
 	}
 
 	return &protos.GetConfigResponse{
@@ -1562,7 +1584,7 @@ func (s *ExternalServer) GetConfig(ctx context.Context, _ *protos.GetConfigReque
 			Pipelines:        pipelinesSlice,
 			Notifications:    notificationsSlice,
 			WasmModules:      wasm,
-			AudienceMappings: mappings,
+			AudienceMappings: stringMappings,
 		},
 	}, nil
 }
