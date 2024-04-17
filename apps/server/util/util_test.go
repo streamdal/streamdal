@@ -96,7 +96,7 @@ func TestAudienceToStr(t *testing.T) {
 
 func TestGrpcMethodCounterName(t *testing.T) {
 	cases := map[string]string{
-		"/protos.External/GetAllConfig":          "grpc_method_external_get_all_config_total",
+		"/protos.External/GetAudienceMappings":   "grpc_method_external_get_all_config_total",
 		"/protos.External/AppVerifyRegistration": "grpc_method_external_app_verify_registration_total",
 		"/protos.Internal/Register":              "grpc_method_internal_register_total",
 	}

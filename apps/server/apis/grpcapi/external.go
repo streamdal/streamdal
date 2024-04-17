@@ -73,7 +73,7 @@ func (s *ExternalServer) GetAll(ctx context.Context, req *protos.GetAllRequest) 
 		return nil, errors.Wrap(err, "unable to get pipelines")
 	}
 
-	allPipelineConfigs, err := s.Options.StoreService.GetAllConfig(ctx)
+	allPipelineConfigs, err := s.Options.StoreService.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get config")
 	}
@@ -250,7 +250,7 @@ func (s *ExternalServer) getAllPipelineInfo(ctx context.Context) (map[string]*pr
 	}
 
 	// Get audience <-> pipeline mappings
-	allPipelineConfigs, err := s.Options.StoreService.GetAllConfig(ctx)
+	allPipelineConfigs, err := s.Options.StoreService.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get pipeline config")
 	}
@@ -1518,6 +1518,53 @@ func (s *ExternalServer) uibffPostRequest(endpoint string, m proto.Message) (*pr
 	}
 
 	return resp, nil
+}
+
+func (s *ExternalServer) GetConfig(ctx context.Context, _ *protos.GetConfigRequest) (*protos.GetConfigResponse, error) {
+	audiences, err := s.Options.StoreService.GetAudiences(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get audiences")
+	}
+
+	notifications, err := s.Options.StoreService.GetNotificationConfigs(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get notification configs")
+	}
+
+	notificationsSlice := make([]*protos.NotificationConfig, 0)
+	for _, n := range notifications {
+		notificationsSlice = append(notificationsSlice, n)
+	}
+
+	pipelines, err := s.Options.StoreService.GetPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get pipelines")
+	}
+
+	pipelinesSlice := make([]*protos.Pipeline, 0)
+	for _, p := range pipelines {
+		pipelinesSlice = append(pipelinesSlice, p)
+	}
+
+	wasm, err := s.Options.StoreService.GetAllWasm(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get wasm")
+	}
+
+	mappings, err := s.Options.StoreService.GetAudienceMappings(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to get mappings")
+	}
+
+	return &protos.GetConfigResponse{
+		Config: &protos.Config{
+			Audiences:        audiences,
+			Pipelines:        pipelinesSlice,
+			Notifications:    notificationsSlice,
+			WasmModules:      wasm,
+			AudienceMappings: mappings,
+		},
+	}, nil
 }
 
 func (s *ExternalServer) Test(_ context.Context, req *protos.TestRequest) (*protos.TestResponse, error) {
