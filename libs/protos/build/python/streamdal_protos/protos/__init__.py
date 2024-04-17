@@ -577,6 +577,9 @@ class Config(betterproto.Message):
     pipelines: List["Pipeline"] = betterproto.message_field(2)
     notifications: List["NotificationConfig"] = betterproto.message_field(3)
     wasm_modules: List["shared.WasmModule"] = betterproto.message_field(4)
+    audience_mappings: Dict[str, "PipelineConfigs"] = betterproto.map_field(
+        5, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
 
 
 @dataclass(eq=False, repr=False)

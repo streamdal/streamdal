@@ -11,6 +11,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { PipelineConfigs } from "./sp_pipeline.js";
 import { WasmModule } from "./shared/sp_shared.js";
 import { NotificationConfig } from "./sp_notify.js";
 import { Pipeline } from "./sp_pipeline.js";
@@ -254,6 +255,12 @@ export interface Config {
      * @generated from protobuf field: repeated protos.shared.WasmModule wasm_modules = 4;
      */
     wasmModules: WasmModule[];
+    /**
+     * @generated from protobuf field: map<string, protos.PipelineConfigs> audience_mappings = 5;
+     */
+    audienceMappings: {
+        [key: string]: PipelineConfigs;
+    }; // key == audience as string
 }
 /**
  * Common status codes used in gRPC method responses
@@ -983,11 +990,12 @@ class Config$Type extends MessageType<Config> {
             { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
             { no: 2, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline },
             { no: 3, name: "notifications", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
-            { no: 4, name: "wasm_modules", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => WasmModule }
+            { no: 4, name: "wasm_modules", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => WasmModule },
+            { no: 5, name: "audience_mappings", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineConfigs } }
         ]);
     }
     create(value?: PartialMessage<Config>): Config {
-        const message = { audiences: [], pipelines: [], notifications: [], wasmModules: [] };
+        const message = { audiences: [], pipelines: [], notifications: [], wasmModules: [], audienceMappings: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<Config>(this, message, value);
@@ -1010,6 +1018,9 @@ class Config$Type extends MessageType<Config> {
                 case /* repeated protos.shared.WasmModule wasm_modules */ 4:
                     message.wasmModules.push(WasmModule.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* map<string, protos.PipelineConfigs> audience_mappings */ 5:
+                    this.binaryReadMap5(message.audienceMappings, reader, options);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1020,6 +1031,22 @@ class Config$Type extends MessageType<Config> {
             }
         }
         return message;
+    }
+    private binaryReadMap5(map: Config["audienceMappings"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof Config["audienceMappings"] | undefined, val: Config["audienceMappings"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = PipelineConfigs.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.Config.audience_mappings");
+            }
+        }
+        map[key ?? ""] = val ?? PipelineConfigs.create();
     }
     internalBinaryWrite(message: Config, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* repeated protos.Audience audiences = 1; */
@@ -1034,6 +1061,13 @@ class Config$Type extends MessageType<Config> {
         /* repeated protos.shared.WasmModule wasm_modules = 4; */
         for (let i = 0; i < message.wasmModules.length; i++)
             WasmModule.internalBinaryWrite(message.wasmModules[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, protos.PipelineConfigs> audience_mappings = 5; */
+        for (let k of Object.keys(message.audienceMappings)) {
+            writer.tag(5, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            PipelineConfigs.internalBinaryWrite(message.audienceMappings[k], writer, options);
+            writer.join().join();
+        }
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

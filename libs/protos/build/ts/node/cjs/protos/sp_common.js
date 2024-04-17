@@ -6,9 +6,10 @@ const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
+const sp_pipeline_1 = require("./sp_pipeline");
 const sp_shared_1 = require("./shared/sp_shared");
 const sp_notify_1 = require("./sp_notify");
-const sp_pipeline_1 = require("./sp_pipeline");
+const sp_pipeline_2 = require("./sp_pipeline");
 /**
  * Common status codes used in gRPC method responses
  *
@@ -739,13 +740,14 @@ class Config$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.Config", [
             { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => exports.Audience },
-            { no: 2, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_pipeline_1.Pipeline },
+            { no: 2, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_pipeline_2.Pipeline },
             { no: 3, name: "notifications", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_notify_1.NotificationConfig },
-            { no: 4, name: "wasm_modules", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_shared_1.WasmModule }
+            { no: 4, name: "wasm_modules", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_shared_1.WasmModule },
+            { no: 5, name: "audience_mappings", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => sp_pipeline_1.PipelineConfigs } }
         ]);
     }
     create(value) {
-        const message = { audiences: [], pipelines: [], notifications: [], wasmModules: [] };
+        const message = { audiences: [], pipelines: [], notifications: [], wasmModules: [], audienceMappings: {} };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -760,13 +762,16 @@ class Config$Type extends runtime_5.MessageType {
                     message.audiences.push(exports.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* repeated protos.Pipeline pipelines */ 2:
-                    message.pipelines.push(sp_pipeline_1.Pipeline.internalBinaryRead(reader, reader.uint32(), options));
+                    message.pipelines.push(sp_pipeline_2.Pipeline.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* repeated protos.NotificationConfig notifications */ 3:
                     message.notifications.push(sp_notify_1.NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* repeated protos.shared.WasmModule wasm_modules */ 4:
                     message.wasmModules.push(sp_shared_1.WasmModule.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* map<string, protos.PipelineConfigs> audience_mappings */ 5:
+                    this.binaryReadMap5(message.audienceMappings, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -779,19 +784,42 @@ class Config$Type extends runtime_5.MessageType {
         }
         return message;
     }
+    binaryReadMap5(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = sp_pipeline_1.PipelineConfigs.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.Config.audience_mappings");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : sp_pipeline_1.PipelineConfigs.create();
+    }
     internalBinaryWrite(message, writer, options) {
         /* repeated protos.Audience audiences = 1; */
         for (let i = 0; i < message.audiences.length; i++)
             exports.Audience.internalBinaryWrite(message.audiences[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* repeated protos.Pipeline pipelines = 2; */
         for (let i = 0; i < message.pipelines.length; i++)
-            sp_pipeline_1.Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_pipeline_2.Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* repeated protos.NotificationConfig notifications = 3; */
         for (let i = 0; i < message.notifications.length; i++)
             sp_notify_1.NotificationConfig.internalBinaryWrite(message.notifications[i], writer.tag(3, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* repeated protos.shared.WasmModule wasm_modules = 4; */
         for (let i = 0; i < message.wasmModules.length; i++)
             sp_shared_1.WasmModule.internalBinaryWrite(message.wasmModules[i], writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* map<string, protos.PipelineConfigs> audience_mappings = 5; */
+        for (let k of Object.keys(message.audienceMappings)) {
+            writer.tag(5, runtime_1.WireType.LengthDelimited).fork().tag(1, runtime_1.WireType.LengthDelimited).string(k);
+            writer.tag(2, runtime_1.WireType.LengthDelimited).fork();
+            sp_pipeline_1.PipelineConfigs.internalBinaryWrite(message.audienceMappings[k], writer, options);
+            writer.join().join();
+        }
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
