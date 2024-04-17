@@ -2,7 +2,6 @@ package util
 
 import (
 	"context"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -14,16 +13,6 @@ import (
 const (
 	AuthTokenMetadata = "auth-token"
 )
-
-func ContainsString(slice []string, s string) bool {
-	for _, item := range slice {
-		if strings.Contains(item, s) {
-			return true
-		}
-	}
-
-	return false
-}
 
 func NewGrpcExternalClient(ctx context.Context, serverAddress, serverAuth string) (protos.ExternalClient, error) {
 	// TODO: Expose a way to pass TLS options
