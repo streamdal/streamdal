@@ -73,45 +73,16 @@ export const NavBar = () => {
           </a>
         </li>
         <li>
-          {serviceSignal.value.pipelines &&
-              Object.keys(serviceSignal.value.pipelines)?.length
-            ? (
-              <a
-                className="flex items-center p-2 text-gray-500 hover:bg-sunset group"
-                href={`data:text/json;charset=utf-8,${
-                  encodeURIComponent(
-                    JSON.stringify(
-                      serviceSignal.value.pipelines,
-                      undefined,
-                      2,
-                    ),
-                  )
-                }`}
-                download="pipelines.json"
-              >
-                <IconFileDownload class="w-6 h-6" />
-                <span class="ml-3 text-gray-900">
-                  Download Pipeline Configs
-                </span>
-              </a>
-            )
-            : (
-              <>
-                <div
-                  className="flex items-center p-2 text-gray-400 hover:bg-sunset group cursor-not-allowed"
-                  data-tooltip-target="pipeline-download"
-                >
-                  <IconFileDownload class="w-6 h-6" />
-                  <span class="ml-3">
-                    Download Pipeline Configs
-                  </span>
-                </div>
-                <Tooltip
-                  targetId="pipeline-download"
-                  message={"No pipelines are configured"}
-                />
-              </>
-            )}
+          <a
+            className="flex items-center p-2 text-gray-500 hover:bg-sunset group"
+            target="_download"
+            href="/configs"
+          >
+            <IconFileDownload class="w-6 h-6" />
+            <span class="ml-3 text-gray-900">
+              Download Configs
+            </span>
+          </a>
         </li>
         <li className="cursor-not-allowed">
           <div className="flex items-center p-2 text-gray-400 hover:bg-sunset group ">

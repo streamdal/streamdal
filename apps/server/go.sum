@@ -222,6 +222,10 @@ github.com/streamdal/streamdal/libs/protos v0.1.38 h1:WSKMdsjPoP0R5z6ojR8NdlX72R
 github.com/streamdal/streamdal/libs/protos v0.1.38/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/streamdal/streamdal/libs/protos v0.1.39 h1:nO7zIzXtEQLGPweZ90XJ+EMJGNzPIX4vQPg8sQvhHl8=
 github.com/streamdal/streamdal/libs/protos v0.1.39/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
+github.com/streamdal/streamdal/libs/protos v0.1.40 h1:4U8W/8Y8u+68oGe4R7p55LHS4c7tRy0wwJu71IXLsnY=
+github.com/streamdal/streamdal/libs/protos v0.1.40/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
+github.com/streamdal/streamdal/libs/protos v0.1.41 h1:OxU8ACMgiFiMt2P7FzV9uXzScrcX7NaNI0+11bkhUbI=
+github.com/streamdal/streamdal/libs/protos v0.1.41/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=

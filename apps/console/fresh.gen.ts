@@ -6,41 +6,42 @@ import * as $0 from "./routes/_500.tsx";
 import * as $1 from "./routes/_app.tsx";
 import * as $2 from "./routes/_layout.tsx";
 import * as $3 from "./routes/_middleware.ts";
-import * as $4 from "./routes/demo/http/echo.tsx";
-import * as $5 from "./routes/demo/http/index.tsx";
-import * as $6 from "./routes/email.tsx";
-import * as $7 from "./routes/index.tsx";
-import * as $8 from "./routes/notifications/[id]/delete.tsx";
-import * as $9 from "./routes/notifications/[id]/index.tsx";
-import * as $10 from "./routes/notifications/add.tsx";
-import * as $11 from "./routes/notifications/index.tsx";
-import * as $12 from "./routes/notifications/save.tsx";
-import * as $13 from "./routes/partials/index.tsx";
-import * as $14 from "./routes/partials/notifications/[id]/index.tsx";
-import * as $15 from "./routes/partials/notifications/add.tsx";
-import * as $16 from "./routes/partials/notifications/index.tsx";
-import * as $17 from "./routes/partials/pipelines/[id]/index.tsx";
-import * as $18 from "./routes/partials/pipelines/add.tsx";
-import * as $19 from "./routes/partials/pipelines/index.tsx";
-import * as $20 from "./routes/partials/tail/[id]/index.tsx";
-import * as $21 from "./routes/pipelines/[id]/delete.tsx";
-import * as $22 from "./routes/pipelines/[id]/index.tsx";
-import * as $23 from "./routes/pipelines/add.tsx";
-import * as $24 from "./routes/pipelines/index.tsx";
-import * as $25 from "./routes/pipelines/save.tsx";
-import * as $26 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
-import * as $27 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
-import * as $28 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
-import * as $29 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $30 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx";
-import * as $31 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
-import * as $32 from "./routes/service/[service]/delete.tsx";
-import * as $33 from "./routes/tail/[id]/index.tsx";
-import * as $34 from "./routes/ws/audience-metrics.tsx";
-import * as $35 from "./routes/ws/demo/http-request.tsx";
-import * as $36 from "./routes/ws/server-error.tsx";
-import * as $37 from "./routes/ws/service-map.tsx";
-import * as $38 from "./routes/ws/tail.tsx";
+import * as $4 from "./routes/configs.tsx";
+import * as $5 from "./routes/demo/http/echo.tsx";
+import * as $6 from "./routes/demo/http/index.tsx";
+import * as $7 from "./routes/email.tsx";
+import * as $8 from "./routes/index.tsx";
+import * as $9 from "./routes/notifications/[id]/delete.tsx";
+import * as $10 from "./routes/notifications/[id]/index.tsx";
+import * as $11 from "./routes/notifications/add.tsx";
+import * as $12 from "./routes/notifications/index.tsx";
+import * as $13 from "./routes/notifications/save.tsx";
+import * as $14 from "./routes/partials/index.tsx";
+import * as $15 from "./routes/partials/notifications/[id]/index.tsx";
+import * as $16 from "./routes/partials/notifications/add.tsx";
+import * as $17 from "./routes/partials/notifications/index.tsx";
+import * as $18 from "./routes/partials/pipelines/[id]/index.tsx";
+import * as $19 from "./routes/partials/pipelines/add.tsx";
+import * as $20 from "./routes/partials/pipelines/index.tsx";
+import * as $21 from "./routes/partials/tail/[id]/index.tsx";
+import * as $22 from "./routes/pipelines/[id]/delete.tsx";
+import * as $23 from "./routes/pipelines/[id]/index.tsx";
+import * as $24 from "./routes/pipelines/add.tsx";
+import * as $25 from "./routes/pipelines/index.tsx";
+import * as $26 from "./routes/pipelines/save.tsx";
+import * as $27 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
+import * as $28 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
+import * as $29 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
+import * as $30 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
+import * as $31 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx";
+import * as $32 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
+import * as $33 from "./routes/service/[service]/delete.tsx";
+import * as $34 from "./routes/tail/[id]/index.tsx";
+import * as $35 from "./routes/ws/audience-metrics.tsx";
+import * as $36 from "./routes/ws/demo/http-request.tsx";
+import * as $37 from "./routes/ws/server-error.tsx";
+import * as $38 from "./routes/ws/service-map.tsx";
+import * as $39 from "./routes/ws/tail.tsx";
 import * as $$0 from "./islands/demo/http-request.tsx";
 import * as $$1 from "./islands/drawer/component.tsx";
 import * as $$2 from "./islands/drawer/infoDrawer.tsx";
@@ -67,47 +68,48 @@ const manifest = {
     "./routes/_app.tsx": $1,
     "./routes/_layout.tsx": $2,
     "./routes/_middleware.ts": $3,
-    "./routes/demo/http/echo.tsx": $4,
-    "./routes/demo/http/index.tsx": $5,
-    "./routes/email.tsx": $6,
-    "./routes/index.tsx": $7,
-    "./routes/notifications/[id]/delete.tsx": $8,
-    "./routes/notifications/[id]/index.tsx": $9,
-    "./routes/notifications/add.tsx": $10,
-    "./routes/notifications/index.tsx": $11,
-    "./routes/notifications/save.tsx": $12,
-    "./routes/partials/index.tsx": $13,
-    "./routes/partials/notifications/[id]/index.tsx": $14,
-    "./routes/partials/notifications/add.tsx": $15,
-    "./routes/partials/notifications/index.tsx": $16,
-    "./routes/partials/pipelines/[id]/index.tsx": $17,
-    "./routes/partials/pipelines/add.tsx": $18,
-    "./routes/partials/pipelines/index.tsx": $19,
-    "./routes/partials/tail/[id]/index.tsx": $20,
-    "./routes/pipelines/[id]/delete.tsx": $21,
-    "./routes/pipelines/[id]/index.tsx": $22,
-    "./routes/pipelines/add.tsx": $23,
-    "./routes/pipelines/index.tsx": $24,
-    "./routes/pipelines/save.tsx": $25,
+    "./routes/configs.tsx": $4,
+    "./routes/demo/http/echo.tsx": $5,
+    "./routes/demo/http/index.tsx": $6,
+    "./routes/email.tsx": $7,
+    "./routes/index.tsx": $8,
+    "./routes/notifications/[id]/delete.tsx": $9,
+    "./routes/notifications/[id]/index.tsx": $10,
+    "./routes/notifications/add.tsx": $11,
+    "./routes/notifications/index.tsx": $12,
+    "./routes/notifications/save.tsx": $13,
+    "./routes/partials/index.tsx": $14,
+    "./routes/partials/notifications/[id]/index.tsx": $15,
+    "./routes/partials/notifications/add.tsx": $16,
+    "./routes/partials/notifications/index.tsx": $17,
+    "./routes/partials/pipelines/[id]/index.tsx": $18,
+    "./routes/partials/pipelines/add.tsx": $19,
+    "./routes/partials/pipelines/index.tsx": $20,
+    "./routes/partials/tail/[id]/index.tsx": $21,
+    "./routes/pipelines/[id]/delete.tsx": $22,
+    "./routes/pipelines/[id]/index.tsx": $23,
+    "./routes/pipelines/add.tsx": $24,
+    "./routes/pipelines/index.tsx": $25,
+    "./routes/pipelines/save.tsx": $26,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx":
-      $26,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
       $27,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
       $28,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
       $29,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
       $30,
-    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx":
       $31,
-    "./routes/service/[service]/delete.tsx": $32,
-    "./routes/tail/[id]/index.tsx": $33,
-    "./routes/ws/audience-metrics.tsx": $34,
-    "./routes/ws/demo/http-request.tsx": $35,
-    "./routes/ws/server-error.tsx": $36,
-    "./routes/ws/service-map.tsx": $37,
-    "./routes/ws/tail.tsx": $38,
+    "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
+      $32,
+    "./routes/service/[service]/delete.tsx": $33,
+    "./routes/tail/[id]/index.tsx": $34,
+    "./routes/ws/audience-metrics.tsx": $35,
+    "./routes/ws/demo/http-request.tsx": $36,
+    "./routes/ws/server-error.tsx": $37,
+    "./routes/ws/service-map.tsx": $38,
+    "./routes/ws/tail.tsx": $39,
   },
   islands: {
     "./islands/demo/http-request.tsx": $$0,

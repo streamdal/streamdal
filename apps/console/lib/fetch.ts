@@ -56,3 +56,13 @@ export const getSchema = async (audience: Audience) => {
     return {};
   }
 };
+
+export const getConfigs = async () => {
+  try {
+    const { response } = await client.getConfig({}, meta);
+    return response;
+  } catch (e) {
+    console.error("Error fetching configs", e);
+    return {};
+  }
+};
