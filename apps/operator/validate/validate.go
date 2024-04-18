@@ -1,28 +1,80 @@
 package validate
 
 import (
+	"fmt"
+	"regexp"
+
 	"github.com/pkg/errors"
 	"github.com/streamdal/streamdal/apps/server/validate"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	crdv1 "github.com/streamdal/streamdal/apps/operator/api/v1"
 )
 
+const (
+	GroupName = "crd.streamdal.com"
+	KindName  = "StreamdalConfig"
+)
+
 func StreamdalConfig(cfg *crdv1.StreamdalConfig) error {
 	if cfg == nil {
-		return errors.New("StreamdalConfig cannot be nil")
+		return invalidError("StreamdalConfig", field.ErrorList{
+			field.Required(field.NewPath("StreamdalConfig"), "StreamdalConfig cannot be nil"),
+		})
 	}
 
+	var errList field.ErrorList
+
 	if cfg.Spec.ServerAddress == "" {
-		return errors.New("StreamdalConfig.Spec.ServerAddress cannot be empty")
+		errList = append(errList, &field.Error{
+			Type:   field.ErrorTypeRequired,
+			Field:  "StreamdalConfig.Spec.ServerAddress",
+			Detail: "Cannot be empty",
+		})
 	}
 
 	if cfg.Spec.ServerAuth == "" {
-		return errors.New("StreamdalConfig.Spec.ServerAuth cannot be 0")
+		errList = append(errList, &field.Error{
+			Type:   field.ErrorTypeRequired,
+			Field:  "StreamdalConfig.Spec.ServerAuth",
+			Detail: "Cannot be empty",
+		})
 	}
 
-	return nil
+	matched, err := regexp.MatchString(`^.*:[0-9]+$`, cfg.Spec.ServerAddress)
+	if err != nil {
+		errList = append(errList, &field.Error{
+			Type:   field.ErrorTypeInternal,
+			Field:  "StreamdalConfig.Spec.ServerAddress",
+			Detail: fmt.Sprintf("Regex validation error: %s", err),
+		})
+	}
+
+	if err == nil && !matched {
+		errList = append(errList, &field.Error{
+			Type:   field.ErrorTypeInvalid,
+			Field:  "StreamdalConfig.Spec.ServerAddress",
+			Detail: "Invalid format - must be in the format 'host:port'",
+		})
+	}
+
+	return invalidError(cfg.Name, errList)
+}
+
+func invalidError(name string, errList field.ErrorList) error {
+	if len(errList) == 0 {
+		return nil
+	}
+
+	return k8serrors.NewInvalid(
+		schema.GroupKind{Group: GroupName, Kind: KindName},
+		name,
+		errList,
+	)
 }
 
 func StreamdalProtosConfig(cfg *protos.Config) error {
@@ -45,6 +97,8 @@ func StreamdalProtosConfig(cfg *protos.Config) error {
 	if err := Pipelines(cfg.Pipelines); err != nil {
 		return errors.Wrap(err, "Config.Pipelines")
 	}
+
+	// TODO: Don't forget to update protos to get Mappings!!!
 
 	return nil
 }

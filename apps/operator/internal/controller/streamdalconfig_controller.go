@@ -24,10 +24,13 @@ import (
 	"github.com/go-logr/logr"
 	serverUtil "github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -42,7 +45,6 @@ const (
 	CreatedBy     = "streamdal-operator"
 
 	ReconcileActionCreate ReconcileAction = "create" // Create covers both "create" and "update"
-	ReconcileActionUpdate ReconcileAction = "update"
 	ReconcileActionDelete ReconcileAction = "delete"
 
 	ResourceTypeAudience     ResourceType = "audience"
@@ -54,7 +56,8 @@ const (
 // StreamdalConfigReconciler reconciles a StreamdalConfig object
 type StreamdalConfigReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 
 	// Used by periodic reconciler to detect shutdown
 	ShutdownCtx context.Context
@@ -111,15 +114,62 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 			return ctrl.Result{}, nil
 		}
 
-		llog.Error(err, "Failed to determine reconcile action")
+		llog.Error(err, "Failed to complete reconcile setup (won't retry)")
 
-		return ctrl.Result{}, err
+		// The only reason that we wouldn't have a ReconcileRequest with a Config
+		// object is if setupReconcileAction has a bug and didn't return one.
+		if rr != nil && rr.Config != nil {
+			if errors.IsInvalid(err) {
+				r.Recorder.Event(rr.Config, v1.EventTypeWarning, "CR validation error (won't retry)", err.Error())
+			} else {
+				r.Recorder.Event(rr.Config, v1.EventTypeWarning, "Reconciliation setup error (won't retry)", err.Error())
+			}
+
+			// TODO: Can't get status to come through "k describe streamdalconfig <name>" - why?
+			//rr.Config.Status.Fatal = true
+			//rr.Config.Status.Status = "error"
+			//rr.Config.Status.Message = "Failed to complete reconcile setup. Error: " + err.Error()
+			//
+			//if err := r.Update(ctx, rr.Config); err != nil {
+			//	llog.Error(err, "unable to update StreamdalConfig status")
+			//}
+		}
+
+		// NOTE: Have to return a nil error because k8s considers a non-nil
+		// error as a transient error and will keep re-queueing the request.
+		return ctrl.Result{}, nil
 	}
 
 	result, err := r.handleResources(ctx, rr)
 	if err != nil {
+		// TODO: llog.Error() should probably be llog.Info() in most cases because
+		// k8s errors are _really_ loud.
 		llog.Error(err, "Failed to complete reconcile action", "action", rr.Action)
-		return ctrl.Result{}, err
+		r.Recorder.Event(rr.Config, v1.EventTypeWarning, "Handle resources error", err.Error())
+
+		// TODO: Should differentiate between a transient error and a non-transient
+		// error so that we can requeue appropriately.
+		return ctrl.Result{}, nil
+	}
+
+	var (
+		action string
+	)
+
+	switch rr.Action {
+	case ReconcileActionCreate:
+		err = r.addFinalizer(ctx, rr)
+		action = "add"
+	case ReconcileActionDelete:
+		err = r.removeFinalizer(ctx, rr)
+		action = "remove"
+	}
+
+	if err != nil {
+		llog.Error(err, fmt.Sprintf("Failed to %s finalizer", action))
+		r.Recorder.Event(rr.Config, v1.EventTypeWarning, fmt.Sprintf("Finalizer '%s' error", action), err.Error())
+
+		return ctrl.Result{}, nil
 	}
 
 	llog.Info("Reconcile action completed", "action", rr.Action)
@@ -127,11 +177,55 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	return result, nil
 }
 
+func (r *StreamdalConfigReconciler) removeFinalizer(ctx context.Context, rr *ReconcileRequest) error {
+	llog := log.Log.WithValues("method", "removeFinalizer")
+	llog.Info("Removing finalizer")
+
+	// Don't remove finalizer if it doesn't exist
+	finalizers := rr.Config.GetFinalizers()
+
+	for i, f := range finalizers {
+		// Go through all finalizers in case there are dupes
+		if f == FinalizerName {
+			rr.Config.Finalizers = append(finalizers[:i], finalizers[i+1:]...)
+		}
+	}
+
+	if err := r.Update(ctx, rr.Config); err != nil {
+		return fmt.Errorf("failed to update CR without finalizer: %s", err)
+	}
+
+	return nil
+}
+
+func (r *StreamdalConfigReconciler) addFinalizer(ctx context.Context, rr *ReconcileRequest) error {
+	llog := log.Log.WithValues("method", "addFinalizer")
+	llog.Info("Adding finalizer")
+
+	// Don't add finalizer if it already exists
+	for _, f := range rr.Config.GetFinalizers() {
+		if f == FinalizerName {
+			llog.Info("Finalizer already exists, nothing to do")
+			return nil
+		}
+	}
+
+	rr.Config.Finalizers = append(rr.Config.Finalizers, FinalizerName)
+
+	if err := r.Update(ctx, rr.Config); err != nil {
+		return fmt.Errorf("failed to update CR with finalizer: %s", err)
+	}
+
+	return nil
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	// Launch periodic reconciler
 	llog := log.Log.WithValues("method", "SetupWithManager")
 	llog.Info("Starting periodic reconciler")
+
+	r.Recorder = mgr.GetEventRecorderFor("streamdal-operator")
 
 	go r.runPeriodicReconciler()
 
@@ -215,7 +309,9 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 		}, nil
 	}
 
-	cfgResp, err := rr.Client.GetConfig(ctx, &protos.GetConfigRequest{})
+	outgoingCtx := metadata.NewOutgoingContext(ctx, metadata.Pairs(util.AuthTokenMetadata, rr.Config.Spec.ServerAuth))
+
+	cfgResp, err := rr.Client.GetConfig(outgoingCtx, &protos.GetConfigRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get config: %s", err)
 	}
@@ -242,7 +338,7 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 			// that it doesn't create.
 			a.XCreatedBy = proto.String(CreatedBy)
 
-			if _, err = rr.Client.CreateAudience(ctx, &protos.CreateAudienceRequest{
+			if _, err = rr.Client.CreateAudience(outgoingCtx, &protos.CreateAudienceRequest{
 				Audience: a,
 			}); err != nil {
 				return nil, fmt.Errorf("failed to create audience '%s': %s", serverUtil.AudienceToStr(a), err)
@@ -254,8 +350,12 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 
 		// Delete audience if it's in list and action is to delete
 		if audienceInList && rr.Action == ReconcileActionDelete {
+			// TODO: We should only delete if the audience has a CreatedBy set
+			// to our operator. Otherwise, we might delete something not "owned"
+			// by us.
+
 			llog.Info("Deleting audience", "audience", serverUtil.AudienceToStr(a))
-			if _, err = rr.Client.DeleteAudience(ctx, &protos.DeleteAudienceRequest{
+			if _, err = rr.Client.DeleteAudience(outgoingCtx, &protos.DeleteAudienceRequest{
 				Audience: a,
 				Force:    nil,
 			}); err != nil {
@@ -266,8 +366,14 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 			continue
 		}
 
+		// TODO: This needs a finalizer so that can properly clean up resources
+		// when CRD is deleted!
+
 		llog.Info("nothing to do", "audience", serverUtil.AudienceToStr(a))
 	}
+
+	r.Recorder.Event(rr.Config, v1.EventTypeNormal, "Audiences handled", fmt.Sprintf("Created: %d, Updated: %d, Deleted: %d",
+		status.NumCreated, status.NumUpdated, status.NumDeleted))
 
 	return status, nil
 }
@@ -295,24 +401,25 @@ func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, re
 	var cfg crdv1.StreamdalConfig
 
 	if err := r.Get(ctx, req.NamespacedName, &cfg); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to fetch StreamdalConfig object: %w", err)
+	}
+
+	reconcileAction := &ReconcileRequest{
+		Config: &cfg,
 	}
 
 	if err := validate.StreamdalConfig(&cfg); err != nil {
-		return nil, fmt.Errorf("failed to validate streamdal config: %s", err)
+		return reconcileAction, errors.NewInternalError(fmt.Errorf("invalid streamdal config: %s", err))
 	}
 
 	// This is a valid request for a valid resource, we know we will definitely
 	// need to talk to the streamdal server.
 	grpcClient, err := util.NewGrpcExternalClient(ctx, cfg.Spec.ServerAddress, cfg.Spec.ServerAuth)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create grpc client: %s", err)
+		return reconcileAction, errors.NewInternalError(fmt.Errorf("unable to create grpc client: %s", err))
 	}
 
-	reconcileAction := &ReconcileRequest{
-		Config: &cfg,
-		Client: grpcClient,
-	}
+	reconcileAction.Client = grpcClient
 
 	if cfg.DeletionTimestamp != nil {
 		reconcileAction.Action = ReconcileActionDelete
@@ -327,7 +434,7 @@ func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, re
 
 // TODO: Implement periodic reconciler
 func (r *StreamdalConfigReconciler) runPeriodicReconciler() {
-	// TODO: No need for any of the select stuff
+	// TODO: No need to catch shutdown (so far)
 	llog := log.Log.WithValues("method", "runPeriodicReconciler")
 	llog.Info("Starting")
 

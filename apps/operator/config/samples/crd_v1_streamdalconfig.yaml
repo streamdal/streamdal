@@ -4,18 +4,20 @@ metadata:
   labels:
     app.kubernetes.io/name: operator
     app.kubernetes.io/managed-by: kustomize
-  name: streamdalconfig-sample
+  name: sample-config
 spec:
-  serverAddress: "streamdal-address"
-  serverAuth: "streamdal-auth"
+  serverAddress: ":8082"
+  serverAuth: "1234"
   configs:
-    - name: "config1"
+    - name: "config with audiences"
       config: >
         {
-          "foo": "bar"
-        }
-    - name: "config2"
-      config: >
-        {
-          "foo": "baz"
+          "audiences": [
+            {
+              "serviceName": "service2",
+              "operationType": "OPERATION_TYPE_CONSUMER",
+              "operationName": "operationName2",
+              "componentName": "componentName2"
+            }
+          ]
         }

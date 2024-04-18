@@ -39,6 +39,9 @@ type ConfigItem struct {
 type StreamdalConfigStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Fatal   bool   `json:"fatal"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 //+kubebuilder:object:root=true
