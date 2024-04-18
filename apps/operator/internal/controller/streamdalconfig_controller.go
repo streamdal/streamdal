@@ -44,7 +44,7 @@ const (
 	FinalizerName = "streamdal.com/finalizer"
 	CreatedBy     = "streamdal-operator"
 
-	ReconcileActionCreate ReconcileAction = "create" // Create covers both "create" and "update"
+	ReconcileActionUpdate ReconcileAction = "update" // "update" covers both "create" and "update"
 	ReconcileActionDelete ReconcileAction = "delete"
 
 	ResourceTypeAudience     ResourceType = "audience"
@@ -83,6 +83,14 @@ type HandleStatus struct {
 	NumCreated int
 	NumUpdated int
 	NumDeleted int
+}
+
+type AudienceJob struct {
+	// Indicates what the handler should do on server
+	ServerAction ReconcileAction
+
+	// The target audience that should be created or deleted
+	Audience *protos.Audience
 }
 
 //+kubebuilder:rbac:groups=crd.streamdal.com,resources=streamdalconfigs,verbs=get;list;watch;create;update;patch;delete
@@ -157,7 +165,7 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	)
 
 	switch rr.Action {
-	case ReconcileActionCreate:
+	case ReconcileActionUpdate:
 		err = r.addFinalizer(ctx, rr)
 		action = "add"
 	case ReconcileActionDelete:
@@ -293,6 +301,10 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 	return ctrl.Result{}, nil
 }
 
+func createCtxWithAuth(ctx context.Context, authToken string) context.Context {
+	return metadata.NewOutgoingContext(ctx, metadata.Pairs(util.AuthTokenMetadata, authToken))
+}
+
 // handleAudiences will either create or delete audiences in the streamdal server.
 //
 // NOTE: An audience can only be created or deleted - it cannot be updated.
@@ -309,7 +321,7 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 		}, nil
 	}
 
-	outgoingCtx := metadata.NewOutgoingContext(ctx, metadata.Pairs(util.AuthTokenMetadata, rr.Config.Spec.ServerAuth))
+	outgoingCtx := createCtxWithAuth(ctx, rr.Config.Spec.ServerAuth)
 
 	cfgResp, err := rr.Client.GetConfig(outgoingCtx, &protos.GetConfigRequest{})
 	if err != nil {
@@ -325,57 +337,107 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 		Action:   rr.Action,
 	}
 
-	// Check if audience already exists in resp
-	for _, a := range cfg.Audiences {
-		audienceInList := serverUtil.AudienceInList(a, cfgResp.Config.Audiences)
-		llog.Info("Audience existence check", "exists", audienceInList, "audience", serverUtil.AudienceToStr(a))
+	jobs := r.generateAudienceJobs(rr.Action, cfg.Audiences, cfgResp.Config.Audiences)
 
-		// Create audience if it's not in list and action is to create
-		if !audienceInList && rr.Action == ReconcileActionCreate {
-			llog.Info("Creating audience", "audience", serverUtil.AudienceToStr(a))
+	llog.Info("Generated audience jobs", "numGenerated", len(jobs))
 
-			// We need to set this because the operator won't manage resources
-			// that it doesn't create.
-			a.XCreatedBy = proto.String(CreatedBy)
+	// TODO: Remember that we cannot remove audiences if they are attached!
+	for _, j := range jobs {
+		switch j.ServerAction {
+		case ReconcileActionUpdate:
+			_, err = rr.Client.CreateAudience(outgoingCtx, &protos.CreateAudienceRequest{
+				Audience: j.Audience,
+			})
 
-			if _, err = rr.Client.CreateAudience(outgoingCtx, &protos.CreateAudienceRequest{
-				Audience: a,
-			}); err != nil {
-				return nil, fmt.Errorf("failed to create audience '%s': %s", serverUtil.AudienceToStr(a), err)
+			if err == nil {
+				status.NumCreated++
 			}
+		case ReconcileActionDelete:
+			_, err = rr.Client.DeleteAudience(outgoingCtx, &protos.DeleteAudienceRequest{
+				Audience: j.Audience,
+				Force:    proto.Bool(true), // This will delete the audience <-> pipeline mapping (if it has any)
+			})
 
-			status.NumCreated++
-			continue
+			if err == nil {
+				status.NumDeleted++
+			}
+		default:
+			audStr := serverUtil.AudienceToStr(j.Audience)
+
+			llog.Info("Unknown server action for audience", "serverAction", j.ServerAction, "audience", audStr)
+
+			return nil, fmt.Errorf("unknown server action '%s' for audience '%s'", j.ServerAction, audStr)
 		}
 
-		// Delete audience if it's in list and action is to delete
-		if audienceInList && rr.Action == ReconcileActionDelete {
-			// TODO: We should only delete if the audience has a CreatedBy set
-			// to our operator. Otherwise, we might delete something not "owned"
-			// by us.
-
-			llog.Info("Deleting audience", "audience", serverUtil.AudienceToStr(a))
-			if _, err = rr.Client.DeleteAudience(outgoingCtx, &protos.DeleteAudienceRequest{
-				Audience: a,
-				Force:    nil,
-			}); err != nil {
-				return nil, fmt.Errorf("failed to delete audience '%s': %s", serverUtil.AudienceToStr(a), err)
-			}
-
-			status.NumDeleted++
-			continue
+		if err != nil {
+			llog.Error(err, "Unable to complete server action", "action", j.ServerAction)
+			return nil, fmt.Errorf("unable to complete server action '%s': %s", j.ServerAction, err)
 		}
-
-		// TODO: This needs a finalizer so that can properly clean up resources
-		// when CRD is deleted!
-
-		llog.Info("nothing to do", "audience", serverUtil.AudienceToStr(a))
 	}
 
-	r.Recorder.Event(rr.Config, v1.EventTypeNormal, "Audiences handled", fmt.Sprintf("Created: %d, Updated: %d, Deleted: %d",
-		status.NumCreated, status.NumUpdated, status.NumDeleted))
+	if status.NumCreated != 0 || status.NumDeleted != 0 {
+		r.Recorder.Event(rr.Config, v1.EventTypeNormal, "Audiences synced",
+			fmt.Sprintf("Created: %d Updated: %d Deleted: %d", status.NumCreated, status.NumUpdated, status.NumDeleted))
+	}
 
 	return status, nil
+}
+
+// generateAudienceJobs will generate audience jobs by comparing the desired
+// state in the CR and what's on the streamdal server.
+func (r *StreamdalConfigReconciler) generateAudienceJobs(
+	action ReconcileAction,
+	crAudiences []*protos.Audience,
+	serverAudiences []*protos.Audience,
+) []*AudienceJob {
+	llog := log.Log.WithValues("method", "generateAudienceJobs")
+	diff := make([]*AudienceJob, 0)
+
+	for _, ca := range crAudiences {
+		switch action {
+		// If this is an "update", we will create a diff that contains steps to
+		// ensure the server and CR have the same state.
+		case ReconcileActionUpdate:
+			// If CR audience not in server - mark it for addition
+			if !serverUtil.AudienceInList(ca, serverAudiences) {
+				ca.XCreatedBy = proto.String(CreatedBy)
+
+				diff = append(diff, &AudienceJob{
+					ServerAction: ReconcileActionUpdate,
+					Audience:     ca,
+				})
+			}
+		case ReconcileActionDelete:
+			// If CR audience in server audience - mark it for deletion
+			if serverUtil.AudienceInList(ca, serverAudiences) {
+				diff = append(diff, &AudienceJob{
+					ServerAction: ReconcileActionDelete,
+					Audience:     ca,
+				})
+			}
+		}
+	}
+
+	// Same thing but backwards - if this is an "update", we need to ensure that
+	// server does NOT have audiences that are defined the CR.
+	if action == ReconcileActionUpdate {
+		for _, sa := range serverAudiences {
+			// If server audience is not defined in CRD - we should delete it from
+			// the server ONLY if it is managed by this k8s operator.
+			if !serverUtil.AudienceInList(sa, crAudiences) {
+				if sa.GetXCreatedBy() == CreatedBy {
+					diff = append(diff, &AudienceJob{
+						ServerAction: ReconcileActionDelete,
+						Audience:     sa,
+					})
+				} else {
+					llog.Info("Wanted to mark audience for deletion but it is not managed by this operator", "audience", serverUtil.AudienceToStr(sa))
+				}
+			}
+		}
+	}
+
+	return diff
 }
 
 // TODO: Implement
@@ -427,7 +489,7 @@ func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, re
 	}
 
 	// Not a delete - either a create or an update
-	reconcileAction.Action = ReconcileActionCreate
+	reconcileAction.Action = ReconcileActionUpdate
 
 	return reconcileAction, nil
 }
