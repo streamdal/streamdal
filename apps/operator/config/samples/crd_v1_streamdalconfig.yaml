@@ -19,5 +19,25 @@ spec:
               "operationName": "operationName5",
               "componentName": "componentName5"
             }
+          ],
+          "notifications": [
+            {
+              "id": "c746e19d-171c-4521-9a2d-bb456624acaa-1",
+              "name": "Test slack Integration",
+              "type": "NOTIFICATION_TYPE_SLACK",
+              "slack": {
+                "botToken": "test-token",
+                "channel": "test-channel"
+              }
+            },
+            {
+              "id": "c746e19d-171c-4521-9a2d-bb456624aca-2",
+              "name": "Test slack Integration",
+              "type": "NOTIFICATION_TYPE_SLACK",
+              "slack": {
+                "botToken": "test-token",
+                "channel": "test-channel"
+              }
+            }
           ]
         }
