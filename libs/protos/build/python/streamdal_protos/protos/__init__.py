@@ -252,8 +252,9 @@ class Pipeline(betterproto.Message):
 
     id: str = betterproto.string_field(1)
     """
-    ID should NOT be set by external gRPC client on CreatePipelineRequest - it
-    will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+    If left blank, the server will generate a unique ID. If one is provided,
+    the server will check if that is ID is already in use when creating a
+    pipeline.
     """
 
     name: str = betterproto.string_field(2)

@@ -136,8 +136,8 @@ type Pipeline struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// ID should NOT be set by external gRPC client on CreatePipelineRequest - it
-	// will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+	// If left blank, the server will generate a unique ID. If one is provided,
+	// the server will check if that is ID is already in use when creating a pipeline.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Friendly name for the pipeline
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
