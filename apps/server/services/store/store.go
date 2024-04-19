@@ -863,6 +863,19 @@ func (s *Store) CreateAudience(ctx context.Context, aud *protos.Audience) error 
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
+	// BEGIN CreatedBy hack
+	if aud.GetXCreatedBy() != "" {
+		s.log.Debugf("detected created_by for audience '%s' set to '%s' - saving to store",
+			util.AudienceToStr(aud), aud.GetXCreatedBy())
+
+		createdByKey := RedisAudienceCreatedByKey(util.AudienceToStr(aud), aud.GetXCreatedBy())
+
+		if err := s.options.RedisBackend.Set(ctx, createdByKey, nil, 0).Err(); err != nil {
+			return fmt.Errorf("error saving created_by audience '%s' to store: %s", createdByKey, err)
+		}
+	}
+	// END CreatedBy hack
+
 	s.sendAudienceTelemetry(ctx, aud, 1)
 
 	return nil
@@ -890,6 +903,21 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 	if err := s.options.RedisBackend.Del(ctx, RedisAudienceKey(audStr)).Err(); err != nil {
 		return errors.Wrap(err, "error deleting audience from store")
 	}
+
+	// BEGIN CreatedBy hack -- do not leave any dangling created_by keys when an audience is deleted
+	createdByKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudienceCreatedByKey(audStr, "*")).Result()
+	if err != nil {
+		return errors.Wrap(err, "error fetching created_by keys")
+	}
+
+	for _, key := range createdByKeys {
+		s.log.Debugf("deleting created by key '%s'", key)
+
+		if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
+			return errors.Wrapf(err, "error deleting created_by key '%s'", key)
+		}
+	}
+	// END CreatedBy hack
 
 	// Send Analytics
 	s.sendAudienceTelemetry(ctx, req.Audience, -1)
@@ -1316,6 +1344,36 @@ func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 
 		audiences = append(audiences, aud)
 	}
+
+	// BEGIN XCreatedBy hack -- used for injecting XCreatedBy into the returned audiences (used by k8s operator)
+	createdByKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudienceCreatedByPrefix+":*").Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching audience created_by keys from store")
+	}
+
+	for _, key := range createdByKeys {
+		segments := strings.Split(key, ":")
+		// Ex: streamdal_audience_created_by:$serviceName:$operationType:$operationName:$componentName:$createdBy
+		if len(segments) != 6 {
+			return nil, errors.Errorf("invalid audience created_by key '%s' (expected '6' segments, got '%d')",
+				key, len(segments))
+		}
+
+		aud := util.AudienceFromStr(strings.Join(segments[1:5], ":"))
+		if aud == nil {
+			return nil, errors.Errorf("invalid audience key '%s'", key)
+		}
+
+		createdBy := segments[5]
+
+		for _, a := range audiences {
+			if util.AudienceEquals(a, aud) {
+				a.XCreatedBy = proto.String(createdBy)
+			}
+		}
+	}
+
+	// END XCreatedBy hack
 
 	return audiences, nil
 }

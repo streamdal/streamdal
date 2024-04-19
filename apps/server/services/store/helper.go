@@ -18,6 +18,9 @@ const (
 	RedisAudiencePrefix    = "streamdal_audience"
 	RedisAudienceKeyFormat = "streamdal_audience:%s" // K: $audience V: SetPipelineConfig JSON
 
+	RedisAudienceCreatedByPrefix = "streamdal_audience_created_by"
+	RedisAudienceCreatedByFormat = "streamdal_audience_created_by:%s:%s" // K: $audience V: None
+
 	// RedisRegisterFormat key resides in the RedisLivePrefix
 	RedisRegisterFormat = "streamdal_live:%s:%s:register" // K: $session_id:$node_name:register; V: NONE
 
@@ -62,6 +65,10 @@ func RedisRegisterKey(session, node string) string {
 
 func RedisAudienceKey(audience string) string {
 	return strings.ToLower(fmt.Sprintf(RedisAudienceKeyFormat, audience))
+}
+
+func RedisAudienceCreatedByKey(audience, createdBy string) string {
+	return strings.ToLower(fmt.Sprintf(RedisAudienceCreatedByFormat, audience, createdBy))
 }
 
 func RedisLiveKey(session, node, audience string) string {
