@@ -18,6 +18,12 @@ spec:
               "operationType": "OPERATION_TYPE_CONSUMER",
               "operationName": "operationName1",
               "componentName": "componentName1"
+            },
+            {
+              "serviceName": "service3",
+              "operationType": "OPERATION_TYPE_CONSUMER",
+              "operationName": "operationName3",
+              "componentName": "componentName3"
             }
           ]
         }
