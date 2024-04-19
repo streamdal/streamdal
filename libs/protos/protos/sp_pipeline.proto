@@ -20,8 +20,8 @@ option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos"
 // is intended to be immutable; clients are expected to generate WASMRequest's
 // that contain a pipeline step.
 message Pipeline {
-  // ID should NOT be set by external gRPC client on CreatePipelineRequest - it
-  // will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+  // If left blank, the server will generate a unique ID. If one is provided,
+  // the server will check if that is ID is already in use when creating a pipeline.
   string id = 1;
 
   // Friendly name for the pipeline
@@ -101,11 +101,6 @@ message PipelineStepNotification {
   // If type == paths, then we will look here for a list of json paths to include
   // in the notification payload.
   repeated string paths = 3;
-
-  // Notification configs for this pipeline. Only filled out in external API responses
-  // TODO: needed? We might be able to exclude since NotificationConfigID is present
-  // TODO: and the console can pull all notification configs via `external.GetNotifications()`
-  //repeated protos.NotificationConfig _notification_configs = 4 [deprecated=true]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // A pipeline step is a single step in a pipeline.

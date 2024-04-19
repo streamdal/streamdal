@@ -333,8 +333,21 @@ func (s *ExternalServer) CreatePipeline(ctx context.Context, req *protos.CreateP
 		return nil, errors.Wrap(err, "unable to get pipeline from request")
 	}
 
-	// Create ID for pipeline
-	pipeline.Id = util.GenerateUUID()
+	var generatedID bool
+
+	// If ID is not provided, generate one
+	if pipeline.Id == "" {
+		generatedID = true
+		pipeline.Id = util.GenerateUUID()
+	}
+
+	// If we did NOT generate an ID, make sure it doesn't collide with an existing
+	// pipeline ID.
+	if !generatedID {
+		if _, err := s.Options.StoreService.GetPipeline(ctx, pipeline.Id); err == nil {
+			return nil, errors.New("pipeline with that ID already exists")
+		}
+	}
 
 	// Populate WASM fields
 	if err := s.Options.WasmService.PopulateWASMFields(ctx, pipeline); err != nil {
@@ -703,7 +716,23 @@ func (s *ExternalServer) CreateNotification(ctx context.Context, req *protos.Cre
 		}, nil
 	}
 
-	req.Notification.Id = util.Pointer(util.GenerateUUID())
+	var generatedID bool
+
+	// Only generate an ID if it's not provided. We need to support user setting
+	// the ID so that we can support automation tooling
+	if req.Notification.GetId() == "" {
+		generatedID = true
+		req.Notification.Id = proto.String(util.GenerateUUID())
+	}
+
+	// If we did NOT generate an ID, make sure it doesn't collide with an existing id
+	if !generatedID {
+		if _, err := s.Options.StoreService.GetNotificationConfig(ctx, &protos.GetNotificationRequest{
+			NotificationId: req.Notification.GetId(),
+		}); err == nil {
+			return nil, errors.New("notification with that ID already exists")
+		}
+	}
 
 	if err := s.Options.StoreService.CreateNotificationConfig(ctx, req); err != nil {
 		return nil, errors.Wrap(err, "unable to create notification config")
@@ -1298,7 +1327,9 @@ func (s *ExternalServer) CreateWasm(ctx context.Context, req *protos.CreateWasmR
 		return nil, status.Errorf(codes.InvalidArgument, "unable to validate CreateWasm request: %s", err.Error())
 	}
 
-	// Generate ID
+	// TODO: This will have to be expanded to support user-provided IDs so we
+	// can support automation tooling. For now, we generate a deterministic ID
+	// based off of the Wasm module bytes.
 	id := util.DeterminativeUUID(req.Wasm.Bytes, customWasmModifier)
 
 	// Check if this ID already exists - if it does, return an error - user should use UpdateWasm()
