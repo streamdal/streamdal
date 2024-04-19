@@ -204,7 +204,7 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 		return ctrl.Result{}, fmt.Errorf("failed to get server config: %s", err)
 	}
 
-	if err := validate.StreamdalProtosConfig(serverConfig.Config); err != nil {
+	if err := validate.WantedConfig(serverConfig.Config); err != nil {
 		llog.Error(err, "Failed to validate server config")
 		return ctrl.Result{}, err
 	}
@@ -216,7 +216,7 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 			return ctrl.Result{}, fmt.Errorf("failed to unmarshal wanted config '%s': %s", cfgItem.Name, err)
 		}
 
-		if err := validate.StreamdalProtosConfig(wantedConfig); err != nil {
+		if err := validate.WantedConfig(wantedConfig); err != nil {
 			llog.Error(err, fmt.Sprintf("Failed to validate wanted config '%s'", cfgItem.Name))
 			return ctrl.Result{}, err
 		}

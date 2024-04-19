@@ -77,7 +77,7 @@ func invalidError(name string, errList field.ErrorList) error {
 	)
 }
 
-func StreamdalProtosConfig(cfg *protos.Config) error {
+func WantedConfig(cfg *protos.Config) error {
 	if cfg == nil {
 		return errors.New("Config cannot be nil")
 	}
@@ -128,14 +128,108 @@ func Notification(notification *protos.NotificationConfig) error {
 		return errors.New("NotificationConfig cannot be nil")
 	}
 
-	// TODO: Add validations; also - reminder: ID's MUST be enforced!!!
+	if notification.GetId() == "" {
+		return errors.New("NotificationConfig.Id cannot be empty")
+	}
+
+	if notification.Name == "" {
+		return errors.New("NotificationConfig.Name cannot be empty")
+	}
+
+	var err error
+
+	switch notification.Type {
+	case protos.NotificationType_NOTIFICATION_TYPE_EMAIL:
+		err = NotificationEmail(notification.GetEmail())
+	case protos.NotificationType_NOTIFICATION_TYPE_PAGERDUTY:
+		err = NotificationPagerduty(notification.GetPagerduty())
+	case protos.NotificationType_NOTIFICATION_TYPE_SLACK:
+		err = NotificationSlack(notification.GetSlack())
+	default:
+		return errors.New("NotificationConfig.Type must be one of EMAIL, PAGERDUTY, or SLACK")
+	}
+
+	return err
+}
+
+func NotificationEmail(cfg *protos.NotificationEmail) error {
+	if cfg == nil {
+		return errors.New("NotificationEmail cannot be nil")
+	}
+
+	switch cfg.Type {
+	case protos.NotificationEmail_TYPE_SMTP:
+		if cfg.GetSmtp() == nil {
+			return errors.New("NotificationEmail.SMTP cannot be nil")
+		}
+	case protos.NotificationEmail_TYPE_SES:
+		if cfg.GetSes() == nil {
+			return errors.New("NotificationEmail.SES cannot be nil")
+		}
+
+		if cfg.GetSes().SesRegion == "" {
+			return errors.New("NotificationEmail.SES.SesRegion cannot be empty")
+		}
+
+		if cfg.GetSes().SesAccessKeyId == "" {
+			return errors.New("NotificationEmail.SES.SesAccessKeyId cannot be empty")
+		}
+
+		if cfg.GetSes().SesSecretAccessKey == "" {
+			return errors.New("NotificationEmail.SES.SesSecretAccessKey cannot be empty")
+		}
+	default:
+		return errors.New("NotificationEmail.Type must be one of SMTP or SES")
+	}
 
 	return nil
 }
 
+func NotificationSlack(cfg *protos.NotificationSlack) error {
+	if cfg == nil {
+		return errors.New("NotificationSlack cannot be nil")
+	}
+
+	if cfg.BotToken == "" {
+		return errors.New("NotificationSlack.BotToken cannot be empty")
+	}
+
+	if cfg.Channel == "" {
+		return errors.New("NotificationSlack.Channel cannot be empty")
+	}
+
+	return nil
+}
+
+func NotificationPagerduty(cfg *protos.NotificationPagerDuty) error {
+	if cfg == nil {
+		return errors.New("NotificationPagerDuty cannot be nil")
+	}
+
+	if cfg.Token == "" {
+		return errors.New("NotificationPagerDuty.Token cannot be empty")
+	}
+
+	if cfg.Email == "" {
+		return errors.New("NotificationPagerDuty.Email cannot be empty")
+	}
+
+	if cfg.ServiceId == "" {
+		return errors.New("NotificationPagerDuty.ServiceId cannot be empty")
+	}
+
+	if cfg.Urgency != protos.NotificationPagerDuty_URGENCY_LOW &&
+		cfg.Urgency != protos.NotificationPagerDuty_URGENCY_HIGH {
+
+		return errors.New("NotificationPagerDuty.Urgency must be one of LOW or HIGH")
+	}
+
+	return nil
+}
+
+// TODO: Punting on wasm module support until later (need to figure out what
+// to do about bytes VS id)
 func WasmModules(modules []*shared.WasmModule) error {
-	// TODO: Punting on wasm module support until later (need to figure out what
-	// to do about bytes VS id)
 	return nil
 }
 
