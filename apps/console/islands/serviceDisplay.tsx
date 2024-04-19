@@ -75,7 +75,7 @@ const serializeDisplay = debounce(
   (rfInstance: ReactFlowInstance) => {
     localStorage.setItem(LAYOUT_KEY, JSON.stringify(rfInstance.toObject()));
   },
-  2000,
+  500,
 );
 
 const deserializeDisplay = () => {

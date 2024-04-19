@@ -3,8 +3,9 @@ import { getConfigs } from "root/lib/fetch.ts";
 
 export const handler: Handlers = {
   async GET() {
+    const { config = {} } = await getConfigs();
     return new Response(
-      JSON.stringify(await getConfigs(), undefined, 2),
+      JSON.stringify(config, undefined, 2),
       {
         headers: {
           "Content-Type": "application/json",
