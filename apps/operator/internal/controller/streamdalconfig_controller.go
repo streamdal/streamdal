@@ -21,12 +21,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-logr/logr"
-	serverUtil "github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -74,7 +71,7 @@ type ResourceType string
 
 type HandleFunc struct {
 	Resource ResourceType
-	Function func(ctx context.Context, rr *ReconcileRequest, cfg *protos.Config) (*HandleStatus, error)
+	Function func(ctx context.Context, rr *ReconcileRequest, wantedCfg, serverCfg *protos.Config) (*HandleStatus, error)
 }
 
 type HandleStatus struct {
@@ -83,14 +80,6 @@ type HandleStatus struct {
 	NumCreated int
 	NumUpdated int
 	NumDeleted int
-}
-
-type AudienceJob struct {
-	// Indicates what the handler should do on server
-	ServerAction ReconcileAction
-
-	// The target audience that should be created or deleted
-	Audience *protos.Audience
 }
 
 //+kubebuilder:rbac:groups=crd.streamdal.com,resources=streamdalconfigs,verbs=get;list;watch;create;update;patch;delete
@@ -115,7 +104,7 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 	llog.Info("Received reconcile request")
 
-	rr, err := r.setupReconcileAction(ctx, &req, &llog)
+	rr, err := r.setupReconcileAction(ctx, &req)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			llog.Info("Resource not found - nothing to do - object is probably deleted")
@@ -124,8 +113,8 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 		llog.Error(err, "Failed to complete reconcile setup (won't retry)")
 
-		// The only reason that we wouldn't have a ReconcileRequest with a Config
-		// object is if setupReconcileAction has a bug and didn't return one.
+		// The only reason we want to do this extra check is if setupReconcileAction()
+		// has a bug and doesn't return a config.
 		if rr != nil && rr.Config != nil {
 			if errors.IsInvalid(err) {
 				r.Recorder.Event(rr.Config, v1.EventTypeWarning, "CR validation error (won't retry)", err.Error())
@@ -185,48 +174,6 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 	return result, nil
 }
 
-func (r *StreamdalConfigReconciler) removeFinalizer(ctx context.Context, rr *ReconcileRequest) error {
-	llog := log.Log.WithValues("method", "removeFinalizer")
-	llog.Info("Removing finalizer")
-
-	// Don't remove finalizer if it doesn't exist
-	finalizers := rr.Config.GetFinalizers()
-
-	for i, f := range finalizers {
-		// Go through all finalizers in case there are dupes
-		if f == FinalizerName {
-			rr.Config.Finalizers = append(finalizers[:i], finalizers[i+1:]...)
-		}
-	}
-
-	if err := r.Update(ctx, rr.Config); err != nil {
-		return fmt.Errorf("failed to update CR without finalizer: %s", err)
-	}
-
-	return nil
-}
-
-func (r *StreamdalConfigReconciler) addFinalizer(ctx context.Context, rr *ReconcileRequest) error {
-	llog := log.Log.WithValues("method", "addFinalizer")
-	llog.Info("Adding finalizer")
-
-	// Don't add finalizer if it already exists
-	for _, f := range rr.Config.GetFinalizers() {
-		if f == FinalizerName {
-			llog.Info("Finalizer already exists, nothing to do")
-			return nil
-		}
-	}
-
-	rr.Config.Finalizers = append(rr.Config.Finalizers, FinalizerName)
-
-	if err := r.Update(ctx, rr.Config); err != nil {
-		return fmt.Errorf("failed to update CR with finalizer: %s", err)
-	}
-
-	return nil
-}
-
 // SetupWithManager sets up the controller with the Manager.
 func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	// Launch periodic reconciler
@@ -244,22 +191,33 @@ func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // handleResources is a helper that will iterate over all resources in the CR
 // and execute the appropriate handler method for each resource type.
-//
-// If deleteResource is false, the resource will be created or updated; if
-// deleteResource is true, the resource will be deleted.
 func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *ReconcileRequest) (ctrl.Result, error) {
 	llog := log.Log.WithValues("method", "handleResources")
 	llog.Info("Handling resource in streamdal server", "action", rr.Action)
 
+	// Add auth metadata to ctx that's used when talking to streamdal grpc api
+	ctx = createCtxWithAuth(ctx, rr.Config.Spec.ServerAuth)
+
+	// Attempt to load server config
+	serverConfig, err := rr.Client.GetConfig(ctx, &protos.GetConfigRequest{})
+	if err != nil {
+		return ctrl.Result{}, fmt.Errorf("failed to get server config: %s", err)
+	}
+
+	if err := validate.StreamdalProtosConfig(serverConfig.Config); err != nil {
+		llog.Error(err, "Failed to validate server config")
+		return ctrl.Result{}, err
+	}
+
 	for _, cfgItem := range rr.Config.Spec.Configs {
-		// Attempt to load config in CR
-		protosCfg := &protos.Config{}
-		if err := protojson.Unmarshal([]byte(cfgItem.Config), protosCfg); err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to unmarshal config '%s': %s", cfgItem.Name, err)
+		// Attempt to load config in CR / wanted config
+		wantedConfig := &protos.Config{}
+		if err := protojson.Unmarshal([]byte(cfgItem.Config), wantedConfig); err != nil {
+			return ctrl.Result{}, fmt.Errorf("failed to unmarshal wanted config '%s': %s", cfgItem.Name, err)
 		}
 
-		if err := validate.StreamdalProtosConfig(protosCfg); err != nil {
-			llog.Error(err, fmt.Sprintf("Failed to validate streamdal JSON config '%s'", cfgItem.Name))
+		if err := validate.StreamdalProtosConfig(wantedConfig); err != nil {
+			llog.Error(err, fmt.Sprintf("Failed to validate wanted config '%s'", cfgItem.Name))
 			return ctrl.Result{}, err
 		}
 
@@ -275,7 +233,7 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 				Function: r.handleNotifications,
 			},
 
-			// Punting on support for wasm modules for now ~DS 04.16.2024
+			// Punting on support for wasm modules for now because of bytes ~DS 04.16.2024
 			//{
 			//	Resource:     "wasm module(s)",
 			//	Function: r.handleWasmModules,
@@ -285,11 +243,17 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 				Resource: ResourceTypePipeline,
 				Function: r.handlePipelines,
 			},
+
+			// Audience <-> pipeline mapping
+			{
+				Resource: "audience <-> pipeline mappings",
+				Function: r.handleMappings,
+			},
 		}
 
 		for _, f := range handleFuncs {
 			llog.Info("Running handle function", "resource", f.Resource)
-			status, err := f.Function(ctx, rr, protosCfg)
+			status, err := f.Function(ctx, rr, wantedConfig, serverConfig.Config)
 			if err != nil {
 				return ctrl.Result{}, fmt.Errorf("failed to handle resource '%s': %s", f.Resource, err)
 			}
@@ -301,165 +265,11 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 	return ctrl.Result{}, nil
 }
 
-func createCtxWithAuth(ctx context.Context, authToken string) context.Context {
-	return metadata.NewOutgoingContext(ctx, metadata.Pairs(util.AuthTokenMetadata, authToken))
-}
-
-// handleAudiences will either create or delete audiences in the streamdal server.
-//
-// NOTE: An audience can only be created or deleted - it cannot be updated.
-// This is because the resource itself consists of 4 required fields - it either
-// exists or doesn't.
-func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *ReconcileRequest, cfg *protos.Config) (*HandleStatus, error) {
-	llog := log.Log.WithValues("method", "handleAudiences", "action", rr.Action)
-	llog.Info("Handling audiences", "numAudiences", len(cfg.Audiences))
-
-	if len(cfg.Audiences) == 0 {
-		llog.Info("No audiences to handle")
-		return &HandleStatus{
-			Resource: "audience",
-		}, nil
-	}
-
-	outgoingCtx := createCtxWithAuth(ctx, rr.Config.Spec.ServerAuth)
-
-	cfgResp, err := rr.Client.GetConfig(outgoingCtx, &protos.GetConfigRequest{})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get config: %s", err)
-	}
-
-	if cfgResp == nil || cfgResp.Config == nil {
-		return nil, fmt.Errorf("failed to get config: response or config is nil")
-	}
-
-	status := &HandleStatus{
-		Resource: ResourceTypeAudience,
-		Action:   rr.Action,
-	}
-
-	jobs := r.generateAudienceJobs(rr.Action, cfg.Audiences, cfgResp.Config.Audiences)
-
-	llog.Info("Generated audience jobs", "numGenerated", len(jobs))
-
-	// TODO: Remember that we cannot remove audiences if they are attached!
-	for _, j := range jobs {
-		switch j.ServerAction {
-		case ReconcileActionUpdate:
-			_, err = rr.Client.CreateAudience(outgoingCtx, &protos.CreateAudienceRequest{
-				Audience: j.Audience,
-			})
-
-			if err == nil {
-				status.NumCreated++
-			}
-		case ReconcileActionDelete:
-			_, err = rr.Client.DeleteAudience(outgoingCtx, &protos.DeleteAudienceRequest{
-				Audience: j.Audience,
-				Force:    proto.Bool(true), // This will delete the audience <-> pipeline mapping (if it has any)
-			})
-
-			if err == nil {
-				status.NumDeleted++
-			}
-		default:
-			audStr := serverUtil.AudienceToStr(j.Audience)
-
-			llog.Info("Unknown server action for audience", "serverAction", j.ServerAction, "audience", audStr)
-
-			return nil, fmt.Errorf("unknown server action '%s' for audience '%s'", j.ServerAction, audStr)
-		}
-
-		if err != nil {
-			llog.Error(err, "Unable to complete server action", "action", j.ServerAction)
-			return nil, fmt.Errorf("unable to complete server action '%s': %s", j.ServerAction, err)
-		}
-	}
-
-	if status.NumCreated != 0 || status.NumDeleted != 0 {
-		r.Recorder.Event(rr.Config, v1.EventTypeNormal, "Audiences synced",
-			fmt.Sprintf("Created: %d Updated: %d Deleted: %d", status.NumCreated, status.NumUpdated, status.NumDeleted))
-	}
-
-	return status, nil
-}
-
-// generateAudienceJobs will generate audience jobs by comparing the desired
-// state in the CR and what's on the streamdal server.
-func (r *StreamdalConfigReconciler) generateAudienceJobs(
-	action ReconcileAction,
-	crAudiences []*protos.Audience,
-	serverAudiences []*protos.Audience,
-) []*AudienceJob {
-	llog := log.Log.WithValues("method", "generateAudienceJobs")
-	diff := make([]*AudienceJob, 0)
-
-	for _, ca := range crAudiences {
-		switch action {
-		// If this is an "update", we will create a diff that contains steps to
-		// ensure the server and CR have the same state.
-		case ReconcileActionUpdate:
-			// If CR audience not in server - mark it for addition
-			if !serverUtil.AudienceInList(ca, serverAudiences) {
-				ca.XCreatedBy = proto.String(CreatedBy)
-
-				diff = append(diff, &AudienceJob{
-					ServerAction: ReconcileActionUpdate,
-					Audience:     ca,
-				})
-			}
-		case ReconcileActionDelete:
-			// If CR audience in server audience - mark it for deletion
-			if serverUtil.AudienceInList(ca, serverAudiences) {
-				diff = append(diff, &AudienceJob{
-					ServerAction: ReconcileActionDelete,
-					Audience:     ca,
-				})
-			}
-		}
-	}
-
-	// Same thing but backwards - if this is an "update", we need to ensure that
-	// server does NOT have audiences that are defined the CR.
-	if action == ReconcileActionUpdate {
-		for _, sa := range serverAudiences {
-			// If server audience is not defined in CRD - we should delete it from
-			// the server ONLY if it is managed by this k8s operator.
-			if !serverUtil.AudienceInList(sa, crAudiences) {
-				if sa.GetXCreatedBy() == CreatedBy {
-					diff = append(diff, &AudienceJob{
-						ServerAction: ReconcileActionDelete,
-						Audience:     sa,
-					})
-				} else {
-					llog.Info("Wanted to mark audience for deletion but it is not managed by this operator", "audience", serverUtil.AudienceToStr(sa))
-				}
-			}
-		}
-	}
-
-	return diff
-}
-
-// TODO: Implement
-func (r *StreamdalConfigReconciler) handleNotifications(ctx context.Context, rr *ReconcileRequest, cfg *protos.Config) (*HandleStatus, error) {
-	return &HandleStatus{}, nil
-}
-
-// TODO: Implement
-func (r *StreamdalConfigReconciler) handlePipelines(ctx context.Context, rr *ReconcileRequest, cfg *protos.Config) (*HandleStatus, error) {
-	return &HandleStatus{}, nil
-}
-
-// TODO: Implement
-func (r *StreamdalConfigReconciler) deleteResource(ctx context.Context, rr *ReconcileRequest) (ctrl.Result, error) {
-	return ctrl.Result{}, nil
-}
-
 // setupReconcileAction will validate the request, determine the type of action
 // it is (create or delete) and create a grpc client that can be used for talking
 // to the streamdal server. NOTE: Both "create" and "update" should be handled
-// by the create handler.
-func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, req *ctrl.Request, log *logr.Logger) (*ReconcileRequest, error) {
+// by the update action.
+func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, req *ctrl.Request) (*ReconcileRequest, error) {
 	var cfg crdv1.StreamdalConfig
 
 	if err := r.Get(ctx, req.NamespacedName, &cfg); err != nil {
@@ -494,7 +304,67 @@ func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, re
 	return reconcileAction, nil
 }
 
-// TODO: Implement periodic reconciler
+// addFinalizer adds the streamdal-operator finalizer to the CR; won't add a new
+// entry if finalizer already present.
+func (r *StreamdalConfigReconciler) addFinalizer(ctx context.Context, rr *ReconcileRequest) error {
+	llog := log.Log.WithValues("method", "addFinalizer")
+	llog.Info("Adding finalizer")
+
+	// Don't add finalizer if it already exists
+	for _, f := range rr.Config.GetFinalizers() {
+		if f == FinalizerName {
+			llog.Info("Finalizer already exists, nothing to do")
+			return nil
+		}
+	}
+
+	rr.Config.Finalizers = append(rr.Config.Finalizers, FinalizerName)
+
+	if err := r.Update(ctx, rr.Config); err != nil {
+		return fmt.Errorf("failed to update CR with finalizer: %s", err)
+	}
+
+	return nil
+}
+
+// removeFinalizer removes the streamdal-operator finalizer and any dupes from
+// the CR; returns nil if finalizer doesn't exist.
+func (r *StreamdalConfigReconciler) removeFinalizer(ctx context.Context, rr *ReconcileRequest) error {
+	llog := log.Log.WithValues("method", "removeFinalizer")
+	llog.Info("Removing finalizer")
+
+	// Don't remove finalizer if it doesn't exist
+	finalizers := rr.Config.GetFinalizers()
+
+	for i, f := range finalizers {
+		// Go through all finalizers in case there are dupes
+		if f == FinalizerName {
+			rr.Config.Finalizers = append(finalizers[:i], finalizers[i+1:]...)
+		}
+	}
+
+	if err := r.Update(ctx, rr.Config); err != nil {
+		return fmt.Errorf("failed to update CR without finalizer: %s", err)
+	}
+
+	return nil
+}
+
+// runPeriodicReconciler is intended to be ran as a goroutine, started at operator
+// startup. It will run every DefaultReconcileInterval or CR.periodicReconcilerInterval
+// (if set).
+//
+// The periodic reconciler is designed to periodically check and ensure that
+// the state of a system aligns with its desired state. It automatically
+// corrects discrepancies by triggering necessary updates or fixes. This
+// mechanism is essential for maintaining system integrity and reliability over
+// time.
+//
+// A periodic reconciler is needed in addition to the regular reconcile loop to
+// handle cases where external changes or system errors might not trigger events
+// detected by the regular loop. For example: someone manually removed a config
+// entry in the streamdal server via the UI - the periodic reconciler would detect
+// the discrepancy and correct it by re-adding the config entry.
 func (r *StreamdalConfigReconciler) runPeriodicReconciler() {
 	// TODO: No need to catch shutdown (so far)
 	llog := log.Log.WithValues("method", "runPeriodicReconciler")
@@ -520,4 +390,9 @@ MAIN:
 	}
 
 	llog.Info("Stopped")
+}
+
+// Helper for creating a ctx used for making auth'd grpc calls to the streamdal server
+func createCtxWithAuth(ctx context.Context, authToken string) context.Context {
+	return metadata.NewOutgoingContext(ctx, metadata.Pairs(util.AuthTokenMetadata, authToken))
 }

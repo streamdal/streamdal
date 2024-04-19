@@ -35,3 +35,15 @@ func NewGrpcExternalClient(ctx context.Context, serverAddress, serverAuth string
 
 	return client, nil
 }
+
+// NotificationInList checks if a notification is in a list of notification configs.
+// TODO: This should _eventually_ be a "deep equal" check as 'id' does not guarantee equality.
+func NotificationInList(n *protos.NotificationConfig, list []*protos.NotificationConfig) bool {
+	for _, ln := range list {
+		if n.GetId() == ln.GetId() {
+			return true
+		}
+	}
+
+	return false
+}

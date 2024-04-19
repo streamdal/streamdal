@@ -14,16 +14,10 @@ spec:
         {
           "audiences": [
             {
-              "serviceName": "service1",
+              "serviceName": "service5",
               "operationType": "OPERATION_TYPE_CONSUMER",
-              "operationName": "operationName1",
-              "componentName": "componentName1"
-            },
-            {
-              "serviceName": "service3",
-              "operationType": "OPERATION_TYPE_CONSUMER",
-              "operationName": "operationName3",
-              "componentName": "componentName3"
+              "operationName": "operationName5",
+              "componentName": "componentName5"
             }
           ]
         }
