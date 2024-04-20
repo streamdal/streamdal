@@ -41,7 +41,8 @@ const (
 	FinalizerName = "streamdal.com/finalizer"
 	CreatedBy     = "streamdal-operator"
 
-	ReconcileActionUpdate ReconcileAction = "update" // "update" covers both "create" and "update"
+	ReconcileActionCreate ReconcileAction = "create"
+	ReconcileActionUpdate ReconcileAction = "update"
 	ReconcileActionDelete ReconcileAction = "delete"
 
 	ResourceTypeAudience     ResourceType = "audience"
@@ -60,6 +61,8 @@ type StreamdalConfigReconciler struct {
 	ShutdownCtx context.Context
 }
 
+// ReconcileRequest represents a request from K8S to reconcile a StreamdalConfig.
+// This type will have Action set to either UPDATE or DELETE.
 type ReconcileRequest struct {
 	Action ReconcileAction
 	Config *crdv1.StreamdalConfig
@@ -239,10 +242,10 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 			//	Function: r.handleWasmModules,
 			//},
 
-			{
-				Resource: ResourceTypePipeline,
-				Function: r.handlePipelines,
-			},
+			//{
+			//	Resource: ResourceTypePipeline,
+			//	Function: r.handlePipelines,
+			//},
 
 			// Audience <-> pipeline mapping
 			{
@@ -258,7 +261,11 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 				return ctrl.Result{}, fmt.Errorf("failed to handle resource '%s': %s", f.Resource, err)
 			}
 
-			llog.Info("Handle function completed", "resource", f.Resource, "numCreated", status.NumCreated, "numUpdated", status.NumUpdated)
+			llog.Info("Handler for resource completed", "resource", f.Resource,
+				"numCreated", status.NumCreated,
+				"numUpdated", status.NumUpdated,
+				"numDeleted", status.NumDeleted,
+			)
 		}
 	}
 

@@ -32,11 +32,20 @@ spec:
             },
             {
               "id": "c746e19d-171c-4521-9a2d-bb456624aca-2",
-              "name": "Test slack Integration",
+              "name": "Test slack IntegratioNN",
               "type": "NOTIFICATION_TYPE_SLACK",
               "slack": {
-                "botToken": "test-token",
+                "botToken": "test-token1234",
                 "channel": "test-channel"
+              }
+            },
+            {
+              "id": "c746e19d-171c-4521-9a2d-bb456624aca-3",
+              "name": "Test slack Integration 24",
+              "type": "NOTIFICATION_TYPE_SLACK",
+              "slack": {
+                "botToken": "super-token",
+                "channel": "super-channel"
               }
             }
           ]

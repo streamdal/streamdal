@@ -13,7 +13,8 @@ import (
 )
 
 type NotificationJob struct {
-	// Indicates what the handler should do on server
+	// Indicates what the handler should do on server; unlike ReconcileRequest
+	// which is only UPDATE or DELETE - the job can be CREATE, UPDATE or DELETE.
 	ServerAction ReconcileAction
 
 	// The target notification that should be created or deleted
@@ -21,7 +22,7 @@ type NotificationJob struct {
 }
 
 func (r *StreamdalConfigReconciler) handleNotifications(
-	ctx context.Context,
+	ctx context.Context, // should already have auth metadata
 	rr *ReconcileRequest,
 	wantedCfg *protos.Config,
 	serverCfg *protos.Config,
@@ -42,13 +43,21 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 
 	for _, j := range jobs {
 		switch j.ServerAction {
-		case ReconcileActionUpdate:
-			_, err = rr.Client.CreateNotification(ctx, &protos.CreateNotificationRequest{
+		case ReconcileActionCreate:
+			_, err := rr.Client.CreateNotification(ctx, &protos.CreateNotificationRequest{
 				Notification: j.Notification,
 			})
 
 			if err == nil {
 				status.NumCreated++
+			}
+		case ReconcileActionUpdate:
+			_, err = rr.Client.UpdateNotification(ctx, &protos.UpdateNotificationRequest{
+				Notification: j.Notification,
+			})
+
+			if err == nil {
+				status.NumUpdated++
 			}
 		case ReconcileActionDelete:
 			_, err = rr.Client.DeleteNotification(ctx, &protos.DeleteNotificationRequest{
@@ -70,7 +79,7 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 		}
 	}
 
-	if status.NumCreated != 0 || status.NumDeleted != 0 {
+	if status.NumCreated != 0 || status.NumUpdated != 0 || status.NumDeleted != 0 {
 		r.Recorder.Event(rr.Config, v1.EventTypeNormal, "Notifications synced",
 			fmt.Sprintf("Created: %d Updated: %d Deleted: %d", status.NumCreated, status.NumUpdated, status.NumDeleted))
 	}
@@ -82,32 +91,55 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 // desired state in the CR and what's on the streamdal server.
 func (r *StreamdalConfigReconciler) generateNotificationJobs(
 	action ReconcileAction,
-	wantedNotifications []*protos.NotificationConfig,
-	serverNotifications []*protos.NotificationConfig,
+	wantedConfigs []*protos.NotificationConfig,
+	serverConfigs []*protos.NotificationConfig,
 ) []*NotificationJob {
 	llog := log.Log.WithValues("method", "generateNotificationJobs")
-	diff := make([]*NotificationJob, 0)
+	jobs := make([]*NotificationJob, 0)
 
-	for _, wn := range wantedNotifications {
+	for _, wc := range wantedConfigs {
+		// Check if server configs contain config with ID in CR
+		sc := util.GetNotificationConfigByID(wc.GetId(), serverConfigs)
+
 		switch action {
-		// If this is an "update", we will create a diff that contains steps to
+		// If this is an "update", we will create a jobs that contains steps to
 		// ensure the server and CR have the same state.
 		case ReconcileActionUpdate:
-			// If CR notification not in server - mark it for addition
-			if !util.NotificationInList(wn, serverNotifications) {
-				wn.XCreatedBy = proto.String(CreatedBy)
+			if sc == nil {
+				// Server does not contain a config with same ID - mark it for addition
+				wc.XCreatedBy = proto.String(CreatedBy)
 
-				diff = append(diff, &NotificationJob{
-					ServerAction: ReconcileActionUpdate,
-					Notification: wn,
+				jobs = append(jobs, &NotificationJob{
+					ServerAction: ReconcileActionCreate,
+					Notification: wc,
 				})
+			} else {
+				// Server contains a config with the same id. Was the config
+				// created by this operator?
+				if sc.GetXCreatedBy() != CreatedBy {
+					llog.Info("Wanted to mark notification for update but it is not managed by this operator",
+						"notificationID", sc.GetId())
+					continue
+				}
+
+				// Set this so that the comparison works correctly
+				wc.XCreatedBy = proto.String(CreatedBy)
+
+				// Server config was crated by this operator but we need to check
+				// if the contents of the config are the same as the wanted config.
+				if equal, _ := util.CompareNotificationConfig(wc, sc); !equal {
+					jobs = append(jobs, &NotificationJob{
+						ServerAction: ReconcileActionUpdate,
+						Notification: wc,
+					})
+				}
 			}
 		case ReconcileActionDelete:
-			// If CR notification in server notifications - mark it for deletion
-			if util.NotificationInList(wn, serverNotifications) {
-				diff = append(diff, &NotificationJob{
+			// If CR config is in server - mark it for deletion
+			if sc != nil {
+				jobs = append(jobs, &NotificationJob{
 					ServerAction: ReconcileActionDelete,
-					Notification: wn,
+					Notification: wc,
 				})
 			}
 		}
@@ -115,13 +147,18 @@ func (r *StreamdalConfigReconciler) generateNotificationJobs(
 
 	// Same thing but backwards - if this is an "update", we need to ensure that
 	// server does NOT have notification configs that are defined the CR.
+	//
+	// NOTE: We only care about this during an "update" action - if we're deleting
+	// the CR, we don't care about what's on the server.
 	if action == ReconcileActionUpdate {
-		for _, sn := range serverNotifications {
+		for _, sn := range serverConfigs {
 			// If server notification is not defined in CRD - we should delete
 			// it from the server ONLY if it is managed by this k8s operator.
-			if !util.NotificationInList(sn, wantedNotifications) {
+			wn := util.GetNotificationConfigByID(sn.GetId(), wantedConfigs)
+
+			if wn == nil {
 				if sn.GetXCreatedBy() == CreatedBy {
-					diff = append(diff, &NotificationJob{
+					jobs = append(jobs, &NotificationJob{
 						ServerAction: ReconcileActionDelete,
 						Notification: sn,
 					})
@@ -133,5 +170,5 @@ func (r *StreamdalConfigReconciler) generateNotificationJobs(
 		}
 	}
 
-	return diff
+	return jobs
 }
