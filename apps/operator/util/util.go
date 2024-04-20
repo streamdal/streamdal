@@ -79,13 +79,14 @@ func CompareNotificationConfig(a, b *protos.NotificationConfig) (bool, string) {
 
 func ComparePipeline(a, b *protos.Pipeline) (bool, string) {
 	opts := cmp.Options{
-		// We need this so that baseline compare pkg can properly compare proto
-		// messages.
+		// We need Transform() so that baseline compare pkg can properly compare proto messages
 		protocmp.Transform(),
 
-		// Leaving this here as an example of how to ignore fields. Note that
-		// the protocmp.Transform() option is required for this to work.
-		//protocmp.IgnoreFields(&protos.Pipeline{}, "_created_by"),
+		// When a pipeline config is fetched via external.GetConfig(),
+		// _wasm_function field might not be included in response. Since we are
+		// only supporting bundled wasm for now, this is safe to ignore (bundled
+		// wasm has it hardcoded to 'f').
+		protocmp.IgnoreFields(&protos.PipelineStep{}, "_wasm_function"),
 	}
 
 	diff := cmp.Diff(a, b, opts...)

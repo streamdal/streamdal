@@ -12,41 +12,71 @@ spec:
     - name: "config with audiences"
       config: >
         {
-          "audiences": [
-            {
-              "serviceName": "service5",
-              "operationType": "OPERATION_TYPE_CONSUMER",
-              "operationName": "operationName5",
-              "componentName": "componentName5"
-            }
-          ],
-          "notifications": [
-            {
-              "id": "c746e19d-171c-4521-9a2d-bb456624acaa-1",
-              "name": "Test slack Integration",
-              "type": "NOTIFICATION_TYPE_SLACK",
-              "slack": {
-                "botToken": "test-token",
-                "channel": "test-channel"
-              }
-            },
-            {
-              "id": "c746e19d-171c-4521-9a2d-bb456624aca-2",
-              "name": "Test slack IntegratioNN",
-              "type": "NOTIFICATION_TYPE_SLACK",
-              "slack": {
-                "botToken": "test-token1234",
-                "channel": "test-channel"
-              }
-            },
-            {
-              "id": "c746e19d-171c-4521-9a2d-bb456624aca-3",
-              "name": "Test slack Integration 24",
-              "type": "NOTIFICATION_TYPE_SLACK",
-              "slack": {
-                "botToken": "super-token",
-                "channel": "super-channel"
-              }
-            }
-          ]
+            "audiences": [
+                {
+                    "serviceName": "service5",
+                    "operationType": "OPERATION_TYPE_CONSUMER",
+                    "operationName": "operationName5",
+                    "componentName": "componentName5"
+                }
+            ],
+            "notifications": [
+                {
+                    "id": "c746e19d-171c-4521-9a2d-bb456624acaa-1",
+                    "name": "Test slack Integration",
+                    "type": "NOTIFICATION_TYPE_SLACK",
+                    "slack": {
+                        "botToken": "test-token",
+                        "channel": "test-channel"
+                    }
+                },
+                {
+                    "id": "c746e19d-171c-4521-9a2d-bb456624aca-2",
+                    "name": "Test slack IntegratioNN",
+                    "type": "NOTIFICATION_TYPE_SLACK",
+                    "slack": {
+                        "botToken": "test-token1234",
+                        "channel": "test-channel"
+                    }
+                },
+                {
+                    "id": "c746e19d-171c-4521-9a2d-bb456624aca-3",
+                    "name": "Test slack Integration 24",
+                    "type": "NOTIFICATION_TYPE_SLACK",
+                    "slack": {
+                        "botToken": "super-token",
+                        "channel": "super-channel"
+                    }
+                }
+            ],
+            "pipelines": [
+                {
+                    "id": "a027f81c-fd90-45f6-9f38-962426c768eb",
+                    "name": "mypipeline-foo3",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onFalse": {
+                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+                            },
+                            "detective": {
+                                "path": "object.field",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_HAS_FIELD"
+                            },
+                            "WasmId": "06f21173-1008-c99b-2bb5-452ffa84b3d5"
+                        },
+                        {
+                            "name": "Step #2",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_MASK_VALUE",
+                                "maskOptions": {
+                                    "path": "object.field"
+                                }
+                            },
+                            "WasmId": "50adafdc-d17f-9caa-3d9d-f951ddc42819"
+                        }
+                    ]
+                }
+            ]
         }

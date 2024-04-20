@@ -247,10 +247,10 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 			//	Function: r.handleWasmModules,
 			//},
 
-			//{
-			//	Resource: ResourceTypePipeline,
-			//	Function: r.handlePipelines,
-			//},
+			{
+				Resource: ResourceTypePipeline,
+				Function: r.handlePipelines,
+			},
 
 			// Audience <-> pipeline mapping
 			{

@@ -61,7 +61,7 @@ func (r *StreamdalConfigReconciler) handlePipelines(
 			}
 		case ReconcileActionDelete:
 			_, err = rr.Client.DeletePipeline(ctx, &protos.DeletePipelineRequest{
-				PipelineId: "",
+				PipelineId: j.Pipeline.GetId(),
 			})
 
 			if err == nil {
