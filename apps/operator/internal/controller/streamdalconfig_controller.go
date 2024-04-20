@@ -194,6 +194,11 @@ func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // handleResources is a helper that will iterate over all resources in the CR
 // and execute the appropriate handler method for each resource type.
+//
+// NOTE: The reconciler won't verify whether a given resources sub-resources
+// exist - that is already handled by the server. The operator should only be
+// concerned with ensuring that desired state matches the real state. Anything
+// outside of that is the server's (and user's) responsibility.
 func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *ReconcileRequest) (ctrl.Result, error) {
 	llog := log.Log.WithValues("method", "handleResources")
 	llog.Info("Handling resource in streamdal server", "action", rr.Action)

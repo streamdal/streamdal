@@ -70,7 +70,7 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 			}
 		default:
 			llog.Info("Unknown server action for notification", "serverAction", j.ServerAction, "notificationID", j.Notification.GetId())
-			return nil, fmt.Errorf("unknown server action '%s' for audience '%s'", j.ServerAction, j.Notification.GetId())
+			return nil, fmt.Errorf("unknown server action '%s' for notification id '%s'", j.ServerAction, j.Notification.GetId())
 		}
 
 		if err != nil {
