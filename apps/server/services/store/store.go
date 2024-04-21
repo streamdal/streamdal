@@ -617,7 +617,8 @@ func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesReques
 	}
 
 	pipelineConfigs := &protos.PipelineConfigs{
-		Configs: make([]*protos.PipelineConfig, 0),
+		Configs:    make([]*protos.PipelineConfig, 0),
+		XCreatedBy: req.XCreatedBy,
 	}
 
 	// Convert pipelines to pipeline config entries
