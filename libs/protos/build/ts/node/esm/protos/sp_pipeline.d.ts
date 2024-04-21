@@ -316,6 +316,12 @@ export interface PipelineConfigs {
      * @generated from protobuf field: optional bool _is_empty = 1000;
      */
     IsEmpty?: boolean;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource/mapping
+     *
+     * @generated from protobuf field: optional string _created_by = 1001;
+     */
+    CreatedBy?: string;
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs

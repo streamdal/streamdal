@@ -434,6 +434,14 @@ class PipelineConfigs(betterproto.Message):
     the encoded protobuf gets written as the actual object and not nil.
     """
 
+    created_by: Optional[str] = betterproto.string_field(
+        1001, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource/mapping
+    """
+
 
 @dataclass(eq=False, repr=False)
 class PipelineConfig(betterproto.Message):

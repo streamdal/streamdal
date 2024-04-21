@@ -167,6 +167,9 @@ message PipelineConfigs {
   // written as the actual object and not nil.
   //
   optional bool _is_empty = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  // Used internally by server and k8s operator to determine who manages this resource/mapping
+  optional string _created_by = 1001; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 
