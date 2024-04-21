@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.30.0
 	github.com/pkg/errors v0.9.1
 	github.com/streamdal/streamdal/apps/server v0.0.43
-	github.com/streamdal/streamdal/libs/protos v0.1.41
+	github.com/streamdal/streamdal/libs/protos v0.1.44
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
 	k8s.io/apimachinery v0.29.0

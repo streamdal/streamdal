@@ -7,6 +7,7 @@ import (
 
 	serverUtil "github.com/streamdal/streamdal/apps/server/util"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"google.golang.org/protobuf/proto"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/streamdal/streamdal/apps/operator/util"
@@ -71,6 +72,7 @@ func (r *StreamdalConfigReconciler) handleMappings(
 		if _, err := rr.Client.SetPipelines(ctx, &protos.SetPipelinesRequest{
 			Audience:    j.Audience,
 			PipelineIds: j.PipelineIDs,
+			XCreatedBy:  proto.String(CreatedBy),
 		}); err != nil {
 			return nil, fmt.Errorf("failed to set pipelines for audience '%s': %v", serverUtil.AudienceToStr(j.Audience), err)
 		}
@@ -124,8 +126,8 @@ func (r *StreamdalConfigReconciler) generateMappingJobs(
 		serverPipelineIDs := util.GetPipelineIDs(serverConfigs[audStr])
 
 		// Mapping exists on server - check if it is managed by this operator
-		if serverConfigs[audStr].XCreatedBy != CreatedBy {
-			llog.Info("Wanted to mark mapping for update but it is NOT managed by this operator",
+		if serverConfigs[audStr].GetXCreatedBy() != CreatedBy {
+			llog.Info("Skipping mapping for audience - mapping not managed by K8S operator",
 				"audience", audStr,
 				"wantedPipelineIDs", strings.Join(wantedPipelineIDs, ", "),
 				"serverPipelineIDs", strings.Join(serverPipelineIDs, ", "),
@@ -134,9 +136,10 @@ func (r *StreamdalConfigReconciler) generateMappingJobs(
 			continue
 		}
 
-		// Mapping owned by us - does server config differ from ours?
+		// Mapping owned by us - does server config differ from ours? If yes,
+		// generate job to overwrite it with config in CR.
 		if !util.CompareStringSlices(wantedPipelineIDs, serverPipelineIDs) {
-			llog.Info("Wanted audience mapping differs from server mappings - creating job!",
+			llog.Info("Wanted audience mapping differs from server mappings - creating job",
 				"audience", audStr,
 				"wantedPipelineIDs", strings.Join(wantedPipelineIDs, ", "),
 				"serverPipelineIDs", strings.Join(serverPipelineIDs, ", "),
@@ -156,7 +159,7 @@ func (r *StreamdalConfigReconciler) generateMappingJobs(
 	// server config and see if there is anything we should remove.
 	for serverAudStr, sc := range serverConfigs {
 		// If this mapping is NOT managed by this operator - skip it
-		if sc.XCreatedBy != CreatedBy {
+		if sc.GetXCreatedBy() != CreatedBy {
 			llog.Info("Skipping mapping not managed by K8S operator",
 				"audience", serverAudStr)
 
@@ -170,6 +173,10 @@ func (r *StreamdalConfigReconciler) generateMappingJobs(
 		}
 
 		// TODO: Is there anything else to do?
+	}
+
+	if len(jobs) != 0 {
+		llog.Info("Generated mapping jobs", "numJobs", len(jobs))
 	}
 
 	return jobs, nil

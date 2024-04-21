@@ -18,6 +18,12 @@ spec:
                     "operationType": "OPERATION_TYPE_CONSUMER",
                     "operationName": "operationName5",
                     "componentName": "componentName5"
+                },
+                {
+                    "serviceName": "service6",
+                    "operationType": "OPERATION_TYPE_CONSUMER",
+                    "operationName": "operationName6",
+                    "componentName": "componentName6"
                 }
             ],
             "notifications": [
@@ -78,5 +84,14 @@ spec:
                         }
                     ]
                 }
-            ]
+            ],
+            "audienceMappings": {
+                "service5:operation_type_consumer:operationname5:componentname5": {
+                    "configs": [
+                        {
+                            "id": "a027f81c-fd90-45f6-9f38-962426c768eb"
+                        }
+                    ]
+                }
+            }
         }
