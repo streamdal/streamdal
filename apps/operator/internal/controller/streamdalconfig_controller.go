@@ -49,6 +49,7 @@ const (
 	ResourceTypeNotification ResourceType = "notification"
 	ResourceTypeWasmModule   ResourceType = "wasm"
 	ResourceTypePipeline     ResourceType = "pipeline"
+	ResourceTypeMapping      ResourceType = "mapping"
 )
 
 // StreamdalConfigReconciler reconciles a StreamdalConfig object

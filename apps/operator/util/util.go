@@ -2,6 +2,7 @@ package util
 
 import (
 	"context"
+	"sort"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
@@ -92,4 +93,34 @@ func ComparePipeline(a, b *protos.Pipeline) (bool, string) {
 	diff := cmp.Diff(a, b, opts...)
 
 	return diff == "", diff
+}
+
+func DedupeAndSortStringSlice(slice []string) []string {
+	keys := make(map[string]bool)
+	list := make([]string, 0)
+
+	for _, entry := range slice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+
+	sort.Strings(list)
+
+	return list
+}
+
+func CompareStringSlices(a, b []string) bool {
+	return cmp.Equal(DedupeAndSortStringSlice(a), DedupeAndSortStringSlice(b))
+}
+
+func GetPipelineIDs(pc *protos.PipelineConfigs) []string {
+	ids := make([]string, 0)
+
+	for _, p := range pc.Configs {
+		ids = append(ids, p.GetId())
+	}
+
+	return ids
 }
