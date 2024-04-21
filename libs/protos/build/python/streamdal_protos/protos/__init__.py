@@ -737,6 +737,10 @@ class DeletePipelineRequest(betterproto.Message):
 class SetPipelinesRequest(betterproto.Message):
     pipeline_ids: List[str] = betterproto.string_field(1)
     audience: "Audience" = betterproto.message_field(2)
+    created_by: Optional[str] = betterproto.string_field(
+        100, optional=True, group="X_created_by"
+    )
+    """Used by automation tooling"""
 
 
 @dataclass(eq=False, repr=False)
