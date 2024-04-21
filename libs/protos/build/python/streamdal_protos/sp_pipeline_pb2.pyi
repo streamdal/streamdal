@@ -57,12 +57,14 @@ class PipelineConfig(_message.Message):
     def __init__(self, id: _Optional[str] = ..., paused: bool = ..., created_at_unix_ts_utc: _Optional[int] = ...) -> None: ...
 
 class PipelineConfigs(_message.Message):
-    __slots__ = ["_is_empty", "configs"]
+    __slots__ = ["_created_by", "_is_empty", "configs"]
     CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
     _IS_EMPTY_FIELD_NUMBER: _ClassVar[int]
+    _created_by: str
     _is_empty: bool
     configs: _containers.RepeatedCompositeFieldContainer[PipelineConfig]
-    def __init__(self, configs: _Optional[_Iterable[_Union[PipelineConfig, _Mapping]]] = ..., _is_empty: bool = ...) -> None: ...
+    def __init__(self, configs: _Optional[_Iterable[_Union[PipelineConfig, _Mapping]]] = ..., _is_empty: bool = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class PipelineStep(_message.Message):
     __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_false", "on_true", "schema_validation", "transform", "valid_json"]
