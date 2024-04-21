@@ -331,6 +331,12 @@ export interface PipelineConfigs {
      * @generated from protobuf field: optional bool _is_empty = 1000;
      */
     IsEmpty?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource/mapping
+     *
+     * @generated from protobuf field: optional string _created_by = 1001;
+     */
+    CreatedBy?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs
@@ -833,7 +839,8 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
     constructor() {
         super("protos.PipelineConfigs", [
             { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig },
-            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1001, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs {
@@ -854,6 +861,9 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
                 case /* optional bool _is_empty */ 1000:
                     message.IsEmpty = reader.bool();
                     break;
+                case /* optional string _created_by */ 1001:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -872,6 +882,9 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
         /* optional bool _is_empty = 1000; */
         if (message.IsEmpty !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.IsEmpty);
+        /* optional string _created_by = 1001; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1001, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
