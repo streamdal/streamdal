@@ -589,7 +589,8 @@ class SetPipelinesRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.SetPipelinesRequest", [
             { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => sp_common_8.Audience }
+            { no: 2, name: "audience", kind: "message", T: () => sp_common_8.Audience },
+            { no: 100, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -610,6 +611,9 @@ class SetPipelinesRequest$Type extends runtime_5.MessageType {
                 case /* protos.Audience audience */ 2:
                     message.audience = sp_common_8.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
+                case /* optional string _created_by */ 100:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -628,6 +632,9 @@ class SetPipelinesRequest$Type extends runtime_5.MessageType {
         /* protos.Audience audience = 2; */
         if (message.audience)
             sp_common_8.Audience.internalBinaryWrite(message.audience, writer.tag(2, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* optional string _created_by = 100; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(100, runtime_1.WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

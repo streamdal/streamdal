@@ -177,6 +177,12 @@ export interface SetPipelinesRequest {
      * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
+    /**
+     * Used by automation tooling
+     *
+     * @generated from protobuf field: optional string _created_by = 100;
+     */
+    CreatedBy?: string;
 }
 /**
  * @generated from protobuf message protos.PausePipelineRequest

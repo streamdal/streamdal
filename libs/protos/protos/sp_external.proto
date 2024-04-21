@@ -188,6 +188,9 @@ message DeletePipelineRequest {
 message SetPipelinesRequest {
   repeated string pipeline_ids = 1;
   protos.Audience audience = 2;
+
+  // Used by automation tooling
+  optional string _created_by = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message PausePipelineRequest {
