@@ -402,6 +402,10 @@ func UpdateNotificationRequest(req *protos.UpdateNotificationRequest) error {
 		return errors.New(".Notification cannot be nil")
 	}
 
+	if req.Notification.GetId() == "" {
+		return ErrEmptyField("Id")
+	}
+
 	if req.Notification.Name == "" {
 		return ErrEmptyField("Name")
 	}
