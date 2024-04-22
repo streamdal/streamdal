@@ -52,6 +52,9 @@ spec:
                 type: string
               serverAuth:
                 type: string
+            required:g
+            - serverAddress
+            - serverAuth
             type: object
           status:
             description: StreamdalConfigStatus defines the observed state of StreamdalConfig
