@@ -50,7 +50,7 @@ MAIN:
 func (r *StreamdalConfigReconciler) runPeriodicReconcilerIteration() error {
 	llog := log.Log.WithValues("method", "runPeriodicReconcilerIteration")
 
-	llog.Info("Fetching list of CRs")
+	//llog.Info("Fetching list of CRs")
 
 	// Get a list of CR's
 	crs := &crdv1.StreamdalConfigList{}
@@ -59,14 +59,12 @@ func (r *StreamdalConfigReconciler) runPeriodicReconcilerIteration() error {
 		return fmt.Errorf("failed to list StreamdalConfig objects: %s", err)
 	}
 
-	if len(crs.Items) == 0 {
-		llog.Info("No CRs to reconcile")
-		return nil
-	}
+	// Really loud
+	//if len(crs.Items) != 0 {
+	//	llog.Info("Going to reconcile CRs", "numCRs", len(crs.Items))
+	//}
 
-	llog.Info("Going to reconcile CRs", "numCRs", len(crs.Items))
-
-	var numReconciled int
+	var numResourcesReconciled int
 
 	// For each CR, verify the config is correct
 	for _, cr := range crs.Items {
@@ -75,12 +73,28 @@ func (r *StreamdalConfigReconciler) runPeriodicReconcilerIteration() error {
 			return fmt.Errorf("failed to setup reconcile action for CR '%s': %s", cr.Name, err)
 		}
 
-		if _, err := r.handleResources(r.ShutdownCtx, rr); err != nil {
+		_, status, err := r.handleReconcileRequest(r.ShutdownCtx, rr)
+		if err != nil {
 			return fmt.Errorf("failed to handle resources for CR '%s': %s", cr.Name, err)
 		}
 
-		llog.Info("CR reconciled", "crName", cr.Name)
-		numReconciled += 1
+		for _, s := range status {
+			if s.NumCreated != 0 || s.NumUpdated != 0 || s.NumDeleted != 0 {
+				numResourcesReconciled++
+
+				llog.Info("Reconciled resource(s) for CR",
+					"crName", cr.Name,
+					"resource", s.Resource,
+					"numCreated", s.NumCreated,
+					"numUpdated", s.NumUpdated,
+					"numDeleted", s.NumDeleted,
+				)
+			}
+		}
+	}
+
+	if numResourcesReconciled != 0 {
+		llog.Info("Reconciled resources", "numResourcesReconciled", numResourcesReconciled)
 	}
 
 	return nil

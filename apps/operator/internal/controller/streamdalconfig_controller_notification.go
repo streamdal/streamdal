@@ -104,6 +104,10 @@ func (r *StreamdalConfigReconciler) generateNotificationJobs(
 		sc := util.GetNotificationConfigByID(wc.GetId(), serverConfigs)
 
 		switch action {
+		// Treat periodic action as an "update" -- the CR is still there so this
+		// is not a delete.
+		case ReconcileActionPeriodic:
+			fallthrough
 		// If this is an "update", we will create a jobs that contains steps to
 		// ensure the server and CR have the same state.
 		case ReconcileActionUpdate:
@@ -152,7 +156,7 @@ func (r *StreamdalConfigReconciler) generateNotificationJobs(
 	//
 	// NOTE: We only care about this during an "update" action - if we're deleting
 	// the CR, we don't care about what's on the server.
-	if action == ReconcileActionUpdate {
+	if action == ReconcileActionUpdate || action == ReconcileActionPeriodic {
 		for _, sn := range serverConfigs {
 			// If server notification is not defined in CRD - we should delete
 			// it from the server ONLY if it is managed by this k8s operator.

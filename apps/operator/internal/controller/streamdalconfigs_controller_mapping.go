@@ -44,7 +44,7 @@ func (r *StreamdalConfigReconciler) handleMappings(
 	serverCfg *protos.Config,
 ) (*HandleStatus, error) {
 	llog := log.Log.WithValues("method", "handleMappings", "action", rr.Action)
-	llog.Info("Handling mappings for audiences", "numWantedResources", len(wantedCfg.Audiences))
+	// llog.Info("Handling mappings for audiences", "numWantedResources", len(wantedCfg.Audiences))
 
 	status := &HandleStatus{
 		Resource: ResourceTypeMapping,
@@ -168,11 +168,7 @@ func (r *StreamdalConfigReconciler) generateMappingJobs(
 				"audience", serverAudStr)
 		}
 
-		// TODO: Is there anything else to do?
-	}
-
-	if len(jobs) != 0 {
-		llog.Info("Generated mapping jobs", "numJobs", len(jobs))
+		// TODO: Is there anything else that we need to do here?
 	}
 
 	return jobs, nil

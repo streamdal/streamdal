@@ -26,7 +26,7 @@ type AudienceJob struct {
 // exists or doesn't.
 func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *ReconcileRequest, wantedCfg, serverCfg *protos.Config) (*HandleStatus, error) {
 	llog := log.Log.WithValues("method", "handleAudiences", "action", rr.Action)
-	//llog.Info("Handling audiences", "numWantedResources", len(wantedCfg.Audiences))
+	// llog.Info("Handling audiences", "numWantedResources", len(wantedCfg.Audiences))
 
 	status := &HandleStatus{
 		Resource: ResourceTypeAudience,
@@ -94,6 +94,10 @@ func (r *StreamdalConfigReconciler) generateAudienceJobs(
 
 	for _, ca := range crAudiences {
 		switch action {
+		// Treat periodic action as an "update" -- the CR is still there so this
+		// is not a delete.
+		case ReconcileActionPeriodic:
+			fallthrough
 		// If this is an "update", we will create a diff that contains steps to
 		// ensure the server and CR have the same state.
 		case ReconcileActionUpdate:
@@ -119,7 +123,7 @@ func (r *StreamdalConfigReconciler) generateAudienceJobs(
 
 	// Same thing but backwards - if this is an "update", we need to ensure that
 	// server does NOT have audiences that are defined the CR.
-	if action == ReconcileActionUpdate {
+	if action == ReconcileActionUpdate || action == ReconcileActionPeriodic {
 		for _, sa := range serverAudiences {
 			// If server audience is not defined in CRD - we should delete it from
 			// the server ONLY if it is managed by this k8s operator.

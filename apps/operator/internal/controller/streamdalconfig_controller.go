@@ -148,7 +148,7 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, nil
 	}
 
-	result, err := r.handleResources(ctx, rr)
+	result, status, err := r.handleReconcileRequest(ctx, rr)
 	if err != nil {
 		// TODO: llog.Error() should probably be llog.Info() in most cases because
 		// k8s errors are _really_ loud.
@@ -180,7 +180,22 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 		return ctrl.Result{}, nil
 	}
 
-	llog.Info("Reconcile action completed", "action", rr.Action)
+	// llog.Info("Reconcile action completed", "action", rr.Action)
+
+	for _, s := range status {
+		if s.NumCreated != 0 || s.NumUpdated != 0 || s.NumDeleted != 0 {
+			llog.Info("Resource synced",
+				"resource", s.Resource,
+				"created", s.NumCreated,
+				"updated", s.NumUpdated,
+				"deleted", s.NumDeleted,
+			)
+
+			r.Recorder.Event(rr.Config, v1.EventTypeNormal, fmt.Sprintf("Reconcile(): %s synced", s.Resource),
+				fmt.Sprintf("Created: %d Updated: %d Deleted: %d", s.NumCreated, s.NumUpdated, s.NumDeleted))
+		}
+
+	}
 
 	return result, nil
 }
@@ -214,16 +229,27 @@ func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-// handleResources is a helper that will iterate over all resources in the CR
+// handleReconcileRequest is a helper that will iterate over all resources in the CR
 // and execute the appropriate handler method for each resource type.
 //
 // NOTE: The reconciler won't verify whether a given resources sub-resources
 // exist - that is already handled by the server. The operator should only be
 // concerned with ensuring that desired state matches the real state. Anything
 // outside of that is the server's (and user's) responsibility.
-func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *ReconcileRequest) (ctrl.Result, error) {
-	llog := log.Log.WithValues("method", "handleResources")
-	llog.Info("Handling resource in streamdal server", "action", rr.Action)
+func (r *StreamdalConfigReconciler) handleReconcileRequest(
+	ctx context.Context,
+	rr *ReconcileRequest,
+) (ctrl.Result, []HandleStatus, error) {
+	llog := log.Log.WithValues("method", "handleReconcileRequest")
+
+	if rr == nil {
+		return ctrl.Result{}, nil, errors.NewInternalError(fmt.Errorf("no ReconcileRequest provided"))
+	}
+
+	// Make this a bit less loud
+	if rr.Action != ReconcileActionPeriodic {
+		llog.Info("Handling reconcile request", "action", rr.Action)
+	}
 
 	// Add auth metadata to ctx that's used when talking to streamdal grpc api
 	ctx = createCtxWithAuth(ctx, rr.Config.Spec.ServerAuth)
@@ -231,24 +257,26 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 	// Attempt to load server config
 	serverConfig, err := rr.StreamdalGRPCClient.GetConfig(ctx, &protos.GetConfigRequest{})
 	if err != nil {
-		return ctrl.Result{}, fmt.Errorf("failed to get server config: %s", err)
+		return ctrl.Result{}, nil, fmt.Errorf("failed to get server config: %s", err)
 	}
 
 	if err := validate.WantedConfig(serverConfig.Config); err != nil {
 		llog.Error(err, "Failed to validate server config")
-		return ctrl.Result{}, err
+		return ctrl.Result{}, nil, err
 	}
+
+	status := make([]HandleStatus, 0)
 
 	for _, cfgItem := range rr.Config.Spec.Configs {
 		// Attempt to load config in CR / wanted config
 		wantedConfig := &protos.Config{}
 		if err := protojson.Unmarshal([]byte(cfgItem.Config), wantedConfig); err != nil {
-			return ctrl.Result{}, fmt.Errorf("failed to unmarshal wanted config '%s': %s", cfgItem.Name, err)
+			return ctrl.Result{}, nil, fmt.Errorf("failed to unmarshal wanted config '%s': %s", cfgItem.Name, err)
 		}
 
 		if err := validate.WantedConfig(wantedConfig); err != nil {
 			llog.Error(err, fmt.Sprintf("Failed to validate wanted config '%s'", cfgItem.Name))
-			return ctrl.Result{}, err
+			return ctrl.Result{}, nil, err
 		}
 
 		// NOTE: Pipelines should be handled last as they will reference other resources
@@ -283,22 +311,16 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 
 		for _, f := range handleFuncs {
 			// llog.Info("Running handle function", "resource", f.Resource)
-			status, err := f.Function(ctx, rr, wantedConfig, serverConfig.Config)
+			tmpStatus, err := f.Function(ctx, rr, wantedConfig, serverConfig.Config)
 			if err != nil {
-				return ctrl.Result{}, fmt.Errorf("failed to handle resource '%s': %s", f.Resource, err)
+				return ctrl.Result{}, nil, fmt.Errorf("failed to handle resource '%s': %s", f.Resource, err)
 			}
 
-			if status.NumCreated != 0 || status.NumUpdated != 0 || status.NumDeleted != 0 {
-				llog.Info("Handler for resource completed", "resource", f.Resource,
-					"numCreated", status.NumCreated,
-					"numUpdated", status.NumUpdated,
-					"numDeleted", status.NumDeleted,
-				)
-			}
+			status = append(status, *tmpStatus)
 		}
 	}
 
-	return ctrl.Result{}, nil
+	return ctrl.Result{}, status, nil
 }
 
 // setupReconcileAction will validate the request, determine the type of action
@@ -369,13 +391,13 @@ func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, re
 // addFinalizer adds the streamdal-operator finalizer to the CR; won't add a new
 // entry if finalizer already present.
 func (r *StreamdalConfigReconciler) addFinalizer(ctx context.Context, rr *ReconcileRequest) error {
-	llog := log.Log.WithValues("method", "addFinalizer")
-	llog.Info("Adding finalizer")
+	//llog := log.Log.WithValues("method", "addFinalizer")
+	//llog.Info("Adding finalizer")
 
 	// Don't add finalizer if it already exists
 	for _, f := range rr.Config.GetFinalizers() {
 		if f == FinalizerName {
-			llog.Info("Finalizer already exists, nothing to do")
+			//llog.Info("Finalizer already exists, nothing to do")
 			return nil
 		}
 	}
