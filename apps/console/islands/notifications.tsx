@@ -5,6 +5,7 @@ import {
   NotificationType,
 } from "streamdal-protos/protos/sp_notify.ts";
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
+import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { initFlowBite } from "../components/flowbite/init.tsx";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
@@ -74,7 +75,7 @@ export default function Notifications(
                   f-partial="/partials/notifications/add"
                   data-tooltip-target="notification-add"
                 >
-                  <img src="/images/plus.svg" class="w-[20px]" />
+                  <IconPlus class="w-6 h-6 pointer-events-none" />
                 </a>
                 <Tooltip
                   targetId="notification-add"

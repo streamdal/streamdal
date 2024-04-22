@@ -9,6 +9,7 @@ import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.
 
 import * as uuid from "$std/uuid/mod.ts";
 import { initFlowbite } from "https://esm.sh/v132/flowbite@1.7.0/denonext/flowbite.mjs";
+import { FormStringKV } from "root/components/form/formStringKV.tsx";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
@@ -40,8 +41,8 @@ import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { PipelineHTTP } from "./pipelineHTTP.tsx";
 import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
 import { PipelineTransform } from "./pipelineTransform.tsx";
-import { FormStringKV } from "root/components/form/formStringKV.tsx";
-import { logFormData } from "root/lib/utils.ts";
+
+import IconX from "tabler-icons/tsx/x.tsx";
 
 export default function PipelineDetail({
   pipeline,
@@ -63,7 +64,7 @@ export default function PipelineDetail({
   useEffect(() => {
     setData({
       ...pipeline,
-      steps: pipeline.steps.map((s: PipelineStep, i) => ({
+      steps: pipeline?.steps?.map((s: PipelineStep, i) => ({
         ...s,
         dragId: uuid.v1.generate(),
         dragOrder: i,
@@ -102,7 +103,6 @@ export default function PipelineDetail({
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
-    logFormData(formData);
 
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
@@ -164,7 +164,7 @@ export default function PipelineDetail({
           </div>
           <div class="ml-2">
             <a href="/" f-partial="/partials">
-              <img src="/images/x.svg" className="w-[14px]" />
+              <IconX class="w-6 h-6 pointer-events-none" />
             </a>
           </div>
         </div>
