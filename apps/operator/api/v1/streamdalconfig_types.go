@@ -20,18 +20,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // StreamdalConfigSpec defines the desired state of StreamdalConfig
 type StreamdalConfigSpec struct {
-	ServerAddress string       `json:"serverAddress,omitempty"`
-	ServerAuth    string       `json:"serverAuth,omitempty"`
-	Configs       []ConfigItem `json:"configs,omitempty"`
+	// +kubebuilder:validation:Required
+	ServerAddress string `json:"serverAddress"`
+
+	// +kubebuilder:validation:Required
+	ServerAuth string `json:"serverAuth"`
+
+	Configs []ConfigItem `json:"configs,omitempty"`
 }
 
 type ConfigItem struct {
-	Name   string `json:"name,omitempty"`
+	// +kubebuilder:validation:Required
+	Name string `json:"name,omitempty"`
+
+	// +kubebuilder:validation:Required
 	Config string `json:"config,omitempty"`
 }
 
