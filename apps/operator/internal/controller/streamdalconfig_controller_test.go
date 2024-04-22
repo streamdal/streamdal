@@ -47,11 +47,15 @@ var _ = Describe("StreamdalConfig Controller", func() {
 			err := k8sClient.Get(ctx, typeNamespacedName, streamdalconfig)
 			if err != nil && errors.IsNotFound(err) {
 				resource := &crdv1.StreamdalConfig{
+					TypeMeta: metav1.TypeMeta{},
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      resourceName,
 						Namespace: "default",
 					},
-					// TODO(user): Specify other spec details if needed.
+					Spec: crdv1.StreamdalConfigSpec{
+						ServerAddress: "localhost:8082",
+						ServerAuth:    "1234",
+					},
 				}
 				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
 			}
