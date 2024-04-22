@@ -5,13 +5,14 @@ import { newPipeline } from "root/components/pipeline/pipeline.ts";
 import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
+import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { initFlowBite } from "../components/flowbite/init.tsx";
 import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import PipelineDetail from "./pipeline.tsx";
 
-const Pipelines = (
+export default function Pipelines(
   { id, pipelines, notifications, success, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
@@ -19,7 +20,7 @@ const Pipelines = (
     success?: SuccessType;
     add?: boolean;
   },
-) => {
+) {
   //
   // wrapper supports adding a new entry
   const wrapper = [
@@ -60,7 +61,7 @@ const Pipelines = (
                   f-partial="/partials/pipelines/add"
                   data-tooltip-target="pipeline-add"
                 >
-                  <img src="/images/plus.svg" class="w-[20px]" />
+                  <IconPlus class="w-6 h-6 pointer-events-none" />
                 </a>
                 <Tooltip
                   targetId="pipeline-add"
@@ -79,7 +80,9 @@ const Pipelines = (
                   >
                     {p.name}
                     {selected === i &&
-                      <IconPencil class="w-4 h-4 text-web" />}
+                      (
+                        <IconPencil class="w-4 h-4 text-web pointer-events-none" />
+                      )}
                   </div>
                 </a>
               ))}
@@ -96,6 +99,4 @@ const Pipelines = (
       <Toast id="pipeline" />
     </>
   );
-};
-
-export default Pipelines;
+}

@@ -9,6 +9,7 @@ import {
   NotificationPagerDuty_Urgency,
   NotificationType,
 } from "streamdal-protos/protos/sp_notify.ts";
+import IconX from "tabler-icons/tsx/x.tsx";
 import { FormBoolean } from "../components/form/formBoolean.tsx";
 import { FormHidden } from "../components/form/formHidden.tsx";
 import { FormInput } from "../components/form/formInput.tsx";
@@ -74,7 +75,7 @@ export default function NotificationDetail({
           </div>
           <div>
             <a href="/" f-partial="/partials">
-              <img src="/images/x.svg" className="w-[14px]" />
+              <IconX class="w-6 h-6 pointer-events-none" />
             </a>
           </div>
         </div>
