@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -38,12 +39,15 @@ import (
 )
 
 const (
-	FinalizerName = "streamdal.com/finalizer"
-	CreatedBy     = "streamdal-operator"
+	FinalizerName                     = "streamdal.com/finalizer"
+	CreatedBy                         = "streamdal-operator"
+	PeriodicReconcilerIntervalEnvVar  = "PERIODIC_RECONCILER_INTERVAL"
+	DefaultPeriodicReconcilerInterval = 10 * time.Second
 
-	ReconcileActionCreate ReconcileAction = "create"
-	ReconcileActionUpdate ReconcileAction = "update"
-	ReconcileActionDelete ReconcileAction = "delete"
+	ReconcileActionCreate   ReconcileAction = "create"
+	ReconcileActionUpdate   ReconcileAction = "update"
+	ReconcileActionDelete   ReconcileAction = "delete"
+	ReconcileActionPeriodic ReconcileAction = "periodic"
 
 	ResourceTypeAudience     ResourceType = "audience"
 	ResourceTypeNotification ResourceType = "notification"
@@ -60,14 +64,17 @@ type StreamdalConfigReconciler struct {
 
 	// Used by periodic reconciler to detect shutdown
 	ShutdownCtx context.Context
+
+	// How often the periodic reconciler should run
+	periodicReconcilerInterval time.Duration
 }
 
 // ReconcileRequest represents a request from K8S to reconcile a StreamdalConfig.
 // This type will have Action set to either UPDATE or DELETE.
 type ReconcileRequest struct {
-	Action ReconcileAction
-	Config *crdv1.StreamdalConfig
-	Client protos.ExternalClient
+	Action              ReconcileAction
+	Config              *crdv1.StreamdalConfig
+	StreamdalGRPCClient protos.ExternalClient
 }
 
 type ReconcileAction string
@@ -180,9 +187,23 @@ func (r *StreamdalConfigReconciler) Reconcile(ctx context.Context, req ctrl.Requ
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *StreamdalConfigReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	// Figure out how often the periodic reconciler should run
+	intervalStr := os.Getenv(PeriodicReconcilerIntervalEnvVar)
+
+	if intervalStr == "" {
+		r.periodicReconcilerInterval = DefaultPeriodicReconcilerInterval
+	} else {
+		interval, err := time.ParseDuration(intervalStr)
+		if err != nil {
+			return fmt.Errorf("failed to parse %s: %s", PeriodicReconcilerIntervalEnvVar, err)
+		}
+
+		r.periodicReconcilerInterval = interval
+	}
+
 	// Launch periodic reconciler
 	llog := log.Log.WithValues("method", "SetupWithManager")
-	llog.Info("Starting periodic reconciler")
+	llog.Info("Starting periodic reconciler", "interval", r.periodicReconcilerInterval)
 
 	r.Recorder = mgr.GetEventRecorderFor("streamdal-operator")
 
@@ -208,7 +229,7 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 	ctx = createCtxWithAuth(ctx, rr.Config.Spec.ServerAuth)
 
 	// Attempt to load server config
-	serverConfig, err := rr.Client.GetConfig(ctx, &protos.GetConfigRequest{})
+	serverConfig, err := rr.StreamdalGRPCClient.GetConfig(ctx, &protos.GetConfigRequest{})
 	if err != nil {
 		return ctrl.Result{}, fmt.Errorf("failed to get server config: %s", err)
 	}
@@ -255,23 +276,25 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 
 			// Audience <-> pipeline mapping
 			{
-				Resource: "audience <-> pipeline mappings",
+				Resource: ResourceTypeMapping,
 				Function: r.handleMappings,
 			},
 		}
 
 		for _, f := range handleFuncs {
-			llog.Info("Running handle function", "resource", f.Resource)
+			// llog.Info("Running handle function", "resource", f.Resource)
 			status, err := f.Function(ctx, rr, wantedConfig, serverConfig.Config)
 			if err != nil {
 				return ctrl.Result{}, fmt.Errorf("failed to handle resource '%s': %s", f.Resource, err)
 			}
 
-			llog.Info("Handler for resource completed", "resource", f.Resource,
-				"numCreated", status.NumCreated,
-				"numUpdated", status.NumUpdated,
-				"numDeleted", status.NumDeleted,
-			)
+			if status.NumCreated != 0 || status.NumUpdated != 0 || status.NumDeleted != 0 {
+				llog.Info("Handler for resource completed", "resource", f.Resource,
+					"numCreated", status.NumCreated,
+					"numUpdated", status.NumUpdated,
+					"numDeleted", status.NumDeleted,
+				)
+			}
 		}
 	}
 
@@ -280,20 +303,40 @@ func (r *StreamdalConfigReconciler) handleResources(ctx context.Context, rr *Rec
 
 // setupReconcileAction will validate the request, determine the type of action
 // it is (create or delete) and create a grpc client that can be used for talking
-// to the streamdal server. NOTE: Both "create" and "update" should be handled
-// by the update action.
-func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, req *ctrl.Request) (*ReconcileRequest, error) {
-	var cfg crdv1.StreamdalConfig
+// to the streamdal server.
+//
+// NOTE: This method is used for both setting up a reconcile action for requests
+// originating from the main reconcile event loop (ie. Reconcile()) and for the
+// periodic reconciler. Reconcile() will pass a request while the periodic reconciler
+// will pass nil and pass a CR as a vararg.
+func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, req *ctrl.Request, cfgs ...*crdv1.StreamdalConfig) (*ReconcileRequest, error) {
+	if req == nil && len(cfgs) == 0 {
+		return nil, errors.NewInternalError(fmt.Errorf("no request or CRs provided"))
+	}
 
-	if err := r.Get(ctx, req.NamespacedName, &cfg); err != nil {
-		return nil, fmt.Errorf("unable to fetch StreamdalConfig object: %w", err)
+	var cfg *crdv1.StreamdalConfig
+
+	// We were either called from reconcile event loop or from periodic reconciler.
+	// Periodic reconciler will NOT pass a request, so we
+	if req != nil {
+		cfg = &crdv1.StreamdalConfig{}
+
+		if err := r.Get(ctx, req.NamespacedName, cfg); err != nil {
+			return nil, fmt.Errorf("unable to fetch StreamdalConfig object: %w", err)
+		}
+	} else {
+		if len(cfgs) != 0 {
+			cfg = cfgs[0]
+		} else {
+			return nil, fmt.Errorf("cfgs do not contain a StreamdalConfig object")
+		}
 	}
 
 	reconcileAction := &ReconcileRequest{
-		Config: &cfg,
+		Config: cfg,
 	}
 
-	if err := validate.StreamdalConfig(&cfg); err != nil {
+	if err := validate.StreamdalConfig(cfg); err != nil {
 		return reconcileAction, errors.NewInternalError(fmt.Errorf("invalid streamdal config: %s", err))
 	}
 
@@ -304,15 +347,21 @@ func (r *StreamdalConfigReconciler) setupReconcileAction(ctx context.Context, re
 		return reconcileAction, errors.NewInternalError(fmt.Errorf("unable to create grpc client: %s", err))
 	}
 
-	reconcileAction.Client = grpcClient
+	reconcileAction.StreamdalGRPCClient = grpcClient
 
 	if cfg.DeletionTimestamp != nil {
 		reconcileAction.Action = ReconcileActionDelete
 		return reconcileAction, nil
 	}
 
-	// Not a delete - either a create or an update
-	reconcileAction.Action = ReconcileActionUpdate
+	// Setup request came from reconcile event loop
+	if req != nil {
+		// Not a delete - either a create or an update
+		reconcileAction.Action = ReconcileActionUpdate
+	} else {
+		// Setup request came from periodic reconciler
+		reconcileAction.Action = ReconcileActionPeriodic
+	}
 
 	return reconcileAction, nil
 }
@@ -361,48 +410,6 @@ func (r *StreamdalConfigReconciler) removeFinalizer(ctx context.Context, rr *Rec
 	}
 
 	return nil
-}
-
-// runPeriodicReconciler is intended to be ran as a goroutine, started at operator
-// startup. It will run every DefaultReconcileInterval or CR.periodicReconcilerInterval
-// (if set).
-//
-// The periodic reconciler is designed to periodically check and ensure that
-// the state of a system aligns with its desired state. It automatically
-// corrects discrepancies by triggering necessary updates or fixes. This
-// mechanism is essential for maintaining system integrity and reliability over
-// time.
-//
-// A periodic reconciler is needed in addition to the regular reconcile loop to
-// handle cases where external changes or system errors might not trigger events
-// detected by the regular loop. For example: someone manually removed a config
-// entry in the streamdal server via the UI - the periodic reconciler would detect
-// the discrepancy and correct it by re-adding the config entry.
-func (r *StreamdalConfigReconciler) runPeriodicReconciler() {
-	// TODO: No need to catch shutdown (so far)
-	llog := log.Log.WithValues("method", "runPeriodicReconciler")
-	llog.Info("Starting")
-
-	// TODO: How do we know what streamdal server to talk to?
-	// IDEA: What if we look through all K8S objects and look for streamdal servers?
-	// ^ Not a good idea - maybe we don't want to have some streamdal servers be
-	// managed by the K8S operator.
-	// IDEA 2: As resources are created, k8s operator adds the server to a map
-	// of "known servers".
-
-MAIN:
-	for {
-		select {
-		case <-r.ShutdownCtx.Done():
-			llog.Info("Caught shutdown signal - stopping")
-			break MAIN
-		default:
-			llog.Info("Run")
-			time.Sleep(3 * time.Second)
-		}
-	}
-
-	llog.Info("Stopped")
 }
 
 // Helper for creating a ctx used for making auth'd grpc calls to the streamdal server

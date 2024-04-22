@@ -26,7 +26,7 @@ type AudienceJob struct {
 // exists or doesn't.
 func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *ReconcileRequest, wantedCfg, serverCfg *protos.Config) (*HandleStatus, error) {
 	llog := log.Log.WithValues("method", "handleAudiences", "action", rr.Action)
-	llog.Info("Handling audiences", "numWantedResources", len(wantedCfg.Audiences))
+	//llog.Info("Handling audiences", "numWantedResources", len(wantedCfg.Audiences))
 
 	status := &HandleStatus{
 		Resource: ResourceTypeAudience,
@@ -35,14 +35,16 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 
 	jobs := r.generateAudienceJobs(rr.Action, wantedCfg.Audiences, serverCfg.Audiences)
 
-	llog.Info("Generated audience jobs", "numGenerated", len(jobs))
+	if len(jobs) != 0 {
+		llog.Info("Generated audience jobs", "numGenerated", len(jobs))
+	}
 
 	var err error
 
 	for _, j := range jobs {
 		switch j.ServerAction {
 		case ReconcileActionUpdate:
-			_, err = rr.Client.CreateAudience(ctx, &protos.CreateAudienceRequest{
+			_, err = rr.StreamdalGRPCClient.CreateAudience(ctx, &protos.CreateAudienceRequest{
 				Audience: j.Audience,
 			})
 
@@ -50,7 +52,7 @@ func (r *StreamdalConfigReconciler) handleAudiences(ctx context.Context, rr *Rec
 				status.NumCreated++
 			}
 		case ReconcileActionDelete:
-			_, err = rr.Client.DeleteAudience(ctx, &protos.DeleteAudienceRequest{
+			_, err = rr.StreamdalGRPCClient.DeleteAudience(ctx, &protos.DeleteAudienceRequest{
 				Audience: j.Audience,
 				Force:    proto.Bool(true), // This will delete the audience <-> pipeline mapping (if it has any)
 			})

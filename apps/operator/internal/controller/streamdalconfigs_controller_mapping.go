@@ -57,19 +57,15 @@ func (r *StreamdalConfigReconciler) handleMappings(
 
 	}
 
-	if len(jobs) == 0 {
-		llog.Info("No mapping jobs to process")
-		return status, nil
-
+	if len(jobs) != 0 {
+		llog.Info("Generated mapping jobs", "numGenerated", len(jobs))
 	}
-
-	llog.Info("Generated mapping jobs", "numGenerated", len(jobs))
 
 	// Since there is no "update" or "delete" - we will just roll through our jobs
 	// and set the mapping.
 
 	for _, j := range jobs {
-		if _, err := rr.Client.SetPipelines(ctx, &protos.SetPipelinesRequest{
+		if _, err := rr.StreamdalGRPCClient.SetPipelines(ctx, &protos.SetPipelinesRequest{
 			Audience:    j.Audience,
 			PipelineIds: j.PipelineIDs,
 			XCreatedBy:  proto.String(CreatedBy),

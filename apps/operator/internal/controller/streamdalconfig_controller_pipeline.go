@@ -28,7 +28,7 @@ func (r *StreamdalConfigReconciler) handlePipelines(
 	serverCfg *protos.Config,
 ) (*HandleStatus, error) {
 	llog := log.Log.WithValues("method", "handlePipelines", "action", rr.Action)
-	llog.Info("Handling pipelines", "numWantedResources", len(wantedCfg.Pipelines))
+	//llog.Info("Handling pipelines", "numWantedResources", len(wantedCfg.Pipelines))
 
 	status := &HandleStatus{
 		Resource: ResourceTypePipeline,
@@ -37,14 +37,16 @@ func (r *StreamdalConfigReconciler) handlePipelines(
 
 	jobs := r.generatePipelineJobs(rr.Action, wantedCfg.Pipelines, serverCfg.Pipelines)
 
-	llog.Info("Generated pipeline jobs", "numGenerated", len(jobs))
+	if len(jobs) != 0 {
+		llog.Info("Generated pipeline jobs", "numGenerated", len(jobs))
+	}
 
 	var err error
 
 	for _, j := range jobs {
 		switch j.ServerAction {
 		case ReconcileActionCreate:
-			_, err := rr.Client.CreatePipeline(ctx, &protos.CreatePipelineRequest{
+			_, err := rr.StreamdalGRPCClient.CreatePipeline(ctx, &protos.CreatePipelineRequest{
 				Pipeline: j.Pipeline,
 			})
 
@@ -52,7 +54,7 @@ func (r *StreamdalConfigReconciler) handlePipelines(
 				status.NumCreated++
 			}
 		case ReconcileActionUpdate:
-			_, err = rr.Client.UpdatePipeline(ctx, &protos.UpdatePipelineRequest{
+			_, err = rr.StreamdalGRPCClient.UpdatePipeline(ctx, &protos.UpdatePipelineRequest{
 				Pipeline: j.Pipeline,
 			})
 
@@ -60,7 +62,7 @@ func (r *StreamdalConfigReconciler) handlePipelines(
 				status.NumUpdated++
 			}
 		case ReconcileActionDelete:
-			_, err = rr.Client.DeletePipeline(ctx, &protos.DeletePipelineRequest{
+			_, err = rr.StreamdalGRPCClient.DeletePipeline(ctx, &protos.DeletePipelineRequest{
 				PipelineId: j.Pipeline.GetId(),
 			})
 

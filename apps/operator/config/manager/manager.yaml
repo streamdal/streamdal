@@ -98,5 +98,8 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        env:
+          - name: PERIODIC_REONCILER_INTERVAL
+            value: 10s
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10

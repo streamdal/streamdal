@@ -28,7 +28,7 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 	serverCfg *protos.Config,
 ) (*HandleStatus, error) {
 	llog := log.Log.WithValues("method", "handleNotifications", "action", rr.Action)
-	llog.Info("Handling notifications", "numWantedResources", len(wantedCfg.Notifications))
+	//llog.Info("Handling notifications", "numWantedResources", len(wantedCfg.Notifications))
 
 	status := &HandleStatus{
 		Resource: ResourceTypeNotification,
@@ -37,14 +37,16 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 
 	jobs := r.generateNotificationJobs(rr.Action, wantedCfg.Notifications, serverCfg.Notifications)
 
-	llog.Info("Generated notification jobs", "numGenerated", len(jobs))
+	if len(jobs) != 0 {
+		llog.Info("Generated notification jobs", "numGenerated", len(jobs))
+	}
 
 	var err error
 
 	for _, j := range jobs {
 		switch j.ServerAction {
 		case ReconcileActionCreate:
-			_, err := rr.Client.CreateNotification(ctx, &protos.CreateNotificationRequest{
+			_, err := rr.StreamdalGRPCClient.CreateNotification(ctx, &protos.CreateNotificationRequest{
 				Notification: j.Notification,
 			})
 
@@ -52,7 +54,7 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 				status.NumCreated++
 			}
 		case ReconcileActionUpdate:
-			_, err = rr.Client.UpdateNotification(ctx, &protos.UpdateNotificationRequest{
+			_, err = rr.StreamdalGRPCClient.UpdateNotification(ctx, &protos.UpdateNotificationRequest{
 				Notification: j.Notification,
 			})
 
@@ -60,7 +62,7 @@ func (r *StreamdalConfigReconciler) handleNotifications(
 				status.NumUpdated++
 			}
 		case ReconcileActionDelete:
-			_, err = rr.Client.DeleteNotification(ctx, &protos.DeleteNotificationRequest{
+			_, err = rr.StreamdalGRPCClient.DeleteNotification(ctx, &protos.DeleteNotificationRequest{
 				// TODO: This should delete by ID and actual config at some point
 				NotificationId: j.Notification.GetId(),
 			})
