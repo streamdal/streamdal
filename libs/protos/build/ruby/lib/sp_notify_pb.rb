@@ -9,6 +9,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       proto3_optional :id, :string, 1
       optional :name, :string, 2
       optional :type, :enum, 3, "protos.NotificationType"
+      proto3_optional :_created_by, :string, 10000
       oneof :config do
         optional :slack, :message, 1000, "protos.NotificationSlack"
         optional :email, :message, 1001, "protos.NotificationEmail"

@@ -3,6 +3,10 @@
 
 require 'google/protobuf'
 
+require 'shared/sp_shared_pb'
+require 'sp_notify_pb'
+require 'sp_pipeline_pb'
+
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("sp_common.proto", :syntax => :proto3) do
     add_message "protos.StandardResponse" do
@@ -15,6 +19,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :component_name, :string, 2
       optional :operation_type, :enum, 3, "protos.OperationType"
       optional :operation_name, :string, 4
+      proto3_optional :_created_by, :string, 1000
     end
     add_message "protos.Metric" do
       optional :name, :string, 1
@@ -55,6 +60,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :sample_rate, :uint32, 1
       optional :sample_interval_seconds, :uint32, 2
     end
+    add_message "protos.Config" do
+      repeated :audiences, :message, 1, "protos.Audience"
+      repeated :pipelines, :message, 2, "protos.Pipeline"
+      repeated :notifications, :message, 3, "protos.NotificationConfig"
+      repeated :wasm_modules, :message, 4, "protos.shared.WasmModule"
+      map :audience_mappings, :string, :message, 5, "protos.PipelineConfigs"
+    end
     add_enum "protos.ResponseCode" do
       value :RESPONSE_CODE_UNSET, 0
       value :RESPONSE_CODE_OK, 1
@@ -93,6 +105,7 @@ module Streamdal
     AudienceRate = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.AudienceRate").msgclass
     Schema = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.Schema").msgclass
     SampleOptions = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.SampleOptions").msgclass
+    Config = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.Config").msgclass
     ResponseCode = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.ResponseCode").enummodule
     OperationType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.OperationType").enummodule
     TailResponseType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.TailResponseType").enummodule

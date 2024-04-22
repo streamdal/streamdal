@@ -17,6 +17,8 @@ module Streamdal
 
         # Returns all data needed for UI; called on initial console load
         rpc :GetAll, ::Streamdal::Protos::GetAllRequest, ::Streamdal::Protos::GetAllResponse
+        # Returns the current _full_ configuration of the server
+        rpc :GetConfig, ::Streamdal::Protos::GetConfigRequest, ::Streamdal::Protos::GetConfigResponse
         # Used by console to stream updates to UI; called after initial GetAll()
         rpc :GetAllStream, ::Streamdal::Protos::GetAllRequest, stream(::Streamdal::Protos::GetAllResponse)
         # Returns pipelines (_wasm_bytes field is stripped)
@@ -48,7 +50,7 @@ module Streamdal
         rpc :AttachNotification, ::Streamdal::Protos::AttachNotificationRequest, ::Streamdal::Protos::StandardResponse
         # Detach a notification config from a pipeline
         rpc :DetachNotification, ::Streamdal::Protos::DetachNotificationRequest, ::Streamdal::Protos::StandardResponse
-        # Create an audience. Used for terraform purposes
+        # Create an audience. Used for automation tooling (terraform, k8s cr's)
         rpc :CreateAudience, ::Streamdal::Protos::CreateAudienceRequest, ::Streamdal::Protos::StandardResponse
         # Delete an audience
         rpc :DeleteAudience, ::Streamdal::Protos::DeleteAudienceRequest, ::Streamdal::Protos::StandardResponse
@@ -65,6 +67,13 @@ module Streamdal
         rpc :AppRegister, ::Streamdal::Protos::AppRegistrationRequest, ::Streamdal::Protos::StandardResponse
         rpc :AppVerifyRegistration, ::Streamdal::Protos::AppVerifyRegistrationRequest, ::Streamdal::Protos::StandardResponse
         rpc :AppRegisterReject, ::Streamdal::Protos::AppRegisterRejectRequest, ::Streamdal::Protos::StandardResponse
+        # BEGIN Wasm methods
+        rpc :GetWasm, ::Streamdal::Protos::GetWasmRequest, ::Streamdal::Protos::GetWasmResponse
+        rpc :GetAllWasm, ::Streamdal::Protos::GetAllWasmRequest, ::Streamdal::Protos::GetAllWasmResponse
+        rpc :CreateWasm, ::Streamdal::Protos::CreateWasmRequest, ::Streamdal::Protos::CreateWasmResponse
+        rpc :UpdateWasm, ::Streamdal::Protos::UpdateWasmRequest, ::Streamdal::Protos::StandardResponse
+        rpc :DeleteWasm, ::Streamdal::Protos::DeleteWasmRequest, ::Streamdal::Protos::StandardResponse
+        # END Wasm methods
         # Test method
         rpc :Test, ::Streamdal::Protos::TestRequest, ::Streamdal::Protos::TestResponse
       end

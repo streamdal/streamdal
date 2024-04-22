@@ -6,7 +6,7 @@ require 'google/protobuf'
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("steps/sp_steps_custom.proto", :syntax => :proto3) do
     add_message "protos.steps.CustomStep" do
-      optional :id, :string, 1
+      map :args, :string, :string, 1
     end
   end
 end

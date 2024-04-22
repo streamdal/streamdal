@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'shared/sp_shared_pb'
 require 'sp_common_pb'
 require 'sp_info_pb'
 require 'sp_notify_pb'
@@ -33,6 +34,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "protos.CreatePipelineRequest" do
       optional :pipeline, :message, 1, "protos.Pipeline"
+      proto3_optional :pipeline_json, :bytes, 2
     end
     add_message "protos.CreatePipelineResponse" do
       optional :message, :string, 1
@@ -40,6 +42,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "protos.UpdatePipelineRequest" do
       optional :pipeline, :message, 1, "protos.Pipeline"
+      proto3_optional :pipeline_json, :bytes, 2
     end
     add_message "protos.DeletePipelineRequest" do
       optional :pipeline_id, :string, 1
@@ -48,6 +51,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "protos.SetPipelinesRequest" do
       repeated :pipeline_ids, :string, 1
       optional :audience, :message, 2, "protos.Audience"
+      proto3_optional :_created_by, :string, 100
     end
     add_message "protos.PausePipelineRequest" do
       optional :pipeline_id, :string, 1
@@ -147,11 +151,40 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "protos.ResumeTailRequest" do
       optional :tail_id, :string, 1
     end
+    add_message "protos.GetWasmRequest" do
+      optional :id, :string, 1
+    end
+    add_message "protos.GetWasmResponse" do
+      optional :wasm, :message, 1, "protos.shared.WasmModule"
+    end
+    add_message "protos.GetAllWasmRequest" do
+    end
+    add_message "protos.GetAllWasmResponse" do
+      repeated :wasm, :message, 1, "protos.shared.WasmModule"
+    end
+    add_message "protos.CreateWasmRequest" do
+      optional :wasm, :message, 1, "protos.shared.WasmModule"
+    end
+    add_message "protos.CreateWasmResponse" do
+      optional :message, :string, 1
+      optional :id, :string, 2
+    end
+    add_message "protos.UpdateWasmRequest" do
+      optional :wasm, :message, 1, "protos.shared.WasmModule"
+    end
+    add_message "protos.DeleteWasmRequest" do
+      repeated :ids, :string, 1
+    end
     add_message "protos.TestRequest" do
       optional :input, :string, 1
     end
     add_message "protos.TestResponse" do
       optional :output, :string, 2
+    end
+    add_message "protos.GetConfigRequest" do
+    end
+    add_message "protos.GetConfigResponse" do
+      optional :config, :message, 1, "protos.Config"
     end
   end
 end
@@ -198,7 +231,17 @@ module Streamdal
     AppRegisterRejectRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.AppRegisterRejectRequest").msgclass
     PauseTailRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PauseTailRequest").msgclass
     ResumeTailRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.ResumeTailRequest").msgclass
+    GetWasmRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetWasmRequest").msgclass
+    GetWasmResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetWasmResponse").msgclass
+    GetAllWasmRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetAllWasmRequest").msgclass
+    GetAllWasmResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetAllWasmResponse").msgclass
+    CreateWasmRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.CreateWasmRequest").msgclass
+    CreateWasmResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.CreateWasmResponse").msgclass
+    UpdateWasmRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.UpdateWasmRequest").msgclass
+    DeleteWasmRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.DeleteWasmRequest").msgclass
     TestRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.TestRequest").msgclass
     TestResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.TestResponse").msgclass
+    GetConfigRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetConfigRequest").msgclass
+    GetConfigResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.GetConfigResponse").msgclass
   end
 end
