@@ -1,23 +1,17 @@
 import { useState } from "preact/hooks";
 import { FormInput } from "../components/form/formInput.tsx";
-import { zfd } from "zod-form-data";
-import * as z from "zod/index.ts";
-import { validate } from "../components/form/validate.ts";
 
-export const EmailSchema = zfd.formData({
-  email: z.string().min(1, { message: "Required" }).email({
-    message: "Must be a valid email.",
-  }),
-  decline: z.boolean().default(false),
-});
+import { ErrorType, validate } from "../components/form/validate.ts";
+import { EmailSchema } from "../components/account/email.ts";
+
 export const EmailCollectionForm = () => {
-  const [errors, setErrors] = useState<string>("");
+  const [errors, setErrors] = useState<ErrorType | null>(null);
   const [data, setData] = useState("");
 
   const onSubmit = async (e: any) => {
     const emailData = new FormData(e.target);
     const { errors } = validate(EmailSchema, emailData);
-    setErrors(errors || {});
+    errors && setErrors(errors);
 
     if (errors) {
       e.preventDefault();
@@ -49,6 +43,7 @@ export const EmailCollectionForm = () => {
           <p className={"text-center font-normal text-sm w-64 my-6"}>
             Enter your email to receive crow-tastic news and Streamdal updates.
           </p>
+
           <FormInput
             name="email"
             label="Your email"

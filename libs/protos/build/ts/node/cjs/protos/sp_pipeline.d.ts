@@ -24,8 +24,8 @@ import { NotificationConfig } from "./sp_notify";
  */
 export interface Pipeline {
     /**
-     * ID should NOT be set by external gRPC client on CreatePipelineRequest - it
-     * will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+     * If left blank, the server will generate a unique ID. If one is provided,
+     * the server will check if that is ID is already in use when creating a pipeline.
      *
      * @generated from protobuf field: string id = 1;
      */
@@ -76,6 +76,12 @@ export interface Pipeline {
      * @generated from protobuf field: optional int64 _updated_at_unix_ts_utc = 1005;
      */
     UpdatedAtUnixTsUtc?: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1006;
+     */
+    CreatedBy?: string;
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
@@ -310,6 +316,12 @@ export interface PipelineConfigs {
      * @generated from protobuf field: optional bool _is_empty = 1000;
      */
     IsEmpty?: boolean;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource/mapping
+     *
+     * @generated from protobuf field: optional string _created_by = 1001;
+     */
+    CreatedBy?: string;
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs

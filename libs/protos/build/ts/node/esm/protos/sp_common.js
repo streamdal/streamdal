@@ -3,6 +3,10 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { PipelineConfigs } from "./sp_pipeline.js";
+import { WasmModule } from "./shared/sp_shared.js";
+import { NotificationConfig } from "./sp_notify.js";
+import { Pipeline } from "./sp_pipeline.js";
 /**
  * Common status codes used in gRPC method responses
  *
@@ -167,7 +171,8 @@ class Audience$Type extends MessageType {
             { no: 1, name: "service_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "component_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "operation_type", kind: "enum", T: () => ["protos.OperationType", OperationType, "OPERATION_TYPE_"] },
-            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 4, name: "operation_name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -194,6 +199,9 @@ class Audience$Type extends MessageType {
                 case /* string operation_name */ 4:
                     message.operationName = reader.string();
                     break;
+                case /* optional string _created_by */ 1000:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -218,6 +226,9 @@ class Audience$Type extends MessageType {
         /* string operation_name = 4; */
         if (message.operationName !== "")
             writer.tag(4, WireType.LengthDelimited).string(message.operationName);
+        /* optional string _created_by = 1000; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1000, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -721,3 +732,98 @@ class SampleOptions$Type extends MessageType {
  * @generated MessageType for protobuf message protos.SampleOptions
  */
 export const SampleOptions = new SampleOptions$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Config$Type extends MessageType {
+    constructor() {
+        super("protos.Config", [
+            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience },
+            { no: 2, name: "pipelines", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Pipeline },
+            { no: 3, name: "notifications", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
+            { no: 4, name: "wasm_modules", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => WasmModule },
+            { no: 5, name: "audience_mappings", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "message", T: () => PipelineConfigs } }
+        ]);
+    }
+    create(value) {
+        const message = { audiences: [], pipelines: [], notifications: [], wasmModules: [], audienceMappings: {} };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated protos.Audience audiences */ 1:
+                    message.audiences.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.Pipeline pipelines */ 2:
+                    message.pipelines.push(Pipeline.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.NotificationConfig notifications */ 3:
+                    message.notifications.push(NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated protos.shared.WasmModule wasm_modules */ 4:
+                    message.wasmModules.push(WasmModule.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* map<string, protos.PipelineConfigs> audience_mappings */ 5:
+                    this.binaryReadMap5(message.audienceMappings, reader, options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    binaryReadMap5(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = PipelineConfigs.internalBinaryRead(reader, reader.uint32(), options);
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.Config.audience_mappings");
+            }
+        }
+        map[key !== null && key !== void 0 ? key : ""] = val !== null && val !== void 0 ? val : PipelineConfigs.create();
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated protos.Audience audiences = 1; */
+        for (let i = 0; i < message.audiences.length; i++)
+            Audience.internalBinaryWrite(message.audiences[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Pipeline pipelines = 2; */
+        for (let i = 0; i < message.pipelines.length; i++)
+            Pipeline.internalBinaryWrite(message.pipelines[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.NotificationConfig notifications = 3; */
+        for (let i = 0; i < message.notifications.length; i++)
+            NotificationConfig.internalBinaryWrite(message.notifications[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.shared.WasmModule wasm_modules = 4; */
+        for (let i = 0; i < message.wasmModules.length; i++)
+            WasmModule.internalBinaryWrite(message.wasmModules[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* map<string, protos.PipelineConfigs> audience_mappings = 5; */
+        for (let k of Object.keys(message.audienceMappings)) {
+            writer.tag(5, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k);
+            writer.tag(2, WireType.LengthDelimited).fork();
+            PipelineConfigs.internalBinaryWrite(message.audienceMappings[k], writer, options);
+            writer.join().join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.Config
+ */
+export const Config = new Config$Type();

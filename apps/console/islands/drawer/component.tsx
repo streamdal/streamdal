@@ -1,5 +1,5 @@
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
-import { ComponentImage } from "../customNodes.tsx";
+import { ComponentImage } from "../../components/serviceMap/customNodes.tsx";
 
 export default function Component() {
   return (

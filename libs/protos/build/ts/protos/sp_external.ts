@@ -15,6 +15,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Config } from "./sp_common.js";
 import { WasmModule } from "./shared/sp_shared.js";
 import { Schema } from "./sp_common.js";
 import { AudienceRate } from "./sp_common.js";
@@ -186,6 +187,12 @@ export interface SetPipelinesRequest {
      * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
+    /**
+     * Used by automation tooling
+     *
+     * @generated from protobuf field: optional string _created_by = 100;
+     */
+    CreatedBy?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * @generated from protobuf message protos.PausePipelineRequest
@@ -615,6 +622,22 @@ export interface TestResponse {
      * @generated from protobuf field: string output = 2;
      */
     output: string;
+}
+/**
+ * Nothing needed here
+ *
+ * @generated from protobuf message protos.GetConfigRequest
+ */
+export interface GetConfigRequest {
+}
+/**
+ * @generated from protobuf message protos.GetConfigResponse
+ */
+export interface GetConfigResponse {
+    /**
+     * @generated from protobuf field: protos.Config config = 1;
+     */
+    config?: Config;
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class GetAllRequest$Type extends MessageType<GetAllRequest> {
@@ -1152,7 +1175,8 @@ class SetPipelinesRequest$Type extends MessageType<SetPipelinesRequest> {
     constructor() {
         super("protos.SetPipelinesRequest", [
             { no: 1, name: "pipeline_ids", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "audience", kind: "message", T: () => Audience }
+            { no: 2, name: "audience", kind: "message", T: () => Audience },
+            { no: 100, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<SetPipelinesRequest>): SetPipelinesRequest {
@@ -1173,6 +1197,9 @@ class SetPipelinesRequest$Type extends MessageType<SetPipelinesRequest> {
                 case /* protos.Audience audience */ 2:
                     message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
                     break;
+                case /* optional string _created_by */ 100:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1191,6 +1218,9 @@ class SetPipelinesRequest$Type extends MessageType<SetPipelinesRequest> {
         /* protos.Audience audience = 2; */
         if (message.audience)
             Audience.internalBinaryWrite(message.audience, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* optional string _created_by = 100; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(100, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -3049,11 +3079,85 @@ class TestResponse$Type extends MessageType<TestResponse> {
  * @generated MessageType for protobuf message protos.TestResponse
  */
 export const TestResponse = new TestResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetConfigRequest$Type extends MessageType<GetConfigRequest> {
+    constructor() {
+        super("protos.GetConfigRequest", []);
+    }
+    create(value?: PartialMessage<GetConfigRequest>): GetConfigRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetConfigRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetConfigRequest): GetConfigRequest {
+        return target ?? this.create();
+    }
+    internalBinaryWrite(message: GetConfigRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetConfigRequest
+ */
+export const GetConfigRequest = new GetConfigRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class GetConfigResponse$Type extends MessageType<GetConfigResponse> {
+    constructor() {
+        super("protos.GetConfigResponse", [
+            { no: 1, name: "config", kind: "message", T: () => Config }
+        ]);
+    }
+    create(value?: PartialMessage<GetConfigResponse>): GetConfigResponse {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<GetConfigResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetConfigResponse): GetConfigResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Config config */ 1:
+                    message.config = Config.internalBinaryRead(reader, reader.uint32(), options, message.config);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: GetConfigResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* protos.Config config = 1; */
+        if (message.config)
+            Config.internalBinaryWrite(message.config, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.GetConfigResponse
+ */
+export const GetConfigResponse = new GetConfigResponse$Type();
 /**
  * @generated ServiceType for protobuf service protos.External
  */
 export const External = new ServiceType("protos.External", [
     { name: "GetAll", options: {}, I: GetAllRequest, O: GetAllResponse },
+    { name: "GetConfig", options: {}, I: GetConfigRequest, O: GetConfigResponse },
     { name: "GetAllStream", serverStreaming: true, options: {}, I: GetAllRequest, O: GetAllResponse },
     { name: "GetPipelines", options: {}, I: GetPipelinesRequest, O: GetPipelinesResponse },
     { name: "GetPipeline", options: {}, I: GetPipelineRequest, O: GetPipelineResponse },

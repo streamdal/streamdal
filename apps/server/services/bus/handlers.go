@@ -47,7 +47,7 @@ func (b *Bus) handleUpdatePipelineRequest(ctx context.Context, req *protos.Updat
 		}
 
 		// Send SetPipelines command for session ID
-		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
+		if _, err := b.sendSetPipelinesCommand(ctx, u.Audience, pipelines, u.SessionId); err != nil {
 			llog.Errorf("unable to send SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
@@ -128,7 +128,7 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 		}
 
 		// Send SetPipelines command for session ID
-		if _, err := b.sendSetPipelinesCommand(le.Audience, pipelines, le.SessionID); err != nil {
+		if _, err := b.sendSetPipelinesCommand(ctx, le.Audience, pipelines, le.SessionID); err != nil {
 			llog.Debugf("error sending SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
@@ -158,7 +158,7 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 	}
 
 	// Send empty SetPipelines command to each session
-	if _, err := b.sendSetPipelinesCommand(req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
+	if _, err := b.sendSetPipelinesCommand(ctx, req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
 		llog.Errorf("unable to send SetPipelines command: %v", err)
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
@@ -215,7 +215,7 @@ func (b *Bus) handleSetPipelinesRequest(ctx context.Context, req *protos.SetPipe
 	llog.Debugf("found '%d' active session(s) for audience '%s' on node '%s'", len(sessionIDs), req.Audience, b.options.NodeName)
 
 	// OK we have an active/live audience on this node - send SetPipelines cmd to it
-	numSent, err := b.sendSetPipelinesCommand(req.Audience, pipelines, sessionIDs...)
+	numSent, err := b.sendSetPipelinesCommand(ctx, req.Audience, pipelines, sessionIDs...)
 	if err != nil {
 		llog.Debugf("error sending SetPipelines command: %v", err)
 		return errors.Wrap(err, "error sending SetPipelines command")
@@ -280,7 +280,7 @@ func (b *Bus) handlePausePipelineRequest(ctx context.Context, req *protos.PauseP
 		llog.Debugf("sending SetPipelines command to session id '%s' for audience '%s'",
 			u.SessionId, util.AudienceToStr(u.Audience))
 
-		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
+		if _, err := b.sendSetPipelinesCommand(ctx, u.Audience, pipelines, u.SessionId); err != nil {
 			llog.Errorf("unable to send SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
@@ -320,7 +320,7 @@ func (b *Bus) handleResumePipelineRequest(ctx context.Context, req *protos.Resum
 		llog.Debugf("sending SetPipelines command to session id '%s' for audience '%s'",
 			u.SessionId, util.AudienceToStr(u.Audience))
 
-		if _, err := b.sendSetPipelinesCommand(u.Audience, pipelines, u.SessionId); err != nil {
+		if _, err := b.sendSetPipelinesCommand(ctx, u.Audience, pipelines, u.SessionId); err != nil {
 			llog.Errorf("unable to send SetPipelines command: %v", err)
 			return errors.Wrap(err, "error sending SetPipelines command")
 		}
@@ -439,7 +439,7 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 	}
 
 	// Send SetPipelines command to each session ID
-	if _, err := b.sendSetPipelinesCommand(req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
+	if _, err := b.sendSetPipelinesCommand(ctx, req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
 		llog.Errorf("unable to send SetPipelines command: %v", err)
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
@@ -453,6 +453,7 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 // schema inference pipeline into the list of provided pipelines. Returns
 // number of SetPipelines commands that were sent.
 func (b *Bus) sendSetPipelinesCommand(
+	ctx context.Context,
 	aud *protos.Audience,
 	pipelines []*protos.Pipeline,
 	sessionIDs ...string,
@@ -462,7 +463,7 @@ func (b *Bus) sendSetPipelinesCommand(
 	})
 
 	// Inject schema inference pipeline
-	updatedPipelines, err := util.InjectSchemaInferenceForPipelines(pipelines, b.options.WASMDir)
+	updatedPipelines, err := b.options.WasmService.InjectSchemaInferenceForPipelines(ctx, pipelines)
 	if err != nil {
 		llog.Errorf("error injecting schema inference pipeline: %s", err)
 		return 0, errors.Wrap(err, "error injecting schema inference pipeline")

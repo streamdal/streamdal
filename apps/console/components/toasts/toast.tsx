@@ -23,6 +23,7 @@ export const Toast = ({ id }: { id: string }) => {
   }, 3000);
 
   const { type, message } = toastSignal.value;
+
   return (
     <div class="relative">
       <div

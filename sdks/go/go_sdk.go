@@ -190,6 +190,12 @@ type Config struct {
 	// help the library determine whether ServerURL and ServerToken should be
 	// optional or required. Optional; default: ClientTypeSDK
 	ClientType ClientType
+
+	// EnableStdout enables ability for wasm modules to write to stdout
+	EnableStdout bool
+
+	// EnableStderr enables ability for wasm modules to write to stderr
+	EnableStderr bool
 }
 
 // Audience is used to announce an audience to the Streamdal server on library initialization

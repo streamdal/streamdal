@@ -1,4 +1,5 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
+import { ChangeEvent } from "react";
 
 export type FormInputProps = {
   name: string;
@@ -37,6 +38,7 @@ export const FormTextArea = ({
           {label}
         </label>
       )}
+
       <textarea
         rows={rows}
         id={name}
@@ -47,12 +49,12 @@ export const FormTextArea = ({
           errors[name] ? "streamdalRed" : "border-twilight"
         } ${inputClass}`}
         value={v}
-        onChange={(e) =>
+        onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
           updateData(
             data,
             setData,
             parsePath(name),
-            e.target.value,
+            e.currentTarget.value,
           )}
         placeholder={placeHolder}
       />

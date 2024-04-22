@@ -1,31 +1,38 @@
 import { ConsumerIcon } from "../../components/icons/consumer.tsx";
 import { ProducerIcon } from "../../components/icons/producer.tsx";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
-import { OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { useState } from "preact/hooks";
-import { tailEnabledSignal, tailSamplingSignal, tailSignal } from "./tail.tsx";
-import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
+import {
+  ServiceSignal,
+  serviceSignal,
+} from "../../components/serviceMap/serviceSignal.ts";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
 import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
 import { Schema } from "./schema.tsx";
 import IconEdit from "tabler-icons/tsx/edit.tsx";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { effect } from "@preact/signals";
+import { useSignalEffect } from "@preact/signals";
+import { tailSamplingSignal } from "root/components/tail/signals.ts";
+import { audienceKey } from "../../lib/utils.ts";
+import { tailRunningSignal } from "../../components/tail/signals.ts";
 
 export default function Operation(
-  { serviceMap }: { serviceMap: ServiceSignal },
+  { serviceMap, audience }: { serviceMap: ServiceSignal; audience: Audience },
 ) {
   const [managePipelines, setManagePipelines] = useState(true);
   const [tailNavOpen, setTailNavOpen] = useState(true);
   const [schemaNavOpen, setSchemaNavOpen] = useState(true);
-  const pipelines = Object.values(serviceMap?.pipelines);
+  const [pipelines, setPipelines] = useState(
+    Object.values(serviceMap?.pipelines),
+  );
+  const [clients, setClients] = useState(opModal.value.clients);
+  const key = audienceKey(audience);
 
-  const audience = opModal.value.audience;
-  const clients = opModal.value.clients;
-
-  effect(() => {
-    if (!tailEnabledSignal.value) {
-      tailSignal.value = [];
+  useSignalEffect(() => {
+    if (serviceSignal.value?.streamingUpdate) {
+      setPipelines(Object.values(serviceSignal.value.pipelines));
+      setClients(serviceSignal.value.liveAudiences?.get(key)?.length || 0);
     }
   });
 
@@ -100,43 +107,50 @@ export default function Operation(
                   ? "View your pipeline data in realtime"
                   : "No attached clients"}
               </div>
-              {clients && (
-                <div class="flex flex-col">
-                  <div className="flex flex-row justify-start items-center mb-2 text-[12px] font-[500] text-cobweb">
-                    Sampling at
-                    <span class="mx-1 font-bold">
-                      {tailSamplingSignal.value.rate}
-                    </span>
-                    messages per
-                    <span class="mx-1 font-bold">
-                      {tailSamplingSignal.value.intervalSeconds}
-                    </span>
-                    second{tailSamplingSignal.value.intervalSeconds > 1
-                      ? "s"
-                      : ""}
-                    <IconEdit
-                      class="ml-1 w-5 h-5 text-cobweb cursor-pointer"
-                      data-tooltip-target="sample-rate"
-                      onClick={() =>
-                        opModal.value = {
-                          ...opModal.value,
-                          tailRateModal: true,
-                        }}
-                    />
-                    <Tooltip
-                      targetId="sample-rate"
-                      message={"Change sample rate."}
-                    />
+
+              {clients
+                ? (
+                  <div class="flex flex-col">
+                    <div className="flex flex-row justify-start items-center mb-2 text-[12px] font-[500] text-cobweb">
+                      Sampling at
+                      <span class="mx-1 font-bold">
+                        {tailSamplingSignal.value.rate}
+                      </span>
+                      messages per
+                      <span class="mx-1 font-bold">
+                        {tailSamplingSignal.value.intervalSeconds}
+                      </span>
+                      second{tailSamplingSignal.value.intervalSeconds > 1
+                        ? "s"
+                        : ""}
+                      <IconEdit
+                        class="ml-1 w-5 h-5 text-cobweb cursor-pointer"
+                        data-tooltip-target="sample-rate"
+                        onClick={() =>
+                          opModal.value = {
+                            ...opModal.value,
+                            tailRateModal: true,
+                          }}
+                      />
+                      <Tooltip
+                        targetId="sample-rate"
+                        message={"Change sample rate."}
+                      />
+                    </div>
+                    <a
+                      href={tailRunningSignal.value
+                        ? "/"
+                        : `/tail/${encodeURIComponent(key)}`}
+                      f-partial={tailRunningSignal.value
+                        ? "/partials"
+                        : `/partials/tail/${encodeURIComponent(key)}`}
+                      className={`mt-2 text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
+                    >
+                      {tailRunningSignal.value ? "Stop Tail" : "Start Tail"}
+                    </a>
                   </div>
-                  <button
-                    className={`mt-2 text-white bg-web rounded-md w-[260px] h-[34px] flex justify-center items-center font-medium text-sm mb-4 cursor-pointer`}
-                    onClick={() =>
-                      tailEnabledSignal.value = !tailEnabledSignal.value}
-                  >
-                    {tailEnabledSignal.value ? "Stop Tail" : "Start Tail"}
-                  </button>
-                </div>
-              )}
+                )
+                : null}
             </div>
             <h3 id="collapse-heading-3">
               <button

@@ -5,6 +5,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Config } from "./sp_common";
 import { WasmModule } from "./shared/sp_shared";
 import { Schema } from "./sp_common";
 import { AudienceRate } from "./sp_common";
@@ -176,6 +177,12 @@ export interface SetPipelinesRequest {
      * @generated from protobuf field: protos.Audience audience = 2;
      */
     audience?: Audience;
+    /**
+     * Used by automation tooling
+     *
+     * @generated from protobuf field: optional string _created_by = 100;
+     */
+    CreatedBy?: string;
 }
 /**
  * @generated from protobuf message protos.PausePipelineRequest
@@ -605,6 +612,22 @@ export interface TestResponse {
      * @generated from protobuf field: string output = 2;
      */
     output: string;
+}
+/**
+ * Nothing needed here
+ *
+ * @generated from protobuf message protos.GetConfigRequest
+ */
+export interface GetConfigRequest {
+}
+/**
+ * @generated from protobuf message protos.GetConfigResponse
+ */
+export interface GetConfigResponse {
+    /**
+     * @generated from protobuf field: protos.Config config = 1;
+     */
+    config?: Config;
 }
 declare class GetAllRequest$Type extends MessageType<GetAllRequest> {
     constructor();
@@ -1103,6 +1126,26 @@ declare class TestResponse$Type extends MessageType<TestResponse> {
  * @generated MessageType for protobuf message protos.TestResponse
  */
 export declare const TestResponse: TestResponse$Type;
+declare class GetConfigRequest$Type extends MessageType<GetConfigRequest> {
+    constructor();
+    create(value?: PartialMessage<GetConfigRequest>): GetConfigRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetConfigRequest): GetConfigRequest;
+    internalBinaryWrite(message: GetConfigRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetConfigRequest
+ */
+export declare const GetConfigRequest: GetConfigRequest$Type;
+declare class GetConfigResponse$Type extends MessageType<GetConfigResponse> {
+    constructor();
+    create(value?: PartialMessage<GetConfigResponse>): GetConfigResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: GetConfigResponse): GetConfigResponse;
+    internalBinaryWrite(message: GetConfigResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.GetConfigResponse
+ */
+export declare const GetConfigResponse: GetConfigResponse$Type;
 /**
  * @generated ServiceType for protobuf service protos.External
  */

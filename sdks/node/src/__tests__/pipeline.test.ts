@@ -52,6 +52,17 @@ const testAttachCommand: Command = {
     oneofKind: "setPipelines",
     setPipelines: {
       pipelines: [testPipeline],
+      wasmModules: {
+        testDetectiveWasm: {
+          id: "testDetectiveWasm",
+
+          bytes: new Uint8Array(),
+          function: "f",
+          name: "",
+          Filename: "",
+          Bundled: false,
+        },
+      },
     },
   },
   audience: testAudience,
@@ -62,6 +73,17 @@ const testDetachCommand: Command = {
     oneofKind: "setPipelines",
     setPipelines: {
       pipelines: [],
+      wasmModules: {
+        testDetectiveWasm: {
+          id: "testDetectiveWasm",
+
+          bytes: new Uint8Array(),
+          function: "f",
+          name: "",
+          Filename: "",
+          Bundled: false,
+        },
+      },
     },
   },
   audience: testAudience,
@@ -71,7 +93,18 @@ const testPauseCommand: Command = {
   command: {
     oneofKind: "setPipelines",
     setPipelines: {
-      pipelines: [...[{...testPipeline, Paused: true }]]
+      pipelines: [...[{ ...testPipeline, Paused: true }]],
+      wasmModules: {
+        testDetectiveWasm: {
+          id: "testDetectiveWasm",
+
+          bytes: new Uint8Array(),
+          function: "f",
+          name: "",
+          Filename: "",
+          Bundled: false,
+        },
+      },
     },
   },
   audience: testAudience,
@@ -81,7 +114,18 @@ const testResumeCommand: Command = {
   command: {
     oneofKind: "setPipelines",
     setPipelines: {
-      pipelines: [...[{...testPipeline, Paused: false }]]
+      pipelines: [...[{ ...testPipeline, Paused: false }]],
+      wasmModules: {
+        testDetectiveWasm: {
+          id: "testDetectiveWasm",
+
+          bytes: new Uint8Array(),
+          function: "f",
+          name: "",
+          Filename: "",
+          Bundled: false,
+        },
+      },
     },
   },
   audience: testAudience,
@@ -89,7 +133,7 @@ const testResumeCommand: Command = {
 
 const testGetSetPipelinesCommandsByServiceResponse = {
   response: {
-    setPipelineCommands : [testAttachCommand],
+    setPipelineCommands: [testAttachCommand],
     wasmModules: { test: { id: "test", bytes: new Uint8Array() } },
   },
 };

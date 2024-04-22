@@ -1,4 +1,4 @@
-export const BirdLogo = (props) => {
+export const BirdLogo = (props: any) => {
   return (
     <svg
       width="199"

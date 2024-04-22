@@ -110,7 +110,7 @@ github.com/rivo/tview
 # github.com/rivo/uniseg v0.4.3
 ## explicit; go 1.18
 github.com/rivo/uniseg
-# github.com/streamdal/streamdal/libs/protos v0.1.31
+# github.com/streamdal/streamdal/libs/protos v0.1.38
 ## explicit; go 1.20
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared

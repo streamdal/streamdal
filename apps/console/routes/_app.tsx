@@ -1,5 +1,5 @@
-import { AppContext } from "$fresh/server.ts";
 import { Head } from "$fresh/src/runtime/head.ts";
+import { AppContext } from "$fresh/server.ts";
 import { DEMO, GOOGLE_ANALYTICS_KEY, SENTRY_KEY } from "../lib/configs.ts";
 
 export const GTM_SCRIPT =
@@ -24,7 +24,7 @@ export default async function App(
           content={"Use Streamdal to build code-native data pipelines that detect and mask PII"}
           name="description"
         />
-        {DEMO === "true" &&
+        {DEMO === true &&
           (
             <>
               <meta
@@ -91,7 +91,7 @@ export default async function App(
                 crossOrigin="anonymous"
               >
               </script>
-              <script src="/sentry.js" sentryKey={SENTRY_KEY} />
+              <script src="/sentry.js" data-sentryKey={SENTRY_KEY} />
             </>
           )}
       </Head>

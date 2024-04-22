@@ -39,6 +39,7 @@ export const PipelineHTTP = (
         setData={setData}
         label="URL"
         placeHolder={"https://www.example.com/entity"}
+        inputClass="w-full"
         errors={errors}
       />
 
@@ -54,7 +55,6 @@ export const PipelineHTTP = (
       <FormStringKV
         name={`steps.${stepNumber}.step.httpRequest.request.headers`}
         data={data}
-        setData={setData}
         label="Headers"
         description="Key/value pairs that will be sent along as HTTP request headers"
         errors={errors}

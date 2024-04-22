@@ -35,6 +35,9 @@ const (
 
 	// If no prometheus URL is provided, use this
 	defaultPrometheusURL = "http://localhost:8081"
+
+	// countersKey is the keyname that counters are stored as in store/redis
+	countersKey = "streamdal_counters"
 )
 
 // defaultCounter is used to define counters
@@ -143,7 +146,7 @@ func New(cfg *Config) (*Metrics, error) {
 func (m *Metrics) loadCountersFromStore() error {
 	counters := make([]*protos.Metric, 0)
 
-	resp := m.RedisBackend.Get(context.Background(), "counters")
+	resp := m.RedisBackend.Get(context.Background(), countersKey)
 	data, err := resp.Bytes()
 	if err != nil {
 		if err == redis.Nil {
@@ -331,7 +334,7 @@ func (m *Metrics) dumpCounters() error {
 		return errors.Wrap(err, "unable to marshal counters")
 	}
 
-	resp := m.RedisBackend.Set(context.Background(), "counters", data, 0)
+	resp := m.RedisBackend.Set(context.Background(), countersKey, data, 0)
 	if _, err := resp.Result(); err != nil {
 		return errors.Wrap(err, "unable to put counters to store")
 	}

@@ -1,10 +1,10 @@
 import { Handlers } from "$fresh/src/server/types.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { ErrorType, validate } from "../../components/form/validate.ts";
-import { pipelineSchema } from "../../islands/pipeline.tsx";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { upsertPipeline } from "../../lib/mutation.ts";
 import { SuccessType } from "../_middleware.ts";
+import { PipelineSchema } from "root/components/pipeline/pipeline.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
@@ -13,12 +13,12 @@ export const handler: Handlers<SuccessType> = {
     const {
       data: pipeline,
       errors,
-    }: {
-      pipeline: Pipeline;
-      errors: ErrorType;
-    } = validate(pipelineSchema, formData);
+    }: { data: Pipeline | null; errors: ErrorType | null } = validate(
+      PipelineSchema as any,
+      formData,
+    );
 
-    const { session } = ctx.state;
+    const { session }: any = ctx.state;
 
     if (errors) {
       session.flash("success", {
@@ -28,11 +28,17 @@ export const handler: Handlers<SuccessType> = {
       });
       return new Response("", {
         status: 307,
-        headers: { Location: `/pipelines/${pipeline.id ? pipeline.id : ""}` },
+        headers: {
+          Location: `/pipelines/${pipeline?.id ? pipeline.id : ""}`,
+        },
       });
     }
 
-    const response = await upsertPipeline(pipeline);
+    const response = pipeline ? await upsertPipeline(pipeline) : {
+      pipelineId: "",
+      code: ResponseCode.GENERIC_ERROR,
+      message: "There was a problem processing your request",
+    };
 
     session.flash("success", {
       status: response.code === ResponseCode.OK,
@@ -47,7 +53,7 @@ export const handler: Handlers<SuccessType> = {
     return new Response("", {
       status: 307,
       headers: {
-        Location: `/pipelines/${response.pipelineId}`,
+        Location: `/pipelines/${response?.pipelineId}`,
       },
     });
   },

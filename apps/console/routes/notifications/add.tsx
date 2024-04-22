@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
+import Notifications from "root/islands/notifications.tsx";
 import { handler as notificationHandler, NotificationsType } from "./index.tsx";
-import { Notifications } from "../../islands/notifications.tsx";
 
 export const handler: Handlers<NotificationsType> = notificationHandler;
 

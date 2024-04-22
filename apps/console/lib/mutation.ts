@@ -11,6 +11,7 @@ import {
   CreateNotificationRequest,
   CreatePipelineRequest,
   DeleteAudienceRequest,
+  DeletePipelineRequest,
   DeleteServiceRequest,
   PausePipelineRequest,
   ResumePipelineRequest,
@@ -90,7 +91,7 @@ export const deletePipeline = async (
 ): Promise<StandardResponse> => {
   const { response }: { response: StandardResponse } = await client
     .deletePipeline(
-      { pipelineId },
+      DeletePipelineRequest.create({ pipelineId }),
       meta,
     );
 
@@ -184,7 +185,8 @@ export const updateNotification = async (
     return {
       id: "updateNotification",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
-      error,
+      message:
+        "There was a problem updating the notification, please try again later",
     };
   }
 };
@@ -200,16 +202,19 @@ export const createNotification = async (
     const { response } = await client.createNotification(request, meta);
     //
     // monkey patch a success code in here so we can check for success
-    // downstream just like we do for udpates
-    response.code = ResponseCode.OK;
-
-    return response;
+    // downstream just like we do for updates
+    return {
+      ...response,
+      code: ResponseCode.OK,
+      message: "Notification created!",
+    };
   } catch (error) {
     console.error("error creating notification", error);
     return {
       id: "createNotification",
       code: ResponseCode.INTERNAL_SERVER_ERROR,
-      error,
+      message:
+        "There was a problem creating the notification, please try again later",
     };
   }
 };

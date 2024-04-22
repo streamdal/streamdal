@@ -51,8 +51,9 @@ func main() {
 		log.WithError(err).Fatal("could not setup dependencies")
 	}
 
-	logrus.Debugf("Install ID: '%s'", d.Config.InstallID)
-	logrus.Debugf("Node ID: '%s'", d.Config.NodeID)
+	logrus.Infof("Install ID: '%s'", d.Config.InstallID)
+	logrus.Infof("Node ID: '%s'", d.Config.NodeID)
+	logrus.Infof("Telemetry Disabled: %t", d.Config.TelemetryDisable)
 
 	// Clean up telemetry on shutdown
 	defer func(Telemetry statsd.Statter) {
@@ -95,6 +96,7 @@ func run(d *deps.Dependencies) error {
 			KVService:       d.KVService,
 			DemoMode:        d.Config.DemoMode,
 			Telemetry:       d.Telemetry,
+			WasmService:     d.WasmService,
 			InstallID:       d.Config.InstallID,
 			NodeID:          d.Config.NodeID,
 		})

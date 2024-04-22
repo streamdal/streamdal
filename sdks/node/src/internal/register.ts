@@ -74,7 +74,7 @@ export const processRegisterResponses = async (
   try {
     for await (const response of call.responses) {
       if (response.command.oneofKind !== "keepAlive") {
-        await processResponse(response);
+        processResponse(response);
       }
     }
   } catch (error) {

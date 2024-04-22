@@ -360,7 +360,7 @@ func (c *Console) DisplayTail(pageTail *tview.TextView, tailComponent *types.Tai
 		pageTail = tview.NewTextView()
 		pageTail.SetBorder(true)
 		pageTail.SetDynamicColors(true)
-		pageTail.SetMaxLines(c.options.Config.MaxOutputLines)
+		pageTail.SetMaxLines(c.options.Config.CLI.MaxOutputLines)
 	}
 
 	// Always update title

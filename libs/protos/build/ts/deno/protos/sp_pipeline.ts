@@ -31,8 +31,8 @@ import { NotificationConfig } from "./sp_notify.ts";
  */
 export interface Pipeline {
     /**
-     * ID should NOT be set by external gRPC client on CreatePipelineRequest - it
-     * will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+     * If left blank, the server will generate a unique ID. If one is provided,
+     * the server will check if that is ID is already in use when creating a pipeline.
      *
      * @generated from protobuf field: string id = 1;
      */
@@ -83,6 +83,12 @@ export interface Pipeline {
      * @generated from protobuf field: optional int64 _updated_at_unix_ts_utc = 1005;
      */
     UpdatedAtUnixTsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1006;
+     */
+    CreatedBy?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
@@ -325,6 +331,12 @@ export interface PipelineConfigs {
      * @generated from protobuf field: optional bool _is_empty = 1000;
      */
     IsEmpty?: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource/mapping
+     *
+     * @generated from protobuf field: optional string _created_by = 1001;
+     */
+    CreatedBy?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs
@@ -377,7 +389,8 @@ class Pipeline$Type extends MessageType<Pipeline> {
             { no: 1002, name: "_version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1003, name: "_url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1004, name: "_created_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
+            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1006, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<Pipeline>): Pipeline {
@@ -422,6 +435,9 @@ class Pipeline$Type extends MessageType<Pipeline> {
                 case /* optional int64 _updated_at_unix_ts_utc */ 1005:
                     message.UpdatedAtUnixTsUtc = reader.int64().toString();
                     break;
+                case /* optional string _created_by */ 1006:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -464,6 +480,9 @@ class Pipeline$Type extends MessageType<Pipeline> {
         /* optional int64 _updated_at_unix_ts_utc = 1005; */
         if (message.UpdatedAtUnixTsUtc !== undefined)
             writer.tag(1005, WireType.Varint).int64(message.UpdatedAtUnixTsUtc);
+        /* optional string _created_by = 1006; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1006, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -820,7 +839,8 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
     constructor() {
         super("protos.PipelineConfigs", [
             { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig },
-            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1001, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<PipelineConfigs>): PipelineConfigs {
@@ -841,6 +861,9 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
                 case /* optional bool _is_empty */ 1000:
                     message.IsEmpty = reader.bool();
                     break;
+                case /* optional string _created_by */ 1001:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -859,6 +882,9 @@ class PipelineConfigs$Type extends MessageType<PipelineConfigs> {
         /* optional bool _is_empty = 1000; */
         if (message.IsEmpty !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.IsEmpty);
+        /* optional string _created_by = 1001; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1001, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

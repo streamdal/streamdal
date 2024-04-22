@@ -1,29 +1,30 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
-import IconPlus from "tabler-icons/tsx/plus.tsx";
 
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import PipelineDetail, { newPipeline } from "./pipeline.tsx";
-import { SuccessType } from "../routes/_middleware.ts";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { OP_MODAL_WIDTH } from "./drawer/infoDrawer.tsx";
+import { useEffect } from "preact/hooks";
+import { newPipeline } from "root/components/pipeline/pipeline.ts";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
-import { useLayoutEffect } from "preact/hooks";
+import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
+import { initFlowBite } from "../components/flowbite/init.tsx";
+import { Toast, toastSignal } from "../components/toasts/toast.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
+import { SuccessType } from "../routes/_middleware.ts";
+import PipelineDetail from "./pipeline.tsx";
 
 const Pipelines = (
   { id, pipelines, notifications, success, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
-    notifications?: NotificationConfig[];
-    success: SuccessType;
+    notifications: NotificationConfig[];
+    success?: SuccessType;
     add?: boolean;
   },
 ) => {
   //
   // wrapper supports adding a new entry
   const wrapper = [
-    ...pipelines,
-    ...pipelines.length === 0 || add ? [newPipeline] : [],
+    ...pipelines ? pipelines : [],
+    ...pipelines?.length === 0 || add ? [newPipeline] : [],
   ];
 
   const index = id ? wrapper?.findIndex((p) => p.id === id) : 0;
@@ -37,15 +38,14 @@ const Pipelines = (
     };
   }
 
-  useLayoutEffect(async () => {
-    const { initFlowbite } = await import("flowbite");
-    initFlowbite();
-  });
+  useEffect(() => {
+    void initFlowBite();
+  }, []);
 
   return (
     <>
       <div
-        className={`relative flex flex-col h-screen w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+        className={`relative flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
       >
         <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
           <span className="opacity-50">Home</span> / Manage Pipelines
@@ -55,11 +55,12 @@ const Pipelines = (
             <div class="border-r w-1/3 flex flex-col pb-[16px] overflow-y-auto">
               <div class="flex justify-between items-center pt-[26px] pb-[16px] px-[14px]">
                 <div class="text-[16px] font-bold">Pipelines</div>
-                <a href="/pipelines/add">
-                  <IconPlus
-                    data-tooltip-target="pipeline-add"
-                    class="w-5 h-5 cursor-pointer"
-                  />
+                <a
+                  href="/pipelines/add"
+                  f-partial="/partials/pipelines/add"
+                  data-tooltip-target="pipeline-add"
+                >
+                  <img src="/images/plus.svg" class="w-[20px]" />
                 </a>
                 <Tooltip
                   targetId="pipeline-add"
@@ -67,7 +68,10 @@ const Pipelines = (
                 />
               </div>
               {wrapper?.map((p: Pipeline, i: number) => (
-                <a href={`/pipelines/${p.id}`}>
+                <a
+                  href={`/pipelines/${p.id}`}
+                  f-partial={`/partials/pipelines/${p.id}`}
+                >
                   <div
                     class={`flex flex-row items-center justify-between py-[14px] pl-[30px] pr-[12px] ${
                       i === selected && "bg-sunset"
@@ -84,7 +88,6 @@ const Pipelines = (
               <PipelineDetail
                 pipeline={wrapper[selected]}
                 notifications={notifications}
-                success={success}
               />
             </div>
           </div>

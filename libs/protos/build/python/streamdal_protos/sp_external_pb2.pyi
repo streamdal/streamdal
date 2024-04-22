@@ -216,6 +216,16 @@ class GetAudienceRatesResponse(_message.Message):
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
     def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _keepalive: bool = ...) -> None: ...
 
+class GetConfigRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetConfigResponse(_message.Message):
+    __slots__ = ["config"]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    config: _sp_common_pb2.Config
+    def __init__(self, config: _Optional[_Union[_sp_common_pb2.Config, _Mapping]] = ...) -> None: ...
+
 class GetMetricsRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
@@ -339,12 +349,14 @@ class ResumeTailRequest(_message.Message):
     def __init__(self, tail_id: _Optional[str] = ...) -> None: ...
 
 class SetPipelinesRequest(_message.Message):
-    __slots__ = ["audience", "pipeline_ids"]
+    __slots__ = ["_created_by", "audience", "pipeline_ids"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_IDS_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    _created_by: str
     audience: _sp_common_pb2.Audience
     pipeline_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class TestRequest(_message.Message):
     __slots__ = ["input"]

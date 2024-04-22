@@ -78,7 +78,8 @@ class Pipeline$Type extends MessageType {
             { no: 1002, name: "_version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1003, name: "_url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1004, name: "_created_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
-            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ }
+            { no: 1005, name: "_updated_at_unix_ts_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1006, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -123,6 +124,9 @@ class Pipeline$Type extends MessageType {
                 case /* optional int64 _updated_at_unix_ts_utc */ 1005:
                     message.UpdatedAtUnixTsUtc = reader.int64().toString();
                     break;
+                case /* optional string _created_by */ 1006:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -165,6 +169,9 @@ class Pipeline$Type extends MessageType {
         /* optional int64 _updated_at_unix_ts_utc = 1005; */
         if (message.UpdatedAtUnixTsUtc !== undefined)
             writer.tag(1005, WireType.Varint).int64(message.UpdatedAtUnixTsUtc);
+        /* optional string _created_by = 1006; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1006, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -521,7 +528,8 @@ class PipelineConfigs$Type extends MessageType {
     constructor() {
         super("protos.PipelineConfigs", [
             { no: 1, name: "configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineConfig },
-            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ }
+            { no: 1000, name: "_is_empty", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
+            { no: 1001, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
@@ -542,6 +550,9 @@ class PipelineConfigs$Type extends MessageType {
                 case /* optional bool _is_empty */ 1000:
                     message.IsEmpty = reader.bool();
                     break;
+                case /* optional string _created_by */ 1001:
+                    message.CreatedBy = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -560,6 +571,9 @@ class PipelineConfigs$Type extends MessageType {
         /* optional bool _is_empty = 1000; */
         if (message.IsEmpty !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.IsEmpty);
+        /* optional string _created_by = 1001; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1001, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

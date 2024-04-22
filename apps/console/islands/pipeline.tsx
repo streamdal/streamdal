@@ -4,402 +4,61 @@ import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 
-import {
-  AbortCondition,
-  Pipeline,
-  PipelineStep,
-  PipelineStepNotification_PayloadType,
-} from "streamdal-protos/protos/sp_pipeline.ts";
+import { Pipeline, PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
-import {
-  TransformTruncateType,
-  TransformType,
-} from "streamdal-protos/protos/steps/sp_steps_transform.ts";
-import { zfd } from "zod-form-data";
-import * as z from "zod/index.ts";
 
-import { PipelineMenu } from "../components/pipeline/pipelineMenu.tsx";
-import { StepMenu } from "../components/pipeline/stepMenu.tsx";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import {
-  ErrorType,
-  resolveValue,
-  validate,
-} from "../components/form/validate.ts";
-import { FormInput } from "../components/form/formInput.tsx";
+import * as uuid from "$std/uuid/mod.ts";
+import { initFlowbite } from "https://esm.sh/v132/flowbite@1.7.0/denonext/flowbite.mjs";
+import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 import { FormHidden } from "../components/form/formHidden.tsx";
+import { FormInput } from "../components/form/formInput.tsx";
 import {
   FormSelect,
   kvActionFromEnum,
   kvModeFromEnum,
   optionsFromEnum,
 } from "../components/form/formSelect.tsx";
-import { isNumeric } from "../lib/utils.ts";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import {
-  argTypes,
-  nArgTypes,
-  oneArgTypes,
-  StepArgs,
-} from "../components/pipeline/stepArgs.tsx";
-import { StepConditions } from "../components/pipeline/stepConditions.tsx";
+  ErrorType,
+  resolveValue,
+  validate,
+} from "../components/form/validate.ts";
 import { DeleteModal } from "../components/modals/deleteModal.tsx";
-import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
-import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
-import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
-import { PipelineNotifications } from "../components/pipeline/stepNotifications.tsx";
-import { PipelineTransform } from "./pipelineTransform.tsx";
 import {
-  JSONSchemaDraft,
-  SchemaValidationCondition,
-  SchemaValidationType,
-} from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
-import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
-import * as uuid from "$std/uuid/mod.ts";
-import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
+  kinds,
+  newStep,
+  PipelineSchema,
+} from "../components/pipeline/pipeline.ts";
+import { PipelineMenu } from "../components/pipeline/pipelineMenu.tsx";
+import { argTypes, StepArgs } from "../components/pipeline/stepArgs.tsx";
+import { StepConditions } from "../components/pipeline/stepConditions.tsx";
+import { StepMenu } from "../components/pipeline/stepMenu.tsx";
+import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { PipelineHTTP } from "./pipelineHTTP.tsx";
+import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
+import { PipelineTransform } from "./pipelineTransform.tsx";
+import { FormStringKV } from "root/components/form/formStringKV.tsx";
+import { logFormData } from "root/lib/utils.ts";
 
-const detective = {
-  type: DetectiveType.BOOLEAN_TRUE,
-  path: "",
-  args: [""],
-};
-
-export const newStep = {
-  name: "",
-  onSuccess: [],
-  onFailure: [],
-  step: {
-    oneofKind: "detective",
-    detective,
-  },
-};
-
-export const newPipeline: Pipeline = {
-  id: "",
-  name: "",
-  steps: [newStep as PipelineStep],
-};
-
-const AbortConditionEnum = z.nativeEnum(AbortCondition);
-const DetectiveTypeEnum = z.nativeEnum(DetectiveType);
-const TransformTypeEnum = z.nativeEnum(TransformType);
-const TransformTruncateTypeEnum = z.nativeEnum(TransformTruncateType);
-const SchemaValidationTypeEnum = z.nativeEnum(SchemaValidationType);
-const SchemaValidationConditionEnum = z.nativeEnum(SchemaValidationCondition);
-const JSONSchemaDraftEnum = z.nativeEnum(JSONSchemaDraft);
-const KVActionTypeEnum = z.nativeEnum(KVAction);
-const KVModeTypeEnum = z.nativeEnum(KVMode);
-const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
-const NotificationPayloadTypeEnum = z.nativeEnum(
-  PipelineStepNotification_PayloadType,
-);
-
-const kinds = [
-  { label: "Detective", value: "detective" },
-  { label: "Transform", value: "transform" },
-  { label: "Key/Value", value: "kv" },
-  { label: "Schema Validation", value: "schemaValidation" },
-  { label: "HTTP Request", value: "httpRequest" },
-];
-
-const transformOptions = z.discriminatedUnion("oneofKind", [
-  z.object({
-    oneofKind: z.literal("replaceValueOptions"),
-    replaceValueOptions: z.object({
-      path: z.string().optional(),
-      value: z.string().min(1, { message: "Required" }),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("deleteFieldOptions"),
-    deleteFieldOptions: z
-      .object({
-        paths: zfd.repeatable(z.array(zfd.text())),
-      })
-      .default({}),
-  }),
-  z.object({
-    oneofKind: z.literal("obfuscateOptions"),
-    obfuscateOptions: z
-      .object({
-        path: z.string().optional(),
-      })
-      .default({}),
-  }),
-  z.object({
-    oneofKind: z.literal("maskOptions"),
-    maskOptions: z
-      .object({
-        path: z.string().optional(),
-      })
-      .default({}),
-  }),
-  z.object({
-    oneofKind: z.literal("truncateOptions"),
-    truncateOptions: z.object({
-      type: zfd.numeric(TransformTruncateTypeEnum),
-      path: z.string().optional(),
-      value: zfd.numeric(z.number().int().min(1)),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("extractOptions"),
-    extractOptions: z.object({
-      flatten: z.preprocess((v) => v === "true", z.boolean()),
-      paths: zfd.repeatable(z.array(zfd.text()).min(1)),
-    }),
-  }),
-]);
-
-const schemaValidationOptions = z.discriminatedUnion("oneofKind", [
-  z.object({
-    oneofKind: z.literal("jsonSchema"),
-    jsonSchema: z.object({
-      jsonSchema: z
-        .string()
-        .min(1, { message: "Required" })
-        .refine((json) => {
-          try {
-            JSON.parse(json);
-            return true;
-          } catch {
-            return false;
-          }
-        }, "Schema is invalid.")
-        .transform((v) => new TextEncoder().encode(v)),
-      draft: zfd.numeric(JSONSchemaDraftEnum),
-    }),
-  }),
-]);
-
-const stepKindSchema = z.discriminatedUnion("oneofKind", [
-  z.object({
-    oneofKind: z.literal("detective"),
-    detective: z
-      .object({
-        path: z.string(),
-        args: zfd.repeatable(z.array(z.string()).default([])),
-        type: zfd.numeric(DetectiveTypeEnum),
-        negate: z.boolean().default(false),
-      })
-      .superRefine((detective, ctx) => {
-        if (
-          ["HAS_FIELD", "IS_TYPE"].includes(DetectiveType[detective.type]) &&
-          detective.path === ""
-        ) {
-          ctx.addIssue({
-            path: ["path"],
-            code: z.ZodIssueCode.custom,
-            message: "Required",
-            fatal: true,
-          });
-
-          return z.never;
-        }
-
-        if (
-          oneArgTypes.includes(DetectiveType[detective.type]) &&
-          detective.args.filter((a) => a.trim() !== "")?.length === 0
-        ) {
-          ctx.addIssue({
-            path: ["args.0"],
-            code: z.ZodIssueCode.custom,
-            message: "One arg required for this step type",
-            fatal: true,
-          });
-
-          return z.never;
-        }
-
-        if (
-          nArgTypes.includes(DetectiveType[detective.type]) &&
-          detective.args.filter((a) => a.trim() !== "")?.length < 2
-        ) {
-          ctx.addIssue({
-            path: ["args.0"],
-            code: z.ZodIssueCode.custom,
-            message: "Two args required for this step type",
-            fatal: true,
-          });
-
-          return z.never;
-        }
-
-        if (
-          DetectiveType[detective.type].includes("NUMERIC") &&
-          detective.args.find((a) => !isNumeric(a))
-        ) {
-          ctx.addIssue({
-            path: [`args.${detective.args.findIndex((a) => !isNumeric(a))}`],
-            code: z.ZodIssueCode.custom,
-            message: "Numeric args required for this step type",
-            fatal: true,
-          });
-
-          return z.never;
-        }
-      }),
-  }),
-  z.object({
-    oneofKind: z.literal("transform"),
-    transform: z.object({
-      type: zfd.numeric(TransformTypeEnum),
-      negate: z.boolean().default(false),
-      options: transformOptions,
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("kv"),
-    kv: z.object({
-      action: zfd.numeric(KVActionTypeEnum),
-      mode: zfd.numeric(KVModeTypeEnum),
-      key: z.string(),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("schemaValidation"),
-    schemaValidation: z.object({
-      type: zfd.numeric(SchemaValidationTypeEnum),
-      condition: zfd
-        .numeric(SchemaValidationConditionEnum)
-        .default(SchemaValidationCondition.MATCH),
-      options: schemaValidationOptions,
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("httpRequest"),
-    httpRequest: z.object({
-      request: z.object({
-        method: zfd.numeric(HTTPMethodEnum),
-        url: z.string().url(),
-        body: z.string().transform((v) => new TextEncoder().encode(v)),
-        headers: z
-          .record(
-            z.string().min(1, { message: "Required" }),
-            z.string().min(1, { message: "Required" }),
-          )
-          .optional(),
-      }),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("encode"),
-    encode: z.object({
-      id: z.string().min(1, { message: "Required" }),
-      negate: z.boolean().default(false),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("decode"),
-    decode: z.object({
-      id: z.string().min(1, { message: "Required" }),
-      negate: z.boolean().default(false),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("custom"),
-    custom: z.object({
-      id: z.string().min(1, { message: "Required" }),
-      negate: z.boolean().default(false),
-    }),
-  }),
-]);
-
-const resultConditionSchema = z.object({
-  abort: zfd.numeric(AbortConditionEnum).default(AbortCondition.UNSET),
-  notify: z.preprocess((v) => v === "true", z.boolean()),
-  metadata: z
-    .record(
-      z.string().min(1, { message: "Required" }),
-      z.string().min(1, { message: "Required" }),
-    )
-    .optional(),
-  notification: z.object({
-    notificationConfigIds: zfd.repeatable(z.array(z.string())),
-    payloadType: zfd.numeric(NotificationPayloadTypeEnum),
-    paths: zfd.repeatable(z.array(z.string())),
-  }).superRefine((notification, ctx) => {
-    if (
-      notification.payloadType ==
-        PipelineStepNotification_PayloadType.SELECT_PATHS &&
-      notification.paths.filter((a) => a.trim() !== "")?.length === 0
-    ) {
-      ctx.addIssue({
-        path: ["paths.0"],
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        fatal: true,
-      });
-
-      return z.never;
-    }
-  }).optional(),
-});
-
-const stepSchema = z
-  .object({
-    id: z.string().optional(),
-    name: z.string().min(1, { message: "Required" }),
-    dynamic: z.preprocess((v) => v === "true", z.boolean()),
-    onTrue: resultConditionSchema.optional(),
-    onFalse: resultConditionSchema.optional(),
-    onError: resultConditionSchema.optional(),
-    step: stepKindSchema,
-  })
-  .superRefine((step, ctx) => {
-    //
-    // If this is non-dynamic transform step, path is required
-    if (
-      step?.step?.oneofKind === "transform" &&
-      !step.dynamic &&
-      step?.step?.transform?.options?.oneofKind !== "extractOptions" &&
-      !step?.step?.transform?.options[step?.step?.transform?.options?.oneofKind]
-        ?.path &&
-      !step?.step?.transform?.options[step?.step?.transform?.options?.oneofKind]
-        ?.paths
-    ) {
-      ctx.addIssue({
-        path: [
-          `step.transform.options.${step?.step?.transform?.options?.oneofKind}.${
-            step?.step?.transform?.options?.oneofKind !== "deleteFieldOptions"
-              ? "paths"
-              : "path"
-          }`,
-        ],
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        fatal: true,
-      });
-
-      return z.never;
-    }
-  });
-
-export const pipelineSchema = zfd.formData({
-  id: z.string().optional(),
-  name: z.string().min(1, { message: "Required" }),
-  steps: zfd.repeatable(
-    z.array(stepSchema).min(1, { message: "At least one step is required" }),
-  ),
-});
-
-const PipelineDetail = ({
+export default function PipelineDetail({
   pipeline,
   notifications,
 }: {
   pipeline: Pipeline;
   notifications: NotificationConfig[];
-}) => {
+}) {
   const [open, setOpen] = useState([0]);
-  const [deleteOpen, setDeleteOpen] = useState(null);
+  const [deleteOpen, setDeleteOpen] = useState<any>(null);
 
   //
   // typing the initializer to force preact useState hooks to
   // properly type this since it doesn't support useState<type>
   const e: ErrorType = {};
   const [errors, setErrors] = useState(e);
-  const [data, setData] = useState();
+  const [data, setData] = useState<any>();
 
   useEffect(() => {
     setData({
@@ -419,12 +78,12 @@ const PipelineDetail = ({
     setData({
       ...data,
       steps: [
-        ...data.steps,
+        ...data ? data.steps : [],
         ...[
           {
             ...newStep,
             dragId: uuid.v1.generate(),
-            dragOrder: data.steps.length,
+            dragOrder: data?.steps?.length,
           },
         ],
       ],
@@ -434,14 +93,18 @@ const PipelineDetail = ({
   };
 
   const deleteStep = (stepIndex: number) => {
-    setData({ ...data, steps: data.steps.filter((_, i) => i !== stepIndex) });
+    setData({
+      ...data,
+      steps: data.steps.filter((_: any, i: number) => i !== stepIndex),
+    });
     setDeleteOpen(null);
   };
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
+    logFormData(formData);
 
-    const { errors } = validate(pipelineSchema, formData);
+    const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
 
     if (errors) {
@@ -450,19 +113,25 @@ const PipelineDetail = ({
     }
   };
 
-  const handleDrag = (ev: React.DragEvent<HTMLDivElement>) => {
+  const handleDrag = (ev: any) => {
     setDragId(ev.currentTarget.id);
   };
 
-  const handleDrop = (ev: React.DragEvent<HTMLDivElement>) => {
-    const dragStep = data.steps.find((s) => s.dragId === dragId);
-    const dropStep = data.steps.find((s) => s.dragId === ev.currentTarget.id);
+  const handleDrop = (ev: any) => {
+    const dragStep = data.steps.find((s: PipelineStep & { dragId: string }) =>
+      s.dragId === dragId
+    );
+    const dropStep = data.steps.find((s: PipelineStep & { dragId: string }) =>
+      s.dragId === ev.currentTarget.id
+    );
     const dragOrder = dragStep.dragOrder;
     const dropOrder = dropStep.dragOrder;
 
     setData({
       ...data,
-      steps: data.steps.map((s) => ({
+      steps: data.steps.map((
+        s: PipelineStep & { dragId: string; dragOrder: number },
+      ) => ({
         ...s,
         dragOrder: s.dragId === dragId
           ? dropOrder
@@ -487,12 +156,13 @@ const PipelineDetail = ({
                 data={data}
                 setData={setData}
                 errors={errors}
+                inputClass="w-full"
                 defaultValue={resolveValue(data, "name")}
               />
             </div>
             <PipelineMenu id={pipeline?.id} />
           </div>
-          <div>
+          <div class="ml-2">
             <a href="/" f-partial="/partials">
               <img src="/images/x.svg" className="w-[14px]" />
             </a>
@@ -516,8 +186,9 @@ const PipelineDetail = ({
             />
             <Tooltip targetId="step-add" message="Add a new step" />
           </div>
+
           {{ ...data }?.steps
-            ?.sort((a, b) => a.dragOrder - b.dragOrder)
+            ?.sort((a: any, b: any) => a.dragOrder - b.dragOrder)
             .map((step: PipelineStep & { dragId: string }, i: number) => (
               <div class="mb-6 flex flex-row items-start">
                 <div class="text-twilight mr-6 mt-4 text-[16px] font-medium">
@@ -547,20 +218,17 @@ const PipelineDetail = ({
                           data={data}
                           setData={setData}
                           errors={errors}
+                          inputClass="w-full"
                           defaultValue={`Step #${i + 1}`}
                         />
                       </div>
                       <StepMenu
                         index={i}
-                        step={step}
-                        onDelete={() => {
-                          setDeleteOpen(i);
-                        }}
+                        onDelete={() => setDeleteOpen(i)}
                       />
                       {deleteOpen === i
                         ? (
                           <DeleteModal
-                            id={i}
                             entityType="Pipeline step"
                             entityName={step.name}
                             onClose={() => setDeleteOpen(null)}
@@ -596,11 +264,13 @@ const PipelineDetail = ({
                       label="Step Type"
                       errors={errors}
                       inputClass="w-64"
+                      readonly={step.step.oneofKind === "custom"}
                       children={kinds.map((kind, i) => (
                         <option
                           key={`step-kind-key-${i}`}
                           value={kind.value}
                           label={kind.label}
+                          disabled={kind.value === "custom"}
                         />
                       ))}
                     />
@@ -611,6 +281,7 @@ const PipelineDetail = ({
                           data={data}
                           setData={setData}
                           label="Path"
+                          inputClass="w-full"
                           placeHolder={["HAS_FIELD", "IS_TYPE"].includes(
                               DetectiveType[data.steps[i].step.detective?.type],
                             )
@@ -629,13 +300,15 @@ const PipelineDetail = ({
                           />
                           <div>
                             {argTypes.includes(
-                              DetectiveType[data.steps[i].step.detective?.type],
+                              DetectiveType[
+                                data.steps[i].step.detective?.type
+                              ] as keyof typeof DetectiveType,
                             ) && (
                               <StepArgs
                                 stepIndex={i}
                                 type={DetectiveType[
                                   data.steps[i].step.detective.type
-                                ]}
+                                ] as keyof typeof DetectiveType}
                                 data={data}
                                 setData={setData}
                                 errors={errors}
@@ -688,6 +361,7 @@ const PipelineDetail = ({
                           data={data}
                           setData={setData}
                           label="Key"
+                          inputClass="w-full"
                           errors={errors}
                         />
                       </>
@@ -700,13 +374,36 @@ const PipelineDetail = ({
                         errors={errors}
                       />
                     )}
-                    <StepConditions
-                      notifications={notifications}
-                      stepIndex={i}
-                      data={data}
-                      setData={setData}
-                      errors={errors}
-                    />
+
+                    {"custom" === step.step.oneofKind
+                      ? (
+                        <>
+                          <div class="p-2 text-sm text-stormCloud">
+                            Custom Wasm steps are not editable in the console.
+                          </div>
+                          <FormHidden
+                            name={`steps.${i}.WasmId`}
+                            value={resolveValue(data, `steps.${i}.WasmId`)}
+                          />
+                          <FormStringKV
+                            name={`steps.${i}.step.custom.args`}
+                            data={data}
+                            label="Args"
+                            description="Custom step arguments"
+                            errors={errors}
+                            readonly={true}
+                          />
+                        </>
+                      )
+                      : (
+                        <StepConditions
+                          notifications={notifications}
+                          stepIndex={i}
+                          data={data}
+                          setData={setData}
+                          errors={errors}
+                        />
+                      )}
                   </div>
                 </div>
               </div>
@@ -720,6 +417,4 @@ const PipelineDetail = ({
       </form>
     </>
   );
-};
-
-export default PipelineDetail;
+}

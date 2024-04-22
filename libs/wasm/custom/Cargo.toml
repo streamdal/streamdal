@@ -1,0 +1,18 @@
+[package]
+name = "custom"
+version = "0.0.120"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+protobuf = "3.4.0"
+streamdal-protos = { path="../../protos/build/rust/protos" }
+common = { path = "../common" }
+
+[profile.release]
+lto = true
+
