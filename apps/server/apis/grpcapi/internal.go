@@ -391,7 +391,7 @@ func (s *InternalServer) GetSetPipelinesCommandsByService(
 		return nil, errors.Wrapf(err, "unable to get configs for service '%s'", req.ServiceName)
 	}
 
-	numInjected, err := util.InjectSchemaInferenceForSetPipelinesCommands(setPipelinesCommands, s.Options.Config.WASMDir)
+	numInjected, err := s.Options.WasmService.InjectSchemaInferenceForSetPipelinesCommands(ctx, setPipelinesCommands)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to inject schema inference pipelines")
 	}

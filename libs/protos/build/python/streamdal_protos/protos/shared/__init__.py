@@ -4,6 +4,7 @@
 # This file has been @generated
 import builtins
 from dataclasses import dataclass
+from typing import Optional
 
 import betterproto
 
@@ -28,16 +29,58 @@ class KvAction(betterproto.Enum):
 @dataclass(eq=False, repr=False)
 class WasmModule(betterproto.Message):
     """
-    WasmModule is used to ensure we only send the wasm module once per request
-    instead of duplicated in every pipeline where it is used. This prevents
-    over-sized payloads on SDK startup
+    Main type representing a wasm module entry. Used by server for
+    external.*Wasm() methods; also used to ensure we only send the wasm module
+    once per request instead of duplicated in every pipeline where it is used.
+    This prevents over-sized payloads on SDK startup.
     """
 
     id: str = betterproto.string_field(1)
-    """ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server"""
+    """
+    ID is uuid(sha256(_wasm_bytes)) and is used for referencing the Wasm module
+    """
 
     bytes: builtins.bytes = betterproto.bytes_field(2)
-    """WASM module bytes (set by server)"""
+    """Contents of the Wasm module"""
 
     function: str = betterproto.string_field(3)
-    """WASM function name to execute (set by server)"""
+    """Entry point function name"""
+
+    name: str = betterproto.string_field(4)
+    """Friendly name for the Wasm module"""
+
+    filename: str = betterproto.string_field(5)
+    """Filename of the Wasm module (used only for bundled wasm)"""
+
+    bundled: bool = betterproto.bool_field(6)
+    """
+    Indicates whether this wasm entry is for bundled wasm or for wasm added via
+    CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+    """
+
+    description: Optional[str] = betterproto.string_field(
+        101, optional=True, group="_description"
+    )
+    """Informative, debug fields"""
+
+    version: Optional[str] = betterproto.string_field(
+        102, optional=True, group="_version"
+    )
+    url: Optional[str] = betterproto.string_field(103, optional=True, group="_url")
+    created_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
+        1000, optional=True, group="X_created_at_unix_ts_ns_utc"
+    )
+    """Set by server"""
+
+    updated_at_unix_ts_ns_utc: Optional[int] = betterproto.int64_field(
+        1001, optional=True, group="X_updated_at_unix_ts_ns_utc"
+    )
+    """Set by server"""
+
+    created_by: Optional[str] = betterproto.string_field(
+        1002, optional=True, group="X_created_by"
+    )
+    """
+    Used internally by server and k8s operator to determine who manages this
+    resource
+    """

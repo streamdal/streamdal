@@ -2,6 +2,14 @@ import type { RpcTransport } from "@protobuf-ts/runtime-rpc";
 import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
+import type { DeleteWasmRequest } from "./sp_external.js";
+import type { UpdateWasmRequest } from "./sp_external.js";
+import type { CreateWasmResponse } from "./sp_external.js";
+import type { CreateWasmRequest } from "./sp_external.js";
+import type { GetAllWasmResponse } from "./sp_external.js";
+import type { GetAllWasmRequest } from "./sp_external.js";
+import type { GetWasmResponse } from "./sp_external.js";
+import type { GetWasmRequest } from "./sp_external.js";
 import type { AppRegisterRejectRequest } from "./sp_external.js";
 import type { AppVerifyRegistrationRequest } from "./sp_external.js";
 import type { AppRegistrationRequest } from "./sp_external.js";
@@ -43,6 +51,8 @@ import type { GetPipelineRequest } from "./sp_external.js";
 import type { GetPipelinesResponse } from "./sp_external.js";
 import type { GetPipelinesRequest } from "./sp_external.js";
 import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { GetConfigResponse } from "./sp_external.js";
+import type { GetConfigRequest } from "./sp_external.js";
 import type { GetAllResponse } from "./sp_external.js";
 import type { GetAllRequest } from "./sp_external.js";
 import type { UnaryCall } from "@protobuf-ts/runtime-rpc";
@@ -57,6 +67,12 @@ export interface IExternalClient {
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
+    /**
+     * Returns the current _full_ configuration of the server
+     *
+     * @generated from protobuf rpc: GetConfig(protos.GetConfigRequest) returns (protos.GetConfigResponse);
+     */
+    getConfig(input: GetConfigRequest, options?: RpcOptions): UnaryCall<GetConfigRequest, GetConfigResponse>;
     /**
      * Used by console to stream updates to UI; called after initial GetAll()
      *
@@ -154,7 +170,7 @@ export interface IExternalClient {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */
@@ -213,6 +229,30 @@ export interface IExternalClient {
      * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
+    /**
+     * BEGIN Wasm methods
+     *
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
+     */
+    getWasm(input: GetWasmRequest, options?: RpcOptions): UnaryCall<GetWasmRequest, GetWasmResponse>;
+    /**
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
+     */
+    getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse>;
+    /**
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
+     */
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, CreateWasmResponse>;
+    /**
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
+     */
+    updateWasm(input: UpdateWasmRequest, options?: RpcOptions): UnaryCall<UpdateWasmRequest, StandardResponse>;
+    /**
+     * END Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteWasm(input: DeleteWasmRequest, options?: RpcOptions): UnaryCall<DeleteWasmRequest, StandardResponse>;
     /**
      * Test method
      *
@@ -238,6 +278,12 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
     /**
+     * Returns the current _full_ configuration of the server
+     *
+     * @generated from protobuf rpc: GetConfig(protos.GetConfigRequest) returns (protos.GetConfigResponse);
+     */
+    getConfig(input: GetConfigRequest, options?: RpcOptions): UnaryCall<GetConfigRequest, GetConfigResponse>;
+    /**
      * Used by console to stream updates to UI; called after initial GetAll()
      *
      * @generated from protobuf rpc: GetAllStream(protos.GetAllRequest) returns (stream protos.GetAllResponse);
@@ -334,7 +380,7 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */
@@ -393,6 +439,30 @@ export declare class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
+    /**
+     * BEGIN Wasm methods
+     *
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
+     */
+    getWasm(input: GetWasmRequest, options?: RpcOptions): UnaryCall<GetWasmRequest, GetWasmResponse>;
+    /**
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
+     */
+    getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse>;
+    /**
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
+     */
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, CreateWasmResponse>;
+    /**
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
+     */
+    updateWasm(input: UpdateWasmRequest, options?: RpcOptions): UnaryCall<UpdateWasmRequest, StandardResponse>;
+    /**
+     * END Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteWasm(input: DeleteWasmRequest, options?: RpcOptions): UnaryCall<DeleteWasmRequest, StandardResponse>;
     /**
      * Test method
      *

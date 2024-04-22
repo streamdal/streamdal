@@ -12,31 +12,83 @@ import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * WasmModule is used to ensure we only send the wasm module once per request
+ * Main type representing a wasm module entry. Used by server for external.*Wasm()
+ * methods; also used to ensure we only send the wasm module once per request
  * instead of duplicated in every pipeline where it is used. This prevents
- * over-sized payloads on SDK startup
+ * over-sized payloads on SDK startup.
  *
  * @generated from protobuf message protos.shared.WasmModule
  */
 export interface WasmModule {
     /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by streamdal server
+     * ID is uuid(sha256(_wasm_bytes)) and is used for referencing the Wasm module
      *
      * @generated from protobuf field: string id = 1;
      */
     id: string;
     /**
-     * WASM module bytes (set by server)
+     * Contents of the Wasm module
      *
      * @generated from protobuf field: bytes bytes = 2;
      */
     bytes: Uint8Array;
     /**
-     * WASM function name to execute (set by server)
+     * Entry point function name
      *
      * @generated from protobuf field: string function = 3;
      */
     function: string;
+    /**
+     * Friendly name for the Wasm module
+     *
+     * @generated from protobuf field: string name = 4;
+     */
+    name: string;
+    /**
+     * Filename of the Wasm module (used only for bundled wasm)
+     *
+     * @generated from protobuf field: string _filename = 5;
+     */
+    Filename: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Indicates whether this wasm entry is for bundled wasm or for wasm added via
+     * CreateWasm(); ignored in CreateWasm() and UpdateWasm().
+     *
+     * @generated from protobuf field: bool _bundled = 6;
+     */
+    Bundled: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Informative, debug fields
+     *
+     * @generated from protobuf field: optional string description = 101;
+     */
+    description?: string;
+    /**
+     * @generated from protobuf field: optional string version = 102;
+     */
+    version?: string;
+    /**
+     * @generated from protobuf field: optional string url = 103;
+     */
+    url?: string;
+    /**
+     * Set by server
+     *
+     * @generated from protobuf field: optional int64 _created_at_unix_ts_ns_utc = 1000;
+     */
+    CreatedAtUnixTsNsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Set by server
+     *
+     * @generated from protobuf field: optional int64 _updated_at_unix_ts_ns_utc = 1001;
+     */
+    UpdatedAtUnixTsNsUtc?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1002;
+     */
+    CreatedBy?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * KVAction is a shared type that is used for protos.KVCommand and protos.KVStep.
@@ -83,11 +135,20 @@ class WasmModule$Type extends MessageType<WasmModule> {
         super("protos.shared.WasmModule", [
             { no: 1, name: "id", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "bytes", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 3, name: "function", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "function", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "_filename", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 6, name: "_bundled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 101, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 102, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 103, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 1000, name: "_created_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1001, name: "_updated_at_unix_ts_ns_utc", kind: "scalar", opt: true, T: 3 /*ScalarType.INT64*/ },
+            { no: 1002, name: "_created_by", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<WasmModule>): WasmModule {
-        const message = { id: "", bytes: new Uint8Array(0), function: "" };
+        const message = { id: "", bytes: new Uint8Array(0), function: "", name: "", Filename: "", Bundled: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<WasmModule>(this, message, value);
@@ -106,6 +167,33 @@ class WasmModule$Type extends MessageType<WasmModule> {
                     break;
                 case /* string function */ 3:
                     message.function = reader.string();
+                    break;
+                case /* string name */ 4:
+                    message.name = reader.string();
+                    break;
+                case /* string _filename */ 5:
+                    message.Filename = reader.string();
+                    break;
+                case /* bool _bundled */ 6:
+                    message.Bundled = reader.bool();
+                    break;
+                case /* optional string description */ 101:
+                    message.description = reader.string();
+                    break;
+                case /* optional string version */ 102:
+                    message.version = reader.string();
+                    break;
+                case /* optional string url */ 103:
+                    message.url = reader.string();
+                    break;
+                case /* optional int64 _created_at_unix_ts_ns_utc */ 1000:
+                    message.CreatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                case /* optional int64 _updated_at_unix_ts_ns_utc */ 1001:
+                    message.UpdatedAtUnixTsNsUtc = reader.int64().toString();
+                    break;
+                case /* optional string _created_by */ 1002:
+                    message.CreatedBy = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -128,6 +216,33 @@ class WasmModule$Type extends MessageType<WasmModule> {
         /* string function = 3; */
         if (message.function !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.function);
+        /* string name = 4; */
+        if (message.name !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.name);
+        /* string _filename = 5; */
+        if (message.Filename !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.Filename);
+        /* bool _bundled = 6; */
+        if (message.Bundled !== false)
+            writer.tag(6, WireType.Varint).bool(message.Bundled);
+        /* optional string description = 101; */
+        if (message.description !== undefined)
+            writer.tag(101, WireType.LengthDelimited).string(message.description);
+        /* optional string version = 102; */
+        if (message.version !== undefined)
+            writer.tag(102, WireType.LengthDelimited).string(message.version);
+        /* optional string url = 103; */
+        if (message.url !== undefined)
+            writer.tag(103, WireType.LengthDelimited).string(message.url);
+        /* optional int64 _created_at_unix_ts_ns_utc = 1000; */
+        if (message.CreatedAtUnixTsNsUtc !== undefined)
+            writer.tag(1000, WireType.Varint).int64(message.CreatedAtUnixTsNsUtc);
+        /* optional int64 _updated_at_unix_ts_ns_utc = 1001; */
+        if (message.UpdatedAtUnixTsNsUtc !== undefined)
+            writer.tag(1001, WireType.Varint).int64(message.UpdatedAtUnixTsNsUtc);
+        /* optional string _created_by = 1002; */
+        if (message.CreatedBy !== undefined)
+            writer.tag(1002, WireType.LengthDelimited).string(message.CreatedBy);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

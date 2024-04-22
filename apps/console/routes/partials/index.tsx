@@ -6,4 +6,6 @@ export const config: RouteConfig = {
   skipInheritedLayouts: true,
 };
 
-export default defineRoute(async () => <Partial name="main-content" />);
+export default defineRoute(async () => (
+  <Partial name="overlay-content"></Partial>
+));

@@ -1,14 +1,18 @@
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { audienceMetricsSignal } from "../components/serviceMap/customEdge.tsx";
-import {
-  MAX_TAIL_SIZE,
-  tailSamplingSignal,
-  tailSignal,
-} from "../islands/drawer/tail.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { demoHttpRequestSignal } from "../routes/demo/http/index.tsx";
+import { MAX_TAIL_SIZE } from "./const.ts";
+import {
+  tailSamplingSignal,
+  tailSignal,
+} from "root/components/tail/signals.ts";
+import {
+  ServiceSignal,
+  serviceSignal,
+} from "../components/serviceMap/serviceSignal.ts";
+import { mapLiveAudiences } from "./serviceMapper.ts";
 
 const SOCKET_KEEPALIVE = 30000;
 const socketPing = (webSocket: WebSocket) =>
@@ -50,6 +54,7 @@ export const demoHttpRequestSocket = (path: string) => {
 
 export const serviceMapSocket = (path: string) => {
   const webSocket = getSocket(path);
+  webSocket.binaryType = "arraybuffer";
 
   webSocket.addEventListener("open", () => {
     webSocket.send("ping");
@@ -62,12 +67,17 @@ export const serviceMapSocket = (path: string) => {
     }
 
     try {
-      const parsedData = JSON.parse(event.data);
+      const view = new DataView(event.data, 0, event.data.byteLength);
+      const serviceMap: ServiceSignal = JSON.parse(
+        new TextDecoder().decode(view),
+      );
       serviceSignal.value = {
-        ...parsedData,
-        nodesMap: new Map(parsedData.nodesMap),
-        edgesMap: new Map(parsedData.edgesMap),
-        browserInitialized: true,
+        ...serviceMap,
+        //
+        // remap live audiences for convenience,
+        // js maps do not survive socket serialization/deserialization
+        liveAudiences: mapLiveAudiences(serviceMap.live),
+        streamingUpdate: true,
       };
     } catch (e) {
       console.error("error parsing serviceMap socket data", e);

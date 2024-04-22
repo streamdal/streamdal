@@ -1,15 +1,11 @@
-import {
-  initServiceSignal,
-  serviceSignal,
-  setServiceSignal,
-} from "../components/serviceMap/serviceSignal.ts";
-import { client, meta } from "./grpc.ts";
+import { effect, signal } from "@preact/signals";
 import { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
 import {
   GetAllRequest,
   GetAllResponse,
 } from "streamdal-protos/protos/sp_external.ts";
-import { effect, signal } from "@preact/signals";
+import { setServiceSignal } from "../components/serviceMap/serviceSignal.ts";
+import { client, meta } from "./grpc.ts";
 import { SERVER_ERROR, serverErrorSignal } from "./serverError.ts";
 
 export const CONNECT_RETRY_INTERVAL = 3000;
@@ -38,7 +34,6 @@ export const streamServiceMap = async () => {
     const { status } = await call;
     status && console.info("received grpc getAllStream status", status);
   } catch (e) {
-    serviceSignal.value = initServiceSignal;
     //
     // User generated abort signals present as cancelled exceptions, don't reconnect
     if (e?.code === "CANCELLED") {

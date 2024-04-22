@@ -2,7 +2,7 @@ import { Handlers } from "$fresh/src/server/types.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { deleteService } from "../../../lib/mutation.ts";
 
-export const handler: Handlers<> = {
+export const handler: Handlers = {
   async POST(req, ctx) {
     const serviceName = ctx.params.service;
     const response = await deleteService(serviceName);
@@ -14,7 +14,7 @@ export const handler: Handlers<> = {
           status: response.code === ResponseCode.OK,
           message: response.code === ResponseCode.OK
             ? "Successfully deleted"
-            : response.message,
+            : (response as any).error,
         },
         headers: { Location: "/" },
       }),

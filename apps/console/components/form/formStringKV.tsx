@@ -4,13 +4,15 @@ import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
+import { ChangeEvent } from "react";
 
 export type FormKVType = {
   name: string;
   label: string;
-  description: strin;
+  description: string;
   data: any;
   errors: ErrorType;
+  readonly?: boolean;
 };
 
 /**
@@ -22,7 +24,7 @@ export type FormKVType = {
  *     };
  */
 export const FormStringKV = (
-  { name, label, description, data, errors }: FormKVType,
+  { name, label, description, data, errors, readonly }: FormKVType,
 ) => {
   const existingData = resolveValue(data, name);
   const [pairs, setPairs] = useState(
@@ -57,7 +59,11 @@ export const FormStringKV = (
               className="flex flex-row justify-between items-center w-full"
               key={`${name}-key-${i}`}
             >
-              <div className="flex flex-row justify-start items-start w-[80%]">
+              <div
+                className={`flex flex-row justify-start items-start w-[${
+                  readonly ? "100" : "80"
+                }%]`}
+              >
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
                   <label
                     className={`text-xs mb-[3px] `}
@@ -67,15 +73,14 @@ export const FormStringKV = (
                   <input
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight `}
                     value={k}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setPairs(
                         pairs.map(([k, v], ki) =>
-                          ki === i
-                            ? [(e.target as HTMLInputElement).value, v]
-                            : [k, v]
+                          ki === i ? [e.currentTarget.value, v] : [k, v]
                         ),
                       )}
                     placeholder="key"
+                    readOnly={readonly}
                   />
                   <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
                   </div>
@@ -92,16 +97,15 @@ export const FormStringKV = (
                       errors[`${name}.${k}`] && "border-streamdalRed"
                     } `}
                     value={v as string}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setPairs(
                         pairs.map(([k, v], ki) =>
-                          ki === i
-                            ? [k, (e.target as HTMLInputElement).value]
-                            : [k, v]
+                          ki === i ? [k, e.currentTarget.value] : [k, v]
                         ),
                       )}
                     disabled={!k}
                     placeholder={k ? "value" : "enter key first"}
+                    readOnly={readonly}
                   />
                   <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
                     <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
@@ -111,22 +115,29 @@ export const FormStringKV = (
                 </div>
               </div>
 
-              <IconTrash
-                class="w-5 h-5 mt-3 ml-2 text-eyelid cursor-pointer"
-                onClick={() =>
-                  pairs.length === 1
-                    ? setPairs([["", ""]])
-                    : setPairs(pairs.filter((_, index) => index !== i))}
-              />
-              <IconPlus
-                data-tooltip-target={`${name}-add-${i}`}
-                class="w-5 h-5 mt-3 mx-2 cursor-pointer"
-                onClick={() => setPairs([...pairs, ["", ""]])}
-              />
-              <Tooltip
-                targetId={`${name}-add-${i}`}
-                message={`Add ${label}`}
-              />
+              {!readonly && (
+                <IconTrash
+                  class="w-5 h-5 mt-3 ml-2 text-eyelid cursor-pointer"
+                  onClick={() =>
+                    pairs.length === 1
+                      ? setPairs([["", ""]])
+                      : setPairs(pairs.filter((_, index) => index !== i))}
+                />
+              )}
+              {!readonly &&
+                (
+                  <>
+                    <IconPlus
+                      data-tooltip-target={`${name}-add-${i}`}
+                      class="w-5 h-5 mt-3 mx-2 cursor-pointer"
+                      onClick={() => setPairs([...pairs, ["", ""]])}
+                    />
+                    <Tooltip
+                      targetId={`${name}-add-${i}`}
+                      message={`Add ${label}`}
+                    />
+                  </>
+                )}
             </div>
           );
         })}

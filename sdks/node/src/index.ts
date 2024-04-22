@@ -1,10 +1,12 @@
-import { Audience, OperationType } from "@streamdal/protos/protos/sp_common";
+import {
+  Audience as InternalAudience,
+  OperationType,
+} from "@streamdal/protos/protos/sp_common";
 import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import {
   ExecStatus,
   SDKResponse as InternalSDKResponse,
 } from "@streamdal/protos/protos/sp_sdk";
-
 import { v4 as uuidv4 } from "uuid";
 
 import { addAudiences } from "./internal/audience.js";
@@ -14,7 +16,11 @@ import { METRIC_INTERVAL, sendMetrics } from "./internal/metrics.js";
 import { retryProcessPipelines } from "./internal/process.js";
 import { register as internalRegister } from "./internal/register.js";
 
-export { Audience, ExecStatus, OperationType };
+export { ExecStatus, OperationType };
+export type Audience = Pick<
+  InternalAudience,
+  "componentName" | "operationName" | "operationType"
+>;
 
 export type SDKResponse = InternalSDKResponse & {
   decodedData?: any;
@@ -40,7 +46,7 @@ export interface InternalConfigs {
   stepTimeout: string;
   dryRun: boolean;
   sessionId: string;
-  audiences?: Audience[];
+  audiences?: InternalAudience[];
 }
 
 export interface StreamdalRequest {
@@ -84,6 +90,13 @@ const initConfigs = (configs?: StreamdalConfigs) => {
 
   const sessionId = uuidv4();
   const grpcClient = client(url);
+  const audiences: InternalAudience[] | undefined = configs?.audiences?.map(
+    (a: Audience) =>
+      ({
+        ...a,
+        serviceName: configs.serviceName,
+      } as InternalAudience)
+  );
 
   const internalConfigs = {
     grpcClient,
@@ -98,7 +111,7 @@ const initConfigs = (configs?: StreamdalConfigs) => {
     stepTimeout:
       configs?.stepTimeout ?? process.env.STREAMDAL_STEP_TIMEOUT ?? "10",
     dryRun: configs?.dryRun ?? !!process.env.STREAMDAL_DRY_RUN,
-    audiences: configs?.audiences,
+    audiences,
   };
 
   // Heartbeat is obsolete
@@ -113,7 +126,7 @@ const initConfigs = (configs?: StreamdalConfigs) => {
   return internalConfigs;
 };
 
-const encodeJson = (data: string): Uint8Array => {
+const encodeJSON = (data: string): Uint8Array => {
   return new TextEncoder().encode(data);
 };
 
@@ -131,7 +144,7 @@ const encodeAny = (data: any): Uint8Array => {
 export const registerStreamdal = async (
   configs?: StreamdalConfigs
 ): Promise<StreamdalRegistration> => {
-  const internalConfigs = initConfigs(configs);
+  const internalConfigs: InternalConfigs = initConfigs(configs);
 
   await addAudiences(internalConfigs);
   await internalRegister(internalConfigs);
@@ -154,7 +167,7 @@ export const registerStreamdal = async (
       return retryProcessPipelines({
         configs: internalConfigs,
         audience,
-        data: encodeJson(data),
+        data: encodeJSON(data),
       });
     },
     processAny: async ({
@@ -200,6 +213,28 @@ export class Streamdal {
       configs: this.internalConfigs,
       audience,
       data,
+    });
+  }
+
+  async processJSON({
+    audience,
+    data,
+  }: StreamdalJSONRequest): Promise<SDKResponse> {
+    return retryProcessPipelines({
+      configs: this.internalConfigs,
+      audience,
+      data: encodeJSON(data),
+    });
+  }
+
+  async processAny({
+    audience,
+    data,
+  }: StreamdalAnyRequest): Promise<SDKResponse> {
+    return retryProcessPipelines({
+      configs: this.internalConfigs,
+      audience,
+      data: encodeAny(data),
     });
   }
 }

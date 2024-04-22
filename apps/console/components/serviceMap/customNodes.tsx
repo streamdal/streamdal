@@ -4,9 +4,9 @@ import IconDatabase from "tabler-icons/tsx/database.tsx";
 import IconBrandStripe from "tabler-icons/tsx/brand-stripe.tsx";
 import IconBrandAws from "tabler-icons/tsx/brand-aws.tsx";
 import "twind";
-import { OperationType } from "streamdal-protos/protos/sp_common.ts";
-import { ProducerIcon } from "../components/icons/producer.tsx";
-import { ConsumerIcon } from "../components/icons/consumer.tsx";
+import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { ProducerIcon } from "../icons/producer.tsx";
+import { ConsumerIcon } from "../icons/consumer.tsx";
 import {
   audienceKey,
   componentKey,
@@ -15,37 +15,39 @@ import {
   setOperationHoverGroup,
   setServiceGroup,
   titleCase,
-} from "../lib/utils.ts";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { NodeData, Operation } from "../lib/nodeMapper.ts";
-import { opModal } from "../components/serviceMap/opModalSignal.ts";
+} from "../../lib/utils.ts";
+import { Tooltip } from "../tooltip/tooltip.tsx";
+import { FlowNode, NodeData } from "../../lib/nodeMapper.ts";
+import { opModal } from "./opModalSignal.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { ServiceLanguage } from "../components/icons/serviceLanguages.tsx";
+import { ServiceLanguage } from "../icons/serviceLanguages.tsx";
+import { serviceSignal } from "./serviceSignal.ts";
+import { LiveInfo } from "streamdal-protos/protos/sp_info.ts";
 
 export const GROUP_WIDTH = 280;
 export const GROUP_MARGIN = 45;
 
-export const ServiceNode = ({ data }: { data: NodeData }) => {
-  const liveServiceInfo = data.serviceMap.live.find((service) =>
-    service.client?.ServiceName === data.audience.serviceName
+export const ServiceNode = ({ data: { audience } }: FlowNode) => {
+  const liveServiceInfo = serviceSignal.value?.live.find((live: LiveInfo) =>
+    live.client?.ServiceName === audience.serviceName
   );
   const serviceLanguage = liveServiceInfo?.client?.language;
-  const highlighted = data?.audience === opModal.value?.audience &&
+  const highlighted = audience === opModal.value?.audience &&
     opModal.value?.displayType === "service";
   const trashActive = opModal.value?.deleteService;
-  const key = `language-icon-${serviceKey(data?.audience)}`;
+  const key = `language-icon-${serviceKey(audience)}`;
 
   const setHover = () => {
     setServiceGroup(
-      data.audience.serviceName,
-      data.serviceMap.audiences,
+      audience.serviceName,
+      serviceSignal.value.audiences,
       true,
     );
   };
   const resetHover = () => {
     setServiceGroup(
-      data.audience.serviceName,
-      data.serviceMap.audiences,
+      audience.serviceName,
+      serviceSignal.value.audiences,
       false,
     );
   };
@@ -53,47 +55,53 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
   return (
     <div>
       <div
-        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 px-2 hover:border-purple-600 hover:shadow-lg ${
+        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 p-2 hover:border-purple-600 hover:shadow-lg ${
           highlighted
             ? "border-2 border-purple-600"
             : "border-1 border-purple-200"
         }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
-        id={`${serviceKey(data.audience)}-draghandle`}
+        id={`${serviceKey(audience)}-draghandle`}
       >
         <div
           class="flex flex-row items-center"
           onClick={() => {
             opModal.value = {
-              audience: data.audience,
+              audience,
               displayType: "service",
+              clients: 0,
             };
           }}
         >
-          <IconGripVertical class="w-6 h-6 text-purple-100 mr-1" />
-          <div
-            className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
-            data-tooltip-target={key}
-          >
-            <ServiceLanguage language={serviceLanguage} />
+          <div class="w-8">
+            <IconGripVertical class="w-6 h-6 text-purple-100" />
           </div>
-          <Tooltip
-            targetId={key}
-            message={serviceLanguage
-              ? titleCase(serviceLanguage)
-              : "Attach a client to see language"}
-          />
-          <div class="flex flex-col ml-3">
-            <h2 className={"text-lg"}>{data.audience.serviceName}</h2>
+          <div class="mx-2">
+            <div
+              className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
+              data-tooltip-target={key}
+            >
+              <ServiceLanguage language={serviceLanguage} />
+            </div>
+            <Tooltip
+              targetId={key}
+              message={serviceLanguage
+                ? titleCase(serviceLanguage)
+                : "Attach a client to see language"}
+            />
+          </div>
+          <div class="flex flex-col">
+            <h2 className={"text-lg"}>{audience.serviceName}</h2>
           </div>
         </div>
         <button
           onClick={() =>
             opModal.value = {
-              audience: data.audience,
+              audience,
               displayType: "service",
               deleteService: true,
+              clients: 0,
             }}
           className={"p-2 rounded"}
         >
@@ -121,15 +129,16 @@ export const ServiceNode = ({ data }: { data: NodeData }) => {
   );
 };
 
-export const GroupNode = ({ data }: { data: NodeData }) => {
-  const op = OperationType[data.audience.operationType];
+export const GroupNode = ({ data: { audience, group } }: FlowNode) => {
+  const key = audienceKey(audience);
+  const op = OperationType[audience.operationType];
   const producer = op === OperationType[OperationType.PRODUCER];
   const setHover = () => {
-    setOperationHoverGroup(data.audience, true);
+    setOperationHoverGroup(audience, true);
   };
 
   const resetHover = () => {
-    setOperationHoverGroup(data.audience, false);
+    setOperationHoverGroup(audience, false);
   };
 
   return (
@@ -146,11 +155,8 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
         {`${titleCase(op)}s`}
       </div>
       <div class="flex flex-col items-center justify-center mb w-full">
-        {data.ops.map((o: Operation, i: number) => (
-          <OperationNode
-            operation={o}
-            css={`${data.ops.length === i + 1 ? "" : "mb-2"}`}
-          />
+        {group?.map((audience: Audience) => (
+          <OperationNode audience={audience} />
         ))}
       </div>
       <Handle
@@ -167,19 +173,18 @@ export const GroupNode = ({ data }: { data: NodeData }) => {
   );
 };
 
-export const OperationNode = (
-  { operation }: { operation: Operation },
-) => {
-  const key = audienceKey(operation.audience);
+export const OperationNode = ({ audience }: { audience: Audience }) => {
+  const key = audienceKey(audience);
   const highlight = opModal.value?.audience &&
     key === audienceKey(opModal.value?.audience) &&
     opModal.value?.displayType === "operation";
   const trashActive = opModal.value?.deleteOperation;
+  const clients = serviceSignal.value?.liveAudiences.get(key);
 
   return (
     <div
       type="button"
-      class={`flex items-center justify-between w-[260px] h-[64px] group bg-white rounded-lg shadow-lg ${
+      class={`flex items-center justify-between w-[260px] min-h-[64px] group bg-white rounded-lg shadow-lg ${
         highlight ? "border-2 border-purple-600" : "border-1 border-purple-200"
       } pl-1 pr-2 mt-2`}
     >
@@ -187,9 +192,9 @@ export const OperationNode = (
         class="whitespace-nowrap text-ellipsis overflow-hidden w-full"
         onClick={() =>
           opModal.value = {
-            audience: operation.audience,
+            audience: audience,
             displayType: "operation",
-            clients: operation.clients,
+            clients: clients?.length || 0,
           }}
       >
         <div
@@ -197,17 +202,17 @@ export const OperationNode = (
         >
           <h2
             data-tooltip-target={key}
-            class={"text-[16px] whitespace-nowrap text-ellipsis overflow-hidden"}
+            class={"text-[16px] whitespace-normal break-words"}
           >
-            {operation.audience.operationName}
+            {audience.operationName}
           </h2>
           <Tooltip
             targetId={key}
             message={"Click to attach and detach pipelines"}
           />
           <h3 class="text-xs text-streamdalPurple font-semibold">
-            {`${operation.clients?.length || 0} attached client${
-              operation.clients?.length !== 1 ? "s" : ""
+            {`${clients?.length || 0} attached client${
+              clients?.length !== 1 ? "s" : ""
             }`}
           </h3>
         </div>
@@ -215,9 +220,9 @@ export const OperationNode = (
       <button
         onClick={() => {
           opModal.value = {
-            audience: operation.audience,
+            audience: audience,
             displayType: "operation",
-            clients: operation.clients,
+            clients: clients?.length || 0,
             deleteOperation: true,
           };
         }}
@@ -274,31 +279,32 @@ export const ComponentImage = (
   return <IconDatabase className={`text-white w-14 h-14`} />;
 };
 
-export const ComponentNode = ({ data }: { data: NodeData }) => {
-  const highlighted = data?.audience === opModal.value?.audience &&
+export const ComponentNode = ({ data: { audience } }: FlowNode) => {
+  const highlighted = audience === opModal.value?.audience &&
     opModal.value?.displayType === "component";
   const setHover = () => {
     setComponentGroup(
-      data.audience.componentName,
-      data.serviceMap.audiences,
+      audience.componentName,
+      serviceSignal.value?.audiences,
       true,
     );
   };
   const resetHover = () => {
     setComponentGroup(
-      data.audience.componentName,
-      data.serviceMap.audiences,
+      audience.componentName,
+      serviceSignal.value?.audiences,
       false,
     );
   };
 
-  const cKey = componentKey(data.audience);
+  const cKey = componentKey(audience);
   return (
     <div
       onClick={() => {
         opModal.value = {
-          audience: data.audience,
+          audience,
           displayType: "component",
+          clients: 0,
         };
       }}
     >
@@ -316,18 +322,22 @@ export const ComponentNode = ({ data }: { data: NodeData }) => {
       </div>
       <div
         id={`${cKey}-dragHandle`}
-        class={`z-0 flex justify-center items-center bg-web rounded-md hover:shadow-xl hover:border-4 hover:border-purple-600 h-[145px] w-[145px] ${
+        class={`z-0 flex justify-center items-center bg-web rounded-md border-4 hover:shadow-xl hover:border-4 hover:border-purple-600 min-h-[145px] w-[145px] ${
           highlighted && "border-4 border-purple-600"
         }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
       >
-        <div class="flex justify-center flex-col items-center">
+        <div class="flex justify-center flex-col items-center p-2">
           <ComponentImage
-            componentName={data.audience.componentName}
+            componentName={audience.componentName}
             className={"w-[40px]"}
           />
-          <p class={"z-10 mt-2 text-white"}>{data.audience.componentName}</p>
+          <p
+            class={"z-10 text-white"}
+          >
+            {audience.componentName}
+          </p>
         </div>
       </div>
     </div>

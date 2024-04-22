@@ -1,96 +1,28 @@
 import { useEffect, useState } from "preact/hooks";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { zfd } from "zod-form-data";
-import * as z from "zod/index.ts";
-import { validate } from "../components/form/validate.ts";
-import { FormInput } from "../components/form/formInput.tsx";
-import { FormHidden } from "../components/form/formHidden.tsx";
-import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
+
+import { resolveValue, validate } from "root/components/form/validate.ts";
+import { NotificationSchema } from "root/components/notifications/schema.ts";
 import {
   NotificationConfig,
   NotificationEmail_Type,
   NotificationPagerDuty_Urgency,
   NotificationType,
 } from "streamdal-protos/protos/sp_notify.ts";
+import { FormBoolean } from "../components/form/formBoolean.tsx";
+import { FormHidden } from "../components/form/formHidden.tsx";
+import { FormInput } from "../components/form/formInput.tsx";
+import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
 import { InlineInput } from "../components/form/inlineInput.tsx";
 import { NotificationMenu } from "../components/notifications/notificationMenu.tsx";
-import { FormBoolean } from "../components/form/formBoolean.tsx";
 
-const NotificationTypeEnum = z.nativeEnum(NotificationType);
-const EmailNotificationTypeEnum = z.nativeEnum(NotificationEmail_Type);
-const NotificationPaterDutyUrgencyEnum = z.nativeEnum(
-  NotificationPagerDuty_Urgency,
-);
-
-const SMTPEmailNotificationSchema = z.object({
-  host: z.string().min(1, { message: "Required" }),
-  port: zfd.numeric(z.number({ message: "Required" })),
-  user: z.string().min(1, { message: "Required" }),
-  password: z.string().min(1, { message: "Required" }),
-  useTls: zfd.text(z.string({ required_error: "Required" })),
-});
-
-const SESEmailNotificationSchema = z.object({
-  sesRegion: z.string().min(1, { message: "Required" }),
-  sesAccessKeyId: z.string().min(1, { message: "Required" }),
-  sesSecretAccessKey: z.string().min(1, { message: "Required" }),
-});
-
-const EmailNotificationKindSchema = z.discriminatedUnion("oneofKind", [
-  z.object({
-    oneofKind: z.literal("smtp"),
-    smtp: SMTPEmailNotificationSchema,
-  }),
-  z.object({
-    oneofKind: z.literal("ses"),
-    ses: SESEmailNotificationSchema,
-  }),
-]);
-
-const NotificationKindSchema = z.discriminatedUnion("oneofKind", [
-  z.object({
-    oneofKind: z.literal("slack"),
-    slack: z.object({
-      botToken: z.string().min(1, { message: "Required" }),
-      channel: z.string().min(1, { message: "Required" }),
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("email"),
-    email: z.object({
-      type: zfd.numeric(EmailNotificationTypeEnum),
-      recipients: zfd.repeatable(
-        z.array(z.string().min(1, { message: "Required" })),
-      ),
-      fromAddress: z.string().min(1, { message: "Required" }),
-      config: EmailNotificationKindSchema,
-    }),
-  }),
-  z.object({
-    oneofKind: z.literal("pagerduty"),
-    pagerduty: z.object({
-      token: z.string().min(1, { message: "Required" }),
-      email: z.string().min(1, { message: "Required" }),
-      serviceId: z.string().min(1, { message: "Required" }),
-      urgency: zfd.numeric(NotificationPaterDutyUrgencyEnum),
-    }),
-  }),
-]);
-
-export const NotificationSchema = zfd.formData({
-  id: z.string().optional(),
-  name: z.string().min(1, { message: "Required" }),
-  type: zfd.numeric(NotificationTypeEnum),
-  config: NotificationKindSchema,
-});
-
-const NotificationDetail = ({
+export default function NotificationDetail({
   notification,
 }: {
   notification: NotificationConfig;
-}) => {
+}) {
   const [errors, setErrors] = useState({});
-  const [data, setData] = useState(notification);
+  const [data, setData] = useState<any>();
 
   useEffect(() => {
     setData({
@@ -108,17 +40,6 @@ const NotificationDetail = ({
       return;
     }
   };
-
-  useEffect(() => {
-    const oneofKind = NotificationType[data.type].toLowerCase();
-    setData({
-      ...data,
-      config: {
-        ...data.config,
-        oneofKind,
-      },
-    });
-  }, [data.type]);
 
   const addRecipient = () => {
     setData({
@@ -146,6 +67,7 @@ const NotificationDetail = ({
                 data={data}
                 setData={setData}
                 errors={errors}
+                defaultValue={resolveValue(data, "name")}
               />
             </div>
             {<NotificationMenu id={notification?.id} />}
@@ -169,7 +91,7 @@ const NotificationDetail = ({
               />
               <FormHidden
                 name={`config.oneofKind`}
-                value={data.config.oneofKind}
+                value={data?.config?.oneofKind || NotificationType.SLACK}
               />
 
               {data?.type == NotificationType.SLACK && (
@@ -230,20 +152,22 @@ const NotificationDetail = ({
                     <IconPlus class="h-5 w-5 cursor-pointer" />
                   </div>
 
-                  {data?.config?.email?.recipients?.length
-                    ? (
-                      data?.config?.email?.recipients?.map((r, i) => (
-                        <FormInput
-                          name={`config.email.recipients.${i}`}
-                          data={data}
-                          label={`Recipient ${i + 1}.`}
-                          setData={setData}
-                          placeHolder={""}
-                          errors={errors}
-                        />
-                      ))
-                    )
-                    : (
+                  {(
+                    data?.config?.email?.recipients?.map((
+                      r: any,
+                      i: number,
+                    ) => (
+                      <FormInput
+                        name={`config.email.recipients.${i}`}
+                        data={data}
+                        label={`Recipient ${i + 1}.`}
+                        setData={setData}
+                        placeHolder={""}
+                        errors={errors}
+                      />
+                    ))
+                  ) ||
+                    (
                       <FormInput
                         name={`config.email.recipients.0`}
                         data={data}
@@ -278,7 +202,6 @@ const NotificationDetail = ({
                           setData={setData}
                           label="Port"
                           errors={errors}
-                          isNumber={true}
                           wrapperClass="w-[49%]"
                         />
                       </div>
@@ -309,34 +232,37 @@ const NotificationDetail = ({
                       />
                     </>
                   )}
-                  {data?.config.email?.type == NotificationEmail_Type.SES && (
-                    <>
-                      <div class={"flex-col"}>
-                        <FormInput
-                          name={"config.email.config.ses.sesRegion"}
-                          data={data}
-                          label="Region"
-                          setData={setData}
-                          errors={errors}
-                        />
-                        <FormInput
-                          name={"config.email.config.ses.sesAccessKeyId"}
-                          data={data}
-                          label="Access Key Id"
-                          setData={setData}
-                          errors={errors}
-                        />
-                      </div>
+                  {data?.config.oneofKind === "email" &&
+                    data?.config?.email?.type ===
+                      NotificationEmail_Type.SES &&
+                    (
+                      <>
+                        <div class={"flex-col"}>
+                          <FormInput
+                            name={"config.email.config.ses.sesRegion"}
+                            data={data}
+                            label="Region"
+                            setData={setData}
+                            errors={errors}
+                          />
+                          <FormInput
+                            name={"config.email.config.ses.sesAccessKeyId"}
+                            data={data}
+                            label="Access Key Id"
+                            setData={setData}
+                            errors={errors}
+                          />
+                        </div>
 
-                      <FormInput
-                        name={"config.email.config.ses.sesSecretAccessKey"}
-                        data={data}
-                        label="Secret Access Key"
-                        setData={setData}
-                        errors={errors}
-                      />
-                    </>
-                  )}
+                        <FormInput
+                          name={"config.email.config.ses.sesSecretAccessKey"}
+                          data={data}
+                          label="Secret Access Key"
+                          setData={setData}
+                          errors={errors}
+                        />
+                      </>
+                    )}
                 </div>
               )}
               {data?.type == NotificationType.PAGERDUTY && (
@@ -384,6 +310,4 @@ const NotificationDetail = ({
       </form>
     </>
   );
-};
-
-export default NotificationDetail;
+}

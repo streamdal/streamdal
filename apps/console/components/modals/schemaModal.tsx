@@ -1,10 +1,10 @@
-import { OP_MODAL_WIDTH } from "../../islands/drawer/infoDrawer.tsx";
+import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { humanDateFormat } from "../../lib/utils.ts";
 import IconX from "tabler-icons/tsx/x.tsx";
 
 export const SchemaUpdated = (
-  { updatedDate }: { updatedDate?: strin },
+  { updatedDate }: { updatedDate?: string },
 ) => {
   try {
     return (

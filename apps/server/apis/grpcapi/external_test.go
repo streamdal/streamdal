@@ -5,19 +5,21 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
-
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 
 	"github.com/streamdal/streamdal/apps/server/config"
 	"github.com/streamdal/streamdal/apps/server/deps"
@@ -955,6 +957,276 @@ var _ = Describe("External gRPC API", func() {
 		//    - Broadcast a DeleteAudience message
 		// 3. Deleting an audience without specifying audience should error
 	})
+
+	Context("GetWasm", func() {
+		It("happy path: should return info about specific wasm module", func() {
+			// Reminder: Should have all fields filled out (createdAt, updatedAt)
+			preloadedKeys, err := redisClient.Keys(context.Background(), store.RedisWasmPrefix+":*").Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(preloadedKeys).ToNot(BeEmpty())
+
+			for _, key := range preloadedKeys {
+				split := strings.Split(key, ":")
+				Expect(len(split)).To(Equal(3))
+
+				id := split[2]
+
+				resp, err := externalClient.GetWasm(ctxWithGoodAuth, &protos.GetWasmRequest{Id: id})
+				Expect(err).ToNot(HaveOccurred())
+				Expect(resp).ToNot(BeNil())
+
+				// Check fields
+				Expect(resp.Wasm).ToNot(BeNil())
+				Expect(resp.Wasm.Id).To(Equal(id))
+				Expect(resp.Wasm.Bytes).To(BeEmpty()) // gRPC API strips bytes to save on b/w
+				Expect(resp.Wasm.GetXCreatedAtUnixTsNsUtc()).ToNot(BeZero())
+				Expect(resp.Wasm.XBundled).To(BeTrue())
+				Expect(resp.Wasm.Function).ToNot(BeEmpty())
+			}
+		})
+
+		It("querying unknown wasm module should return error", func() {
+			resp, err := externalClient.GetWasm(ctxWithGoodAuth, &protos.GetWasmRequest{Id: "does-not-exist"})
+			Expect(err).To(HaveOccurred())
+			Expect(resp).To(BeNil())
+			Expect(err.Error()).To(ContainSubstring("wasm not found"))
+		})
+	})
+
+	Context("GetAllWasm", func() {
+		It("happy path: should return all wasm modules", func() {
+			preloadedKeys, err := redisClient.Keys(context.Background(), store.RedisWasmPrefix+":*").Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(preloadedKeys).ToNot(BeEmpty())
+
+			fetchedModules, err := externalClient.GetAllWasm(ctxWithGoodAuth, &protos.GetAllWasmRequest{})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fetchedModules).ToNot(BeNil())
+			Expect(len(fetchedModules.Wasm)).To(Equal(len(preloadedKeys)))
+
+			for _, pk := range preloadedKeys {
+				split := strings.Split(pk, ":")
+				Expect(len(split)).To(Equal(3))
+
+				id := split[2]
+
+				found := false
+				for _, module := range fetchedModules.Wasm {
+					if module.Id == id {
+						found = true
+					}
+				}
+
+				Expect(found).To(BeTrue(), "module %s not found in response", id)
+			}
+		})
+	})
+
+	// CreateWasm is intended for creating custom Wasm only. The only 2 differences
+	// between custom and bundled wasm are:
+	//   1. Custom Wasm ID is generated using a "customWasmModifier" (see util.DeterminativeUUID())
+	//   2. Custom Wasm is NOT marked as bundled
+	Context("CreateWasm", func() {
+		It("happy path: should create a new wasm module", func() {
+			module := generateWasmModule()
+			expectedID := util.DeterminativeUUID(module.Bytes, customWasmModifier)
+			// Make sure that fields are overwritten
+			module.XBundled = true
+			module.Id = "should-not-be-used"
+
+			resp, err := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: module})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("created"))
+			Expect(resp.Id).ToNot(BeEmpty())
+			Expect(resp.Id).To(Equal(expectedID))
+
+			// Make sure that we can fetch it
+			fetchedResp, err := externalClient.GetWasm(ctxWithGoodAuth, &protos.GetWasmRequest{Id: expectedID})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fetchedResp).ToNot(BeNil())
+			Expect(fetchedResp.Wasm).ToNot(BeNil())
+			Expect(fetchedResp.Wasm.Id).To(Equal(expectedID))
+		})
+
+		It("should error if new wasm CUSTOM module already exists", func() {
+			seed := "already-created"
+			module := generateWasmModule(seed)
+			expectedID := util.DeterminativeUUID(module.Bytes, customWasmModifier)
+
+			// Create it
+			resp1, err1 := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: module})
+			Expect(err1).ToNot(HaveOccurred())
+			Expect(resp1).ToNot(BeNil())
+			Expect(resp1.Message).To(ContainSubstring("created"))
+			Expect(resp1.Id).ToNot(BeEmpty())
+			Expect(resp1.Id).To(Equal(expectedID))
+
+			// Attempt to create it again
+			resp2, err2 := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: module})
+			Expect(err2).To(HaveOccurred())
+			Expect(err2.Error()).To(ContainSubstring("already exists"))
+			Expect(resp2).To(BeNil())
+		})
+
+		It("should error if wasm module is missing fields", func() {
+			moduleWithoutName := generateWasmModule()
+			moduleWithoutName.Name = ""
+
+			moduleWithoutBytes := generateWasmModule()
+			moduleWithoutBytes.Bytes = nil
+
+			resp1, err1 := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: moduleWithoutName})
+			Expect(err1).To(HaveOccurred())
+			Expect(err1.Error()).To(ContainSubstring("cannot be empty"))
+			Expect(resp1).To(BeNil())
+
+			resp2, err2 := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: moduleWithoutBytes})
+			Expect(err2).To(HaveOccurred())
+			Expect(err2.Error()).To(ContainSubstring("cannot be nil"))
+			Expect(resp2).To(BeNil())
+		})
+	})
+
+	Context("UpdateWasm", func() {
+		It("happy path: should update a wasm module", func() {
+			seed := "update-test-happy-path"
+			module := generateWasmModule(seed)
+			module.Name = "name-before-update"
+			expectedID := util.DeterminativeUUID(module.Bytes, customWasmModifier)
+			Expect(module.Id).To(Equal(expectedID))
+
+			// Create it
+			resp1, err1 := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: module})
+			Expect(err1).ToNot(HaveOccurred())
+			Expect(resp1).ToNot(BeNil())
+			Expect(resp1.Message).To(ContainSubstring("created"))
+			Expect(resp1.Id).To(Equal(expectedID))
+
+			// Now update it and try to update
+			module.Name = "name-after-update"
+			module.Function = "function-after-update"
+			module.Description = util.Pointer("description-after-update")
+			module.Url = util.Pointer("url-after-update")
+			module.Version = util.Pointer("version-after-update")
+
+			resp2, err2 := externalClient.UpdateWasm(ctxWithGoodAuth, &protos.UpdateWasmRequest{
+				Wasm: module,
+			})
+
+			Expect(err2).ToNot(HaveOccurred())
+			Expect(resp2).ToNot(BeNil())
+			Expect(resp2.Message).To(ContainSubstring("updated"))
+
+			fetchedResp, err := externalClient.GetWasm(ctxWithGoodAuth, &protos.GetWasmRequest{Id: expectedID})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fetchedResp).ToNot(BeNil())
+			Expect(fetchedResp.Wasm).ToNot(BeNil())
+			Expect(fetchedResp.Wasm.Id).To(Equal(expectedID))
+			Expect(fetchedResp.Wasm.Name).To(Equal(module.Name))
+			Expect(fetchedResp.Wasm.Function).To(Equal(module.Function))
+			Expect(*fetchedResp.Wasm.Url).To(Equal(*module.Url))
+			Expect(*fetchedResp.Wasm.Version).To(Equal(*module.Version))
+			Expect(*fetchedResp.Wasm.Description).To(Equal(*module.Description))
+		})
+
+		It("won't allow updating a wasm module that doesn't exist", func() {
+			module := generateWasmModule()
+			module.Id = "does-not-exist"
+
+			resp, err := externalClient.UpdateWasm(ctxWithGoodAuth, &protos.UpdateWasmRequest{Wasm: module})
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("Existing wasm module not found"))
+		})
+
+		It("won't allow updating a wasm module that is bundled", func() {
+			// Grab existing detective key
+			preloadedKeys, err := redisClient.Keys(context.Background(), store.RedisWasmPrefix+":detective:*").Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(preloadedKeys)).To(Equal(1))
+
+			split := strings.Split(preloadedKeys[0], ":")
+			id := split[2]
+
+			// Generate new module with bundled ID
+			module := generateWasmModule()
+			module.Id = id
+
+			resp, err := externalClient.UpdateWasm(ctxWithGoodAuth, &protos.UpdateWasmRequest{Wasm: module})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("cannot update bundled wasm module"))
+		})
+
+		It("won't allow updating a wasm module with missing fields", func() {
+			module := generateWasmModule()
+			module.Id = ""
+
+			resp, err := externalClient.UpdateWasm(ctxWithGoodAuth, &protos.UpdateWasmRequest{Wasm: module})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("cannot be empty"))
+		})
+	})
+
+	Context("DeleteWasm", func() {
+		It("happy path: should delete a wasm module", func() {
+			seed := "delete-test-happy-path"
+			module := generateWasmModule(seed)
+			expectedID := util.DeterminativeUUID(module.Bytes, customWasmModifier)
+
+			// Create it
+			resp1, err1 := externalClient.CreateWasm(ctxWithGoodAuth, &protos.CreateWasmRequest{Wasm: module})
+			Expect(err1).ToNot(HaveOccurred())
+			Expect(resp1).ToNot(BeNil())
+
+			// Fetch it
+			fetchedResp, err := externalClient.GetWasm(ctxWithGoodAuth, &protos.GetWasmRequest{Id: expectedID})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(fetchedResp).ToNot(BeNil())
+			Expect(fetchedResp.Wasm).ToNot(BeNil())
+			Expect(fetchedResp.Wasm.Id).To(Equal(expectedID))
+
+			// Delete it
+			resp2, err2 := externalClient.DeleteWasm(ctxWithGoodAuth, &protos.DeleteWasmRequest{Ids: []string{expectedID}})
+			Expect(err2).ToNot(HaveOccurred())
+			Expect(resp2).ToNot(BeNil())
+
+			// Fetching again should return not exists
+			fetchedResp2, err := externalClient.GetWasm(ctxWithGoodAuth, &protos.GetWasmRequest{Id: expectedID})
+			Expect(err).To(HaveOccurred())
+			Expect(fetchedResp2).To(BeNil())
+			Expect(err.Error()).To(ContainSubstring("wasm not found"))
+		})
+
+		It("returns error if an id does not exist", func() {
+			module := generateWasmModule()
+			module.Id = "does-not-exist-for-delete-error-test"
+
+			resp, err := externalClient.DeleteWasm(ctxWithGoodAuth, &protos.DeleteWasmRequest{Ids: []string{module.Id}})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("not found"))
+		})
+
+		It("cannot delete bundled wasm", func() {
+			// Grab existing detective key
+			preloadedKeys, err := redisClient.Keys(context.Background(), store.RedisWasmPrefix+":detective:*").Result()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(preloadedKeys)).To(Equal(1))
+
+			split := strings.Split(preloadedKeys[0], ":")
+			id := split[2]
+
+			resp, err := externalClient.DeleteWasm(ctxWithGoodAuth, &protos.DeleteWasmRequest{Ids: []string{id}})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Message).To(ContainSubstring("cannot delete bundled wasm module"))
+		})
+	})
 })
 
 func genAESKey() string {
@@ -975,7 +1247,7 @@ func runServer() {
 		GRPCAPIListenAddress: GRPCAPIAddress,
 		RedisURL:             "localhost:6379",
 		SessionTTL:           time.Second * 5,
-		WASMDir:              "./assets/wasm",
+		WASMDir:              "../../assets/wasm",
 		AesKey:               genAESKey(),
 		TelemetryDisable:     true,
 	})
@@ -996,6 +1268,7 @@ func runServer() {
 		MetricsService:  d.MetricsService,
 		KVService:       d.KVService,
 		Telemetry:       d.Telemetry,
+		WasmService:     d.WasmService,
 	})
 
 	if err != nil {
@@ -1074,5 +1347,31 @@ func newAudience(serviceName string) *protos.Audience {
 		ComponentName: "test-component",
 		OperationType: protos.OperationType_OPERATION_TYPE_CONSUMER,
 		OperationName: "test-operation",
+	}
+}
+
+// Gene
+func generateWasmModule(seed ...string) *shared.WasmModule {
+	data, err := os.ReadFile("../../assets/wasm/transform.wasm")
+	Expect(err).ToNot(HaveOccurred())
+	Expect(data).ToNot(BeNil())
+
+	// Append some additional bits to the data to make it unique (and generate a different ID)
+	if len(seed) > 0 {
+		data = append(data, []byte(seed[0])...)
+	}
+
+	return &shared.WasmModule{
+		Id:                    util.DeterminativeUUID(data, customWasmModifier),
+		Bytes:                 data,
+		Function:              "f",
+		Name:                  "transform",
+		XFilename:             "transform.wasm",
+		XBundled:              true,
+		Description:           util.Pointer("test transform description"),
+		Version:               util.Pointer("v0.0.1-transform"),
+		Url:                   util.Pointer("https://example.com/transform.wasm"),
+		XCreatedAtUnixTsNsUtc: util.Pointer(time.Now().UTC().UnixNano()),
+		XUpdatedAtUnixTsNsUtc: nil,
 	}
 }

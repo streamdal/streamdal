@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "shared/sp_shared.proto";
 import "sp_common.proto";
 import "sp_info.proto";
 import "sp_notify.proto";
@@ -13,6 +14,9 @@ option ruby_package = "Streamdal::Protos";
 service External {
   // Returns all data needed for UI; called on initial console load
   rpc GetAll(GetAllRequest) returns (GetAllResponse);
+
+  // Returns the current _full_ configuration of the server
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse);
 
   // Used by console to stream updates to UI; called after initial GetAll()
   rpc GetAllStream(GetAllRequest) returns (stream GetAllResponse);
@@ -67,7 +71,7 @@ service External {
     option deprecated = true;
   }
 
-  // Create an audience. Used for terraform purposes
+  // Create an audience. Used for automation tooling (terraform, k8s cr's)
   rpc CreateAudience(CreateAudienceRequest) returns (protos.StandardResponse);
 
   // Delete an audience
@@ -96,6 +100,18 @@ service External {
   rpc AppVerifyRegistration(AppVerifyRegistrationRequest) returns (StandardResponse);
 
   rpc AppRegisterReject(AppRegisterRejectRequest) returns (StandardResponse);
+
+  // BEGIN Wasm methods
+  rpc GetWasm(GetWasmRequest) returns (GetWasmResponse);
+
+  rpc GetAllWasm(GetAllWasmRequest) returns (GetAllWasmResponse);
+
+  rpc CreateWasm(CreateWasmRequest) returns (CreateWasmResponse);
+
+  rpc UpdateWasm(UpdateWasmRequest) returns (StandardResponse);
+
+  rpc DeleteWasm(DeleteWasmRequest) returns (StandardResponse);
+  // END Wasm methods
 
   // Test method
   rpc Test(TestRequest) returns (TestResponse);
@@ -145,8 +161,10 @@ message GetPipelineResponse {
   protos.Pipeline pipeline = 1;
 }
 
+// Create a new pipeline; accepts either pipeline object or pipeline as JSON bytes
 message CreatePipelineRequest {
   protos.Pipeline pipeline = 1;
+  optional bytes pipeline_json = 2;
 }
 
 message CreatePipelineResponse {
@@ -156,6 +174,7 @@ message CreatePipelineResponse {
 
 message UpdatePipelineRequest {
   protos.Pipeline pipeline = 1;
+  optional bytes pipeline_json = 2;
 }
 
 message DeletePipelineRequest {
@@ -170,6 +189,9 @@ message DeletePipelineRequest {
 message SetPipelinesRequest {
   repeated string pipeline_ids = 1;
   protos.Audience audience = 2;
+
+  // Used by automation tooling
+  optional string _created_by = 100; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 message PausePipelineRequest {
@@ -324,10 +346,51 @@ message ResumeTailRequest {
   string tail_id = 1;
 }
 
+message GetWasmRequest {
+  string id = 1;
+}
+
+message GetWasmResponse {
+  protos.shared.WasmModule wasm = 1;
+}
+
+message GetAllWasmRequest {
+  // Nothing needed here
+}
+
+message GetAllWasmResponse {
+  repeated protos.shared.WasmModule wasm = 1;
+}
+
+message CreateWasmRequest {
+  protos.shared.WasmModule wasm = 1;
+}
+
+message CreateWasmResponse {
+  string message = 1;
+  string id = 2;
+}
+
+message UpdateWasmRequest {
+  protos.shared.WasmModule wasm = 1;
+}
+
+message DeleteWasmRequest {
+  repeated string ids = 1;
+}
+
 message TestRequest {
   string input = 1;
 }
 
 message TestResponse {
   string output = 2;
+}
+
+message GetConfigRequest {
+   // Nothing needed here
+}
+
+message GetConfigResponse {
+  protos.Config config = 1;
 }

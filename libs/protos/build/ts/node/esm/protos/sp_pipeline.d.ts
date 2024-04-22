@@ -24,8 +24,8 @@ import { NotificationConfig } from "./sp_notify.js";
  */
 export interface Pipeline {
     /**
-     * ID should NOT be set by external gRPC client on CreatePipelineRequest - it
-     * will be ignored; it _does_ need to be set on UpdatePipelineRequest.
+     * If left blank, the server will generate a unique ID. If one is provided,
+     * the server will check if that is ID is already in use when creating a pipeline.
      *
      * @generated from protobuf field: string id = 1;
      */
@@ -56,6 +56,32 @@ export interface Pipeline {
      * @generated from protobuf field: optional bool _paused = 1000;
      */
     Paused?: boolean;
+    /**
+     * @generated from protobuf field: optional string _description = 1001;
+     */
+    Description?: string;
+    /**
+     * @generated from protobuf field: optional string _version = 1002;
+     */
+    Version?: string;
+    /**
+     * @generated from protobuf field: optional string _url = 1003;
+     */
+    Url?: string;
+    /**
+     * @generated from protobuf field: optional int64 _created_at_unix_ts_utc = 1004;
+     */
+    CreatedAtUnixTsUtc?: string;
+    /**
+     * @generated from protobuf field: optional int64 _updated_at_unix_ts_utc = 1005;
+     */
+    UpdatedAtUnixTsUtc?: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1006;
+     */
+    CreatedBy?: string;
 }
 /**
  * Conditions define how the SDK should handle a Wasm response in a step.
@@ -210,6 +236,8 @@ export interface PipelineStep {
     } | {
         oneofKind: "custom";
         /**
+         * If set, _wasm_id MUST be set
+         *
          * @generated from protobuf field: protos.steps.CustomStep custom = 1004;
          */
         custom: CustomStep;
@@ -247,19 +275,19 @@ export interface PipelineStep {
         oneofKind: undefined;
     };
     /**
-     * ID is a uuid(sha256(_wasm_bytes)) that is set by server
+     * Set by server UNLESS step is CustomStep
      *
      * @generated from protobuf field: optional string _wasm_id = 10000;
      */
     WasmId?: string;
     /**
-     * WASM module bytes (set by server)
+     * Set by server
      *
      * @generated from protobuf field: optional bytes _wasm_bytes = 10001;
      */
     WasmBytes?: Uint8Array;
     /**
-     * WASM function name to execute (set by server)
+     * Set by server
      *
      * @generated from protobuf field: optional string _wasm_function = 10002;
      */
@@ -288,6 +316,12 @@ export interface PipelineConfigs {
      * @generated from protobuf field: optional bool _is_empty = 1000;
      */
     IsEmpty?: boolean;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource/mapping
+     *
+     * @generated from protobuf field: optional string _created_by = 1001;
+     */
+    CreatedBy?: string;
 }
 /**
  * PipelineConfig is structure used in protos.PipelineConfigs

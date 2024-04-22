@@ -20,7 +20,7 @@ export const handler: Handlers<PipelineRoute> = {
   },
 
   async POST(_req, ctx) {
-    const { session } = ctx.state;
+    const { session }: any = ctx.state;
     const success = session.flash("success");
     return ctx.render({
       success,

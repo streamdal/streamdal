@@ -2,7 +2,6 @@ import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { opModal } from "../serviceMap/opModalSignal.ts";
 import { PipelineActionMenu } from "../../islands/pipelineActionMenu.tsx";
-import { tailEnabledSignal } from "../../islands/drawer/tail.tsx";
 
 export const ManageOpPipelines = (
   { pipelines }: { pipelines: PipelineInfo[] },
@@ -31,10 +30,7 @@ export const ManageOpPipelines = (
                 : null
             ))}
             <div class="flex items-center justify-center hover:bg-purple-100 py-3">
-              <a
-                href="/pipelines/add"
-                onClick={() => tailEnabledSignal.value = false}
-              >
+              <a href="/pipelines/add">
                 <div
                   class={"flex justify-between items-center text-streamdalPurple font-semibold"}
                 >

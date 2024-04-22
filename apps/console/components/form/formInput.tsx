@@ -1,4 +1,5 @@
 import { ErrorType, parsePath, resolveValue, updateData } from "./validate.ts";
+import { ChangeEvent } from "react";
 
 export type FormInputProps = {
   name: string;
@@ -6,7 +7,7 @@ export type FormInputProps = {
   setData: (data: any) => void;
   label?: string;
   placeHolder?: string;
-  errors: ErrorType;
+  errors: ErrorType | null;
   inputClass?: string;
   wrapperClass?: string;
 };
@@ -20,7 +21,6 @@ export const FormInput = ({
   placeHolder,
   inputClass,
   wrapperClass,
-  isNumber,
 }: FormInputProps) => {
   const value = resolveValue(data, name);
 
@@ -29,7 +29,9 @@ export const FormInput = ({
       {label && (
         <label
           htmlFor={name}
-          className={`text-xs mb-[3px] ${errors[name] && "text-streamdalRed"}`}
+          className={`text-xs mb-[3px] ${
+            errors && errors[name] && "text-streamdalRed"
+          }`}
         >
           {label}
         </label>
@@ -38,22 +40,22 @@ export const FormInput = ({
         id={name}
         name={name}
         class={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
-          errors[name] ? "streamdalRed" : "border-twilight"
+          errors && errors[name] ? "streamdalRed" : "border-twilight"
         } ${inputClass}`}
         value={value}
-        onChange={(e) =>
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
           updateData(
             data,
             setData,
             parsePath(name),
-            e.target.value,
+            e.currentTarget.value,
           )}
         placeholder={placeHolder}
         size={value?.length}
       />
 
       <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
-        {errors[name]}
+        {errors ? errors[name] : null}
       </div>
     </div>
   );

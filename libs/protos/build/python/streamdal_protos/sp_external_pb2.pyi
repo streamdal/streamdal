@@ -1,3 +1,4 @@
+from shared import sp_shared_pb2 as _sp_shared_pb2
 import sp_common_pb2 as _sp_common_pb2
 import sp_info_pb2 as _sp_info_pb2
 import sp_notify_pb2 as _sp_notify_pb2
@@ -79,10 +80,12 @@ class CreateNotificationResponse(_message.Message):
     def __init__(self, notification: _Optional[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class CreatePipelineRequest(_message.Message):
-    __slots__ = ["pipeline"]
+    __slots__ = ["pipeline", "pipeline_json"]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_JSON_FIELD_NUMBER: _ClassVar[int]
     pipeline: _sp_pipeline_pb2.Pipeline
-    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
+    pipeline_json: bytes
+    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ..., pipeline_json: _Optional[bytes] = ...) -> None: ...
 
 class CreatePipelineResponse(_message.Message):
     __slots__ = ["message", "pipeline_id"]
@@ -91,6 +94,20 @@ class CreatePipelineResponse(_message.Message):
     message: str
     pipeline_id: str
     def __init__(self, message: _Optional[str] = ..., pipeline_id: _Optional[str] = ...) -> None: ...
+
+class CreateWasmRequest(_message.Message):
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _sp_shared_pb2.WasmModule
+    def __init__(self, wasm: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...
+
+class CreateWasmResponse(_message.Message):
+    __slots__ = ["id", "message"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    message: str
+    def __init__(self, message: _Optional[str] = ..., id: _Optional[str] = ...) -> None: ...
 
 class DeleteAudienceRequest(_message.Message):
     __slots__ = ["audience", "force"]
@@ -121,6 +138,12 @@ class DeleteServiceRequest(_message.Message):
     force: bool
     service_name: str
     def __init__(self, service_name: _Optional[str] = ..., force: bool = ...) -> None: ...
+
+class DeleteWasmRequest(_message.Message):
+    __slots__ = ["ids"]
+    IDS_FIELD_NUMBER: _ClassVar[int]
+    ids: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, ids: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class DetachNotificationRequest(_message.Message):
     __slots__ = ["notification_id", "pipeline_id"]
@@ -164,6 +187,16 @@ class GetAllResponse(_message.Message):
     pipelines: _containers.MessageMap[str, _sp_info_pb2.PipelineInfo]
     def __init__(self, live: _Optional[_Iterable[_Union[_sp_info_pb2.LiveInfo, _Mapping]]] = ..., audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ..., pipelines: _Optional[_Mapping[str, _sp_info_pb2.PipelineInfo]] = ..., configs: _Optional[_Mapping[str, _sp_pipeline_pb2.PipelineConfigs]] = ..., generated_at_unix_ts_ns_utc: _Optional[int] = ..., _keepalive: bool = ...) -> None: ...
 
+class GetAllWasmRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetAllWasmResponse(_message.Message):
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _containers.RepeatedCompositeFieldContainer[_sp_shared_pb2.WasmModule]
+    def __init__(self, wasm: _Optional[_Iterable[_Union[_sp_shared_pb2.WasmModule, _Mapping]]] = ...) -> None: ...
+
 class GetAudienceRatesRequest(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
@@ -182,6 +215,16 @@ class GetAudienceRatesResponse(_message.Message):
     _keepalive: bool
     rates: _containers.MessageMap[str, _sp_common_pb2.AudienceRate]
     def __init__(self, rates: _Optional[_Mapping[str, _sp_common_pb2.AudienceRate]] = ..., _keepalive: bool = ...) -> None: ...
+
+class GetConfigRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class GetConfigResponse(_message.Message):
+    __slots__ = ["config"]
+    CONFIG_FIELD_NUMBER: _ClassVar[int]
+    config: _sp_common_pb2.Config
+    def __init__(self, config: _Optional[_Union[_sp_common_pb2.Config, _Mapping]] = ...) -> None: ...
 
 class GetMetricsRequest(_message.Message):
     __slots__ = []
@@ -265,6 +308,18 @@ class GetSchemaResponse(_message.Message):
     schema: _sp_common_pb2.Schema
     def __init__(self, schema: _Optional[_Union[_sp_common_pb2.Schema, _Mapping]] = ...) -> None: ...
 
+class GetWasmRequest(_message.Message):
+    __slots__ = ["id"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    def __init__(self, id: _Optional[str] = ...) -> None: ...
+
+class GetWasmResponse(_message.Message):
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _sp_shared_pb2.WasmModule
+    def __init__(self, wasm: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...
+
 class PausePipelineRequest(_message.Message):
     __slots__ = ["audience", "pipeline_id"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
@@ -294,12 +349,14 @@ class ResumeTailRequest(_message.Message):
     def __init__(self, tail_id: _Optional[str] = ...) -> None: ...
 
 class SetPipelinesRequest(_message.Message):
-    __slots__ = ["audience", "pipeline_ids"]
+    __slots__ = ["_created_by", "audience", "pipeline_ids"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_IDS_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    _created_by: str
     audience: _sp_common_pb2.Audience
     pipeline_ids: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+    def __init__(self, pipeline_ids: _Optional[_Iterable[str]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class TestRequest(_message.Message):
     __slots__ = ["input"]
@@ -320,7 +377,15 @@ class UpdateNotificationRequest(_message.Message):
     def __init__(self, notification: _Optional[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]] = ...) -> None: ...
 
 class UpdatePipelineRequest(_message.Message):
-    __slots__ = ["pipeline"]
+    __slots__ = ["pipeline", "pipeline_json"]
     PIPELINE_FIELD_NUMBER: _ClassVar[int]
+    PIPELINE_JSON_FIELD_NUMBER: _ClassVar[int]
     pipeline: _sp_pipeline_pb2.Pipeline
-    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ...) -> None: ...
+    pipeline_json: bytes
+    def __init__(self, pipeline: _Optional[_Union[_sp_pipeline_pb2.Pipeline, _Mapping]] = ..., pipeline_json: _Optional[bytes] = ...) -> None: ...
+
+class UpdateWasmRequest(_message.Message):
+    __slots__ = ["wasm"]
+    WASM_FIELD_NUMBER: _ClassVar[int]
+    wasm: _sp_shared_pb2.WasmModule
+    def __init__(self, wasm: _Optional[_Union[_sp_shared_pb2.WasmModule, _Mapping]] = ...) -> None: ...

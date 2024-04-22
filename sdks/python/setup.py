@@ -5,7 +5,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 setup(
     name="streamdal",
-    version='0.1.12',
+    version='0.1.15',
     description="Python client SDK for Streamdal's open source observability server",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -70,7 +70,7 @@ setup(
         "rfc3986==2.0.0",
         "rich==13.7.0",
         "six==1.16.0",
-        "streamdal-protos==0.1.32",
+        "streamdal-protos==0.1.36",
         "stringcase==1.2.0",
         "tf==1.0.0",
         "token-bucket==0.3.0",

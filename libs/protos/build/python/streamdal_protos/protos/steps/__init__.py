@@ -229,9 +229,9 @@ class TransformTruncateType(betterproto.Enum):
 
 @dataclass(eq=False, repr=False)
 class CustomStep(betterproto.Message):
-    """WIP -- Custom WASM exec?"""
-
-    id: str = betterproto.string_field(1)
+    args: Dict[str, str] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_STRING
+    )
 
 
 @dataclass(eq=False, repr=False)

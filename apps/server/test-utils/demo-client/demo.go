@@ -163,6 +163,8 @@ func (r *Demo) newClient() (*streamdal.Streamdal, error) {
 		ShutdownCtx:     context.Background(),
 		ClientType:      0,   // This is intended primarily for shims - shims will specify that they're a shim
 		Audiences:       nil, // We could specify an audience here if we know it ahead of time; otherwise specify in .Process()
+		EnableStdout:    true,
+		EnableStderr:    true,
 	}
 
 	if r.config.InjectLogger {

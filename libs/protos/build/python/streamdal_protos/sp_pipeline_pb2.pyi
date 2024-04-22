@@ -21,18 +21,30 @@ ABORT_CONDITION_UNSET: AbortCondition
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Pipeline(_message.Message):
-    __slots__ = ["_notification_configs", "_paused", "id", "name", "steps"]
+    __slots__ = ["_created_at_unix_ts_utc", "_created_by", "_description", "_notification_configs", "_paused", "_updated_at_unix_ts_utc", "_url", "_version", "id", "name", "steps"]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STEPS_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    _DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     _NOTIFICATION_CONFIGS_FIELD_NUMBER: _ClassVar[int]
     _PAUSED_FIELD_NUMBER: _ClassVar[int]
+    _UPDATED_AT_UNIX_TS_UTC_FIELD_NUMBER: _ClassVar[int]
+    _URL_FIELD_NUMBER: _ClassVar[int]
+    _VERSION_FIELD_NUMBER: _ClassVar[int]
+    _created_at_unix_ts_utc: int
+    _created_by: str
+    _description: str
     _notification_configs: _containers.RepeatedCompositeFieldContainer[_sp_notify_pb2.NotificationConfig]
     _paused: bool
+    _updated_at_unix_ts_utc: int
+    _url: str
+    _version: str
     id: str
     name: str
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ..., _description: _Optional[str] = ..., _version: _Optional[str] = ..., _url: _Optional[str] = ..., _created_at_unix_ts_utc: _Optional[int] = ..., _updated_at_unix_ts_utc: _Optional[int] = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class PipelineConfig(_message.Message):
     __slots__ = ["created_at_unix_ts_utc", "id", "paused"]
@@ -45,12 +57,14 @@ class PipelineConfig(_message.Message):
     def __init__(self, id: _Optional[str] = ..., paused: bool = ..., created_at_unix_ts_utc: _Optional[int] = ...) -> None: ...
 
 class PipelineConfigs(_message.Message):
-    __slots__ = ["_is_empty", "configs"]
+    __slots__ = ["_created_by", "_is_empty", "configs"]
     CONFIGS_FIELD_NUMBER: _ClassVar[int]
+    _CREATED_BY_FIELD_NUMBER: _ClassVar[int]
     _IS_EMPTY_FIELD_NUMBER: _ClassVar[int]
+    _created_by: str
     _is_empty: bool
     configs: _containers.RepeatedCompositeFieldContainer[PipelineConfig]
-    def __init__(self, configs: _Optional[_Iterable[_Union[PipelineConfig, _Mapping]]] = ..., _is_empty: bool = ...) -> None: ...
+    def __init__(self, configs: _Optional[_Iterable[_Union[PipelineConfig, _Mapping]]] = ..., _is_empty: bool = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class PipelineStep(_message.Message):
     __slots__ = ["_wasm_bytes", "_wasm_function", "_wasm_id", "custom", "decode", "detective", "dynamic", "encode", "http_request", "infer_schema", "kv", "name", "on_error", "on_false", "on_true", "schema_validation", "transform", "valid_json"]

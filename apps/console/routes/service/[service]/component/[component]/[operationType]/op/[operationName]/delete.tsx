@@ -3,7 +3,7 @@ import { getAudienceFromParams } from "root/lib/utils.ts";
 import { deleteAudience } from "root/lib/mutation.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 
-export const handler: Handlers<> = {
+export const handler: Handlers = {
   async POST(req, ctx) {
     const audience = getAudienceFromParams(ctx.params);
     const response = await deleteAudience(audience, true);
@@ -15,7 +15,7 @@ export const handler: Handlers<> = {
           status: response.code === ResponseCode.OK,
           message: response.code === ResponseCode.OK
             ? "Successfully deleted"
-            : response.message,
+            : (response as any).error,
         },
         headers: { Location: "/" },
       }),

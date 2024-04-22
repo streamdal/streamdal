@@ -25,13 +25,12 @@
 /// of protobuf runtime.
 const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_4_0;
 
-///  WIP -- Custom WASM exec?
 // @@protoc_insertion_point(message:protos.steps.CustomStep)
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct CustomStep {
     // message fields
-    // @@protoc_insertion_point(field:protos.steps.CustomStep.id)
-    pub id: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.steps.CustomStep.args)
+    pub args: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.CustomStep.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -51,10 +50,10 @@ impl CustomStep {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
-            "id",
-            |m: &CustomStep| { &m.id },
-            |m: &mut CustomStep| { &mut m.id },
+        fields.push(::protobuf::reflect::rt::v2::make_map_simpler_accessor::<_, _, _>(
+            "args",
+            |m: &CustomStep| { &m.args },
+            |m: &mut CustomStep| { &mut m.args },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CustomStep>(
             "CustomStep",
@@ -75,7 +74,19 @@ impl ::protobuf::Message for CustomStep {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    self.id = is.read_string()?;
+                    let len = is.read_raw_varint32()?;
+                    let old_limit = is.push_limit(len as u64)?;
+                    let mut key = ::std::default::Default::default();
+                    let mut value = ::std::default::Default::default();
+                    while let Some(tag) = is.read_raw_tag_or_eof()? {
+                        match tag {
+                            10 => key = is.read_string()?,
+                            18 => value = is.read_string()?,
+                            _ => ::protobuf::rt::skip_field_for_tag(tag, is)?,
+                        };
+                    }
+                    is.pop_limit(old_limit);
+                    self.args.insert(key, value);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -89,18 +100,27 @@ impl ::protobuf::Message for CustomStep {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if !self.id.is_empty() {
-            my_size += ::protobuf::rt::string_size(1, &self.id);
-        }
+        for (k, v) in &self.args {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
+        };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if !self.id.is_empty() {
-            os.write_string(1, &self.id)?;
-        }
+        for (k, v) in &self.args {
+            let mut entry_size = 0;
+            entry_size += ::protobuf::rt::string_size(1, &k);
+            entry_size += ::protobuf::rt::string_size(2, &v);
+            os.write_raw_varint32(10)?; // Tag.
+            os.write_raw_varint32(entry_size as u32)?;
+            os.write_string(1, &k)?;
+            os.write_string(2, &v)?;
+        };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -118,16 +138,13 @@ impl ::protobuf::Message for CustomStep {
     }
 
     fn clear(&mut self) {
-        self.id.clear();
+        self.args.clear();
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static CustomStep {
-        static instance: CustomStep = CustomStep {
-            id: ::std::string::String::new(),
-            special_fields: ::protobuf::SpecialFields::new(),
-        };
-        &instance
+        static instance: ::protobuf::rt::Lazy<CustomStep> = ::protobuf::rt::Lazy::new();
+        instance.get(CustomStep::new)
     }
 }
 
@@ -149,17 +166,17 @@ impl ::protobuf::reflect::ProtobufValue for CustomStep {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x1bsteps/sp_steps_custom.proto\x12\x0cprotos.steps\"\x1c\n\nCustomSte\
-    p\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\x02idBVZ@github.com/streamdal/stre\
-    amdal/libs/protos/build/go/protos/steps\xea\x02\x11Streamdal::ProtosJ\
-    \xb1\x01\n\x06\x12\x04\0\0\n\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
-    \x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\
-    \x0b\x12\x03\x04\0W\n\x08\n\x01\x08\x12\x03\x05\0*\n\t\n\x02\x08-\x12\
-    \x03\x05\0*\n&\n\x02\x04\0\x12\x04\x08\0\n\x01\x1a\x1a\x20WIP\x20--\x20C\
-    ustom\x20WASM\x20exec?\n\n\n\n\x03\x04\0\x01\x12\x03\x08\x08\x12\n\x0b\n\
-    \x04\x04\0\x02\0\x12\x03\t\x02\x10\n\x0c\n\x05\x04\0\x02\0\x05\x12\x03\t\
-    \x02\x08\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\t\t\x0b\n\x0c\n\x05\x04\0\
-    \x02\0\x03\x12\x03\t\x0e\x0fb\x06proto3\
+    \n\x1bsteps/sp_steps_custom.proto\x12\x0cprotos.steps\"}\n\nCustomStep\
+    \x126\n\x04args\x18\x01\x20\x03(\x0b2\".protos.steps.CustomStep.ArgsEntr\
+    yR\x04args\x1a7\n\tArgsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\
+    \x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01BBZ@github.com\
+    /streamdal/streamdal/libs/protos/build/go/protos/stepsJ\x80\x01\n\x06\
+    \x12\x04\0\0\x08\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
+    \x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\x03\
+    \x04\0W\n\n\n\x02\x04\0\x12\x04\x06\0\x08\x01\n\n\n\x03\x04\0\x01\x12\
+    \x03\x06\x08\x12\n\x0b\n\x04\x04\0\x02\0\x12\x03\x07\x02\x1f\n\x0c\n\x05\
+    \x04\0\x02\0\x06\x12\x03\x07\x02\x15\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\
+    \x07\x16\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x07\x1d\x1eb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

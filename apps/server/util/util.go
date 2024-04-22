@@ -14,9 +14,6 @@ import (
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
-
-	"github.com/streamdal/streamdal/apps/server/wasm"
 )
 
 const (
@@ -53,6 +50,11 @@ func CtxMetadata(ctx context.Context) map[string]string {
 	return m
 }
 
+func NowUnixTsNsUtcPtr() *int64 {
+	ts := time.Now().UTC().UnixNano()
+	return &ts
+}
+
 func CtxStringValue(ctx context.Context, key string) string {
 	if ctx == nil {
 		return ""
@@ -66,7 +68,7 @@ func CtxStringValue(ctx context.Context, key string) string {
 	return values[0]
 }
 
-func Pointer[T any](val T) *T {
+func Pointer[T any](val T) *T { // DS: Generics! In the wild!
 	return &val
 }
 
@@ -120,52 +122,6 @@ func StandardResponse(ctx context.Context, code protos.ResponseCode, msg string)
 		Code:    code,
 		Message: msg,
 	}
-}
-
-// PopulateWASMFields is used for populating WASM in *protos.Pipeline because
-// the SDK may not have had audiences at startup and thus GetSetPipelinesByService()
-// would not have returned any WASM data.
-func PopulateWASMFields(pipeline *protos.Pipeline, prefix string) error {
-	if pipeline == nil {
-		return errors.New("pipeline cannot be nil")
-	}
-
-	for _, s := range pipeline.Steps {
-		var (
-			mapping *wasm.Mapping
-			err     error
-		)
-
-		// We can do this dynamically later
-		switch s.Step.(type) {
-		case *protos.PipelineStep_Detective:
-			mapping, err = wasm.Load("detective", prefix)
-		case *protos.PipelineStep_Transform:
-			mapping, err = wasm.Load("transform", prefix)
-		case *protos.PipelineStep_Kv:
-			mapping, err = wasm.Load("kv", prefix)
-		case *protos.PipelineStep_HttpRequest:
-			mapping, err = wasm.Load("httprequest", prefix)
-		case *protos.PipelineStep_InferSchema:
-			mapping, err = wasm.Load("inferschema", prefix)
-		case *protos.PipelineStep_SchemaValidation:
-			mapping, err = wasm.Load("schemavalidation", prefix)
-		case *protos.PipelineStep_ValidJson:
-			mapping, err = wasm.Load("validjson", prefix)
-		default:
-			return errors.Errorf("unknown pipeline step type: %T", s.Step)
-		}
-
-		if err != nil {
-			return errors.Wrapf(err, "error loading '%T' WASM mapping", s.Step)
-		}
-
-		s.XWasmFunction = &mapping.FuncName
-		s.XWasmBytes = mapping.Contents
-		s.XWasmId = &mapping.ID
-	}
-
-	return nil
 }
 
 // GenerateWasmMapping will generate a map of WASM modules from the given command(s).
@@ -236,72 +192,6 @@ func ConvertPipelineConfigsAudToStr(configs map[*protos.Audience]*protos.Pipelin
 	}
 
 	return m
-}
-
-func GenerateSchemaInferencePipeline(wasmDir string) (*protos.Pipeline, error) {
-	pipeline := &protos.Pipeline{
-		Id:   GenerateUUID(),
-		Name: "Schema Inference (auto-generated pipeline)",
-		Steps: []*protos.PipelineStep{
-			{
-				Name: "Infer Schema (auto-generated step)",
-				Step: &protos.PipelineStep_InferSchema{
-					InferSchema: &steps.InferSchemaStep{
-						CurrentSchema: make([]byte, 0),
-					},
-				},
-			},
-		},
-	}
-
-	if err := PopulateWASMFields(pipeline, wasmDir); err != nil {
-		return nil, errors.Wrap(err, "error populating WASM fields")
-	}
-
-	return pipeline, nil
-}
-
-// InjectSchemaInferenceForSetPipelinesCommands is a helper function for injecting
-// a schema inference pipeline into a slice of SetPipelines commands. This is
-// basically InjectSchemaInferenceForPipeline() but for commands.
-func InjectSchemaInferenceForSetPipelinesCommands(
-	cmds []*protos.Command,
-	wasmDir string,
-) (int, error) {
-	if len(cmds) == 0 {
-		return 0, nil
-	}
-
-	var numInjected int
-
-	for _, cmd := range cmds {
-		if cmd.GetSetPipelines() == nil {
-			fmt.Printf("skipping injection for non-SetPipelines command for audience '%s'\n", AudienceToStr(cmd.Audience))
-			continue
-		}
-
-		updatedPipelines, err := InjectSchemaInferenceForPipelines(cmd.GetSetPipelines().Pipelines, wasmDir)
-		if err != nil {
-			return 0, errors.Wrap(err, "error injecting schema inference pipeline")
-		}
-
-		cmd.GetSetPipelines().Pipelines = updatedPipelines
-
-		numInjected += 1
-	}
-
-	return numInjected, nil
-}
-
-// InjectSchemaInferenceForPipelines will inject a schema inference pipeline into
-// the given slice of pipelines. This is useful
-func InjectSchemaInferenceForPipelines(pipelines []*protos.Pipeline, wasmDir string) ([]*protos.Pipeline, error) {
-	schemaInferencePipeline, err := GenerateSchemaInferencePipeline(wasmDir)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to generate schema inference pipeline")
-	}
-
-	return append([]*protos.Pipeline{schemaInferencePipeline}, pipelines...), nil
 }
 
 func AudienceEquals(a, b *protos.Audience) bool {
@@ -435,4 +325,45 @@ func AudienceInList(audience *protos.Audience, list []*protos.Audience) bool {
 	}
 
 	return false
+}
+
+func GetWasmIDFromRedisKey(key string) (string, error) {
+	split := strings.Split(key, ":")
+	if len(split) != 3 {
+		return "", errors.New("Wasm redis key does not contain 3 parts")
+	}
+
+	return split[2], nil
+}
+
+func GetWasmNameFromKey(key string) (string, error) {
+	split := strings.Split(key, ":")
+	if len(split) != 3 {
+		return "", errors.New("Wasm redis key does not contain 3 parts")
+	}
+
+	return split[1], nil
+}
+
+// DeterminativeUUID generates a deterministic UUID from the given data; accepts
+// an optional modifier string that will be appended to data before hashing.
+//
+// NOT: Modifier is useful if you already have added Wasm with the same data -
+// CreateWasm() would normally error; you can get around this by passing a
+// unique modifier.
+func DeterminativeUUID(data []byte, modifier ...string) string {
+	tmpData := data
+
+	if len(modifier) > 0 {
+		tmpData = append(data, []byte(modifier[0])...)
+	}
+
+	hash := sha256.Sum256(tmpData)
+
+	id, err := uuid.FromBytes(hash[16:])
+	if err != nil {
+		return ""
+	}
+
+	return id.String()
 }

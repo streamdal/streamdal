@@ -6,6 +6,14 @@ import type { ServiceInfo } from "@protobuf-ts/runtime-rpc";
 import { External } from "./sp_external.js";
 import type { TestResponse } from "./sp_external.js";
 import type { TestRequest } from "./sp_external.js";
+import type { DeleteWasmRequest } from "./sp_external.js";
+import type { UpdateWasmRequest } from "./sp_external.js";
+import type { CreateWasmResponse } from "./sp_external.js";
+import type { CreateWasmRequest } from "./sp_external.js";
+import type { GetAllWasmResponse } from "./sp_external.js";
+import type { GetAllWasmRequest } from "./sp_external.js";
+import type { GetWasmResponse } from "./sp_external.js";
+import type { GetWasmRequest } from "./sp_external.js";
 import type { AppRegisterRejectRequest } from "./sp_external.js";
 import type { AppVerifyRegistrationRequest } from "./sp_external.js";
 import type { AppRegistrationRequest } from "./sp_external.js";
@@ -47,6 +55,8 @@ import type { GetPipelineRequest } from "./sp_external.js";
 import type { GetPipelinesResponse } from "./sp_external.js";
 import type { GetPipelinesRequest } from "./sp_external.js";
 import type { ServerStreamingCall } from "@protobuf-ts/runtime-rpc";
+import type { GetConfigResponse } from "./sp_external.js";
+import type { GetConfigRequest } from "./sp_external.js";
 import { stackIntercept } from "@protobuf-ts/runtime-rpc";
 import type { GetAllResponse } from "./sp_external.js";
 import type { GetAllRequest } from "./sp_external.js";
@@ -62,6 +72,12 @@ export interface IExternalClient {
      * @generated from protobuf rpc: GetAll(protos.GetAllRequest) returns (protos.GetAllResponse);
      */
     getAll(input: GetAllRequest, options?: RpcOptions): UnaryCall<GetAllRequest, GetAllResponse>;
+    /**
+     * Returns the current _full_ configuration of the server
+     *
+     * @generated from protobuf rpc: GetConfig(protos.GetConfigRequest) returns (protos.GetConfigResponse);
+     */
+    getConfig(input: GetConfigRequest, options?: RpcOptions): UnaryCall<GetConfigRequest, GetConfigResponse>;
     /**
      * Used by console to stream updates to UI; called after initial GetAll()
      *
@@ -159,7 +175,7 @@ export interface IExternalClient {
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse>;
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */
@@ -219,6 +235,30 @@ export interface IExternalClient {
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse>;
     /**
+     * BEGIN Wasm methods
+     *
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
+     */
+    getWasm(input: GetWasmRequest, options?: RpcOptions): UnaryCall<GetWasmRequest, GetWasmResponse>;
+    /**
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
+     */
+    getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse>;
+    /**
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
+     */
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, CreateWasmResponse>;
+    /**
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
+     */
+    updateWasm(input: UpdateWasmRequest, options?: RpcOptions): UnaryCall<UpdateWasmRequest, StandardResponse>;
+    /**
+     * END Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteWasm(input: DeleteWasmRequest, options?: RpcOptions): UnaryCall<DeleteWasmRequest, StandardResponse>;
+    /**
      * Test method
      *
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
@@ -244,12 +284,21 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
         return stackIntercept<GetAllRequest, GetAllResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * Returns the current _full_ configuration of the server
+     *
+     * @generated from protobuf rpc: GetConfig(protos.GetConfigRequest) returns (protos.GetConfigResponse);
+     */
+    getConfig(input: GetConfigRequest, options?: RpcOptions): UnaryCall<GetConfigRequest, GetConfigResponse> {
+        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetConfigRequest, GetConfigResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * Used by console to stream updates to UI; called after initial GetAll()
      *
      * @generated from protobuf rpc: GetAllStream(protos.GetAllRequest) returns (stream protos.GetAllResponse);
      */
     getAllStream(input: GetAllRequest, options?: RpcOptions): ServerStreamingCall<GetAllRequest, GetAllResponse> {
-        const method = this.methods[1], opt = this._transport.mergeOptions(options);
+        const method = this.methods[2], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetAllRequest, GetAllResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
@@ -258,7 +307,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetPipelines(protos.GetPipelinesRequest) returns (protos.GetPipelinesResponse);
      */
     getPipelines(input: GetPipelinesRequest, options?: RpcOptions): UnaryCall<GetPipelinesRequest, GetPipelinesResponse> {
-        const method = this.methods[2], opt = this._transport.mergeOptions(options);
+        const method = this.methods[3], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetPipelinesRequest, GetPipelinesResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -267,7 +316,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetPipeline(protos.GetPipelineRequest) returns (protos.GetPipelineResponse);
      */
     getPipeline(input: GetPipelineRequest, options?: RpcOptions): UnaryCall<GetPipelineRequest, GetPipelineResponse> {
-        const method = this.methods[3], opt = this._transport.mergeOptions(options);
+        const method = this.methods[4], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetPipelineRequest, GetPipelineResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -276,7 +325,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: CreatePipeline(protos.CreatePipelineRequest) returns (protos.CreatePipelineResponse);
      */
     createPipeline(input: CreatePipelineRequest, options?: RpcOptions): UnaryCall<CreatePipelineRequest, CreatePipelineResponse> {
-        const method = this.methods[4], opt = this._transport.mergeOptions(options);
+        const method = this.methods[5], opt = this._transport.mergeOptions(options);
         return stackIntercept<CreatePipelineRequest, CreatePipelineResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -285,7 +334,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: UpdatePipeline(protos.UpdatePipelineRequest) returns (protos.StandardResponse);
      */
     updatePipeline(input: UpdatePipelineRequest, options?: RpcOptions): UnaryCall<UpdatePipelineRequest, StandardResponse> {
-        const method = this.methods[5], opt = this._transport.mergeOptions(options);
+        const method = this.methods[6], opt = this._transport.mergeOptions(options);
         return stackIntercept<UpdatePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -294,14 +343,14 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: DeletePipeline(protos.DeletePipelineRequest) returns (protos.StandardResponse);
      */
     deletePipeline(input: DeletePipelineRequest, options?: RpcOptions): UnaryCall<DeletePipelineRequest, StandardResponse> {
-        const method = this.methods[6], opt = this._transport.mergeOptions(options);
+        const method = this.methods[7], opt = this._transport.mergeOptions(options);
         return stackIntercept<DeletePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: SetPipelines(protos.SetPipelinesRequest) returns (protos.StandardResponse);
      */
     setPipelines(input: SetPipelinesRequest, options?: RpcOptions): UnaryCall<SetPipelinesRequest, StandardResponse> {
-        const method = this.methods[7], opt = this._transport.mergeOptions(options);
+        const method = this.methods[8], opt = this._transport.mergeOptions(options);
         return stackIntercept<SetPipelinesRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -310,7 +359,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: PausePipeline(protos.PausePipelineRequest) returns (protos.StandardResponse);
      */
     pausePipeline(input: PausePipelineRequest, options?: RpcOptions): UnaryCall<PausePipelineRequest, StandardResponse> {
-        const method = this.methods[8], opt = this._transport.mergeOptions(options);
+        const method = this.methods[9], opt = this._transport.mergeOptions(options);
         return stackIntercept<PausePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -319,7 +368,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: ResumePipeline(protos.ResumePipelineRequest) returns (protos.StandardResponse);
      */
     resumePipeline(input: ResumePipelineRequest, options?: RpcOptions): UnaryCall<ResumePipelineRequest, StandardResponse> {
-        const method = this.methods[9], opt = this._transport.mergeOptions(options);
+        const method = this.methods[10], opt = this._transport.mergeOptions(options);
         return stackIntercept<ResumePipelineRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -328,7 +377,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: CreateNotification(protos.CreateNotificationRequest) returns (protos.CreateNotificationResponse);
      */
     createNotification(input: CreateNotificationRequest, options?: RpcOptions): UnaryCall<CreateNotificationRequest, CreateNotificationResponse> {
-        const method = this.methods[10], opt = this._transport.mergeOptions(options);
+        const method = this.methods[11], opt = this._transport.mergeOptions(options);
         return stackIntercept<CreateNotificationRequest, CreateNotificationResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -337,7 +386,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: UpdateNotification(protos.UpdateNotificationRequest) returns (protos.StandardResponse);
      */
     updateNotification(input: UpdateNotificationRequest, options?: RpcOptions): UnaryCall<UpdateNotificationRequest, StandardResponse> {
-        const method = this.methods[11], opt = this._transport.mergeOptions(options);
+        const method = this.methods[12], opt = this._transport.mergeOptions(options);
         return stackIntercept<UpdateNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -346,7 +395,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: DeleteNotification(protos.DeleteNotificationRequest) returns (protos.StandardResponse);
      */
     deleteNotification(input: DeleteNotificationRequest, options?: RpcOptions): UnaryCall<DeleteNotificationRequest, StandardResponse> {
-        const method = this.methods[12], opt = this._transport.mergeOptions(options);
+        const method = this.methods[13], opt = this._transport.mergeOptions(options);
         return stackIntercept<DeleteNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -355,7 +404,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetNotifications(protos.GetNotificationsRequest) returns (protos.GetNotificationsResponse);
      */
     getNotifications(input: GetNotificationsRequest, options?: RpcOptions): UnaryCall<GetNotificationsRequest, GetNotificationsResponse> {
-        const method = this.methods[13], opt = this._transport.mergeOptions(options);
+        const method = this.methods[14], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetNotificationsRequest, GetNotificationsResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -364,7 +413,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetNotification(protos.GetNotificationRequest) returns (protos.GetNotificationResponse);
      */
     getNotification(input: GetNotificationRequest, options?: RpcOptions): UnaryCall<GetNotificationRequest, GetNotificationResponse> {
-        const method = this.methods[14], opt = this._transport.mergeOptions(options);
+        const method = this.methods[15], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetNotificationRequest, GetNotificationResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -374,7 +423,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: AttachNotification(protos.AttachNotificationRequest) returns (protos.StandardResponse);
      */
     attachNotification(input: AttachNotificationRequest, options?: RpcOptions): UnaryCall<AttachNotificationRequest, StandardResponse> {
-        const method = this.methods[15], opt = this._transport.mergeOptions(options);
+        const method = this.methods[16], opt = this._transport.mergeOptions(options);
         return stackIntercept<AttachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -384,16 +433,16 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: DetachNotification(protos.DetachNotificationRequest) returns (protos.StandardResponse);
      */
     detachNotification(input: DetachNotificationRequest, options?: RpcOptions): UnaryCall<DetachNotificationRequest, StandardResponse> {
-        const method = this.methods[16], opt = this._transport.mergeOptions(options);
+        const method = this.methods[17], opt = this._transport.mergeOptions(options);
         return stackIntercept<DetachNotificationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
-     * Create an audience. Used for terraform purposes
+     * Create an audience. Used for automation tooling (terraform, k8s cr's)
      *
      * @generated from protobuf rpc: CreateAudience(protos.CreateAudienceRequest) returns (protos.StandardResponse);
      */
     createAudience(input: CreateAudienceRequest, options?: RpcOptions): UnaryCall<CreateAudienceRequest, StandardResponse> {
-        const method = this.methods[17], opt = this._transport.mergeOptions(options);
+        const method = this.methods[18], opt = this._transport.mergeOptions(options);
         return stackIntercept<CreateAudienceRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -402,7 +451,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: DeleteAudience(protos.DeleteAudienceRequest) returns (protos.StandardResponse);
      */
     deleteAudience(input: DeleteAudienceRequest, options?: RpcOptions): UnaryCall<DeleteAudienceRequest, StandardResponse> {
-        const method = this.methods[18], opt = this._transport.mergeOptions(options);
+        const method = this.methods[19], opt = this._transport.mergeOptions(options);
         return stackIntercept<DeleteAudienceRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -411,7 +460,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: DeleteService(protos.DeleteServiceRequest) returns (protos.StandardResponse);
      */
     deleteService(input: DeleteServiceRequest, options?: RpcOptions): UnaryCall<DeleteServiceRequest, StandardResponse> {
-        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
         return stackIntercept<DeleteServiceRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -420,71 +469,110 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: GetMetrics(protos.GetMetricsRequest) returns (stream protos.GetMetricsResponse);
      */
     getMetrics(input: GetMetricsRequest, options?: RpcOptions): ServerStreamingCall<GetMetricsRequest, GetMetricsResponse> {
-        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        const method = this.methods[21], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetMetricsRequest, GetMetricsResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: Tail(protos.TailRequest) returns (stream protos.TailResponse);
      */
     tail(input: TailRequest, options?: RpcOptions): ServerStreamingCall<TailRequest, TailResponse> {
-        const method = this.methods[21], opt = this._transport.mergeOptions(options);
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
         return stackIntercept<TailRequest, TailResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: PauseTail(protos.PauseTailRequest) returns (protos.StandardResponse);
      */
     pauseTail(input: PauseTailRequest, options?: RpcOptions): UnaryCall<PauseTailRequest, StandardResponse> {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
         return stackIntercept<PauseTailRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: ResumeTail(protos.ResumeTailRequest) returns (protos.StandardResponse);
      */
     resumeTail(input: ResumeTailRequest, options?: RpcOptions): UnaryCall<ResumeTailRequest, StandardResponse> {
-        const method = this.methods[23], opt = this._transport.mergeOptions(options);
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
         return stackIntercept<ResumeTailRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetAudienceRates(protos.GetAudienceRatesRequest) returns (stream protos.GetAudienceRatesResponse);
      */
     getAudienceRates(input: GetAudienceRatesRequest, options?: RpcOptions): ServerStreamingCall<GetAudienceRatesRequest, GetAudienceRatesResponse> {
-        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        const method = this.methods[25], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetAudienceRatesRequest, GetAudienceRatesResponse>("serverStreaming", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetSchema(protos.GetSchemaRequest) returns (protos.GetSchemaResponse);
      */
     getSchema(input: GetSchemaRequest, options?: RpcOptions): UnaryCall<GetSchemaRequest, GetSchemaResponse> {
-        const method = this.methods[25], opt = this._transport.mergeOptions(options);
+        const method = this.methods[26], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetSchemaRequest, GetSchemaResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppRegistrationStatus(protos.AppRegistrationStatusRequest) returns (protos.AppRegistrationStatusResponse);
      */
     appRegistrationStatus(input: AppRegistrationStatusRequest, options?: RpcOptions): UnaryCall<AppRegistrationStatusRequest, AppRegistrationStatusResponse> {
-        const method = this.methods[26], opt = this._transport.mergeOptions(options);
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppRegistrationStatusRequest, AppRegistrationStatusResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppRegister(protos.AppRegistrationRequest) returns (protos.StandardResponse);
      */
     appRegister(input: AppRegistrationRequest, options?: RpcOptions): UnaryCall<AppRegistrationRequest, StandardResponse> {
-        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        const method = this.methods[28], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppVerifyRegistration(protos.AppVerifyRegistrationRequest) returns (protos.StandardResponse);
      */
     appVerifyRegistration(input: AppVerifyRegistrationRequest, options?: RpcOptions): UnaryCall<AppVerifyRegistrationRequest, StandardResponse> {
-        const method = this.methods[28], opt = this._transport.mergeOptions(options);
+        const method = this.methods[29], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppVerifyRegistrationRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AppRegisterReject(protos.AppRegisterRejectRequest) returns (protos.StandardResponse);
      */
     appRegisterReject(input: AppRegisterRejectRequest, options?: RpcOptions): UnaryCall<AppRegisterRejectRequest, StandardResponse> {
-        const method = this.methods[29], opt = this._transport.mergeOptions(options);
+        const method = this.methods[30], opt = this._transport.mergeOptions(options);
         return stackIntercept<AppRegisterRejectRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * BEGIN Wasm methods
+     *
+     * @generated from protobuf rpc: GetWasm(protos.GetWasmRequest) returns (protos.GetWasmResponse);
+     */
+    getWasm(input: GetWasmRequest, options?: RpcOptions): UnaryCall<GetWasmRequest, GetWasmResponse> {
+        const method = this.methods[31], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetWasmRequest, GetWasmResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: GetAllWasm(protos.GetAllWasmRequest) returns (protos.GetAllWasmResponse);
+     */
+    getAllWasm(input: GetAllWasmRequest, options?: RpcOptions): UnaryCall<GetAllWasmRequest, GetAllWasmResponse> {
+        const method = this.methods[32], opt = this._transport.mergeOptions(options);
+        return stackIntercept<GetAllWasmRequest, GetAllWasmResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: CreateWasm(protos.CreateWasmRequest) returns (protos.CreateWasmResponse);
+     */
+    createWasm(input: CreateWasmRequest, options?: RpcOptions): UnaryCall<CreateWasmRequest, CreateWasmResponse> {
+        const method = this.methods[33], opt = this._transport.mergeOptions(options);
+        return stackIntercept<CreateWasmRequest, CreateWasmResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: UpdateWasm(protos.UpdateWasmRequest) returns (protos.StandardResponse);
+     */
+    updateWasm(input: UpdateWasmRequest, options?: RpcOptions): UnaryCall<UpdateWasmRequest, StandardResponse> {
+        const method = this.methods[34], opt = this._transport.mergeOptions(options);
+        return stackIntercept<UpdateWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * END Wasm methods
+     *
+     * @generated from protobuf rpc: DeleteWasm(protos.DeleteWasmRequest) returns (protos.StandardResponse);
+     */
+    deleteWasm(input: DeleteWasmRequest, options?: RpcOptions): UnaryCall<DeleteWasmRequest, StandardResponse> {
+        const method = this.methods[35], opt = this._transport.mergeOptions(options);
+        return stackIntercept<DeleteWasmRequest, StandardResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * Test method
@@ -492,7 +580,7 @@ export class ExternalClient implements IExternalClient, ServiceInfo {
      * @generated from protobuf rpc: Test(protos.TestRequest) returns (protos.TestResponse);
      */
     test(input: TestRequest, options?: RpcOptions): UnaryCall<TestRequest, TestResponse> {
-        const method = this.methods[30], opt = this._transport.mergeOptions(options);
+        const method = this.methods[36], opt = this._transport.mergeOptions(options);
         return stackIntercept<TestRequest, TestResponse>("unary", this._transport, method, opt, input);
     }
 }

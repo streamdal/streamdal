@@ -1,27 +1,20 @@
 import { SuccessType } from "../_middleware.ts";
 import { Handlers } from "$fresh/src/server/types.ts";
-import { ErrorType, validate } from "../../components/form/validate.ts";
-import {
-  createNotification,
-  updateNotification,
-  upsertNotification,
-} from "../../lib/mutation.ts";
-import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import { validate } from "../../components/form/validate.ts";
+import { createNotification, updateNotification } from "../../lib/mutation.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { NotificationSchema } from "../../islands/notification.tsx";
+import { NotificationSchema } from "root/components/notifications/schema.ts";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
     const notificationData = await req.formData();
-    const { data: notification, errors }: {
-      notification: NotificationConfig;
-      errors: ErrorType;
-    } = validate(
+    const { data: notification, errors } = validate(
       NotificationSchema,
       notificationData,
     );
 
-    const { session } = ctx.state;
+    const { session }: any = ctx.state;
 
     if (errors) {
       session.flash("success", {
@@ -35,16 +28,16 @@ export const handler: Handlers<SuccessType> = {
           status: 307,
           headers: {
             Location: `/notifications/${
-              notification.id ? notification.id : ""
+              notification?.id ? notification.id : ""
             }`,
           },
         },
       );
     }
 
-    const response = notification.id
-      ? await updateNotification(notification)
-      : await createNotification(notification);
+    const response = notification?.id
+      ? await updateNotification(notification as NotificationConfig)
+      : await createNotification(notification as NotificationConfig);
 
     session.flash("success", {
       status: response.code === ResponseCode.OK,
@@ -52,7 +45,9 @@ export const handler: Handlers<SuccessType> = {
         ? "Success!"
         : "Update notification failed. Please try again later",
       ...response.code !== ResponseCode.OK
-        ? { errors: { apiError: response.message, status: response.code } }
+        ? {
+          errors: { apiError: (response as any)?.error, status: response.code },
+        }
         : {},
     });
 
@@ -64,8 +59,8 @@ export const handler: Handlers<SuccessType> = {
           Location: `/notifications/${
             response.id
               ? response.id
-              : response.notification?.id
-              ? response.notification.id
+              : (response as any).notification?.id
+              ? (response as any).notification.id
               : ""
           }`,
         },
@@ -73,7 +68,3 @@ export const handler: Handlers<SuccessType> = {
     );
   },
 };
-
-export default function NotificationSaveRoute() {
-  return null;
-}

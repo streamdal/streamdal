@@ -27,6 +27,16 @@ export const DetachPipelineModal = (
   { audience }: { audience: Audience },
 ) => {
   const pipeline = opModal.value.detachPipeline;
+
+  if (!pipeline) {
+    toastSignal.value = {
+      id: "pipelineCrud",
+      type: "error",
+      message: "Pipeline not found",
+    };
+    return null;
+  }
+
   const close = () =>
     opModal.value = { ...opModal.value, detachPipeline: null };
 

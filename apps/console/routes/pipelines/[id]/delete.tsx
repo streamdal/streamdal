@@ -9,10 +9,12 @@ import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
 import Pipelines from "../../../islands/pipelines.tsx";
+import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 export type DeletePipeline = {
   pipeline: Pipeline;
   pipelines: Pipeline[];
+  notifications: NotificationConfig[];
 };
 
 export const handler: Handlers<DeletePipeline> = {
@@ -21,6 +23,7 @@ export const handler: Handlers<DeletePipeline> = {
     if (!pipeline) {
       return ctx.renderNotFound();
     }
+
     return ctx.render({
       pipeline,
       pipelines: await getPipelines(),
@@ -30,14 +33,20 @@ export const handler: Handlers<DeletePipeline> = {
   async POST(req, ctx) {
     const response = await deletePipeline(ctx.params.id);
 
+    const { session }: any = ctx.state;
+
+    session.flash("success", {
+      status: response.code === ResponseCode.OK,
+      message: response.code === ResponseCode.OK
+        ? "Success!"
+        : "Delete pipeline failed. Please try again later",
+      ...(response.code !== ResponseCode.OK
+        ? { errors: { apiError: response.message } }
+        : {}),
+    });
+
     return new Response("", {
       status: 307,
-      success: {
-        status: response.code === ResponseCode.OK,
-        message: response.code === ResponseCode.OK
-          ? "Successfully deleted"
-          : response.message,
-      },
       headers: { Location: "/pipelines" },
     });
   },

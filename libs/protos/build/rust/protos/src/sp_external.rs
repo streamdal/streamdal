@@ -861,12 +861,15 @@ impl ::protobuf::reflect::ProtobufValue for GetPipelineResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+///  Create a new pipeline; accepts either pipeline object or pipeline as JSON bytes
 // @@protoc_insertion_point(message:protos.CreatePipelineRequest)
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct CreatePipelineRequest {
     // message fields
     // @@protoc_insertion_point(field:protos.CreatePipelineRequest.pipeline)
     pub pipeline: ::protobuf::MessageField<super::sp_pipeline::Pipeline>,
+    // @@protoc_insertion_point(field:protos.CreatePipelineRequest.pipeline_json)
+    pub pipeline_json: ::std::option::Option<::std::vec::Vec<u8>>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.CreatePipelineRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -884,12 +887,17 @@ impl CreatePipelineRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::Pipeline>(
             "pipeline",
             |m: &CreatePipelineRequest| { &m.pipeline },
             |m: &mut CreatePipelineRequest| { &mut m.pipeline },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "pipeline_json",
+            |m: &CreatePipelineRequest| { &m.pipeline_json },
+            |m: &mut CreatePipelineRequest| { &mut m.pipeline_json },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CreatePipelineRequest>(
             "CreatePipelineRequest",
@@ -912,6 +920,9 @@ impl ::protobuf::Message for CreatePipelineRequest {
                 10 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.pipeline)?;
                 },
+                18 => {
+                    self.pipeline_json = ::std::option::Option::Some(is.read_bytes()?);
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -928,6 +939,9 @@ impl ::protobuf::Message for CreatePipelineRequest {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
+        if let Some(v) = self.pipeline_json.as_ref() {
+            my_size += ::protobuf::rt::bytes_size(2, &v);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -936,6 +950,9 @@ impl ::protobuf::Message for CreatePipelineRequest {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if let Some(v) = self.pipeline.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        if let Some(v) = self.pipeline_json.as_ref() {
+            os.write_bytes(2, v)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -955,12 +972,14 @@ impl ::protobuf::Message for CreatePipelineRequest {
 
     fn clear(&mut self) {
         self.pipeline.clear();
+        self.pipeline_json = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static CreatePipelineRequest {
         static instance: CreatePipelineRequest = CreatePipelineRequest {
             pipeline: ::protobuf::MessageField::none(),
+            pipeline_json: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1130,6 +1149,8 @@ pub struct UpdatePipelineRequest {
     // message fields
     // @@protoc_insertion_point(field:protos.UpdatePipelineRequest.pipeline)
     pub pipeline: ::protobuf::MessageField<super::sp_pipeline::Pipeline>,
+    // @@protoc_insertion_point(field:protos.UpdatePipelineRequest.pipeline_json)
+    pub pipeline_json: ::std::option::Option<::std::vec::Vec<u8>>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.UpdatePipelineRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -1147,12 +1168,17 @@ impl UpdatePipelineRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut fields = ::std::vec::Vec::with_capacity(2);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_pipeline::Pipeline>(
             "pipeline",
             |m: &UpdatePipelineRequest| { &m.pipeline },
             |m: &mut UpdatePipelineRequest| { &mut m.pipeline },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "pipeline_json",
+            |m: &UpdatePipelineRequest| { &m.pipeline_json },
+            |m: &mut UpdatePipelineRequest| { &mut m.pipeline_json },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<UpdatePipelineRequest>(
             "UpdatePipelineRequest",
@@ -1175,6 +1201,9 @@ impl ::protobuf::Message for UpdatePipelineRequest {
                 10 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.pipeline)?;
                 },
+                18 => {
+                    self.pipeline_json = ::std::option::Option::Some(is.read_bytes()?);
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -1191,6 +1220,9 @@ impl ::protobuf::Message for UpdatePipelineRequest {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
+        if let Some(v) = self.pipeline_json.as_ref() {
+            my_size += ::protobuf::rt::bytes_size(2, &v);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -1199,6 +1231,9 @@ impl ::protobuf::Message for UpdatePipelineRequest {
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if let Some(v) = self.pipeline.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        if let Some(v) = self.pipeline_json.as_ref() {
+            os.write_bytes(2, v)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1218,12 +1253,14 @@ impl ::protobuf::Message for UpdatePipelineRequest {
 
     fn clear(&mut self) {
         self.pipeline.clear();
+        self.pipeline_json = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
     fn default_instance() -> &'static UpdatePipelineRequest {
         static instance: UpdatePipelineRequest = UpdatePipelineRequest {
             pipeline: ::protobuf::MessageField::none(),
+            pipeline_json: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1399,6 +1436,9 @@ pub struct SetPipelinesRequest {
     pub pipeline_ids: ::std::vec::Vec<::std::string::String>,
     // @@protoc_insertion_point(field:protos.SetPipelinesRequest.audience)
     pub audience: ::protobuf::MessageField<super::sp_common::Audience>,
+    ///  Used by automation tooling
+    // @@protoc_insertion_point(field:protos.SetPipelinesRequest._created_by)
+    pub _created_by: ::std::option::Option<::std::string::String>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.SetPipelinesRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -1416,7 +1456,7 @@ impl SetPipelinesRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut fields = ::std::vec::Vec::with_capacity(3);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "pipeline_ids",
@@ -1427,6 +1467,11 @@ impl SetPipelinesRequest {
             "audience",
             |m: &SetPipelinesRequest| { &m.audience },
             |m: &mut SetPipelinesRequest| { &mut m.audience },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+            "_created_by",
+            |m: &SetPipelinesRequest| { &m._created_by },
+            |m: &mut SetPipelinesRequest| { &mut m._created_by },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SetPipelinesRequest>(
             "SetPipelinesRequest",
@@ -1452,6 +1497,9 @@ impl ::protobuf::Message for SetPipelinesRequest {
                 18 => {
                     ::protobuf::rt::read_singular_message_into_field(is, &mut self.audience)?;
                 },
+                802 => {
+                    self._created_by = ::std::option::Option::Some(is.read_string()?);
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -1471,6 +1519,9 @@ impl ::protobuf::Message for SetPipelinesRequest {
             let len = v.compute_size();
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
         }
+        if let Some(v) = self._created_by.as_ref() {
+            my_size += ::protobuf::rt::string_size(100, &v);
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -1482,6 +1533,9 @@ impl ::protobuf::Message for SetPipelinesRequest {
         };
         if let Some(v) = self.audience.as_ref() {
             ::protobuf::rt::write_message_field_with_cached_size(2, v, os)?;
+        }
+        if let Some(v) = self._created_by.as_ref() {
+            os.write_string(100, v)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -1502,6 +1556,7 @@ impl ::protobuf::Message for SetPipelinesRequest {
     fn clear(&mut self) {
         self.pipeline_ids.clear();
         self.audience.clear();
+        self._created_by = ::std::option::Option::None;
         self.special_fields.clear();
     }
 
@@ -1509,6 +1564,7 @@ impl ::protobuf::Message for SetPipelinesRequest {
         static instance: SetPipelinesRequest = SetPipelinesRequest {
             pipeline_ids: ::std::vec::Vec::new(),
             audience: ::protobuf::MessageField::none(),
+            _created_by: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -5238,6 +5294,985 @@ impl ::protobuf::reflect::ProtobufValue for ResumeTailRequest {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+// @@protoc_insertion_point(message:protos.GetWasmRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct GetWasmRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.GetWasmRequest.id)
+    pub id: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetWasmRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetWasmRequest {
+    fn default() -> &'a GetWasmRequest {
+        <GetWasmRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetWasmRequest {
+    pub fn new() -> GetWasmRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &GetWasmRequest| { &m.id },
+            |m: &mut GetWasmRequest| { &mut m.id },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetWasmRequest>(
+            "GetWasmRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetWasmRequest {
+    const NAME: &'static str = "GetWasmRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.id = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.id);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.id.is_empty() {
+            os.write_string(1, &self.id)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetWasmRequest {
+        GetWasmRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.id.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetWasmRequest {
+        static instance: GetWasmRequest = GetWasmRequest {
+            id: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetWasmRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetWasmRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetWasmRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetWasmRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.GetWasmResponse)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct GetWasmResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.GetWasmResponse.wasm)
+    pub wasm: ::protobuf::MessageField<super::sp_shared::WasmModule>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetWasmResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetWasmResponse {
+    fn default() -> &'a GetWasmResponse {
+        <GetWasmResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetWasmResponse {
+    pub fn new() -> GetWasmResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_shared::WasmModule>(
+            "wasm",
+            |m: &GetWasmResponse| { &m.wasm },
+            |m: &mut GetWasmResponse| { &mut m.wasm },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetWasmResponse>(
+            "GetWasmResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetWasmResponse {
+    const NAME: &'static str = "GetWasmResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.wasm)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.wasm.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.wasm.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetWasmResponse {
+        GetWasmResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.wasm.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetWasmResponse {
+        static instance: GetWasmResponse = GetWasmResponse {
+            wasm: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetWasmResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetWasmResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetWasmResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetWasmResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.GetAllWasmRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct GetAllWasmRequest {
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetAllWasmRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetAllWasmRequest {
+    fn default() -> &'a GetAllWasmRequest {
+        <GetAllWasmRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetAllWasmRequest {
+    pub fn new() -> GetAllWasmRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(0);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAllWasmRequest>(
+            "GetAllWasmRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetAllWasmRequest {
+    const NAME: &'static str = "GetAllWasmRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetAllWasmRequest {
+        GetAllWasmRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetAllWasmRequest {
+        static instance: GetAllWasmRequest = GetAllWasmRequest {
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetAllWasmRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetAllWasmRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetAllWasmRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetAllWasmRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.GetAllWasmResponse)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct GetAllWasmResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.GetAllWasmResponse.wasm)
+    pub wasm: ::std::vec::Vec<super::sp_shared::WasmModule>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetAllWasmResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetAllWasmResponse {
+    fn default() -> &'a GetAllWasmResponse {
+        <GetAllWasmResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetAllWasmResponse {
+    pub fn new() -> GetAllWasmResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "wasm",
+            |m: &GetAllWasmResponse| { &m.wasm },
+            |m: &mut GetAllWasmResponse| { &mut m.wasm },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetAllWasmResponse>(
+            "GetAllWasmResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetAllWasmResponse {
+    const NAME: &'static str = "GetAllWasmResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.wasm.push(is.read_message()?);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        for value in &self.wasm {
+            let len = value.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        for v in &self.wasm {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetAllWasmResponse {
+        GetAllWasmResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.wasm.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetAllWasmResponse {
+        static instance: GetAllWasmResponse = GetAllWasmResponse {
+            wasm: ::std::vec::Vec::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetAllWasmResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetAllWasmResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetAllWasmResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetAllWasmResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.CreateWasmRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct CreateWasmRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.CreateWasmRequest.wasm)
+    pub wasm: ::protobuf::MessageField<super::sp_shared::WasmModule>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.CreateWasmRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a CreateWasmRequest {
+    fn default() -> &'a CreateWasmRequest {
+        <CreateWasmRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl CreateWasmRequest {
+    pub fn new() -> CreateWasmRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_shared::WasmModule>(
+            "wasm",
+            |m: &CreateWasmRequest| { &m.wasm },
+            |m: &mut CreateWasmRequest| { &mut m.wasm },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CreateWasmRequest>(
+            "CreateWasmRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for CreateWasmRequest {
+    const NAME: &'static str = "CreateWasmRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.wasm)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.wasm.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.wasm.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> CreateWasmRequest {
+        CreateWasmRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.wasm.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static CreateWasmRequest {
+        static instance: CreateWasmRequest = CreateWasmRequest {
+            wasm: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for CreateWasmRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("CreateWasmRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for CreateWasmRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CreateWasmRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.CreateWasmResponse)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct CreateWasmResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.CreateWasmResponse.message)
+    pub message: ::std::string::String,
+    // @@protoc_insertion_point(field:protos.CreateWasmResponse.id)
+    pub id: ::std::string::String,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.CreateWasmResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a CreateWasmResponse {
+    fn default() -> &'a CreateWasmResponse {
+        <CreateWasmResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl CreateWasmResponse {
+    pub fn new() -> CreateWasmResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(2);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "message",
+            |m: &CreateWasmResponse| { &m.message },
+            |m: &mut CreateWasmResponse| { &mut m.message },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "id",
+            |m: &CreateWasmResponse| { &m.id },
+            |m: &mut CreateWasmResponse| { &mut m.id },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<CreateWasmResponse>(
+            "CreateWasmResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for CreateWasmResponse {
+    const NAME: &'static str = "CreateWasmResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.message = is.read_string()?;
+                },
+                18 => {
+                    self.id = is.read_string()?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if !self.message.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.message);
+        }
+        if !self.id.is_empty() {
+            my_size += ::protobuf::rt::string_size(2, &self.id);
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if !self.message.is_empty() {
+            os.write_string(1, &self.message)?;
+        }
+        if !self.id.is_empty() {
+            os.write_string(2, &self.id)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> CreateWasmResponse {
+        CreateWasmResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.message.clear();
+        self.id.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static CreateWasmResponse {
+        static instance: CreateWasmResponse = CreateWasmResponse {
+            message: ::std::string::String::new(),
+            id: ::std::string::String::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for CreateWasmResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("CreateWasmResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for CreateWasmResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for CreateWasmResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.UpdateWasmRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct UpdateWasmRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.UpdateWasmRequest.wasm)
+    pub wasm: ::protobuf::MessageField<super::sp_shared::WasmModule>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.UpdateWasmRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a UpdateWasmRequest {
+    fn default() -> &'a UpdateWasmRequest {
+        <UpdateWasmRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl UpdateWasmRequest {
+    pub fn new() -> UpdateWasmRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_shared::WasmModule>(
+            "wasm",
+            |m: &UpdateWasmRequest| { &m.wasm },
+            |m: &mut UpdateWasmRequest| { &mut m.wasm },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<UpdateWasmRequest>(
+            "UpdateWasmRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for UpdateWasmRequest {
+    const NAME: &'static str = "UpdateWasmRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.wasm)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.wasm.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.wasm.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> UpdateWasmRequest {
+        UpdateWasmRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.wasm.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static UpdateWasmRequest {
+        static instance: UpdateWasmRequest = UpdateWasmRequest {
+            wasm: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for UpdateWasmRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("UpdateWasmRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for UpdateWasmRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for UpdateWasmRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.DeleteWasmRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct DeleteWasmRequest {
+    // message fields
+    // @@protoc_insertion_point(field:protos.DeleteWasmRequest.ids)
+    pub ids: ::std::vec::Vec<::std::string::String>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.DeleteWasmRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a DeleteWasmRequest {
+    fn default() -> &'a DeleteWasmRequest {
+        <DeleteWasmRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl DeleteWasmRequest {
+    pub fn new() -> DeleteWasmRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
+            "ids",
+            |m: &DeleteWasmRequest| { &m.ids },
+            |m: &mut DeleteWasmRequest| { &mut m.ids },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<DeleteWasmRequest>(
+            "DeleteWasmRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for DeleteWasmRequest {
+    const NAME: &'static str = "DeleteWasmRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    self.ids.push(is.read_string()?);
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        for value in &self.ids {
+            my_size += ::protobuf::rt::string_size(1, &value);
+        };
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        for v in &self.ids {
+            os.write_string(1, &v)?;
+        };
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> DeleteWasmRequest {
+        DeleteWasmRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.ids.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static DeleteWasmRequest {
+        static instance: DeleteWasmRequest = DeleteWasmRequest {
+            ids: ::std::vec::Vec::new(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for DeleteWasmRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("DeleteWasmRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for DeleteWasmRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for DeleteWasmRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 // @@protoc_insertion_point(message:protos.TestRequest)
 #[derive(PartialEq,Clone,Default,Debug)]
 pub struct TestRequest {
@@ -5482,514 +6517,834 @@ impl ::protobuf::reflect::ProtobufValue for TestResponse {
     type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
 }
 
+// @@protoc_insertion_point(message:protos.GetConfigRequest)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct GetConfigRequest {
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetConfigRequest.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetConfigRequest {
+    fn default() -> &'a GetConfigRequest {
+        <GetConfigRequest as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetConfigRequest {
+    pub fn new() -> GetConfigRequest {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(0);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetConfigRequest>(
+            "GetConfigRequest",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetConfigRequest {
+    const NAME: &'static str = "GetConfigRequest";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetConfigRequest {
+        GetConfigRequest::new()
+    }
+
+    fn clear(&mut self) {
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetConfigRequest {
+        static instance: GetConfigRequest = GetConfigRequest {
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetConfigRequest {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetConfigRequest").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetConfigRequest {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetConfigRequest {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
+// @@protoc_insertion_point(message:protos.GetConfigResponse)
+#[derive(PartialEq,Clone,Default,Debug)]
+pub struct GetConfigResponse {
+    // message fields
+    // @@protoc_insertion_point(field:protos.GetConfigResponse.config)
+    pub config: ::protobuf::MessageField<super::sp_common::Config>,
+    // special fields
+    // @@protoc_insertion_point(special_field:protos.GetConfigResponse.special_fields)
+    pub special_fields: ::protobuf::SpecialFields,
+}
+
+impl<'a> ::std::default::Default for &'a GetConfigResponse {
+    fn default() -> &'a GetConfigResponse {
+        <GetConfigResponse as ::protobuf::Message>::default_instance()
+    }
+}
+
+impl GetConfigResponse {
+    pub fn new() -> GetConfigResponse {
+        ::std::default::Default::default()
+    }
+
+    fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
+        let mut fields = ::std::vec::Vec::with_capacity(1);
+        let mut oneofs = ::std::vec::Vec::with_capacity(0);
+        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, super::sp_common::Config>(
+            "config",
+            |m: &GetConfigResponse| { &m.config },
+            |m: &mut GetConfigResponse| { &mut m.config },
+        ));
+        ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<GetConfigResponse>(
+            "GetConfigResponse",
+            fields,
+            oneofs,
+        )
+    }
+}
+
+impl ::protobuf::Message for GetConfigResponse {
+    const NAME: &'static str = "GetConfigResponse";
+
+    fn is_initialized(&self) -> bool {
+        true
+    }
+
+    fn merge_from(&mut self, is: &mut ::protobuf::CodedInputStream<'_>) -> ::protobuf::Result<()> {
+        while let Some(tag) = is.read_raw_tag_or_eof()? {
+            match tag {
+                10 => {
+                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.config)?;
+                },
+                tag => {
+                    ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
+                },
+            };
+        }
+        ::std::result::Result::Ok(())
+    }
+
+    // Compute sizes of nested messages
+    #[allow(unused_variables)]
+    fn compute_size(&self) -> u64 {
+        let mut my_size = 0;
+        if let Some(v) = self.config.as_ref() {
+            let len = v.compute_size();
+            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        }
+        my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
+        self.special_fields.cached_size().set(my_size as u32);
+        my_size
+    }
+
+    fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
+        if let Some(v) = self.config.as_ref() {
+            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        }
+        os.write_unknown_fields(self.special_fields.unknown_fields())?;
+        ::std::result::Result::Ok(())
+    }
+
+    fn special_fields(&self) -> &::protobuf::SpecialFields {
+        &self.special_fields
+    }
+
+    fn mut_special_fields(&mut self) -> &mut ::protobuf::SpecialFields {
+        &mut self.special_fields
+    }
+
+    fn new() -> GetConfigResponse {
+        GetConfigResponse::new()
+    }
+
+    fn clear(&mut self) {
+        self.config.clear();
+        self.special_fields.clear();
+    }
+
+    fn default_instance() -> &'static GetConfigResponse {
+        static instance: GetConfigResponse = GetConfigResponse {
+            config: ::protobuf::MessageField::none(),
+            special_fields: ::protobuf::SpecialFields::new(),
+        };
+        &instance
+    }
+}
+
+impl ::protobuf::MessageFull for GetConfigResponse {
+    fn descriptor() -> ::protobuf::reflect::MessageDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::MessageDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().message_by_package_relative_name("GetConfigResponse").unwrap()).clone()
+    }
+}
+
+impl ::std::fmt::Display for GetConfigResponse {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        ::protobuf::text_format::fmt(self, f)
+    }
+}
+
+impl ::protobuf::reflect::ProtobufValue for GetConfigResponse {
+    type RuntimeType = ::protobuf::reflect::rt::RuntimeTypeMessage<Self>;
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x11sp_external.proto\x12\x06protos\x1a\x0fsp_common.proto\x1a\rsp_inf\
-    o.proto\x1a\x0fsp_notify.proto\x1a\x11sp_pipeline.proto\"\x0f\n\rGetAllR\
-    equest\"\x84\x04\n\x0eGetAllResponse\x12$\n\x04live\x18\x01\x20\x03(\x0b\
-    2\x10.protos.LiveInfoR\x04live\x12.\n\taudiences\x18\x02\x20\x03(\x0b2\
-    \x10.protos.AudienceR\taudiences\x12C\n\tpipelines\x18\x03\x20\x03(\x0b2\
-    %.protos.GetAllResponse.PipelinesEntryR\tpipelines\x12=\n\x07configs\x18\
-    \x04\x20\x03(\x0b2#.protos.GetAllResponse.ConfigsEntryR\x07configs\x12;\
-    \n\x1bgenerated_at_unix_ts_ns_utc\x18d\x20\x01(\x03R\x16generatedAtUnixT\
-    sNsUtc\x12#\n\n_keepalive\x18\xe8\x07\x20\x01(\x08H\0R\tKeepalive\x88\
-    \x01\x01\x1aR\n\x0ePipelinesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\
-    \x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.protos.PipelineInfoR\
-    \x05value:\x028\x01\x1aS\n\x0cConfigsEntry\x12\x10\n\x03key\x18\x01\x20\
-    \x01(\tR\x03key\x12-\n\x05value\x18\x02\x20\x01(\x0b2\x17.protos.Pipelin\
-    eConfigsR\x05value:\x028\x01B\r\n\x0bX_keepalive\"\x15\n\x13GetPipelines\
-    Request\"F\n\x14GetPipelinesResponse\x12.\n\tpipelines\x18\x01\x20\x03(\
-    \x0b2\x10.protos.PipelineR\tpipelines\"5\n\x12GetPipelineRequest\x12\x1f\
-    \n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\"C\n\x13GetPipelineRes\
-    ponse\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08p\
-    ipeline\"E\n\x15CreatePipelineRequest\x12,\n\x08pipeline\x18\x01\x20\x01\
-    (\x0b2\x10.protos.PipelineR\x08pipeline\"S\n\x16CreatePipelineResponse\
-    \x12\x18\n\x07message\x18\x01\x20\x01(\tR\x07message\x12\x1f\n\x0bpipeli\
-    ne_id\x18\x02\x20\x01(\tR\npipelineId\"E\n\x15UpdatePipelineRequest\x12,\
-    \n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeline\"j\
-    \n\x15DeletePipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\
-    \npipelineId\x120\n\n_audiences\x18\xe8\x07\x20\x03(\x0b2\x10.protos.Aud\
-    ienceR\tAudiences\"f\n\x13SetPipelinesRequest\x12!\n\x0cpipeline_ids\x18\
-    \x01\x20\x03(\tR\x0bpipelineIds\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\
-    \x10.protos.AudienceR\x08audience\"e\n\x14PausePipelineRequest\x12\x1f\n\
-    \x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\
-    \x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"f\n\x15ResumePipeli\
-    neRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\
-    \n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"[\
-    \n\x19CreateNotificationRequest\x12>\n\x0cnotification\x18\x01\x20\x01(\
-    \x0b2\x1a.protos.NotificationConfigR\x0cnotification\"\\\n\x1aCreateNoti\
-    ficationResponse\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos\
-    .NotificationConfigR\x0cnotification\"[\n\x19UpdateNotificationRequest\
-    \x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationCon\
-    figR\x0cnotification\"D\n\x19DeleteNotificationRequest\x12'\n\x0fnotific\
-    ation_id\x18\x01\x20\x01(\tR\x0enotificationId\"\x19\n\x17GetNotificatio\
-    nsRequest\"\xd3\x01\n\x18GetNotificationsResponse\x12Y\n\rnotifications\
-    \x18\x01\x20\x03(\x0b23.protos.GetNotificationsResponse.NotificationsEnt\
-    ryR\rnotifications\x1a\\\n\x12NotificationsEntry\x12\x10\n\x03key\x18\
-    \x01\x20\x01(\tR\x03key\x120\n\x05value\x18\x02\x20\x01(\x0b2\x1a.protos\
-    .NotificationConfigR\x05value:\x028\x01\"A\n\x16GetNotificationRequest\
-    \x12'\n\x0fnotification_id\x18\x01\x20\x01(\tR\x0enotificationId\"Y\n\
-    \x17GetNotificationResponse\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\
-    \x1a.protos.NotificationConfigR\x0cnotification\"i\n\x19AttachNotificati\
-    onRequest\x12'\n\x0fnotification_id\x18\x01\x20\x01(\tR\x0enotificationI\
-    d\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01(\tR\npipelineId:\x02\x18\x01\
-    \"i\n\x19DetachNotificationRequest\x12'\n\x0fnotification_id\x18\x01\x20\
-    \x01(\tR\x0enotificationId\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01(\tR\
-    \npipelineId:\x02\x18\x01\"E\n\x15CreateAudienceRequest\x12,\n\x08audien\
-    ce\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"j\n\x15Delete\
-    AudienceRequest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.Audi\
-    enceR\x08audience\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\x05force\
-    \x88\x01\x01B\x08\n\x06_force\"^\n\x14DeleteServiceRequest\x12!\n\x0cser\
-    vice_name\x18\x01\x20\x01(\tR\x0bserviceName\x12\x19\n\x05force\x18\x02\
-    \x20\x01(\x08H\0R\x05force\x88\x01\x01B\x08\n\x06_force\"\x13\n\x11GetMe\
-    tricsRequest\"\xd7\x01\n\x12GetMetricsResponse\x12A\n\x07metrics\x18\x01\
-    \x20\x03(\x0b2'.protos.GetMetricsResponse.MetricsEntryR\x07metrics\x12#\
-    \n\n_keepalive\x18\xe8\x07\x20\x01(\x08H\0R\tKeepalive\x88\x01\x01\x1aJ\
-    \n\x0cMetricsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12$\n\
-    \x05value\x18\x02\x20\x01(\x0b2\x0e.protos.MetricR\x05value:\x028\x01B\r\
-    \n\x0bX_keepalive\"\x19\n\x17GetAudienceRatesRequest\"\xe1\x01\n\x18GetA\
-    udienceRatesResponse\x12A\n\x05rates\x18\x01\x20\x03(\x0b2+.protos.GetAu\
-    dienceRatesResponse.RatesEntryR\x05rates\x12#\n\n_keepalive\x18\xe8\x07\
-    \x20\x01(\x08H\0R\tKeepalive\x88\x01\x01\x1aN\n\nRatesEntry\x12\x10\n\
+    \n\x11sp_external.proto\x12\x06protos\x1a\x16shared/sp_shared.proto\x1a\
+    \x0fsp_common.proto\x1a\rsp_info.proto\x1a\x0fsp_notify.proto\x1a\x11sp_\
+    pipeline.proto\"\x0f\n\rGetAllRequest\"\x84\x04\n\x0eGetAllResponse\x12$\
+    \n\x04live\x18\x01\x20\x03(\x0b2\x10.protos.LiveInfoR\x04live\x12.\n\tau\
+    diences\x18\x02\x20\x03(\x0b2\x10.protos.AudienceR\taudiences\x12C\n\tpi\
+    pelines\x18\x03\x20\x03(\x0b2%.protos.GetAllResponse.PipelinesEntryR\tpi\
+    pelines\x12=\n\x07configs\x18\x04\x20\x03(\x0b2#.protos.GetAllResponse.C\
+    onfigsEntryR\x07configs\x12;\n\x1bgenerated_at_unix_ts_ns_utc\x18d\x20\
+    \x01(\x03R\x16generatedAtUnixTsNsUtc\x12#\n\n_keepalive\x18\xe8\x07\x20\
+    \x01(\x08H\0R\tKeepalive\x88\x01\x01\x1aR\n\x0ePipelinesEntry\x12\x10\n\
     \x03key\x18\x01\x20\x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\
-    \x14.protos.AudienceRateR\x05value:\x028\x01B\r\n\x0bX_keepalive\"@\n\
-    \x10GetSchemaRequest\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos\
-    .AudienceR\x08audience\";\n\x11GetSchemaResponse\x12&\n\x06schema\x18\
-    \x01\x20\x01(\x0b2\x0e.protos.SchemaR\x06schema\"4\n\x1cAppRegistrationS\
-    tatusRequest\x12\x14\n\x05email\x18\x01\x20\x01(\tR\x05email\"\xb8\x01\n\
-    \x1dAppRegistrationStatusResponse\x12D\n\x06status\x18\x01\x20\x01(\x0e2\
-    ,.protos.AppRegistrationStatusResponse.StatusR\x06status\"Q\n\x06Status\
-    \x12\x10\n\x0cSTATUS_UNSET\x10\0\x12\x11\n\rSTATUS_SUBMIT\x10\x01\x12\
-    \x11\n\rSTATUS_VERIFY\x10\x02\x12\x0f\n\x0bSTATUS_DONE\x10\x03\"b\n\x16A\
-    ppRegistrationRequest\x12\x14\n\x05email\x18\x01\x20\x01(\tR\x05email\
-    \x12\x1d\n\ncluster_id\x18\x02\x20\x01(\tR\tclusterId\x12\x13\n\x05_code\
-    \x18d\x20\x01(\tR\x04Code\"H\n\x1cAppVerifyRegistrationRequest\x12\x14\n\
-    \x05email\x18\x01\x20\x01(\tR\x05email\x12\x12\n\x04code\x18\x02\x20\x01\
-    (\tR\x04code\"9\n\x18AppRegisterRejectRequest\x12\x1d\n\ncluster_id\x18\
-    \x01\x20\x01(\tR\tclusterId\"+\n\x10PauseTailRequest\x12\x17\n\x07tail_i\
-    d\x18\x01\x20\x01(\tR\x06tailId\",\n\x11ResumeTailRequest\x12\x17\n\x07t\
-    ail_id\x18\x01\x20\x01(\tR\x06tailId\"#\n\x0bTestRequest\x12\x14\n\x05in\
-    put\x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestResponse\x12\x16\n\x06outpu\
-    t\x18\x02\x20\x01(\tR\x06output2\xbd\x12\n\x08External\x127\n\x06GetAll\
-    \x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse\x12?\n\x0cGe\
-    tAllStream\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse0\
-    \x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesRequest\x1a\x1c.p\
-    rotos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.protos.GetPipel\
-    ineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\x0eCreatePipeline\
-    \x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.CreatePipelineRespo\
-    nse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineRequest\x1a\
-    \x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.protos.Del\
-    etePipelineRequest\x1a\x18.protos.StandardResponse\x12E\n\x0cSetPipeline\
-    s\x12\x1b.protos.SetPipelinesRequest\x1a\x18.protos.StandardResponse\x12\
-    G\n\rPausePipeline\x12\x1c.protos.PausePipelineRequest\x1a\x18.protos.St\
-    andardResponse\x12I\n\x0eResumePipeline\x12\x1d.protos.ResumePipelineReq\
-    uest\x1a\x18.protos.StandardResponse\x12[\n\x12CreateNotification\x12!.p\
-    rotos.CreateNotificationRequest\x1a\".protos.CreateNotificationResponse\
-    \x12Q\n\x12UpdateNotification\x12!.protos.UpdateNotificationRequest\x1a\
-    \x18.protos.StandardResponse\x12Q\n\x12DeleteNotification\x12!.protos.De\
-    leteNotificationRequest\x1a\x18.protos.StandardResponse\x12U\n\x10GetNot\
-    ifications\x12\x1f.protos.GetNotificationsRequest\x1a\x20.protos.GetNoti\
-    ficationsResponse\x12R\n\x0fGetNotification\x12\x1e.protos.GetNotificati\
-    onRequest\x1a\x1f.protos.GetNotificationResponse\x12V\n\x12AttachNotific\
-    ation\x12!.protos.AttachNotificationRequest\x1a\x18.protos.StandardRespo\
-    nse\"\x03\x88\x02\x01\x12V\n\x12DetachNotification\x12!.protos.DetachNot\
-    ificationRequest\x1a\x18.protos.StandardResponse\"\x03\x88\x02\x01\x12I\
-    \n\x0eCreateAudience\x12\x1d.protos.CreateAudienceRequest\x1a\x18.protos\
-    .StandardResponse\x12I\n\x0eDeleteAudience\x12\x1d.protos.DeleteAudience\
-    Request\x1a\x18.protos.StandardResponse\x12G\n\rDeleteService\x12\x1c.pr\
-    otos.DeleteServiceRequest\x1a\x18.protos.StandardResponse\x12E\n\nGetMet\
-    rics\x12\x19.protos.GetMetricsRequest\x1a\x1a.protos.GetMetricsResponse0\
-    \x01\x123\n\x04Tail\x12\x13.protos.TailRequest\x1a\x14.protos.TailRespon\
-    se0\x01\x12?\n\tPauseTail\x12\x18.protos.PauseTailRequest\x1a\x18.protos\
-    .StandardResponse\x12A\n\nResumeTail\x12\x19.protos.ResumeTailRequest\
-    \x1a\x18.protos.StandardResponse\x12W\n\x10GetAudienceRates\x12\x1f.prot\
-    os.GetAudienceRatesRequest\x1a\x20.protos.GetAudienceRatesResponse0\x01\
-    \x12@\n\tGetSchema\x12\x18.protos.GetSchemaRequest\x1a\x19.protos.GetSch\
-    emaResponse\x12d\n\x15AppRegistrationStatus\x12$.protos.AppRegistrationS\
-    tatusRequest\x1a%.protos.AppRegistrationStatusResponse\x12G\n\x0bAppRegi\
-    ster\x12\x1e.protos.AppRegistrationRequest\x1a\x18.protos.StandardRespon\
-    se\x12W\n\x15AppVerifyRegistration\x12$.protos.AppVerifyRegistrationRequ\
-    est\x1a\x18.protos.StandardResponse\x12O\n\x11AppRegisterReject\x12\x20.\
-    protos.AppRegisterRejectRequest\x1a\x18.protos.StandardResponse\x121\n\
-    \x04Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseBPZ:githu\
-    b.com/streamdal/streamdal/libs/protos/build/go/protos\xea\x02\x11Streamd\
-    al::ProtosJ\xf0J\n\x07\x12\x05\0\0\xcc\x02\x01\n\x08\n\x01\x0c\x12\x03\0\
-    \0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\
-    \x19\n\t\n\x02\x03\x01\x12\x03\x05\0\x17\n\t\n\x02\x03\x02\x12\x03\x06\0\
-    \x19\n\t\n\x02\x03\x03\x12\x03\x07\0\x1b\n\x08\n\x01\x08\x12\x03\t\0Q\n\
-    \t\n\x02\x08\x0b\x12\x03\t\0Q\n\x08\n\x01\x08\x12\x03\n\0*\n\t\n\x02\x08\
-    -\x12\x03\n\0*\n\n\n\x02\x06\0\x12\x04\x0c\0e\x01\n\n\n\x03\x06\0\x01\
-    \x12\x03\x0c\x08\x10\nM\n\x04\x06\0\x02\0\x12\x03\x0e\x025\x1a@\x20Retur\
-    ns\x20all\x20data\x20needed\x20for\x20UI;\x20called\x20on\x20initial\x20\
-    console\x20load\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\x03\x0e\x06\x0c\n\x0c\
-    \n\x05\x06\0\x02\0\x02\x12\x03\x0e\r\x1a\n\x0c\n\x05\x06\0\x02\0\x03\x12\
-    \x03\x0e%3\nU\n\x04\x06\0\x02\x01\x12\x03\x11\x02B\x1aH\x20Used\x20by\
-    \x20console\x20to\x20stream\x20updates\x20to\x20UI;\x20called\x20after\
-    \x20initial\x20GetAll()\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x11\x06\
-    \x12\n\x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x11\x13\x20\n\x0c\n\x05\x06\0\
-    \x02\x01\x06\x12\x03\x11+1\n\x0c\n\x05\x06\0\x02\x01\x03\x12\x03\x112@\n\
-    @\n\x04\x06\0\x02\x02\x12\x03\x14\x02G\x1a3\x20Returns\x20pipelines\x20(\
-    _wasm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x02\x01\
-    \x12\x03\x14\x06\x12\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x14\x13&\n\
-    \x0c\n\x05\x06\0\x02\x02\x03\x12\x03\x141E\nH\n\x04\x06\0\x02\x03\x12\
-    \x03\x17\x02D\x1a;\x20Returns\x20a\x20single\x20pipeline\x20(_wasm_bytes\
-    \x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x03\x01\x12\x03\x17\
-    \x06\x11\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03\x17\x12$\n\x0c\n\x05\x06\
-    \0\x02\x03\x03\x12\x03\x17/B\nE\n\x04\x06\0\x02\x04\x12\x03\x1a\x02M\x1a\
-    8\x20Create\x20a\x20new\x20pipeline;\x20id\x20must\x20be\x20left\x20empt\
-    y\x20on\x20create\n\n\x0c\n\x05\x06\0\x02\x04\x01\x12\x03\x1a\x06\x14\n\
-    \x0c\n\x05\x06\0\x02\x04\x02\x12\x03\x1a\x15*\n\x0c\n\x05\x06\0\x02\x04\
-    \x03\x12\x03\x1a5K\n:\n\x04\x06\0\x02\x05\x12\x03\x1d\x02N\x1a-\x20Updat\
-    e\x20an\x20existing\x20pipeline;\x20id\x20must\x20be\x20set\n\n\x0c\n\
-    \x05\x06\0\x02\x05\x01\x12\x03\x1d\x06\x14\n\x0c\n\x05\x06\0\x02\x05\x02\
-    \x12\x03\x1d\x15*\n\x0c\n\x05\x06\0\x02\x05\x03\x12\x03\x1d5L\n\x20\n\
-    \x04\x06\0\x02\x06\x12\x03\x20\x02N\x1a\x13\x20Delete\x20a\x20pipeline\n\
+    \x14.protos.PipelineInfoR\x05value:\x028\x01\x1aS\n\x0cConfigsEntry\x12\
+    \x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12-\n\x05value\x18\x02\x20\x01\
+    (\x0b2\x17.protos.PipelineConfigsR\x05value:\x028\x01B\r\n\x0bX_keepaliv\
+    e\"\x15\n\x13GetPipelinesRequest\"F\n\x14GetPipelinesResponse\x12.\n\tpi\
+    pelines\x18\x01\x20\x03(\x0b2\x10.protos.PipelineR\tpipelines\"5\n\x12Ge\
+    tPipelineRequest\x12\x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineI\
+    d\"C\n\x13GetPipelineResponse\x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\
+    \x10.protos.PipelineR\x08pipeline\"\x81\x01\n\x15CreatePipelineRequest\
+    \x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeli\
+    ne\x12(\n\rpipeline_json\x18\x02\x20\x01(\x0cH\0R\x0cpipelineJson\x88\
+    \x01\x01B\x10\n\x0e_pipeline_json\"S\n\x16CreatePipelineResponse\x12\x18\
+    \n\x07message\x18\x01\x20\x01(\tR\x07message\x12\x1f\n\x0bpipeline_id\
+    \x18\x02\x20\x01(\tR\npipelineId\"\x81\x01\n\x15UpdatePipelineRequest\
+    \x12,\n\x08pipeline\x18\x01\x20\x01(\x0b2\x10.protos.PipelineR\x08pipeli\
+    ne\x12(\n\rpipeline_json\x18\x02\x20\x01(\x0cH\0R\x0cpipelineJson\x88\
+    \x01\x01B\x10\n\x0e_pipeline_json\"j\n\x15DeletePipelineRequest\x12\x1f\
+    \n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x120\n\n_audiences\x18\
+    \xe8\x07\x20\x03(\x0b2\x10.protos.AudienceR\tAudiences\"\x9b\x01\n\x13Se\
+    tPipelinesRequest\x12!\n\x0cpipeline_ids\x18\x01\x20\x03(\tR\x0bpipeline\
+    Ids\x12,\n\x08audience\x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08aud\
+    ience\x12#\n\x0b_created_by\x18d\x20\x01(\tH\0R\tCreatedBy\x88\x01\x01B\
+    \x0e\n\x0cX_created_by\"e\n\x14PausePipelineRequest\x12\x1f\n\x0bpipelin\
+    e_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\x18\x02\x20\x01(\
+    \x0b2\x10.protos.AudienceR\x08audience\"f\n\x15ResumePipelineRequest\x12\
+    \x1f\n\x0bpipeline_id\x18\x01\x20\x01(\tR\npipelineId\x12,\n\x08audience\
+    \x18\x02\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\"[\n\x19CreateNo\
+    tificationRequest\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.proto\
+    s.NotificationConfigR\x0cnotification\"\\\n\x1aCreateNotificationRespons\
+    e\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationCo\
+    nfigR\x0cnotification\"[\n\x19UpdateNotificationRequest\x12>\n\x0cnotifi\
+    cation\x18\x01\x20\x01(\x0b2\x1a.protos.NotificationConfigR\x0cnotificat\
+    ion\"D\n\x19DeleteNotificationRequest\x12'\n\x0fnotification_id\x18\x01\
+    \x20\x01(\tR\x0enotificationId\"\x19\n\x17GetNotificationsRequest\"\xd3\
+    \x01\n\x18GetNotificationsResponse\x12Y\n\rnotifications\x18\x01\x20\x03\
+    (\x0b23.protos.GetNotificationsResponse.NotificationsEntryR\rnotificatio\
+    ns\x1a\\\n\x12NotificationsEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\
+    \x03key\x120\n\x05value\x18\x02\x20\x01(\x0b2\x1a.protos.NotificationCon\
+    figR\x05value:\x028\x01\"A\n\x16GetNotificationRequest\x12'\n\x0fnotific\
+    ation_id\x18\x01\x20\x01(\tR\x0enotificationId\"Y\n\x17GetNotificationRe\
+    sponse\x12>\n\x0cnotification\x18\x01\x20\x01(\x0b2\x1a.protos.Notificat\
+    ionConfigR\x0cnotification\"i\n\x19AttachNotificationRequest\x12'\n\x0fn\
+    otification_id\x18\x01\x20\x01(\tR\x0enotificationId\x12\x1f\n\x0bpipeli\
+    ne_id\x18\x02\x20\x01(\tR\npipelineId:\x02\x18\x01\"i\n\x19DetachNotific\
+    ationRequest\x12'\n\x0fnotification_id\x18\x01\x20\x01(\tR\x0enotificati\
+    onId\x12\x1f\n\x0bpipeline_id\x18\x02\x20\x01(\tR\npipelineId:\x02\x18\
+    \x01\"E\n\x15CreateAudienceRequest\x12,\n\x08audience\x18\x01\x20\x01(\
+    \x0b2\x10.protos.AudienceR\x08audience\"j\n\x15DeleteAudienceRequest\x12\
+    ,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audience\
+    \x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\x05force\x88\x01\x01B\x08\n\
+    \x06_force\"^\n\x14DeleteServiceRequest\x12!\n\x0cservice_name\x18\x01\
+    \x20\x01(\tR\x0bserviceName\x12\x19\n\x05force\x18\x02\x20\x01(\x08H\0R\
+    \x05force\x88\x01\x01B\x08\n\x06_force\"\x13\n\x11GetMetricsRequest\"\
+    \xd7\x01\n\x12GetMetricsResponse\x12A\n\x07metrics\x18\x01\x20\x03(\x0b2\
+    '.protos.GetMetricsResponse.MetricsEntryR\x07metrics\x12#\n\n_keepalive\
+    \x18\xe8\x07\x20\x01(\x08H\0R\tKeepalive\x88\x01\x01\x1aJ\n\x0cMetricsEn\
+    try\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12$\n\x05value\x18\x02\
+    \x20\x01(\x0b2\x0e.protos.MetricR\x05value:\x028\x01B\r\n\x0bX_keepalive\
+    \"\x19\n\x17GetAudienceRatesRequest\"\xe1\x01\n\x18GetAudienceRatesRespo\
+    nse\x12A\n\x05rates\x18\x01\x20\x03(\x0b2+.protos.GetAudienceRatesRespon\
+    se.RatesEntryR\x05rates\x12#\n\n_keepalive\x18\xe8\x07\x20\x01(\x08H\0R\
+    \tKeepalive\x88\x01\x01\x1aN\n\nRatesEntry\x12\x10\n\x03key\x18\x01\x20\
+    \x01(\tR\x03key\x12*\n\x05value\x18\x02\x20\x01(\x0b2\x14.protos.Audienc\
+    eRateR\x05value:\x028\x01B\r\n\x0bX_keepalive\"@\n\x10GetSchemaRequest\
+    \x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.AudienceR\x08audien\
+    ce\";\n\x11GetSchemaResponse\x12&\n\x06schema\x18\x01\x20\x01(\x0b2\x0e.\
+    protos.SchemaR\x06schema\"4\n\x1cAppRegistrationStatusRequest\x12\x14\n\
+    \x05email\x18\x01\x20\x01(\tR\x05email\"\xb8\x01\n\x1dAppRegistrationSta\
+    tusResponse\x12D\n\x06status\x18\x01\x20\x01(\x0e2,.protos.AppRegistrati\
+    onStatusResponse.StatusR\x06status\"Q\n\x06Status\x12\x10\n\x0cSTATUS_UN\
+    SET\x10\0\x12\x11\n\rSTATUS_SUBMIT\x10\x01\x12\x11\n\rSTATUS_VERIFY\x10\
+    \x02\x12\x0f\n\x0bSTATUS_DONE\x10\x03\"b\n\x16AppRegistrationRequest\x12\
+    \x14\n\x05email\x18\x01\x20\x01(\tR\x05email\x12\x1d\n\ncluster_id\x18\
+    \x02\x20\x01(\tR\tclusterId\x12\x13\n\x05_code\x18d\x20\x01(\tR\x04Code\
+    \"H\n\x1cAppVerifyRegistrationRequest\x12\x14\n\x05email\x18\x01\x20\x01\
+    (\tR\x05email\x12\x12\n\x04code\x18\x02\x20\x01(\tR\x04code\"9\n\x18AppR\
+    egisterRejectRequest\x12\x1d\n\ncluster_id\x18\x01\x20\x01(\tR\tclusterI\
+    d\"+\n\x10PauseTailRequest\x12\x17\n\x07tail_id\x18\x01\x20\x01(\tR\x06t\
+    ailId\",\n\x11ResumeTailRequest\x12\x17\n\x07tail_id\x18\x01\x20\x01(\tR\
+    \x06tailId\"\x20\n\x0eGetWasmRequest\x12\x0e\n\x02id\x18\x01\x20\x01(\tR\
+    \x02id\"@\n\x0fGetWasmResponse\x12-\n\x04wasm\x18\x01\x20\x01(\x0b2\x19.\
+    protos.shared.WasmModuleR\x04wasm\"\x13\n\x11GetAllWasmRequest\"C\n\x12G\
+    etAllWasmResponse\x12-\n\x04wasm\x18\x01\x20\x03(\x0b2\x19.protos.shared\
+    .WasmModuleR\x04wasm\"B\n\x11CreateWasmRequest\x12-\n\x04wasm\x18\x01\
+    \x20\x01(\x0b2\x19.protos.shared.WasmModuleR\x04wasm\">\n\x12CreateWasmR\
+    esponse\x12\x18\n\x07message\x18\x01\x20\x01(\tR\x07message\x12\x0e\n\
+    \x02id\x18\x02\x20\x01(\tR\x02id\"B\n\x11UpdateWasmRequest\x12-\n\x04was\
+    m\x18\x01\x20\x01(\x0b2\x19.protos.shared.WasmModuleR\x04wasm\"%\n\x11De\
+    leteWasmRequest\x12\x10\n\x03ids\x18\x01\x20\x03(\tR\x03ids\"#\n\x0bTest\
+    Request\x12\x14\n\x05input\x18\x01\x20\x01(\tR\x05input\"&\n\x0cTestResp\
+    onse\x12\x16\n\x06output\x18\x02\x20\x01(\tR\x06output\"\x12\n\x10GetCon\
+    figRequest\";\n\x11GetConfigResponse\x12&\n\x06config\x18\x01\x20\x01(\
+    \x0b2\x0e.protos.ConfigR\x06config2\xcb\x15\n\x08External\x127\n\x06GetA\
+    ll\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetAllResponse\x12@\n\tGe\
+    tConfig\x12\x18.protos.GetConfigRequest\x1a\x19.protos.GetConfigResponse\
+    \x12?\n\x0cGetAllStream\x12\x15.protos.GetAllRequest\x1a\x16.protos.GetA\
+    llResponse0\x01\x12I\n\x0cGetPipelines\x12\x1b.protos.GetPipelinesReques\
+    t\x1a\x1c.protos.GetPipelinesResponse\x12F\n\x0bGetPipeline\x12\x1a.prot\
+    os.GetPipelineRequest\x1a\x1b.protos.GetPipelineResponse\x12O\n\x0eCreat\
+    ePipeline\x12\x1d.protos.CreatePipelineRequest\x1a\x1e.protos.CreatePipe\
+    lineResponse\x12I\n\x0eUpdatePipeline\x12\x1d.protos.UpdatePipelineReque\
+    st\x1a\x18.protos.StandardResponse\x12I\n\x0eDeletePipeline\x12\x1d.prot\
+    os.DeletePipelineRequest\x1a\x18.protos.StandardResponse\x12E\n\x0cSetPi\
+    pelines\x12\x1b.protos.SetPipelinesRequest\x1a\x18.protos.StandardRespon\
+    se\x12G\n\rPausePipeline\x12\x1c.protos.PausePipelineRequest\x1a\x18.pro\
+    tos.StandardResponse\x12I\n\x0eResumePipeline\x12\x1d.protos.ResumePipel\
+    ineRequest\x1a\x18.protos.StandardResponse\x12[\n\x12CreateNotification\
+    \x12!.protos.CreateNotificationRequest\x1a\".protos.CreateNotificationRe\
+    sponse\x12Q\n\x12UpdateNotification\x12!.protos.UpdateNotificationReques\
+    t\x1a\x18.protos.StandardResponse\x12Q\n\x12DeleteNotification\x12!.prot\
+    os.DeleteNotificationRequest\x1a\x18.protos.StandardResponse\x12U\n\x10G\
+    etNotifications\x12\x1f.protos.GetNotificationsRequest\x1a\x20.protos.Ge\
+    tNotificationsResponse\x12R\n\x0fGetNotification\x12\x1e.protos.GetNotif\
+    icationRequest\x1a\x1f.protos.GetNotificationResponse\x12V\n\x12AttachNo\
+    tification\x12!.protos.AttachNotificationRequest\x1a\x18.protos.Standard\
+    Response\"\x03\x88\x02\x01\x12V\n\x12DetachNotification\x12!.protos.Deta\
+    chNotificationRequest\x1a\x18.protos.StandardResponse\"\x03\x88\x02\x01\
+    \x12I\n\x0eCreateAudience\x12\x1d.protos.CreateAudienceRequest\x1a\x18.p\
+    rotos.StandardResponse\x12I\n\x0eDeleteAudience\x12\x1d.protos.DeleteAud\
+    ienceRequest\x1a\x18.protos.StandardResponse\x12G\n\rDeleteService\x12\
+    \x1c.protos.DeleteServiceRequest\x1a\x18.protos.StandardResponse\x12E\n\
+    \nGetMetrics\x12\x19.protos.GetMetricsRequest\x1a\x1a.protos.GetMetricsR\
+    esponse0\x01\x123\n\x04Tail\x12\x13.protos.TailRequest\x1a\x14.protos.Ta\
+    ilResponse0\x01\x12?\n\tPauseTail\x12\x18.protos.PauseTailRequest\x1a\
+    \x18.protos.StandardResponse\x12A\n\nResumeTail\x12\x19.protos.ResumeTai\
+    lRequest\x1a\x18.protos.StandardResponse\x12W\n\x10GetAudienceRates\x12\
+    \x1f.protos.GetAudienceRatesRequest\x1a\x20.protos.GetAudienceRatesRespo\
+    nse0\x01\x12@\n\tGetSchema\x12\x18.protos.GetSchemaRequest\x1a\x19.proto\
+    s.GetSchemaResponse\x12d\n\x15AppRegistrationStatus\x12$.protos.AppRegis\
+    trationStatusRequest\x1a%.protos.AppRegistrationStatusResponse\x12G\n\
+    \x0bAppRegister\x12\x1e.protos.AppRegistrationRequest\x1a\x18.protos.Sta\
+    ndardResponse\x12W\n\x15AppVerifyRegistration\x12$.protos.AppVerifyRegis\
+    trationRequest\x1a\x18.protos.StandardResponse\x12O\n\x11AppRegisterReje\
+    ct\x12\x20.protos.AppRegisterRejectRequest\x1a\x18.protos.StandardRespon\
+    se\x12:\n\x07GetWasm\x12\x16.protos.GetWasmRequest\x1a\x17.protos.GetWas\
+    mResponse\x12C\n\nGetAllWasm\x12\x19.protos.GetAllWasmRequest\x1a\x1a.pr\
+    otos.GetAllWasmResponse\x12C\n\nCreateWasm\x12\x19.protos.CreateWasmRequ\
+    est\x1a\x1a.protos.CreateWasmResponse\x12A\n\nUpdateWasm\x12\x19.protos.\
+    UpdateWasmRequest\x1a\x18.protos.StandardResponse\x12A\n\nDeleteWasm\x12\
+    \x19.protos.DeleteWasmRequest\x1a\x18.protos.StandardResponse\x121\n\x04\
+    Test\x12\x13.protos.TestRequest\x1a\x14.protos.TestResponseB<Z:github.co\
+    m/streamdal/streamdal/libs/protos/build/go/protosJ\xaeX\n\x07\x12\x05\0\
+    \0\x8a\x03\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\
+    \x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x20\n\t\n\x02\x03\x01\x12\x03\
+    \x05\0\x19\n\t\n\x02\x03\x02\x12\x03\x06\0\x17\n\t\n\x02\x03\x03\x12\x03\
+    \x07\0\x19\n\t\n\x02\x03\x04\x12\x03\x08\0\x1b\n\x08\n\x01\x08\x12\x03\n\
+    \0Q\n\t\n\x02\x08\x0b\x12\x03\n\0Q\n\n\n\x02\x06\0\x12\x04\x0c\0t\x01\n\
+    \n\n\x03\x06\0\x01\x12\x03\x0c\x08\x10\nM\n\x04\x06\0\x02\0\x12\x03\x0e\
+    \x025\x1a@\x20Returns\x20all\x20data\x20needed\x20for\x20UI;\x20called\
+    \x20on\x20initial\x20console\x20load\n\n\x0c\n\x05\x06\0\x02\0\x01\x12\
+    \x03\x0e\x06\x0c\n\x0c\n\x05\x06\0\x02\0\x02\x12\x03\x0e\r\x1a\n\x0c\n\
+    \x05\x06\0\x02\0\x03\x12\x03\x0e%3\nE\n\x04\x06\0\x02\x01\x12\x03\x11\
+    \x02>\x1a8\x20Returns\x20the\x20current\x20_full_\x20configuration\x20of\
+    \x20the\x20server\n\n\x0c\n\x05\x06\0\x02\x01\x01\x12\x03\x11\x06\x0f\n\
+    \x0c\n\x05\x06\0\x02\x01\x02\x12\x03\x11\x10\x20\n\x0c\n\x05\x06\0\x02\
+    \x01\x03\x12\x03\x11+<\nU\n\x04\x06\0\x02\x02\x12\x03\x14\x02B\x1aH\x20U\
+    sed\x20by\x20console\x20to\x20stream\x20updates\x20to\x20UI;\x20called\
+    \x20after\x20initial\x20GetAll()\n\n\x0c\n\x05\x06\0\x02\x02\x01\x12\x03\
+    \x14\x06\x12\n\x0c\n\x05\x06\0\x02\x02\x02\x12\x03\x14\x13\x20\n\x0c\n\
+    \x05\x06\0\x02\x02\x06\x12\x03\x14+1\n\x0c\n\x05\x06\0\x02\x02\x03\x12\
+    \x03\x142@\n@\n\x04\x06\0\x02\x03\x12\x03\x17\x02G\x1a3\x20Returns\x20pi\
+    pelines\x20(_wasm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\
+    \x02\x03\x01\x12\x03\x17\x06\x12\n\x0c\n\x05\x06\0\x02\x03\x02\x12\x03\
+    \x17\x13&\n\x0c\n\x05\x06\0\x02\x03\x03\x12\x03\x171E\nH\n\x04\x06\0\x02\
+    \x04\x12\x03\x1a\x02D\x1a;\x20Returns\x20a\x20single\x20pipeline\x20(_wa\
+    sm_bytes\x20field\x20is\x20stripped)\n\n\x0c\n\x05\x06\0\x02\x04\x01\x12\
+    \x03\x1a\x06\x11\n\x0c\n\x05\x06\0\x02\x04\x02\x12\x03\x1a\x12$\n\x0c\n\
+    \x05\x06\0\x02\x04\x03\x12\x03\x1a/B\nE\n\x04\x06\0\x02\x05\x12\x03\x1d\
+    \x02M\x1a8\x20Create\x20a\x20new\x20pipeline;\x20id\x20must\x20be\x20lef\
+    t\x20empty\x20on\x20create\n\n\x0c\n\x05\x06\0\x02\x05\x01\x12\x03\x1d\
+    \x06\x14\n\x0c\n\x05\x06\0\x02\x05\x02\x12\x03\x1d\x15*\n\x0c\n\x05\x06\
+    \0\x02\x05\x03\x12\x03\x1d5K\n:\n\x04\x06\0\x02\x06\x12\x03\x20\x02N\x1a\
+    -\x20Update\x20an\x20existing\x20pipeline;\x20id\x20must\x20be\x20set\n\
     \n\x0c\n\x05\x06\0\x02\x06\x01\x12\x03\x20\x06\x14\n\x0c\n\x05\x06\0\x02\
     \x06\x02\x12\x03\x20\x15*\n\x0c\n\x05\x06\0\x02\x06\x03\x12\x03\x205L\n\
-    \x0b\n\x04\x06\0\x02\x07\x12\x03\"\x02J\n\x0c\n\x05\x06\0\x02\x07\x01\
-    \x12\x03\"\x06\x12\n\x0c\n\x05\x06\0\x02\x07\x02\x12\x03\"\x13&\n\x0c\n\
-    \x05\x06\0\x02\x07\x03\x12\x03\"1H\nC\n\x04\x06\0\x02\x08\x12\x03%\x02L\
-    \x1a6\x20Pause\x20a\x20pipeline;\x20noop\x20if\x20pipeline\x20is\x20alre\
-    ady\x20paused\n\n\x0c\n\x05\x06\0\x02\x08\x01\x12\x03%\x06\x13\n\x0c\n\
-    \x05\x06\0\x02\x08\x02\x12\x03%\x14(\n\x0c\n\x05\x06\0\x02\x08\x03\x12\
-    \x03%3J\n@\n\x04\x06\0\x02\t\x12\x03(\x02N\x1a3\x20Resume\x20a\x20pipeli\
-    ne;\x20noop\x20if\x20pipeline\x20is\x20not\x20paused\n\n\x0c\n\x05\x06\0\
-    \x02\t\x01\x12\x03(\x06\x14\n\x0c\n\x05\x06\0\x02\t\x02\x12\x03(\x15*\n\
-    \x0c\n\x05\x06\0\x02\t\x03\x12\x03(5L\n/\n\x04\x06\0\x02\n\x12\x03+\x02Y\
-    \x1a\"\x20Create\x20a\x20new\x20notification\x20config\n\n\x0c\n\x05\x06\
-    \0\x02\n\x01\x12\x03+\x06\x18\n\x0c\n\x05\x06\0\x02\n\x02\x12\x03+\x192\
-    \n\x0c\n\x05\x06\0\x02\n\x03\x12\x03+=W\n5\n\x04\x06\0\x02\x0b\x12\x03.\
-    \x02V\x1a(\x20Update\x20an\x20existing\x20notification\x20config\n\n\x0c\
-    \n\x05\x06\0\x02\x0b\x01\x12\x03.\x06\x18\n\x0c\n\x05\x06\0\x02\x0b\x02\
-    \x12\x03.\x192\n\x0c\n\x05\x06\0\x02\x0b\x03\x12\x03.=T\n+\n\x04\x06\0\
-    \x02\x0c\x12\x031\x02V\x1a\x1e\x20Delete\x20a\x20notification\x20config\
-    \n\n\x0c\n\x05\x06\0\x02\x0c\x01\x12\x031\x06\x18\n\x0c\n\x05\x06\0\x02\
-    \x0c\x02\x12\x031\x192\n\x0c\n\x05\x06\0\x02\x0c\x03\x12\x031=T\n/\n\x04\
-    \x06\0\x02\r\x12\x034\x02S\x1a\"\x20Returns\x20all\x20notification\x20co\
-    nfigs\n\n\x0c\n\x05\x06\0\x02\r\x01\x12\x034\x06\x16\n\x0c\n\x05\x06\0\
-    \x02\r\x02\x12\x034\x17.\n\x0c\n\x05\x06\0\x02\r\x03\x12\x0349Q\n3\n\x04\
-    \x06\0\x02\x0e\x12\x037\x02P\x1a&\x20Returns\x20a\x20single\x20notificat\
-    ion\x20config\n\n\x0c\n\x05\x06\0\x02\x0e\x01\x12\x037\x06\x15\n\x0c\n\
-    \x05\x06\0\x02\x0e\x02\x12\x037\x16,\n\x0c\n\x05\x06\0\x02\x0e\x03\x12\
-    \x0377N\n:\n\x04\x06\0\x02\x0f\x12\x04:\x02=\x03\x1a,\x20Attach\x20a\x20\
+    \x20\n\x04\x06\0\x02\x07\x12\x03#\x02N\x1a\x13\x20Delete\x20a\x20pipelin\
+    e\n\n\x0c\n\x05\x06\0\x02\x07\x01\x12\x03#\x06\x14\n\x0c\n\x05\x06\0\x02\
+    \x07\x02\x12\x03#\x15*\n\x0c\n\x05\x06\0\x02\x07\x03\x12\x03#5L\n\x0b\n\
+    \x04\x06\0\x02\x08\x12\x03%\x02J\n\x0c\n\x05\x06\0\x02\x08\x01\x12\x03%\
+    \x06\x12\n\x0c\n\x05\x06\0\x02\x08\x02\x12\x03%\x13&\n\x0c\n\x05\x06\0\
+    \x02\x08\x03\x12\x03%1H\nC\n\x04\x06\0\x02\t\x12\x03(\x02L\x1a6\x20Pause\
+    \x20a\x20pipeline;\x20noop\x20if\x20pipeline\x20is\x20already\x20paused\
+    \n\n\x0c\n\x05\x06\0\x02\t\x01\x12\x03(\x06\x13\n\x0c\n\x05\x06\0\x02\t\
+    \x02\x12\x03(\x14(\n\x0c\n\x05\x06\0\x02\t\x03\x12\x03(3J\n@\n\x04\x06\0\
+    \x02\n\x12\x03+\x02N\x1a3\x20Resume\x20a\x20pipeline;\x20noop\x20if\x20p\
+    ipeline\x20is\x20not\x20paused\n\n\x0c\n\x05\x06\0\x02\n\x01\x12\x03+\
+    \x06\x14\n\x0c\n\x05\x06\0\x02\n\x02\x12\x03+\x15*\n\x0c\n\x05\x06\0\x02\
+    \n\x03\x12\x03+5L\n/\n\x04\x06\0\x02\x0b\x12\x03.\x02Y\x1a\"\x20Create\
+    \x20a\x20new\x20notification\x20config\n\n\x0c\n\x05\x06\0\x02\x0b\x01\
+    \x12\x03.\x06\x18\n\x0c\n\x05\x06\0\x02\x0b\x02\x12\x03.\x192\n\x0c\n\
+    \x05\x06\0\x02\x0b\x03\x12\x03.=W\n5\n\x04\x06\0\x02\x0c\x12\x031\x02V\
+    \x1a(\x20Update\x20an\x20existing\x20notification\x20config\n\n\x0c\n\
+    \x05\x06\0\x02\x0c\x01\x12\x031\x06\x18\n\x0c\n\x05\x06\0\x02\x0c\x02\
+    \x12\x031\x192\n\x0c\n\x05\x06\0\x02\x0c\x03\x12\x031=T\n+\n\x04\x06\0\
+    \x02\r\x12\x034\x02V\x1a\x1e\x20Delete\x20a\x20notification\x20config\n\
+    \n\x0c\n\x05\x06\0\x02\r\x01\x12\x034\x06\x18\n\x0c\n\x05\x06\0\x02\r\
+    \x02\x12\x034\x192\n\x0c\n\x05\x06\0\x02\r\x03\x12\x034=T\n/\n\x04\x06\0\
+    \x02\x0e\x12\x037\x02S\x1a\"\x20Returns\x20all\x20notification\x20config\
+    s\n\n\x0c\n\x05\x06\0\x02\x0e\x01\x12\x037\x06\x16\n\x0c\n\x05\x06\0\x02\
+    \x0e\x02\x12\x037\x17.\n\x0c\n\x05\x06\0\x02\x0e\x03\x12\x0379Q\n3\n\x04\
+    \x06\0\x02\x0f\x12\x03:\x02P\x1a&\x20Returns\x20a\x20single\x20notificat\
+    ion\x20config\n\n\x0c\n\x05\x06\0\x02\x0f\x01\x12\x03:\x06\x15\n\x0c\n\
+    \x05\x06\0\x02\x0f\x02\x12\x03:\x16,\n\x0c\n\x05\x06\0\x02\x0f\x03\x12\
+    \x03:7N\n:\n\x04\x06\0\x02\x10\x12\x04=\x02@\x03\x1a,\x20Attach\x20a\x20\
     notification\x20config\x20to\x20a\x20pipeline\n\n\x0c\n\x05\x06\0\x02\
-    \x0f\x01\x12\x03:\x06\x18\n\x0c\n\x05\x06\0\x02\x0f\x02\x12\x03:\x192\n\
-    \x0c\n\x05\x06\0\x02\x0f\x03\x12\x03:=T\n\x0c\n\x05\x06\0\x02\x0f\x04\
-    \x12\x03<\x04\x1d\n^\n\x06\x06\0\x02\x0f\x04!\x12\x03<\x04\x1d\x1aO\x20D\
+    \x10\x01\x12\x03=\x06\x18\n\x0c\n\x05\x06\0\x02\x10\x02\x12\x03=\x192\n\
+    \x0c\n\x05\x06\0\x02\x10\x03\x12\x03==T\n\x0c\n\x05\x06\0\x02\x10\x04\
+    \x12\x03?\x04\x1d\n^\n\x06\x06\0\x02\x10\x04!\x12\x03?\x04\x1d\x1aO\x20D\
     eprecated\x20now\x20that\x20we\x20are\x20including\x20notification\x20co\
-    nfigs\x20in\x20steps\x20themselves\n\n<\n\x04\x06\0\x02\x10\x12\x04@\x02\
-    C\x03\x1a.\x20Detach\x20a\x20notification\x20config\x20from\x20a\x20pipe\
-    line\n\n\x0c\n\x05\x06\0\x02\x10\x01\x12\x03@\x06\x18\n\x0c\n\x05\x06\0\
-    \x02\x10\x02\x12\x03@\x192\n\x0c\n\x05\x06\0\x02\x10\x03\x12\x03@=T\n\
-    \x0c\n\x05\x06\0\x02\x10\x04\x12\x03B\x04\x1d\n^\n\x06\x06\0\x02\x10\x04\
-    !\x12\x03B\x04\x1d\x1aO\x20Deprecated\x20now\x20that\x20we\x20are\x20inc\
-    luding\x20notification\x20configs\x20in\x20steps\x20themselves\n\n>\n\
-    \x04\x06\0\x02\x11\x12\x03F\x02N\x1a1\x20Create\x20an\x20audience.\x20Us\
-    ed\x20for\x20terraform\x20purposes\n\n\x0c\n\x05\x06\0\x02\x11\x01\x12\
-    \x03F\x06\x14\n\x0c\n\x05\x06\0\x02\x11\x02\x12\x03F\x15*\n\x0c\n\x05\
-    \x06\0\x02\x11\x03\x12\x03F5L\n!\n\x04\x06\0\x02\x12\x12\x03I\x02N\x1a\
-    \x14\x20Delete\x20an\x20audience\n\n\x0c\n\x05\x06\0\x02\x12\x01\x12\x03\
-    I\x06\x14\n\x0c\n\x05\x06\0\x02\x12\x02\x12\x03I\x15*\n\x0c\n\x05\x06\0\
-    \x02\x12\x03\x12\x03I5L\n<\n\x04\x06\0\x02\x13\x12\x03L\x02L\x1a/\x20Del\
-    ete\x20a\x20service\x20and\x20all\x20associated\x20audiences\n\n\x0c\n\
-    \x05\x06\0\x02\x13\x01\x12\x03L\x06\x13\n\x0c\n\x05\x06\0\x02\x13\x02\
-    \x12\x03L\x14(\n\x0c\n\x05\x06\0\x02\x13\x03\x12\x03L3J\n*\n\x04\x06\0\
-    \x02\x14\x12\x03O\x02H\x1a\x1d\x20Returns\x20all\x20metric\x20counters\n\
-    \n\x0c\n\x05\x06\0\x02\x14\x01\x12\x03O\x06\x10\n\x0c\n\x05\x06\0\x02\
-    \x14\x02\x12\x03O\x11\"\n\x0c\n\x05\x06\0\x02\x14\x06\x12\x03O-3\n\x0c\n\
-    \x05\x06\0\x02\x14\x03\x12\x03O4F\n\x0b\n\x04\x06\0\x02\x15\x12\x03Q\x02\
-    6\n\x0c\n\x05\x06\0\x02\x15\x01\x12\x03Q\x06\n\n\x0c\n\x05\x06\0\x02\x15\
-    \x02\x12\x03Q\x0b\x16\n\x0c\n\x05\x06\0\x02\x15\x06\x12\x03Q!'\n\x0c\n\
-    \x05\x06\0\x02\x15\x03\x12\x03Q(4\n\x0b\n\x04\x06\0\x02\x16\x12\x03S\x02\
-    D\n\x0c\n\x05\x06\0\x02\x16\x01\x12\x03S\x06\x0f\n\x0c\n\x05\x06\0\x02\
-    \x16\x02\x12\x03S\x10\x20\n\x0c\n\x05\x06\0\x02\x16\x03\x12\x03S+B\n\x0b\
-    \n\x04\x06\0\x02\x17\x12\x03U\x02F\n\x0c\n\x05\x06\0\x02\x17\x01\x12\x03\
-    U\x06\x10\n\x0c\n\x05\x06\0\x02\x17\x02\x12\x03U\x11\"\n\x0c\n\x05\x06\0\
-    \x02\x17\x03\x12\x03U-D\n\x0b\n\x04\x06\0\x02\x18\x12\x03W\x02Z\n\x0c\n\
-    \x05\x06\0\x02\x18\x01\x12\x03W\x06\x16\n\x0c\n\x05\x06\0\x02\x18\x02\
-    \x12\x03W\x17.\n\x0c\n\x05\x06\0\x02\x18\x06\x12\x03W9?\n\x0c\n\x05\x06\
-    \0\x02\x18\x03\x12\x03W@X\n\x0b\n\x04\x06\0\x02\x19\x12\x03Y\x02>\n\x0c\
-    \n\x05\x06\0\x02\x19\x01\x12\x03Y\x06\x0f\n\x0c\n\x05\x06\0\x02\x19\x02\
-    \x12\x03Y\x10\x20\n\x0c\n\x05\x06\0\x02\x19\x03\x12\x03Y+<\n\x0b\n\x04\
-    \x06\0\x02\x1a\x12\x03[\x02b\n\x0c\n\x05\x06\0\x02\x1a\x01\x12\x03[\x06\
-    \x1b\n\x0c\n\x05\x06\0\x02\x1a\x02\x12\x03[\x1c8\n\x0c\n\x05\x06\0\x02\
-    \x1a\x03\x12\x03[C`\n\x0b\n\x04\x06\0\x02\x1b\x12\x03]\x02E\n\x0c\n\x05\
-    \x06\0\x02\x1b\x01\x12\x03]\x06\x11\n\x0c\n\x05\x06\0\x02\x1b\x02\x12\
-    \x03]\x12(\n\x0c\n\x05\x06\0\x02\x1b\x03\x12\x03]3C\n\x0b\n\x04\x06\0\
-    \x02\x1c\x12\x03_\x02U\n\x0c\n\x05\x06\0\x02\x1c\x01\x12\x03_\x06\x1b\n\
-    \x0c\n\x05\x06\0\x02\x1c\x02\x12\x03_\x1c8\n\x0c\n\x05\x06\0\x02\x1c\x03\
-    \x12\x03_CS\n\x0b\n\x04\x06\0\x02\x1d\x12\x03a\x02M\n\x0c\n\x05\x06\0\
-    \x02\x1d\x01\x12\x03a\x06\x17\n\x0c\n\x05\x06\0\x02\x1d\x02\x12\x03a\x18\
-    0\n\x0c\n\x05\x06\0\x02\x1d\x03\x12\x03a;K\n\x1a\n\x04\x06\0\x02\x1e\x12\
-    \x03d\x02/\x1a\r\x20Test\x20method\n\n\x0c\n\x05\x06\0\x02\x1e\x01\x12\
-    \x03d\x06\n\n\x0c\n\x05\x06\0\x02\x1e\x02\x12\x03d\x0b\x16\n\x0c\n\x05\
-    \x06\0\x02\x1e\x03\x12\x03d!-\n=\n\x02\x04\0\x12\x04g\0i\x01\"1\x20Don't\
-    \x20think\x20there\x20is\x20anything\x20to\x20pass\x20in\x20(yet)?\n\n\n\
-    \n\x03\x04\0\x01\x12\x03g\x08\x15\n\x0b\n\x02\x04\x01\x12\x05k\0\x80\x01\
-    \x01\n\n\n\x03\x04\x01\x01\x12\x03k\x08\x16\n8\n\x04\x04\x01\x02\0\x12\
-    \x03m\x02$\x1a+\x20Clients\x20currently\x20connected\x20to\x20the\x20ser\
-    ver\n\n\x0c\n\x05\x04\x01\x02\0\x04\x12\x03m\x02\n\n\x0c\n\x05\x04\x01\
-    \x02\0\x06\x12\x03m\x0b\x1a\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03m\x1b\
-    \x1f\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03m\"#\n@\n\x04\x04\x01\x02\x01\
-    \x12\x03p\x02)\x1a3\x20All\x20of\x20the\x20audiences\x20that\x20are\x20k\
-    nown\x20to\x20the\x20server\n\n\x0c\n\x05\x04\x01\x02\x01\x04\x12\x03p\
-    \x02\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03p\x0b\x1a\n\x0c\n\x05\x04\
-    \x01\x02\x01\x01\x12\x03p\x1b$\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03p'\
-    (\n\xbb\x01\n\x04\x04\x01\x02\x02\x12\x03u\x022\x1a\xad\x01\x20All\x20of\
-    \x20the\x20pipelines\x20known\x20to\x20the\x20server\x20+\x20pipeline\
-    \x20<->\x20audience\x20mappings\n\x20key\x20==\x20pipeline_id;\x20if\x20\
-    \"Audience\"\x20is\x20not\x20filled\x20out\x20-\x20pipeline\x20is\x20not\
-    \x20attached\n\x20to\x20any\x20audience.\n\n\x0c\n\x05\x04\x01\x02\x02\
-    \x06\x12\x03u\x02#\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03u$-\n\x0c\n\
-    \x05\x04\x01\x02\x02\x03\x12\x03u01\nN\n\x04\x04\x01\x02\x03\x12\x03x\
-    \x023\x1aA\x20Audience\x20to\x20pipeline\x20mapping\x20config;\x20key\
-    \x20==\x20$audience_as_string\n\n\x0c\n\x05\x04\x01\x02\x03\x06\x12\x03x\
-    \x02&\n\x0c\n\x05\x04\x01\x02\x03\x01\x12\x03x'.\n\x0c\n\x05\x04\x01\x02\
-    \x03\x03\x12\x03x12\n\x85\x01\n\x04\x04\x01\x02\x04\x12\x03|\x02*\x1ax\
-    \x20When\x20was\x20this\x20response\x20generated.\x20This\x20is\x20usefu\
-    l\x20for\x20determining\x20what\x20is\n\x20the\x20latest\x20update\x20wh\
-    en\x20using\x20GetAllStream().\n\n\x0c\n\x05\x04\x01\x02\x04\x05\x12\x03\
-    |\x02\x07\n\x0c\n\x05\x04\x01\x02\x04\x01\x12\x03|\x08#\n\x0c\n\x05\x04\
-    \x01\x02\x04\x03\x12\x03|&)\n\x88\x01\n\x04\x04\x01\x02\x05\x12\x03\x7f\
-    \x02\"\x1aD\x20Set\x20by\x20server\x20to\x20indicate\x20that\x20the\x20r\
-    esponse\x20is\x20a\x20keepalive\x20message\n\"5\x20protolint:disable:thi\
-    s\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\x0c\n\x05\x04\x01\x02\x05\x04\x12\
-    \x03\x7f\x02\n\n\x0c\n\x05\x04\x01\x02\x05\x05\x12\x03\x7f\x0b\x0f\n\x0c\
-    \n\x05\x04\x01\x02\x05\x01\x12\x03\x7f\x10\x1a\n\x0c\n\x05\x04\x01\x02\
-    \x05\x03\x12\x03\x7f\x1d!\n1\n\x02\x04\x02\x12\x06\x82\x01\0\x84\x01\x01\
-    \"#\x20Don't\x20think\x20we\x20need\x20anything\x20here\n\n\x0b\n\x03\
-    \x04\x02\x01\x12\x04\x82\x01\x08\x1b\n-\n\x02\x04\x03\x12\x06\x87\x01\0\
-    \x89\x01\x01\x1a\x1f\x20Array\x20of\x20pipeline\x20definitions\n\n\x0b\n\
-    \x03\x04\x03\x01\x12\x04\x87\x01\x08\x1c\n\x0c\n\x04\x04\x03\x02\0\x12\
-    \x04\x88\x01\x02)\n\r\n\x05\x04\x03\x02\0\x04\x12\x04\x88\x01\x02\n\n\r\
-    \n\x05\x04\x03\x02\0\x06\x12\x04\x88\x01\x0b\x1a\n\r\n\x05\x04\x03\x02\0\
-    \x01\x12\x04\x88\x01\x1b$\n\r\n\x05\x04\x03\x02\0\x03\x12\x04\x88\x01'(\
-    \n\x0c\n\x02\x04\x04\x12\x06\x8b\x01\0\x8d\x01\x01\n\x0b\n\x03\x04\x04\
-    \x01\x12\x04\x8b\x01\x08\x1a\n\x0c\n\x04\x04\x04\x02\0\x12\x04\x8c\x01\
-    \x02\x19\n\r\n\x05\x04\x04\x02\0\x05\x12\x04\x8c\x01\x02\x08\n\r\n\x05\
-    \x04\x04\x02\0\x01\x12\x04\x8c\x01\t\x14\n\r\n\x05\x04\x04\x02\0\x03\x12\
-    \x04\x8c\x01\x17\x18\n\x0c\n\x02\x04\x05\x12\x06\x8f\x01\0\x91\x01\x01\n\
-    \x0b\n\x03\x04\x05\x01\x12\x04\x8f\x01\x08\x1b\n\x0c\n\x04\x04\x05\x02\0\
-    \x12\x04\x90\x01\x02\x1f\n\r\n\x05\x04\x05\x02\0\x06\x12\x04\x90\x01\x02\
-    \x11\n\r\n\x05\x04\x05\x02\0\x01\x12\x04\x90\x01\x12\x1a\n\r\n\x05\x04\
-    \x05\x02\0\x03\x12\x04\x90\x01\x1d\x1e\n\x0c\n\x02\x04\x06\x12\x06\x93\
-    \x01\0\x95\x01\x01\n\x0b\n\x03\x04\x06\x01\x12\x04\x93\x01\x08\x1d\n\x0c\
-    \n\x04\x04\x06\x02\0\x12\x04\x94\x01\x02\x1f\n\r\n\x05\x04\x06\x02\0\x06\
-    \x12\x04\x94\x01\x02\x11\n\r\n\x05\x04\x06\x02\0\x01\x12\x04\x94\x01\x12\
-    \x1a\n\r\n\x05\x04\x06\x02\0\x03\x12\x04\x94\x01\x1d\x1e\n\x0c\n\x02\x04\
-    \x07\x12\x06\x97\x01\0\x9a\x01\x01\n\x0b\n\x03\x04\x07\x01\x12\x04\x97\
-    \x01\x08\x1e\n\x0c\n\x04\x04\x07\x02\0\x12\x04\x98\x01\x02\x15\n\r\n\x05\
-    \x04\x07\x02\0\x05\x12\x04\x98\x01\x02\x08\n\r\n\x05\x04\x07\x02\0\x01\
-    \x12\x04\x98\x01\t\x10\n\r\n\x05\x04\x07\x02\0\x03\x12\x04\x98\x01\x13\
-    \x14\n\x0c\n\x04\x04\x07\x02\x01\x12\x04\x99\x01\x02\x19\n\r\n\x05\x04\
-    \x07\x02\x01\x05\x12\x04\x99\x01\x02\x08\n\r\n\x05\x04\x07\x02\x01\x01\
-    \x12\x04\x99\x01\t\x14\n\r\n\x05\x04\x07\x02\x01\x03\x12\x04\x99\x01\x17\
-    \x18\n\x0c\n\x02\x04\x08\x12\x06\x9c\x01\0\x9e\x01\x01\n\x0b\n\x03\x04\
-    \x08\x01\x12\x04\x9c\x01\x08\x1d\n\x0c\n\x04\x04\x08\x02\0\x12\x04\x9d\
-    \x01\x02\x1f\n\r\n\x05\x04\x08\x02\0\x06\x12\x04\x9d\x01\x02\x11\n\r\n\
-    \x05\x04\x08\x02\0\x01\x12\x04\x9d\x01\x12\x1a\n\r\n\x05\x04\x08\x02\0\
-    \x03\x12\x04\x9d\x01\x1d\x1e\n\x0c\n\x02\x04\t\x12\x06\xa0\x01\0\xa7\x01\
-    \x01\n\x0b\n\x03\x04\t\x01\x12\x04\xa0\x01\x08\x1d\n\x0c\n\x04\x04\t\x02\
-    \0\x12\x04\xa1\x01\x02\x19\n\r\n\x05\x04\t\x02\0\x05\x12\x04\xa1\x01\x02\
-    \x08\n\r\n\x05\x04\t\x02\0\x01\x12\x04\xa1\x01\t\x14\n\r\n\x05\x04\t\x02\
-    \0\x03\x12\x04\xa1\x01\x17\x18\n\x8b\x02\n\x04\x04\t\x02\x01\x12\x04\xa6\
-    \x01\x02-\x1a\xc5\x01\x20This\x20field\x20is\x20for\x20internal\x20usage\
-    \x20only\x20by\x20the\x20server.\x20It\x20is\x20used\x20to\x20indicate\n\
-    \x20to\x20the\x20bus\x20handler\x20who\x20this\x20pipeline\x20was\x20use\
-    d\x20by\x20so\x20the\x20handler\x20can\x20decide\n\x20who\x20we\x20need\
-    \x20to\x20emit\x20a\x20SetPipelines\x20cmd\x20to.\n\"5\x20protolint:disa\
-    ble:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\n\x05\x04\t\x02\x01\x04\
-    \x12\x04\xa6\x01\x02\n\n\r\n\x05\x04\t\x02\x01\x06\x12\x04\xa6\x01\x0b\
-    \x1a\n\r\n\x05\x04\t\x02\x01\x01\x12\x04\xa6\x01\x1b%\n\r\n\x05\x04\t\
-    \x02\x01\x03\x12\x04\xa6\x01(,\n\x0c\n\x02\x04\n\x12\x06\xa9\x01\0\xac\
-    \x01\x01\n\x0b\n\x03\x04\n\x01\x12\x04\xa9\x01\x08\x1b\n\x0c\n\x04\x04\n\
-    \x02\0\x12\x04\xaa\x01\x02#\n\r\n\x05\x04\n\x02\0\x04\x12\x04\xaa\x01\
-    \x02\n\n\r\n\x05\x04\n\x02\0\x05\x12\x04\xaa\x01\x0b\x11\n\r\n\x05\x04\n\
-    \x02\0\x01\x12\x04\xaa\x01\x12\x1e\n\r\n\x05\x04\n\x02\0\x03\x12\x04\xaa\
-    \x01!\"\n\x0c\n\x04\x04\n\x02\x01\x12\x04\xab\x01\x02\x1f\n\r\n\x05\x04\
-    \n\x02\x01\x06\x12\x04\xab\x01\x02\x11\n\r\n\x05\x04\n\x02\x01\x01\x12\
-    \x04\xab\x01\x12\x1a\n\r\n\x05\x04\n\x02\x01\x03\x12\x04\xab\x01\x1d\x1e\
-    \n\x0c\n\x02\x04\x0b\x12\x06\xae\x01\0\xb1\x01\x01\n\x0b\n\x03\x04\x0b\
-    \x01\x12\x04\xae\x01\x08\x1c\n\x0c\n\x04\x04\x0b\x02\0\x12\x04\xaf\x01\
-    \x02\x19\n\r\n\x05\x04\x0b\x02\0\x05\x12\x04\xaf\x01\x02\x08\n\r\n\x05\
-    \x04\x0b\x02\0\x01\x12\x04\xaf\x01\t\x14\n\r\n\x05\x04\x0b\x02\0\x03\x12\
-    \x04\xaf\x01\x17\x18\n\x0c\n\x04\x04\x0b\x02\x01\x12\x04\xb0\x01\x02\x1f\
-    \n\r\n\x05\x04\x0b\x02\x01\x06\x12\x04\xb0\x01\x02\x11\n\r\n\x05\x04\x0b\
-    \x02\x01\x01\x12\x04\xb0\x01\x12\x1a\n\r\n\x05\x04\x0b\x02\x01\x03\x12\
-    \x04\xb0\x01\x1d\x1e\n\x0c\n\x02\x04\x0c\x12\x06\xb3\x01\0\xb6\x01\x01\n\
-    \x0b\n\x03\x04\x0c\x01\x12\x04\xb3\x01\x08\x1d\n\x0c\n\x04\x04\x0c\x02\0\
-    \x12\x04\xb4\x01\x02\x19\n\r\n\x05\x04\x0c\x02\0\x05\x12\x04\xb4\x01\x02\
-    \x08\n\r\n\x05\x04\x0c\x02\0\x01\x12\x04\xb4\x01\t\x14\n\r\n\x05\x04\x0c\
-    \x02\0\x03\x12\x04\xb4\x01\x17\x18\n\x0c\n\x04\x04\x0c\x02\x01\x12\x04\
-    \xb5\x01\x02\x1f\n\r\n\x05\x04\x0c\x02\x01\x06\x12\x04\xb5\x01\x02\x11\n\
-    \r\n\x05\x04\x0c\x02\x01\x01\x12\x04\xb5\x01\x12\x1a\n\r\n\x05\x04\x0c\
-    \x02\x01\x03\x12\x04\xb5\x01\x1d\x1e\n\x1d\n\x02\x04\r\x12\x06\xb9\x01\0\
-    \xbb\x01\x01\x1a\x0f\x20Notifications\n\n\x0b\n\x03\x04\r\x01\x12\x04\
-    \xb9\x01\x08!\n\x0c\n\x04\x04\r\x02\0\x12\x04\xba\x01\x02-\n\r\n\x05\x04\
-    \r\x02\0\x06\x12\x04\xba\x01\x02\x1b\n\r\n\x05\x04\r\x02\0\x01\x12\x04\
-    \xba\x01\x1c(\n\r\n\x05\x04\r\x02\0\x03\x12\x04\xba\x01+,\n\x0c\n\x02\
-    \x04\x0e\x12\x06\xbd\x01\0\xbf\x01\x01\n\x0b\n\x03\x04\x0e\x01\x12\x04\
-    \xbd\x01\x08\"\n\x0c\n\x04\x04\x0e\x02\0\x12\x04\xbe\x01\x02-\n\r\n\x05\
-    \x04\x0e\x02\0\x06\x12\x04\xbe\x01\x02\x1b\n\r\n\x05\x04\x0e\x02\0\x01\
-    \x12\x04\xbe\x01\x1c(\n\r\n\x05\x04\x0e\x02\0\x03\x12\x04\xbe\x01+,\n\
-    \x0c\n\x02\x04\x0f\x12\x06\xc2\x01\0\xc4\x01\x01\n\x0b\n\x03\x04\x0f\x01\
-    \x12\x04\xc2\x01\x08!\n\x0c\n\x04\x04\x0f\x02\0\x12\x04\xc3\x01\x02-\n\r\
-    \n\x05\x04\x0f\x02\0\x06\x12\x04\xc3\x01\x02\x1b\n\r\n\x05\x04\x0f\x02\0\
-    \x01\x12\x04\xc3\x01\x1c(\n\r\n\x05\x04\x0f\x02\0\x03\x12\x04\xc3\x01+,\
-    \n\x0c\n\x02\x04\x10\x12\x06\xc6\x01\0\xc8\x01\x01\n\x0b\n\x03\x04\x10\
-    \x01\x12\x04\xc6\x01\x08!\n\x0c\n\x04\x04\x10\x02\0\x12\x04\xc7\x01\x02\
-    \x1d\n\r\n\x05\x04\x10\x02\0\x05\x12\x04\xc7\x01\x02\x08\n\r\n\x05\x04\
-    \x10\x02\0\x01\x12\x04\xc7\x01\t\x18\n\r\n\x05\x04\x10\x02\0\x03\x12\x04\
-    \xc7\x01\x1b\x1c\n1\n\x02\x04\x11\x12\x06\xca\x01\0\xcc\x01\x01\"#\x20Do\
-    n't\x20think\x20we\x20need\x20anything\x20here\n\n\x0b\n\x03\x04\x11\x01\
-    \x12\x04\xca\x01\x08\x1f\n\x0c\n\x02\x04\x12\x12\x06\xce\x01\0\xd1\x01\
-    \x01\n\x0b\n\x03\x04\x12\x01\x12\x04\xce\x01\x08\x20\n4\n\x04\x04\x12\
-    \x02\0\x12\x04\xd0\x01\x02:\x1a&\x20Key\x20==\x20id\x20of\x20the\x20noti\
-    fication\x20config\n\n\r\n\x05\x04\x12\x02\0\x06\x12\x04\xd0\x01\x02'\n\
-    \r\n\x05\x04\x12\x02\0\x01\x12\x04\xd0\x01(5\n\r\n\x05\x04\x12\x02\0\x03\
-    \x12\x04\xd0\x0189\n\x0c\n\x02\x04\x13\x12\x06\xd3\x01\0\xd5\x01\x01\n\
-    \x0b\n\x03\x04\x13\x01\x12\x04\xd3\x01\x08\x1e\n\x0c\n\x04\x04\x13\x02\0\
-    \x12\x04\xd4\x01\x02\x1d\n\r\n\x05\x04\x13\x02\0\x05\x12\x04\xd4\x01\x02\
-    \x08\n\r\n\x05\x04\x13\x02\0\x01\x12\x04\xd4\x01\t\x18\n\r\n\x05\x04\x13\
-    \x02\0\x03\x12\x04\xd4\x01\x1b\x1c\n\x0c\n\x02\x04\x14\x12\x06\xd7\x01\0\
-    \xd9\x01\x01\n\x0b\n\x03\x04\x14\x01\x12\x04\xd7\x01\x08\x1f\n\x0c\n\x04\
-    \x04\x14\x02\0\x12\x04\xd8\x01\x02-\n\r\n\x05\x04\x14\x02\0\x06\x12\x04\
-    \xd8\x01\x02\x1b\n\r\n\x05\x04\x14\x02\0\x01\x12\x04\xd8\x01\x1c(\n\r\n\
-    \x05\x04\x14\x02\0\x03\x12\x04\xd8\x01+,\n\x0c\n\x02\x04\x15\x12\x06\xdb\
-    \x01\0\xdf\x01\x01\n\x0b\n\x03\x04\x15\x01\x12\x04\xdb\x01\x08!\n\x0b\n\
-    \x03\x04\x15\x07\x12\x04\xdc\x01\x02\x1b\n\x0c\n\x04\x04\x15\x07\x03\x12\
-    \x04\xdc\x01\x02\x1b\n\x0c\n\x04\x04\x15\x02\0\x12\x04\xdd\x01\x02\x1d\n\
-    \r\n\x05\x04\x15\x02\0\x05\x12\x04\xdd\x01\x02\x08\n\r\n\x05\x04\x15\x02\
-    \0\x01\x12\x04\xdd\x01\t\x18\n\r\n\x05\x04\x15\x02\0\x03\x12\x04\xdd\x01\
-    \x1b\x1c\n\x0c\n\x04\x04\x15\x02\x01\x12\x04\xde\x01\x02\x19\n\r\n\x05\
-    \x04\x15\x02\x01\x05\x12\x04\xde\x01\x02\x08\n\r\n\x05\x04\x15\x02\x01\
-    \x01\x12\x04\xde\x01\t\x14\n\r\n\x05\x04\x15\x02\x01\x03\x12\x04\xde\x01\
-    \x17\x18\n\x0c\n\x02\x04\x16\x12\x06\xe1\x01\0\xe5\x01\x01\n\x0b\n\x03\
-    \x04\x16\x01\x12\x04\xe1\x01\x08!\n\x0b\n\x03\x04\x16\x07\x12\x04\xe2\
-    \x01\x02\x1b\n\x0c\n\x04\x04\x16\x07\x03\x12\x04\xe2\x01\x02\x1b\n\x0c\n\
-    \x04\x04\x16\x02\0\x12\x04\xe3\x01\x02\x1d\n\r\n\x05\x04\x16\x02\0\x05\
-    \x12\x04\xe3\x01\x02\x08\n\r\n\x05\x04\x16\x02\0\x01\x12\x04\xe3\x01\t\
-    \x18\n\r\n\x05\x04\x16\x02\0\x03\x12\x04\xe3\x01\x1b\x1c\n\x0c\n\x04\x04\
-    \x16\x02\x01\x12\x04\xe4\x01\x02\x19\n\r\n\x05\x04\x16\x02\x01\x05\x12\
-    \x04\xe4\x01\x02\x08\n\r\n\x05\x04\x16\x02\x01\x01\x12\x04\xe4\x01\t\x14\
-    \n\r\n\x05\x04\x16\x02\x01\x03\x12\x04\xe4\x01\x17\x18\n\x0c\n\x02\x04\
-    \x17\x12\x06\xe7\x01\0\xe9\x01\x01\n\x0b\n\x03\x04\x17\x01\x12\x04\xe7\
-    \x01\x08\x1d\n\x0c\n\x04\x04\x17\x02\0\x12\x04\xe8\x01\x02\x1f\n\r\n\x05\
-    \x04\x17\x02\0\x06\x12\x04\xe8\x01\x02\x11\n\r\n\x05\x04\x17\x02\0\x01\
-    \x12\x04\xe8\x01\x12\x1a\n\r\n\x05\x04\x17\x02\0\x03\x12\x04\xe8\x01\x1d\
-    \x1e\n\x0c\n\x02\x04\x18\x12\x06\xeb\x01\0\xf0\x01\x01\n\x0b\n\x03\x04\
-    \x18\x01\x12\x04\xeb\x01\x08\x1d\n\x0c\n\x04\x04\x18\x02\0\x12\x04\xec\
-    \x01\x02\x1f\n\r\n\x05\x04\x18\x02\0\x06\x12\x04\xec\x01\x02\x11\n\r\n\
-    \x05\x04\x18\x02\0\x01\x12\x04\xec\x01\x12\x1a\n\r\n\x05\x04\x18\x02\0\
-    \x03\x12\x04\xec\x01\x1d\x1e\nY\n\x04\x04\x18\x02\x01\x12\x04\xef\x01\
-    \x02\x1a\x1aK\x20If\x20true,\x20will\x20also\x20detach\x20all\x20pipelin\
-    es\x20from\x20the\x20audience\x20(if\x20it\x20has\x20any)\n\n\r\n\x05\
-    \x04\x18\x02\x01\x04\x12\x04\xef\x01\x02\n\n\r\n\x05\x04\x18\x02\x01\x05\
-    \x12\x04\xef\x01\x0b\x0f\n\r\n\x05\x04\x18\x02\x01\x01\x12\x04\xef\x01\
-    \x10\x15\n\r\n\x05\x04\x18\x02\x01\x03\x12\x04\xef\x01\x18\x19\n\x0c\n\
-    \x02\x04\x19\x12\x06\xf2\x01\0\xf6\x01\x01\n\x0b\n\x03\x04\x19\x01\x12\
-    \x04\xf2\x01\x08\x1c\n\x0c\n\x04\x04\x19\x02\0\x12\x04\xf3\x01\x02\x1a\n\
-    \r\n\x05\x04\x19\x02\0\x05\x12\x04\xf3\x01\x02\x08\n\r\n\x05\x04\x19\x02\
-    \0\x01\x12\x04\xf3\x01\t\x15\n\r\n\x05\x04\x19\x02\0\x03\x12\x04\xf3\x01\
-    \x18\x19\n\x0c\n\x04\x04\x19\x02\x01\x12\x04\xf5\x01\x02\x1a\n\r\n\x05\
-    \x04\x19\x02\x01\x04\x12\x04\xf5\x01\x02\n\n\r\n\x05\x04\x19\x02\x01\x05\
-    \x12\x04\xf5\x01\x0b\x0f\n\r\n\x05\x04\x19\x02\x01\x01\x12\x04\xf5\x01\
-    \x10\x15\n\r\n\x05\x04\x19\x02\x01\x03\x12\x04\xf5\x01\x18\x19\nD\n\x02\
-    \x04\x1a\x12\x06\xf8\x01\0\xfa\x01\x01\"6\x20Nothing\x20needed\x20here,\
+    nfigs\x20in\x20steps\x20themselves\n\n<\n\x04\x06\0\x02\x11\x12\x04C\x02\
+    F\x03\x1a.\x20Detach\x20a\x20notification\x20config\x20from\x20a\x20pipe\
+    line\n\n\x0c\n\x05\x06\0\x02\x11\x01\x12\x03C\x06\x18\n\x0c\n\x05\x06\0\
+    \x02\x11\x02\x12\x03C\x192\n\x0c\n\x05\x06\0\x02\x11\x03\x12\x03C=T\n\
+    \x0c\n\x05\x06\0\x02\x11\x04\x12\x03E\x04\x1d\n^\n\x06\x06\0\x02\x11\x04\
+    !\x12\x03E\x04\x1d\x1aO\x20Deprecated\x20now\x20that\x20we\x20are\x20inc\
+    luding\x20notification\x20configs\x20in\x20steps\x20themselves\n\nT\n\
+    \x04\x06\0\x02\x12\x12\x03I\x02N\x1aG\x20Create\x20an\x20audience.\x20Us\
+    ed\x20for\x20automation\x20tooling\x20(terraform,\x20k8s\x20cr's)\n\n\
+    \x0c\n\x05\x06\0\x02\x12\x01\x12\x03I\x06\x14\n\x0c\n\x05\x06\0\x02\x12\
+    \x02\x12\x03I\x15*\n\x0c\n\x05\x06\0\x02\x12\x03\x12\x03I5L\n!\n\x04\x06\
+    \0\x02\x13\x12\x03L\x02N\x1a\x14\x20Delete\x20an\x20audience\n\n\x0c\n\
+    \x05\x06\0\x02\x13\x01\x12\x03L\x06\x14\n\x0c\n\x05\x06\0\x02\x13\x02\
+    \x12\x03L\x15*\n\x0c\n\x05\x06\0\x02\x13\x03\x12\x03L5L\n<\n\x04\x06\0\
+    \x02\x14\x12\x03O\x02L\x1a/\x20Delete\x20a\x20service\x20and\x20all\x20a\
+    ssociated\x20audiences\n\n\x0c\n\x05\x06\0\x02\x14\x01\x12\x03O\x06\x13\
+    \n\x0c\n\x05\x06\0\x02\x14\x02\x12\x03O\x14(\n\x0c\n\x05\x06\0\x02\x14\
+    \x03\x12\x03O3J\n*\n\x04\x06\0\x02\x15\x12\x03R\x02H\x1a\x1d\x20Returns\
+    \x20all\x20metric\x20counters\n\n\x0c\n\x05\x06\0\x02\x15\x01\x12\x03R\
+    \x06\x10\n\x0c\n\x05\x06\0\x02\x15\x02\x12\x03R\x11\"\n\x0c\n\x05\x06\0\
+    \x02\x15\x06\x12\x03R-3\n\x0c\n\x05\x06\0\x02\x15\x03\x12\x03R4F\n\x0b\n\
+    \x04\x06\0\x02\x16\x12\x03T\x026\n\x0c\n\x05\x06\0\x02\x16\x01\x12\x03T\
+    \x06\n\n\x0c\n\x05\x06\0\x02\x16\x02\x12\x03T\x0b\x16\n\x0c\n\x05\x06\0\
+    \x02\x16\x06\x12\x03T!'\n\x0c\n\x05\x06\0\x02\x16\x03\x12\x03T(4\n\x0b\n\
+    \x04\x06\0\x02\x17\x12\x03V\x02D\n\x0c\n\x05\x06\0\x02\x17\x01\x12\x03V\
+    \x06\x0f\n\x0c\n\x05\x06\0\x02\x17\x02\x12\x03V\x10\x20\n\x0c\n\x05\x06\
+    \0\x02\x17\x03\x12\x03V+B\n\x0b\n\x04\x06\0\x02\x18\x12\x03X\x02F\n\x0c\
+    \n\x05\x06\0\x02\x18\x01\x12\x03X\x06\x10\n\x0c\n\x05\x06\0\x02\x18\x02\
+    \x12\x03X\x11\"\n\x0c\n\x05\x06\0\x02\x18\x03\x12\x03X-D\n\x0b\n\x04\x06\
+    \0\x02\x19\x12\x03Z\x02Z\n\x0c\n\x05\x06\0\x02\x19\x01\x12\x03Z\x06\x16\
+    \n\x0c\n\x05\x06\0\x02\x19\x02\x12\x03Z\x17.\n\x0c\n\x05\x06\0\x02\x19\
+    \x06\x12\x03Z9?\n\x0c\n\x05\x06\0\x02\x19\x03\x12\x03Z@X\n\x0b\n\x04\x06\
+    \0\x02\x1a\x12\x03\\\x02>\n\x0c\n\x05\x06\0\x02\x1a\x01\x12\x03\\\x06\
+    \x0f\n\x0c\n\x05\x06\0\x02\x1a\x02\x12\x03\\\x10\x20\n\x0c\n\x05\x06\0\
+    \x02\x1a\x03\x12\x03\\+<\n\x0b\n\x04\x06\0\x02\x1b\x12\x03^\x02b\n\x0c\n\
+    \x05\x06\0\x02\x1b\x01\x12\x03^\x06\x1b\n\x0c\n\x05\x06\0\x02\x1b\x02\
+    \x12\x03^\x1c8\n\x0c\n\x05\x06\0\x02\x1b\x03\x12\x03^C`\n\x0b\n\x04\x06\
+    \0\x02\x1c\x12\x03`\x02E\n\x0c\n\x05\x06\0\x02\x1c\x01\x12\x03`\x06\x11\
+    \n\x0c\n\x05\x06\0\x02\x1c\x02\x12\x03`\x12(\n\x0c\n\x05\x06\0\x02\x1c\
+    \x03\x12\x03`3C\n\x0b\n\x04\x06\0\x02\x1d\x12\x03b\x02U\n\x0c\n\x05\x06\
+    \0\x02\x1d\x01\x12\x03b\x06\x1b\n\x0c\n\x05\x06\0\x02\x1d\x02\x12\x03b\
+    \x1c8\n\x0c\n\x05\x06\0\x02\x1d\x03\x12\x03bCS\n\x0b\n\x04\x06\0\x02\x1e\
+    \x12\x03d\x02M\n\x0c\n\x05\x06\0\x02\x1e\x01\x12\x03d\x06\x17\n\x0c\n\
+    \x05\x06\0\x02\x1e\x02\x12\x03d\x180\n\x0c\n\x05\x06\0\x02\x1e\x03\x12\
+    \x03d;K\n!\n\x04\x06\0\x02\x1f\x12\x03g\x028\x1a\x14\x20BEGIN\x20Wasm\
+    \x20methods\n\n\x0c\n\x05\x06\0\x02\x1f\x01\x12\x03g\x06\r\n\x0c\n\x05\
+    \x06\0\x02\x1f\x02\x12\x03g\x0e\x1c\n\x0c\n\x05\x06\0\x02\x1f\x03\x12\
+    \x03g'6\n\x0b\n\x04\x06\0\x02\x20\x12\x03i\x02A\n\x0c\n\x05\x06\0\x02\
+    \x20\x01\x12\x03i\x06\x10\n\x0c\n\x05\x06\0\x02\x20\x02\x12\x03i\x11\"\n\
+    \x0c\n\x05\x06\0\x02\x20\x03\x12\x03i-?\n\x0b\n\x04\x06\0\x02!\x12\x03k\
+    \x02A\n\x0c\n\x05\x06\0\x02!\x01\x12\x03k\x06\x10\n\x0c\n\x05\x06\0\x02!\
+    \x02\x12\x03k\x11\"\n\x0c\n\x05\x06\0\x02!\x03\x12\x03k-?\n\x0b\n\x04\
+    \x06\0\x02\"\x12\x03m\x02?\n\x0c\n\x05\x06\0\x02\"\x01\x12\x03m\x06\x10\
+    \n\x0c\n\x05\x06\0\x02\"\x02\x12\x03m\x11\"\n\x0c\n\x05\x06\0\x02\"\x03\
+    \x12\x03m-=\n\x1f\n\x04\x06\0\x02#\x12\x03o\x02?\"\x12\x20END\x20Wasm\
+    \x20methods\n\n\x0c\n\x05\x06\0\x02#\x01\x12\x03o\x06\x10\n\x0c\n\x05\
+    \x06\0\x02#\x02\x12\x03o\x11\"\n\x0c\n\x05\x06\0\x02#\x03\x12\x03o-=\n\
+    \x1a\n\x04\x06\0\x02$\x12\x03s\x02/\x1a\r\x20Test\x20method\n\n\x0c\n\
+    \x05\x06\0\x02$\x01\x12\x03s\x06\n\n\x0c\n\x05\x06\0\x02$\x02\x12\x03s\
+    \x0b\x16\n\x0c\n\x05\x06\0\x02$\x03\x12\x03s!-\n=\n\x02\x04\0\x12\x04v\0\
+    x\x01\"1\x20Don't\x20think\x20there\x20is\x20anything\x20to\x20pass\x20i\
+    n\x20(yet)?\n\n\n\n\x03\x04\0\x01\x12\x03v\x08\x15\n\x0b\n\x02\x04\x01\
+    \x12\x05z\0\x8f\x01\x01\n\n\n\x03\x04\x01\x01\x12\x03z\x08\x16\n8\n\x04\
+    \x04\x01\x02\0\x12\x03|\x02$\x1a+\x20Clients\x20currently\x20connected\
+    \x20to\x20the\x20server\n\n\x0c\n\x05\x04\x01\x02\0\x04\x12\x03|\x02\n\n\
+    \x0c\n\x05\x04\x01\x02\0\x06\x12\x03|\x0b\x1a\n\x0c\n\x05\x04\x01\x02\0\
+    \x01\x12\x03|\x1b\x1f\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03|\"#\n@\n\x04\
+    \x04\x01\x02\x01\x12\x03\x7f\x02)\x1a3\x20All\x20of\x20the\x20audiences\
+    \x20that\x20are\x20known\x20to\x20the\x20server\n\n\x0c\n\x05\x04\x01\
+    \x02\x01\x04\x12\x03\x7f\x02\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x03\
+    \x7f\x0b\x1a\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\x7f\x1b$\n\x0c\n\
+    \x05\x04\x01\x02\x01\x03\x12\x03\x7f'(\n\xbc\x01\n\x04\x04\x01\x02\x02\
+    \x12\x04\x84\x01\x022\x1a\xad\x01\x20All\x20of\x20the\x20pipelines\x20kn\
+    own\x20to\x20the\x20server\x20+\x20pipeline\x20<->\x20audience\x20mappin\
+    gs\n\x20key\x20==\x20pipeline_id;\x20if\x20\"Audience\"\x20is\x20not\x20\
+    filled\x20out\x20-\x20pipeline\x20is\x20not\x20attached\n\x20to\x20any\
+    \x20audience.\n\n\r\n\x05\x04\x01\x02\x02\x06\x12\x04\x84\x01\x02#\n\r\n\
+    \x05\x04\x01\x02\x02\x01\x12\x04\x84\x01$-\n\r\n\x05\x04\x01\x02\x02\x03\
+    \x12\x04\x84\x0101\nO\n\x04\x04\x01\x02\x03\x12\x04\x87\x01\x023\x1aA\
+    \x20Audience\x20to\x20pipeline\x20mapping\x20config;\x20key\x20==\x20$au\
+    dience_as_string\n\n\r\n\x05\x04\x01\x02\x03\x06\x12\x04\x87\x01\x02&\n\
+    \r\n\x05\x04\x01\x02\x03\x01\x12\x04\x87\x01'.\n\r\n\x05\x04\x01\x02\x03\
+    \x03\x12\x04\x87\x0112\n\x86\x01\n\x04\x04\x01\x02\x04\x12\x04\x8b\x01\
+    \x02*\x1ax\x20When\x20was\x20this\x20response\x20generated.\x20This\x20i\
+    s\x20useful\x20for\x20determining\x20what\x20is\n\x20the\x20latest\x20up\
+    date\x20when\x20using\x20GetAllStream().\n\n\r\n\x05\x04\x01\x02\x04\x05\
+    \x12\x04\x8b\x01\x02\x07\n\r\n\x05\x04\x01\x02\x04\x01\x12\x04\x8b\x01\
+    \x08#\n\r\n\x05\x04\x01\x02\x04\x03\x12\x04\x8b\x01&)\n\x89\x01\n\x04\
+    \x04\x01\x02\x05\x12\x04\x8e\x01\x02\"\x1aD\x20Set\x20by\x20server\x20to\
+    \x20indicate\x20that\x20the\x20response\x20is\x20a\x20keepalive\x20messa\
+    ge\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\
+    \n\x05\x04\x01\x02\x05\x04\x12\x04\x8e\x01\x02\n\n\r\n\x05\x04\x01\x02\
+    \x05\x05\x12\x04\x8e\x01\x0b\x0f\n\r\n\x05\x04\x01\x02\x05\x01\x12\x04\
+    \x8e\x01\x10\x1a\n\r\n\x05\x04\x01\x02\x05\x03\x12\x04\x8e\x01\x1d!\n1\n\
+    \x02\x04\x02\x12\x06\x91\x01\0\x93\x01\x01\"#\x20Don't\x20think\x20we\
+    \x20need\x20anything\x20here\n\n\x0b\n\x03\x04\x02\x01\x12\x04\x91\x01\
+    \x08\x1b\n-\n\x02\x04\x03\x12\x06\x96\x01\0\x98\x01\x01\x1a\x1f\x20Array\
+    \x20of\x20pipeline\x20definitions\n\n\x0b\n\x03\x04\x03\x01\x12\x04\x96\
+    \x01\x08\x1c\n\x0c\n\x04\x04\x03\x02\0\x12\x04\x97\x01\x02)\n\r\n\x05\
+    \x04\x03\x02\0\x04\x12\x04\x97\x01\x02\n\n\r\n\x05\x04\x03\x02\0\x06\x12\
+    \x04\x97\x01\x0b\x1a\n\r\n\x05\x04\x03\x02\0\x01\x12\x04\x97\x01\x1b$\n\
+    \r\n\x05\x04\x03\x02\0\x03\x12\x04\x97\x01'(\n\x0c\n\x02\x04\x04\x12\x06\
+    \x9a\x01\0\x9c\x01\x01\n\x0b\n\x03\x04\x04\x01\x12\x04\x9a\x01\x08\x1a\n\
+    \x0c\n\x04\x04\x04\x02\0\x12\x04\x9b\x01\x02\x19\n\r\n\x05\x04\x04\x02\0\
+    \x05\x12\x04\x9b\x01\x02\x08\n\r\n\x05\x04\x04\x02\0\x01\x12\x04\x9b\x01\
+    \t\x14\n\r\n\x05\x04\x04\x02\0\x03\x12\x04\x9b\x01\x17\x18\n\x0c\n\x02\
+    \x04\x05\x12\x06\x9e\x01\0\xa0\x01\x01\n\x0b\n\x03\x04\x05\x01\x12\x04\
+    \x9e\x01\x08\x1b\n\x0c\n\x04\x04\x05\x02\0\x12\x04\x9f\x01\x02\x1f\n\r\n\
+    \x05\x04\x05\x02\0\x06\x12\x04\x9f\x01\x02\x11\n\r\n\x05\x04\x05\x02\0\
+    \x01\x12\x04\x9f\x01\x12\x1a\n\r\n\x05\x04\x05\x02\0\x03\x12\x04\x9f\x01\
+    \x1d\x1e\n_\n\x02\x04\x06\x12\x06\xa3\x01\0\xa6\x01\x01\x1aQ\x20Create\
+    \x20a\x20new\x20pipeline;\x20accepts\x20either\x20pipeline\x20object\x20\
+    or\x20pipeline\x20as\x20JSON\x20bytes\n\n\x0b\n\x03\x04\x06\x01\x12\x04\
+    \xa3\x01\x08\x1d\n\x0c\n\x04\x04\x06\x02\0\x12\x04\xa4\x01\x02\x1f\n\r\n\
+    \x05\x04\x06\x02\0\x06\x12\x04\xa4\x01\x02\x11\n\r\n\x05\x04\x06\x02\0\
+    \x01\x12\x04\xa4\x01\x12\x1a\n\r\n\x05\x04\x06\x02\0\x03\x12\x04\xa4\x01\
+    \x1d\x1e\n\x0c\n\x04\x04\x06\x02\x01\x12\x04\xa5\x01\x02#\n\r\n\x05\x04\
+    \x06\x02\x01\x04\x12\x04\xa5\x01\x02\n\n\r\n\x05\x04\x06\x02\x01\x05\x12\
+    \x04\xa5\x01\x0b\x10\n\r\n\x05\x04\x06\x02\x01\x01\x12\x04\xa5\x01\x11\
+    \x1e\n\r\n\x05\x04\x06\x02\x01\x03\x12\x04\xa5\x01!\"\n\x0c\n\x02\x04\
+    \x07\x12\x06\xa8\x01\0\xab\x01\x01\n\x0b\n\x03\x04\x07\x01\x12\x04\xa8\
+    \x01\x08\x1e\n\x0c\n\x04\x04\x07\x02\0\x12\x04\xa9\x01\x02\x15\n\r\n\x05\
+    \x04\x07\x02\0\x05\x12\x04\xa9\x01\x02\x08\n\r\n\x05\x04\x07\x02\0\x01\
+    \x12\x04\xa9\x01\t\x10\n\r\n\x05\x04\x07\x02\0\x03\x12\x04\xa9\x01\x13\
+    \x14\n\x0c\n\x04\x04\x07\x02\x01\x12\x04\xaa\x01\x02\x19\n\r\n\x05\x04\
+    \x07\x02\x01\x05\x12\x04\xaa\x01\x02\x08\n\r\n\x05\x04\x07\x02\x01\x01\
+    \x12\x04\xaa\x01\t\x14\n\r\n\x05\x04\x07\x02\x01\x03\x12\x04\xaa\x01\x17\
+    \x18\n\x0c\n\x02\x04\x08\x12\x06\xad\x01\0\xb0\x01\x01\n\x0b\n\x03\x04\
+    \x08\x01\x12\x04\xad\x01\x08\x1d\n\x0c\n\x04\x04\x08\x02\0\x12\x04\xae\
+    \x01\x02\x1f\n\r\n\x05\x04\x08\x02\0\x06\x12\x04\xae\x01\x02\x11\n\r\n\
+    \x05\x04\x08\x02\0\x01\x12\x04\xae\x01\x12\x1a\n\r\n\x05\x04\x08\x02\0\
+    \x03\x12\x04\xae\x01\x1d\x1e\n\x0c\n\x04\x04\x08\x02\x01\x12\x04\xaf\x01\
+    \x02#\n\r\n\x05\x04\x08\x02\x01\x04\x12\x04\xaf\x01\x02\n\n\r\n\x05\x04\
+    \x08\x02\x01\x05\x12\x04\xaf\x01\x0b\x10\n\r\n\x05\x04\x08\x02\x01\x01\
+    \x12\x04\xaf\x01\x11\x1e\n\r\n\x05\x04\x08\x02\x01\x03\x12\x04\xaf\x01!\
+    \"\n\x0c\n\x02\x04\t\x12\x06\xb2\x01\0\xb9\x01\x01\n\x0b\n\x03\x04\t\x01\
+    \x12\x04\xb2\x01\x08\x1d\n\x0c\n\x04\x04\t\x02\0\x12\x04\xb3\x01\x02\x19\
+    \n\r\n\x05\x04\t\x02\0\x05\x12\x04\xb3\x01\x02\x08\n\r\n\x05\x04\t\x02\0\
+    \x01\x12\x04\xb3\x01\t\x14\n\r\n\x05\x04\t\x02\0\x03\x12\x04\xb3\x01\x17\
+    \x18\n\x8b\x02\n\x04\x04\t\x02\x01\x12\x04\xb8\x01\x02-\x1a\xc5\x01\x20T\
+    his\x20field\x20is\x20for\x20internal\x20usage\x20only\x20by\x20the\x20s\
+    erver.\x20It\x20is\x20used\x20to\x20indicate\n\x20to\x20the\x20bus\x20ha\
+    ndler\x20who\x20this\x20pipeline\x20was\x20used\x20by\x20so\x20the\x20ha\
+    ndler\x20can\x20decide\n\x20who\x20we\x20need\x20to\x20emit\x20a\x20SetP\
+    ipelines\x20cmd\x20to.\n\"5\x20protolint:disable:this\x20FIELD_NAMES_LOW\
+    ER_SNAKE_CASE\n\n\r\n\x05\x04\t\x02\x01\x04\x12\x04\xb8\x01\x02\n\n\r\n\
+    \x05\x04\t\x02\x01\x06\x12\x04\xb8\x01\x0b\x1a\n\r\n\x05\x04\t\x02\x01\
+    \x01\x12\x04\xb8\x01\x1b%\n\r\n\x05\x04\t\x02\x01\x03\x12\x04\xb8\x01(,\
+    \n\x0c\n\x02\x04\n\x12\x06\xbb\x01\0\xc1\x01\x01\n\x0b\n\x03\x04\n\x01\
+    \x12\x04\xbb\x01\x08\x1b\n\x0c\n\x04\x04\n\x02\0\x12\x04\xbc\x01\x02#\n\
+    \r\n\x05\x04\n\x02\0\x04\x12\x04\xbc\x01\x02\n\n\r\n\x05\x04\n\x02\0\x05\
+    \x12\x04\xbc\x01\x0b\x11\n\r\n\x05\x04\n\x02\0\x01\x12\x04\xbc\x01\x12\
+    \x1e\n\r\n\x05\x04\n\x02\0\x03\x12\x04\xbc\x01!\"\n\x0c\n\x04\x04\n\x02\
+    \x01\x12\x04\xbd\x01\x02\x1f\n\r\n\x05\x04\n\x02\x01\x06\x12\x04\xbd\x01\
+    \x02\x11\n\r\n\x05\x04\n\x02\x01\x01\x12\x04\xbd\x01\x12\x1a\n\r\n\x05\
+    \x04\n\x02\x01\x03\x12\x04\xbd\x01\x1d\x1e\na\n\x04\x04\n\x02\x02\x12\
+    \x04\xc0\x01\x02$\x1a\x1c\x20Used\x20by\x20automation\x20tooling\n\"5\
+    \x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\n\x05\
+    \x04\n\x02\x02\x04\x12\x04\xc0\x01\x02\n\n\r\n\x05\x04\n\x02\x02\x05\x12\
+    \x04\xc0\x01\x0b\x11\n\r\n\x05\x04\n\x02\x02\x01\x12\x04\xc0\x01\x12\x1d\
+    \n\r\n\x05\x04\n\x02\x02\x03\x12\x04\xc0\x01\x20#\n\x0c\n\x02\x04\x0b\
+    \x12\x06\xc3\x01\0\xc6\x01\x01\n\x0b\n\x03\x04\x0b\x01\x12\x04\xc3\x01\
+    \x08\x1c\n\x0c\n\x04\x04\x0b\x02\0\x12\x04\xc4\x01\x02\x19\n\r\n\x05\x04\
+    \x0b\x02\0\x05\x12\x04\xc4\x01\x02\x08\n\r\n\x05\x04\x0b\x02\0\x01\x12\
+    \x04\xc4\x01\t\x14\n\r\n\x05\x04\x0b\x02\0\x03\x12\x04\xc4\x01\x17\x18\n\
+    \x0c\n\x04\x04\x0b\x02\x01\x12\x04\xc5\x01\x02\x1f\n\r\n\x05\x04\x0b\x02\
+    \x01\x06\x12\x04\xc5\x01\x02\x11\n\r\n\x05\x04\x0b\x02\x01\x01\x12\x04\
+    \xc5\x01\x12\x1a\n\r\n\x05\x04\x0b\x02\x01\x03\x12\x04\xc5\x01\x1d\x1e\n\
+    \x0c\n\x02\x04\x0c\x12\x06\xc8\x01\0\xcb\x01\x01\n\x0b\n\x03\x04\x0c\x01\
+    \x12\x04\xc8\x01\x08\x1d\n\x0c\n\x04\x04\x0c\x02\0\x12\x04\xc9\x01\x02\
+    \x19\n\r\n\x05\x04\x0c\x02\0\x05\x12\x04\xc9\x01\x02\x08\n\r\n\x05\x04\
+    \x0c\x02\0\x01\x12\x04\xc9\x01\t\x14\n\r\n\x05\x04\x0c\x02\0\x03\x12\x04\
+    \xc9\x01\x17\x18\n\x0c\n\x04\x04\x0c\x02\x01\x12\x04\xca\x01\x02\x1f\n\r\
+    \n\x05\x04\x0c\x02\x01\x06\x12\x04\xca\x01\x02\x11\n\r\n\x05\x04\x0c\x02\
+    \x01\x01\x12\x04\xca\x01\x12\x1a\n\r\n\x05\x04\x0c\x02\x01\x03\x12\x04\
+    \xca\x01\x1d\x1e\n\x1d\n\x02\x04\r\x12\x06\xce\x01\0\xd0\x01\x01\x1a\x0f\
+    \x20Notifications\n\n\x0b\n\x03\x04\r\x01\x12\x04\xce\x01\x08!\n\x0c\n\
+    \x04\x04\r\x02\0\x12\x04\xcf\x01\x02-\n\r\n\x05\x04\r\x02\0\x06\x12\x04\
+    \xcf\x01\x02\x1b\n\r\n\x05\x04\r\x02\0\x01\x12\x04\xcf\x01\x1c(\n\r\n\
+    \x05\x04\r\x02\0\x03\x12\x04\xcf\x01+,\n\x0c\n\x02\x04\x0e\x12\x06\xd2\
+    \x01\0\xd4\x01\x01\n\x0b\n\x03\x04\x0e\x01\x12\x04\xd2\x01\x08\"\n\x0c\n\
+    \x04\x04\x0e\x02\0\x12\x04\xd3\x01\x02-\n\r\n\x05\x04\x0e\x02\0\x06\x12\
+    \x04\xd3\x01\x02\x1b\n\r\n\x05\x04\x0e\x02\0\x01\x12\x04\xd3\x01\x1c(\n\
+    \r\n\x05\x04\x0e\x02\0\x03\x12\x04\xd3\x01+,\n\x0c\n\x02\x04\x0f\x12\x06\
+    \xd7\x01\0\xd9\x01\x01\n\x0b\n\x03\x04\x0f\x01\x12\x04\xd7\x01\x08!\n\
+    \x0c\n\x04\x04\x0f\x02\0\x12\x04\xd8\x01\x02-\n\r\n\x05\x04\x0f\x02\0\
+    \x06\x12\x04\xd8\x01\x02\x1b\n\r\n\x05\x04\x0f\x02\0\x01\x12\x04\xd8\x01\
+    \x1c(\n\r\n\x05\x04\x0f\x02\0\x03\x12\x04\xd8\x01+,\n\x0c\n\x02\x04\x10\
+    \x12\x06\xdb\x01\0\xdd\x01\x01\n\x0b\n\x03\x04\x10\x01\x12\x04\xdb\x01\
+    \x08!\n\x0c\n\x04\x04\x10\x02\0\x12\x04\xdc\x01\x02\x1d\n\r\n\x05\x04\
+    \x10\x02\0\x05\x12\x04\xdc\x01\x02\x08\n\r\n\x05\x04\x10\x02\0\x01\x12\
+    \x04\xdc\x01\t\x18\n\r\n\x05\x04\x10\x02\0\x03\x12\x04\xdc\x01\x1b\x1c\n\
+    1\n\x02\x04\x11\x12\x06\xdf\x01\0\xe1\x01\x01\"#\x20Don't\x20think\x20we\
+    \x20need\x20anything\x20here\n\n\x0b\n\x03\x04\x11\x01\x12\x04\xdf\x01\
+    \x08\x1f\n\x0c\n\x02\x04\x12\x12\x06\xe3\x01\0\xe6\x01\x01\n\x0b\n\x03\
+    \x04\x12\x01\x12\x04\xe3\x01\x08\x20\n4\n\x04\x04\x12\x02\0\x12\x04\xe5\
+    \x01\x02:\x1a&\x20Key\x20==\x20id\x20of\x20the\x20notification\x20config\
+    \n\n\r\n\x05\x04\x12\x02\0\x06\x12\x04\xe5\x01\x02'\n\r\n\x05\x04\x12\
+    \x02\0\x01\x12\x04\xe5\x01(5\n\r\n\x05\x04\x12\x02\0\x03\x12\x04\xe5\x01\
+    89\n\x0c\n\x02\x04\x13\x12\x06\xe8\x01\0\xea\x01\x01\n\x0b\n\x03\x04\x13\
+    \x01\x12\x04\xe8\x01\x08\x1e\n\x0c\n\x04\x04\x13\x02\0\x12\x04\xe9\x01\
+    \x02\x1d\n\r\n\x05\x04\x13\x02\0\x05\x12\x04\xe9\x01\x02\x08\n\r\n\x05\
+    \x04\x13\x02\0\x01\x12\x04\xe9\x01\t\x18\n\r\n\x05\x04\x13\x02\0\x03\x12\
+    \x04\xe9\x01\x1b\x1c\n\x0c\n\x02\x04\x14\x12\x06\xec\x01\0\xee\x01\x01\n\
+    \x0b\n\x03\x04\x14\x01\x12\x04\xec\x01\x08\x1f\n\x0c\n\x04\x04\x14\x02\0\
+    \x12\x04\xed\x01\x02-\n\r\n\x05\x04\x14\x02\0\x06\x12\x04\xed\x01\x02\
+    \x1b\n\r\n\x05\x04\x14\x02\0\x01\x12\x04\xed\x01\x1c(\n\r\n\x05\x04\x14\
+    \x02\0\x03\x12\x04\xed\x01+,\n\x0c\n\x02\x04\x15\x12\x06\xf0\x01\0\xf4\
+    \x01\x01\n\x0b\n\x03\x04\x15\x01\x12\x04\xf0\x01\x08!\n\x0b\n\x03\x04\
+    \x15\x07\x12\x04\xf1\x01\x02\x1b\n\x0c\n\x04\x04\x15\x07\x03\x12\x04\xf1\
+    \x01\x02\x1b\n\x0c\n\x04\x04\x15\x02\0\x12\x04\xf2\x01\x02\x1d\n\r\n\x05\
+    \x04\x15\x02\0\x05\x12\x04\xf2\x01\x02\x08\n\r\n\x05\x04\x15\x02\0\x01\
+    \x12\x04\xf2\x01\t\x18\n\r\n\x05\x04\x15\x02\0\x03\x12\x04\xf2\x01\x1b\
+    \x1c\n\x0c\n\x04\x04\x15\x02\x01\x12\x04\xf3\x01\x02\x19\n\r\n\x05\x04\
+    \x15\x02\x01\x05\x12\x04\xf3\x01\x02\x08\n\r\n\x05\x04\x15\x02\x01\x01\
+    \x12\x04\xf3\x01\t\x14\n\r\n\x05\x04\x15\x02\x01\x03\x12\x04\xf3\x01\x17\
+    \x18\n\x0c\n\x02\x04\x16\x12\x06\xf6\x01\0\xfa\x01\x01\n\x0b\n\x03\x04\
+    \x16\x01\x12\x04\xf6\x01\x08!\n\x0b\n\x03\x04\x16\x07\x12\x04\xf7\x01\
+    \x02\x1b\n\x0c\n\x04\x04\x16\x07\x03\x12\x04\xf7\x01\x02\x1b\n\x0c\n\x04\
+    \x04\x16\x02\0\x12\x04\xf8\x01\x02\x1d\n\r\n\x05\x04\x16\x02\0\x05\x12\
+    \x04\xf8\x01\x02\x08\n\r\n\x05\x04\x16\x02\0\x01\x12\x04\xf8\x01\t\x18\n\
+    \r\n\x05\x04\x16\x02\0\x03\x12\x04\xf8\x01\x1b\x1c\n\x0c\n\x04\x04\x16\
+    \x02\x01\x12\x04\xf9\x01\x02\x19\n\r\n\x05\x04\x16\x02\x01\x05\x12\x04\
+    \xf9\x01\x02\x08\n\r\n\x05\x04\x16\x02\x01\x01\x12\x04\xf9\x01\t\x14\n\r\
+    \n\x05\x04\x16\x02\x01\x03\x12\x04\xf9\x01\x17\x18\n\x0c\n\x02\x04\x17\
+    \x12\x06\xfc\x01\0\xfe\x01\x01\n\x0b\n\x03\x04\x17\x01\x12\x04\xfc\x01\
+    \x08\x1d\n\x0c\n\x04\x04\x17\x02\0\x12\x04\xfd\x01\x02\x1f\n\r\n\x05\x04\
+    \x17\x02\0\x06\x12\x04\xfd\x01\x02\x11\n\r\n\x05\x04\x17\x02\0\x01\x12\
+    \x04\xfd\x01\x12\x1a\n\r\n\x05\x04\x17\x02\0\x03\x12\x04\xfd\x01\x1d\x1e\
+    \n\x0c\n\x02\x04\x18\x12\x06\x80\x02\0\x85\x02\x01\n\x0b\n\x03\x04\x18\
+    \x01\x12\x04\x80\x02\x08\x1d\n\x0c\n\x04\x04\x18\x02\0\x12\x04\x81\x02\
+    \x02\x1f\n\r\n\x05\x04\x18\x02\0\x06\x12\x04\x81\x02\x02\x11\n\r\n\x05\
+    \x04\x18\x02\0\x01\x12\x04\x81\x02\x12\x1a\n\r\n\x05\x04\x18\x02\0\x03\
+    \x12\x04\x81\x02\x1d\x1e\nY\n\x04\x04\x18\x02\x01\x12\x04\x84\x02\x02\
+    \x1a\x1aK\x20If\x20true,\x20will\x20also\x20detach\x20all\x20pipelines\
+    \x20from\x20the\x20audience\x20(if\x20it\x20has\x20any)\n\n\r\n\x05\x04\
+    \x18\x02\x01\x04\x12\x04\x84\x02\x02\n\n\r\n\x05\x04\x18\x02\x01\x05\x12\
+    \x04\x84\x02\x0b\x0f\n\r\n\x05\x04\x18\x02\x01\x01\x12\x04\x84\x02\x10\
+    \x15\n\r\n\x05\x04\x18\x02\x01\x03\x12\x04\x84\x02\x18\x19\n\x0c\n\x02\
+    \x04\x19\x12\x06\x87\x02\0\x8b\x02\x01\n\x0b\n\x03\x04\x19\x01\x12\x04\
+    \x87\x02\x08\x1c\n\x0c\n\x04\x04\x19\x02\0\x12\x04\x88\x02\x02\x1a\n\r\n\
+    \x05\x04\x19\x02\0\x05\x12\x04\x88\x02\x02\x08\n\r\n\x05\x04\x19\x02\0\
+    \x01\x12\x04\x88\x02\t\x15\n\r\n\x05\x04\x19\x02\0\x03\x12\x04\x88\x02\
+    \x18\x19\n\x0c\n\x04\x04\x19\x02\x01\x12\x04\x8a\x02\x02\x1a\n\r\n\x05\
+    \x04\x19\x02\x01\x04\x12\x04\x8a\x02\x02\n\n\r\n\x05\x04\x19\x02\x01\x05\
+    \x12\x04\x8a\x02\x0b\x0f\n\r\n\x05\x04\x19\x02\x01\x01\x12\x04\x8a\x02\
+    \x10\x15\n\r\n\x05\x04\x19\x02\x01\x03\x12\x04\x8a\x02\x18\x19\nD\n\x02\
+    \x04\x1a\x12\x06\x8d\x02\0\x8f\x02\x01\"6\x20Nothing\x20needed\x20here,\
     \x20we\x20return\x20all\x20metrics\x20currently\n\n\x0b\n\x03\x04\x1a\
-    \x01\x12\x04\xf8\x01\x08\x19\n\x0c\n\x02\x04\x1b\x12\x06\xfc\x01\0\x81\
-    \x02\x01\n\x0b\n\x03\x04\x1b\x01\x12\x04\xfc\x01\x08\x1a\n\x0c\n\x04\x04\
-    \x1b\x02\0\x12\x04\xfd\x01\x02(\n\r\n\x05\x04\x1b\x02\0\x06\x12\x04\xfd\
-    \x01\x02\x1b\n\r\n\x05\x04\x1b\x02\0\x01\x12\x04\xfd\x01\x1c#\n\r\n\x05\
-    \x04\x1b\x02\0\x03\x12\x04\xfd\x01&'\n\x89\x01\n\x04\x04\x1b\x02\x01\x12\
-    \x04\x80\x02\x02\"\x1aD\x20Set\x20by\x20server\x20to\x20indicate\x20that\
+    \x01\x12\x04\x8d\x02\x08\x19\n\x0c\n\x02\x04\x1b\x12\x06\x91\x02\0\x96\
+    \x02\x01\n\x0b\n\x03\x04\x1b\x01\x12\x04\x91\x02\x08\x1a\n\x0c\n\x04\x04\
+    \x1b\x02\0\x12\x04\x92\x02\x02(\n\r\n\x05\x04\x1b\x02\0\x06\x12\x04\x92\
+    \x02\x02\x1b\n\r\n\x05\x04\x1b\x02\0\x01\x12\x04\x92\x02\x1c#\n\r\n\x05\
+    \x04\x1b\x02\0\x03\x12\x04\x92\x02&'\n\x89\x01\n\x04\x04\x1b\x02\x01\x12\
+    \x04\x95\x02\x02\"\x1aD\x20Set\x20by\x20server\x20to\x20indicate\x20that\
     \x20the\x20response\x20is\x20a\x20keepalive\x20message\n\"5\x20protolint\
     :disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\n\x05\x04\x1b\x02\
-    \x01\x04\x12\x04\x80\x02\x02\n\n\r\n\x05\x04\x1b\x02\x01\x05\x12\x04\x80\
-    \x02\x0b\x0f\n\r\n\x05\x04\x1b\x02\x01\x01\x12\x04\x80\x02\x10\x1a\n\r\n\
-    \x05\x04\x1b\x02\x01\x03\x12\x04\x80\x02\x1d!\n8\n\x02\x04\x1c\x12\x06\
-    \x83\x02\0\x85\x02\x01\"*\x20Nothing\x20needed\x20here,\x20we\x20return\
-    \x20all\x20rates\n\n\x0b\n\x03\x04\x1c\x01\x12\x04\x83\x02\x08\x1f\n\x0c\
-    \n\x02\x04\x1d\x12\x06\x87\x02\0\x8c\x02\x01\n\x0b\n\x03\x04\x1d\x01\x12\
-    \x04\x87\x02\x08\x20\n)\n\x04\x04\x1d\x02\0\x12\x04\x88\x02\x02%\"\x1b\
+    \x01\x04\x12\x04\x95\x02\x02\n\n\r\n\x05\x04\x1b\x02\x01\x05\x12\x04\x95\
+    \x02\x0b\x0f\n\r\n\x05\x04\x1b\x02\x01\x01\x12\x04\x95\x02\x10\x1a\n\r\n\
+    \x05\x04\x1b\x02\x01\x03\x12\x04\x95\x02\x1d!\n8\n\x02\x04\x1c\x12\x06\
+    \x98\x02\0\x9a\x02\x01\"*\x20Nothing\x20needed\x20here,\x20we\x20return\
+    \x20all\x20rates\n\n\x0b\n\x03\x04\x1c\x01\x12\x04\x98\x02\x08\x1f\n\x0c\
+    \n\x02\x04\x1d\x12\x06\x9c\x02\0\xa1\x02\x01\n\x0b\n\x03\x04\x1d\x01\x12\
+    \x04\x9c\x02\x08\x20\n)\n\x04\x04\x1d\x02\0\x12\x04\x9d\x02\x02%\"\x1b\
     \x20Key\x20is\x20an\x20audience\x20string\n\n\r\n\x05\x04\x1d\x02\0\x06\
-    \x12\x04\x88\x02\x02\x1a\n\r\n\x05\x04\x1d\x02\0\x01\x12\x04\x88\x02\x1b\
-    \x20\n\r\n\x05\x04\x1d\x02\0\x03\x12\x04\x88\x02#$\n\x89\x01\n\x04\x04\
-    \x1d\x02\x01\x12\x04\x8b\x02\x02\"\x1aD\x20Set\x20by\x20server\x20to\x20\
+    \x12\x04\x9d\x02\x02\x1a\n\r\n\x05\x04\x1d\x02\0\x01\x12\x04\x9d\x02\x1b\
+    \x20\n\r\n\x05\x04\x1d\x02\0\x03\x12\x04\x9d\x02#$\n\x89\x01\n\x04\x04\
+    \x1d\x02\x01\x12\x04\xa0\x02\x02\"\x1aD\x20Set\x20by\x20server\x20to\x20\
     indicate\x20that\x20the\x20response\x20is\x20a\x20keepalive\x20message\n\
     \"5\x20protolint:disable:this\x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\n\
-    \x05\x04\x1d\x02\x01\x04\x12\x04\x8b\x02\x02\n\n\r\n\x05\x04\x1d\x02\x01\
-    \x05\x12\x04\x8b\x02\x0b\x0f\n\r\n\x05\x04\x1d\x02\x01\x01\x12\x04\x8b\
-    \x02\x10\x1a\n\r\n\x05\x04\x1d\x02\x01\x03\x12\x04\x8b\x02\x1d!\n\x0c\n\
-    \x02\x04\x1e\x12\x06\x8e\x02\0\x90\x02\x01\n\x0b\n\x03\x04\x1e\x01\x12\
-    \x04\x8e\x02\x08\x18\n\x0c\n\x04\x04\x1e\x02\0\x12\x04\x8f\x02\x02\x1f\n\
-    \r\n\x05\x04\x1e\x02\0\x06\x12\x04\x8f\x02\x02\x11\n\r\n\x05\x04\x1e\x02\
-    \0\x01\x12\x04\x8f\x02\x12\x1a\n\r\n\x05\x04\x1e\x02\0\x03\x12\x04\x8f\
-    \x02\x1d\x1e\n\x0c\n\x02\x04\x1f\x12\x06\x92\x02\0\x94\x02\x01\n\x0b\n\
-    \x03\x04\x1f\x01\x12\x04\x92\x02\x08\x19\n\x0c\n\x04\x04\x1f\x02\0\x12\
-    \x04\x93\x02\x02\x14\n\r\n\x05\x04\x1f\x02\0\x06\x12\x04\x93\x02\x02\x08\
-    \n\r\n\x05\x04\x1f\x02\0\x01\x12\x04\x93\x02\t\x0f\n\r\n\x05\x04\x1f\x02\
-    \0\x03\x12\x04\x93\x02\x12\x13\n\x0c\n\x02\x04\x20\x12\x06\x96\x02\0\x98\
-    \x02\x01\n\x0b\n\x03\x04\x20\x01\x12\x04\x96\x02\x08$\n\x0c\n\x04\x04\
-    \x20\x02\0\x12\x04\x97\x02\x02\x13\n\r\n\x05\x04\x20\x02\0\x05\x12\x04\
-    \x97\x02\x02\x08\n\r\n\x05\x04\x20\x02\0\x01\x12\x04\x97\x02\t\x0e\n\r\n\
-    \x05\x04\x20\x02\0\x03\x12\x04\x97\x02\x11\x12\n\x0c\n\x02\x04!\x12\x06\
-    \x9a\x02\0\xa9\x02\x01\n\x0b\n\x03\x04!\x01\x12\x04\x9a\x02\x08%\n\x0e\n\
-    \x04\x04!\x04\0\x12\x06\x9b\x02\x02\xa6\x02\x03\n\r\n\x05\x04!\x04\0\x01\
-    \x12\x04\x9b\x02\x07\r\n\x0e\n\x06\x04!\x04\0\x02\0\x12\x04\x9c\x02\x04\
-    \x15\n\x0f\n\x07\x04!\x04\0\x02\0\x01\x12\x04\x9c\x02\x04\x10\n\x0f\n\
-    \x07\x04!\x04\0\x02\0\x02\x12\x04\x9c\x02\x13\x14\n=\n\x06\x04!\x04\0\
-    \x02\x01\x12\x04\x9f\x02\x04\x16\x1a-\x20Submit\x20means\x20the\x20user\
+    \x05\x04\x1d\x02\x01\x04\x12\x04\xa0\x02\x02\n\n\r\n\x05\x04\x1d\x02\x01\
+    \x05\x12\x04\xa0\x02\x0b\x0f\n\r\n\x05\x04\x1d\x02\x01\x01\x12\x04\xa0\
+    \x02\x10\x1a\n\r\n\x05\x04\x1d\x02\x01\x03\x12\x04\xa0\x02\x1d!\n\x0c\n\
+    \x02\x04\x1e\x12\x06\xa3\x02\0\xa5\x02\x01\n\x0b\n\x03\x04\x1e\x01\x12\
+    \x04\xa3\x02\x08\x18\n\x0c\n\x04\x04\x1e\x02\0\x12\x04\xa4\x02\x02\x1f\n\
+    \r\n\x05\x04\x1e\x02\0\x06\x12\x04\xa4\x02\x02\x11\n\r\n\x05\x04\x1e\x02\
+    \0\x01\x12\x04\xa4\x02\x12\x1a\n\r\n\x05\x04\x1e\x02\0\x03\x12\x04\xa4\
+    \x02\x1d\x1e\n\x0c\n\x02\x04\x1f\x12\x06\xa7\x02\0\xa9\x02\x01\n\x0b\n\
+    \x03\x04\x1f\x01\x12\x04\xa7\x02\x08\x19\n\x0c\n\x04\x04\x1f\x02\0\x12\
+    \x04\xa8\x02\x02\x14\n\r\n\x05\x04\x1f\x02\0\x06\x12\x04\xa8\x02\x02\x08\
+    \n\r\n\x05\x04\x1f\x02\0\x01\x12\x04\xa8\x02\t\x0f\n\r\n\x05\x04\x1f\x02\
+    \0\x03\x12\x04\xa8\x02\x12\x13\n\x0c\n\x02\x04\x20\x12\x06\xab\x02\0\xad\
+    \x02\x01\n\x0b\n\x03\x04\x20\x01\x12\x04\xab\x02\x08$\n\x0c\n\x04\x04\
+    \x20\x02\0\x12\x04\xac\x02\x02\x13\n\r\n\x05\x04\x20\x02\0\x05\x12\x04\
+    \xac\x02\x02\x08\n\r\n\x05\x04\x20\x02\0\x01\x12\x04\xac\x02\t\x0e\n\r\n\
+    \x05\x04\x20\x02\0\x03\x12\x04\xac\x02\x11\x12\n\x0c\n\x02\x04!\x12\x06\
+    \xaf\x02\0\xbe\x02\x01\n\x0b\n\x03\x04!\x01\x12\x04\xaf\x02\x08%\n\x0e\n\
+    \x04\x04!\x04\0\x12\x06\xb0\x02\x02\xbb\x02\x03\n\r\n\x05\x04!\x04\0\x01\
+    \x12\x04\xb0\x02\x07\r\n\x0e\n\x06\x04!\x04\0\x02\0\x12\x04\xb1\x02\x04\
+    \x15\n\x0f\n\x07\x04!\x04\0\x02\0\x01\x12\x04\xb1\x02\x04\x10\n\x0f\n\
+    \x07\x04!\x04\0\x02\0\x02\x12\x04\xb1\x02\x13\x14\n=\n\x06\x04!\x04\0\
+    \x02\x01\x12\x04\xb4\x02\x04\x16\x1a-\x20Submit\x20means\x20the\x20user\
     \x20is\x20not\x20registered\x20yet\n\n\x0f\n\x07\x04!\x04\0\x02\x01\x01\
-    \x12\x04\x9f\x02\x04\x11\n\x0f\n\x07\x04!\x04\0\x02\x01\x02\x12\x04\x9f\
-    \x02\x14\x15\nJ\n\x06\x04!\x04\0\x02\x02\x12\x04\xa2\x02\x04\x16\x1a:\
+    \x12\x04\xb4\x02\x04\x11\n\x0f\n\x07\x04!\x04\0\x02\x01\x02\x12\x04\xb4\
+    \x02\x14\x15\nJ\n\x06\x04!\x04\0\x02\x02\x12\x04\xb7\x02\x04\x16\x1a:\
     \x20Verify\x20means\x20the\x20user\x20is\x20registered\x20but\x20not\x20\
-    verified\x20yet\n\n\x0f\n\x07\x04!\x04\0\x02\x02\x01\x12\x04\xa2\x02\x04\
-    \x11\n\x0f\n\x07\x04!\x04\0\x02\x02\x02\x12\x04\xa2\x02\x14\x15\n@\n\x06\
-    \x04!\x04\0\x02\x03\x12\x04\xa5\x02\x04\x14\x1a0\x20Done\x20means\x20the\
+    verified\x20yet\n\n\x0f\n\x07\x04!\x04\0\x02\x02\x01\x12\x04\xb7\x02\x04\
+    \x11\n\x0f\n\x07\x04!\x04\0\x02\x02\x02\x12\x04\xb7\x02\x14\x15\n@\n\x06\
+    \x04!\x04\0\x02\x03\x12\x04\xba\x02\x04\x14\x1a0\x20Done\x20means\x20the\
     \x20user\x20is\x20registered\x20and\x20verified\n\n\x0f\n\x07\x04!\x04\0\
-    \x02\x03\x01\x12\x04\xa5\x02\x04\x0f\n\x0f\n\x07\x04!\x04\0\x02\x03\x02\
-    \x12\x04\xa5\x02\x12\x13\n\x0c\n\x04\x04!\x02\0\x12\x04\xa8\x02\x02\x14\
-    \n\r\n\x05\x04!\x02\0\x06\x12\x04\xa8\x02\x02\x08\n\r\n\x05\x04!\x02\0\
-    \x01\x12\x04\xa8\x02\t\x0f\n\r\n\x05\x04!\x02\0\x03\x12\x04\xa8\x02\x12\
-    \x13\n\x0c\n\x02\x04\"\x12\x06\xab\x02\0\xb2\x02\x01\n\x0b\n\x03\x04\"\
-    \x01\x12\x04\xab\x02\x08\x1e\n\x0c\n\x04\x04\"\x02\0\x12\x04\xac\x02\x02\
-    \x13\n\r\n\x05\x04\"\x02\0\x05\x12\x04\xac\x02\x02\x08\n\r\n\x05\x04\"\
-    \x02\0\x01\x12\x04\xac\x02\t\x0e\n\r\n\x05\x04\"\x02\0\x03\x12\x04\xac\
-    \x02\x11\x12\n\x0c\n\x04\x04\"\x02\x01\x12\x04\xae\x02\x02\x18\n\r\n\x05\
-    \x04\"\x02\x01\x05\x12\x04\xae\x02\x02\x08\n\r\n\x05\x04\"\x02\x01\x01\
-    \x12\x04\xae\x02\t\x13\n\r\n\x05\x04\"\x02\x01\x03\x12\x04\xae\x02\x16\
-    \x17\ni\n\x04\x04\"\x02\x02\x12\x04\xb1\x02\x02\x15\x1a$\x20Used\x20for\
+    \x02\x03\x01\x12\x04\xba\x02\x04\x0f\n\x0f\n\x07\x04!\x04\0\x02\x03\x02\
+    \x12\x04\xba\x02\x12\x13\n\x0c\n\x04\x04!\x02\0\x12\x04\xbd\x02\x02\x14\
+    \n\r\n\x05\x04!\x02\0\x06\x12\x04\xbd\x02\x02\x08\n\r\n\x05\x04!\x02\0\
+    \x01\x12\x04\xbd\x02\t\x0f\n\r\n\x05\x04!\x02\0\x03\x12\x04\xbd\x02\x12\
+    \x13\n\x0c\n\x02\x04\"\x12\x06\xc0\x02\0\xc7\x02\x01\n\x0b\n\x03\x04\"\
+    \x01\x12\x04\xc0\x02\x08\x1e\n\x0c\n\x04\x04\"\x02\0\x12\x04\xc1\x02\x02\
+    \x13\n\r\n\x05\x04\"\x02\0\x05\x12\x04\xc1\x02\x02\x08\n\r\n\x05\x04\"\
+    \x02\0\x01\x12\x04\xc1\x02\t\x0e\n\r\n\x05\x04\"\x02\0\x03\x12\x04\xc1\
+    \x02\x11\x12\n\x0c\n\x04\x04\"\x02\x01\x12\x04\xc3\x02\x02\x18\n\r\n\x05\
+    \x04\"\x02\x01\x05\x12\x04\xc3\x02\x02\x08\n\r\n\x05\x04\"\x02\x01\x01\
+    \x12\x04\xc3\x02\t\x13\n\r\n\x05\x04\"\x02\x01\x03\x12\x04\xc3\x02\x16\
+    \x17\ni\n\x04\x04\"\x02\x02\x12\x04\xc6\x02\x02\x15\x1a$\x20Used\x20for\
     \x20storage\x20on\x20ui-bff\x20backend\n\"5\x20protolint:disable:this\
     \x20FIELD_NAMES_LOWER_SNAKE_CASE\n\n\r\n\x05\x04\"\x02\x02\x05\x12\x04\
-    \xb1\x02\x02\x08\n\r\n\x05\x04\"\x02\x02\x01\x12\x04\xb1\x02\t\x0e\n\r\n\
-    \x05\x04\"\x02\x02\x03\x12\x04\xb1\x02\x11\x14\n\x0c\n\x02\x04#\x12\x06\
-    \xb4\x02\0\xb8\x02\x01\n\x0b\n\x03\x04#\x01\x12\x04\xb4\x02\x08$\n\x0c\n\
-    \x04\x04#\x02\0\x12\x04\xb5\x02\x02\x13\n\r\n\x05\x04#\x02\0\x05\x12\x04\
-    \xb5\x02\x02\x08\n\r\n\x05\x04#\x02\0\x01\x12\x04\xb5\x02\t\x0e\n\r\n\
-    \x05\x04#\x02\0\x03\x12\x04\xb5\x02\x11\x12\n\x0c\n\x04\x04#\x02\x01\x12\
-    \x04\xb7\x02\x02\x12\n\r\n\x05\x04#\x02\x01\x05\x12\x04\xb7\x02\x02\x08\
-    \n\r\n\x05\x04#\x02\x01\x01\x12\x04\xb7\x02\t\r\n\r\n\x05\x04#\x02\x01\
-    \x03\x12\x04\xb7\x02\x10\x11\n\x0c\n\x02\x04$\x12\x06\xba\x02\0\xbc\x02\
-    \x01\n\x0b\n\x03\x04$\x01\x12\x04\xba\x02\x08\x20\n\x0c\n\x04\x04$\x02\0\
-    \x12\x04\xbb\x02\x02\x18\n\r\n\x05\x04$\x02\0\x05\x12\x04\xbb\x02\x02\
-    \x08\n\r\n\x05\x04$\x02\0\x01\x12\x04\xbb\x02\t\x13\n\r\n\x05\x04$\x02\0\
-    \x03\x12\x04\xbb\x02\x16\x17\n\x0c\n\x02\x04%\x12\x06\xbe\x02\0\xc0\x02\
-    \x01\n\x0b\n\x03\x04%\x01\x12\x04\xbe\x02\x08\x18\n\x0c\n\x04\x04%\x02\0\
-    \x12\x04\xbf\x02\x02\x15\n\r\n\x05\x04%\x02\0\x05\x12\x04\xbf\x02\x02\
-    \x08\n\r\n\x05\x04%\x02\0\x01\x12\x04\xbf\x02\t\x10\n\r\n\x05\x04%\x02\0\
-    \x03\x12\x04\xbf\x02\x13\x14\n\x0c\n\x02\x04&\x12\x06\xc2\x02\0\xc4\x02\
-    \x01\n\x0b\n\x03\x04&\x01\x12\x04\xc2\x02\x08\x19\n\x0c\n\x04\x04&\x02\0\
-    \x12\x04\xc3\x02\x02\x15\n\r\n\x05\x04&\x02\0\x05\x12\x04\xc3\x02\x02\
-    \x08\n\r\n\x05\x04&\x02\0\x01\x12\x04\xc3\x02\t\x10\n\r\n\x05\x04&\x02\0\
-    \x03\x12\x04\xc3\x02\x13\x14\n\x0c\n\x02\x04'\x12\x06\xc6\x02\0\xc8\x02\
-    \x01\n\x0b\n\x03\x04'\x01\x12\x04\xc6\x02\x08\x13\n\x0c\n\x04\x04'\x02\0\
-    \x12\x04\xc7\x02\x02\x13\n\r\n\x05\x04'\x02\0\x05\x12\x04\xc7\x02\x02\
-    \x08\n\r\n\x05\x04'\x02\0\x01\x12\x04\xc7\x02\t\x0e\n\r\n\x05\x04'\x02\0\
-    \x03\x12\x04\xc7\x02\x11\x12\n\x0c\n\x02\x04(\x12\x06\xca\x02\0\xcc\x02\
-    \x01\n\x0b\n\x03\x04(\x01\x12\x04\xca\x02\x08\x14\n\x0c\n\x04\x04(\x02\0\
-    \x12\x04\xcb\x02\x02\x14\n\r\n\x05\x04(\x02\0\x05\x12\x04\xcb\x02\x02\
-    \x08\n\r\n\x05\x04(\x02\0\x01\x12\x04\xcb\x02\t\x0f\n\r\n\x05\x04(\x02\0\
-    \x03\x12\x04\xcb\x02\x12\x13b\x06proto3\
+    \xc6\x02\x02\x08\n\r\n\x05\x04\"\x02\x02\x01\x12\x04\xc6\x02\t\x0e\n\r\n\
+    \x05\x04\"\x02\x02\x03\x12\x04\xc6\x02\x11\x14\n\x0c\n\x02\x04#\x12\x06\
+    \xc9\x02\0\xcd\x02\x01\n\x0b\n\x03\x04#\x01\x12\x04\xc9\x02\x08$\n\x0c\n\
+    \x04\x04#\x02\0\x12\x04\xca\x02\x02\x13\n\r\n\x05\x04#\x02\0\x05\x12\x04\
+    \xca\x02\x02\x08\n\r\n\x05\x04#\x02\0\x01\x12\x04\xca\x02\t\x0e\n\r\n\
+    \x05\x04#\x02\0\x03\x12\x04\xca\x02\x11\x12\n\x0c\n\x04\x04#\x02\x01\x12\
+    \x04\xcc\x02\x02\x12\n\r\n\x05\x04#\x02\x01\x05\x12\x04\xcc\x02\x02\x08\
+    \n\r\n\x05\x04#\x02\x01\x01\x12\x04\xcc\x02\t\r\n\r\n\x05\x04#\x02\x01\
+    \x03\x12\x04\xcc\x02\x10\x11\n\x0c\n\x02\x04$\x12\x06\xcf\x02\0\xd1\x02\
+    \x01\n\x0b\n\x03\x04$\x01\x12\x04\xcf\x02\x08\x20\n\x0c\n\x04\x04$\x02\0\
+    \x12\x04\xd0\x02\x02\x18\n\r\n\x05\x04$\x02\0\x05\x12\x04\xd0\x02\x02\
+    \x08\n\r\n\x05\x04$\x02\0\x01\x12\x04\xd0\x02\t\x13\n\r\n\x05\x04$\x02\0\
+    \x03\x12\x04\xd0\x02\x16\x17\n\x0c\n\x02\x04%\x12\x06\xd3\x02\0\xd5\x02\
+    \x01\n\x0b\n\x03\x04%\x01\x12\x04\xd3\x02\x08\x18\n\x0c\n\x04\x04%\x02\0\
+    \x12\x04\xd4\x02\x02\x15\n\r\n\x05\x04%\x02\0\x05\x12\x04\xd4\x02\x02\
+    \x08\n\r\n\x05\x04%\x02\0\x01\x12\x04\xd4\x02\t\x10\n\r\n\x05\x04%\x02\0\
+    \x03\x12\x04\xd4\x02\x13\x14\n\x0c\n\x02\x04&\x12\x06\xd7\x02\0\xd9\x02\
+    \x01\n\x0b\n\x03\x04&\x01\x12\x04\xd7\x02\x08\x19\n\x0c\n\x04\x04&\x02\0\
+    \x12\x04\xd8\x02\x02\x15\n\r\n\x05\x04&\x02\0\x05\x12\x04\xd8\x02\x02\
+    \x08\n\r\n\x05\x04&\x02\0\x01\x12\x04\xd8\x02\t\x10\n\r\n\x05\x04&\x02\0\
+    \x03\x12\x04\xd8\x02\x13\x14\n\x0c\n\x02\x04'\x12\x06\xdb\x02\0\xdd\x02\
+    \x01\n\x0b\n\x03\x04'\x01\x12\x04\xdb\x02\x08\x16\n\x0c\n\x04\x04'\x02\0\
+    \x12\x04\xdc\x02\x02\x10\n\r\n\x05\x04'\x02\0\x05\x12\x04\xdc\x02\x02\
+    \x08\n\r\n\x05\x04'\x02\0\x01\x12\x04\xdc\x02\t\x0b\n\r\n\x05\x04'\x02\0\
+    \x03\x12\x04\xdc\x02\x0e\x0f\n\x0c\n\x02\x04(\x12\x06\xdf\x02\0\xe1\x02\
+    \x01\n\x0b\n\x03\x04(\x01\x12\x04\xdf\x02\x08\x17\n\x0c\n\x04\x04(\x02\0\
+    \x12\x04\xe0\x02\x02$\n\r\n\x05\x04(\x02\0\x06\x12\x04\xe0\x02\x02\x1a\n\
+    \r\n\x05\x04(\x02\0\x01\x12\x04\xe0\x02\x1b\x1f\n\r\n\x05\x04(\x02\0\x03\
+    \x12\x04\xe0\x02\"#\n#\n\x02\x04)\x12\x06\xe3\x02\0\xe5\x02\x01\"\x15\
+    \x20Nothing\x20needed\x20here\n\n\x0b\n\x03\x04)\x01\x12\x04\xe3\x02\x08\
+    \x19\n\x0c\n\x02\x04*\x12\x06\xe7\x02\0\xe9\x02\x01\n\x0b\n\x03\x04*\x01\
+    \x12\x04\xe7\x02\x08\x1a\n\x0c\n\x04\x04*\x02\0\x12\x04\xe8\x02\x02-\n\r\
+    \n\x05\x04*\x02\0\x04\x12\x04\xe8\x02\x02\n\n\r\n\x05\x04*\x02\0\x06\x12\
+    \x04\xe8\x02\x0b#\n\r\n\x05\x04*\x02\0\x01\x12\x04\xe8\x02$(\n\r\n\x05\
+    \x04*\x02\0\x03\x12\x04\xe8\x02+,\n\x0c\n\x02\x04+\x12\x06\xeb\x02\0\xed\
+    \x02\x01\n\x0b\n\x03\x04+\x01\x12\x04\xeb\x02\x08\x19\n\x0c\n\x04\x04+\
+    \x02\0\x12\x04\xec\x02\x02$\n\r\n\x05\x04+\x02\0\x06\x12\x04\xec\x02\x02\
+    \x1a\n\r\n\x05\x04+\x02\0\x01\x12\x04\xec\x02\x1b\x1f\n\r\n\x05\x04+\x02\
+    \0\x03\x12\x04\xec\x02\"#\n\x0c\n\x02\x04,\x12\x06\xef\x02\0\xf2\x02\x01\
+    \n\x0b\n\x03\x04,\x01\x12\x04\xef\x02\x08\x1a\n\x0c\n\x04\x04,\x02\0\x12\
+    \x04\xf0\x02\x02\x15\n\r\n\x05\x04,\x02\0\x05\x12\x04\xf0\x02\x02\x08\n\
+    \r\n\x05\x04,\x02\0\x01\x12\x04\xf0\x02\t\x10\n\r\n\x05\x04,\x02\0\x03\
+    \x12\x04\xf0\x02\x13\x14\n\x0c\n\x04\x04,\x02\x01\x12\x04\xf1\x02\x02\
+    \x10\n\r\n\x05\x04,\x02\x01\x05\x12\x04\xf1\x02\x02\x08\n\r\n\x05\x04,\
+    \x02\x01\x01\x12\x04\xf1\x02\t\x0b\n\r\n\x05\x04,\x02\x01\x03\x12\x04\
+    \xf1\x02\x0e\x0f\n\x0c\n\x02\x04-\x12\x06\xf4\x02\0\xf6\x02\x01\n\x0b\n\
+    \x03\x04-\x01\x12\x04\xf4\x02\x08\x19\n\x0c\n\x04\x04-\x02\0\x12\x04\xf5\
+    \x02\x02$\n\r\n\x05\x04-\x02\0\x06\x12\x04\xf5\x02\x02\x1a\n\r\n\x05\x04\
+    -\x02\0\x01\x12\x04\xf5\x02\x1b\x1f\n\r\n\x05\x04-\x02\0\x03\x12\x04\xf5\
+    \x02\"#\n\x0c\n\x02\x04.\x12\x06\xf8\x02\0\xfa\x02\x01\n\x0b\n\x03\x04.\
+    \x01\x12\x04\xf8\x02\x08\x19\n\x0c\n\x04\x04.\x02\0\x12\x04\xf9\x02\x02\
+    \x1a\n\r\n\x05\x04.\x02\0\x04\x12\x04\xf9\x02\x02\n\n\r\n\x05\x04.\x02\0\
+    \x05\x12\x04\xf9\x02\x0b\x11\n\r\n\x05\x04.\x02\0\x01\x12\x04\xf9\x02\
+    \x12\x15\n\r\n\x05\x04.\x02\0\x03\x12\x04\xf9\x02\x18\x19\n\x0c\n\x02\
+    \x04/\x12\x06\xfc\x02\0\xfe\x02\x01\n\x0b\n\x03\x04/\x01\x12\x04\xfc\x02\
+    \x08\x13\n\x0c\n\x04\x04/\x02\0\x12\x04\xfd\x02\x02\x13\n\r\n\x05\x04/\
+    \x02\0\x05\x12\x04\xfd\x02\x02\x08\n\r\n\x05\x04/\x02\0\x01\x12\x04\xfd\
+    \x02\t\x0e\n\r\n\x05\x04/\x02\0\x03\x12\x04\xfd\x02\x11\x12\n\x0c\n\x02\
+    \x040\x12\x06\x80\x03\0\x82\x03\x01\n\x0b\n\x03\x040\x01\x12\x04\x80\x03\
+    \x08\x14\n\x0c\n\x04\x040\x02\0\x12\x04\x81\x03\x02\x14\n\r\n\x05\x040\
+    \x02\0\x05\x12\x04\x81\x03\x02\x08\n\r\n\x05\x040\x02\0\x01\x12\x04\x81\
+    \x03\t\x0f\n\r\n\x05\x040\x02\0\x03\x12\x04\x81\x03\x12\x13\n#\n\x02\x04\
+    1\x12\x06\x84\x03\0\x86\x03\x01\"\x15\x20Nothing\x20needed\x20here\n\n\
+    \x0b\n\x03\x041\x01\x12\x04\x84\x03\x08\x18\n\x0c\n\x02\x042\x12\x06\x88\
+    \x03\0\x8a\x03\x01\n\x0b\n\x03\x042\x01\x12\x04\x88\x03\x08\x19\n\x0c\n\
+    \x04\x042\x02\0\x12\x04\x89\x03\x02\x1b\n\r\n\x05\x042\x02\0\x06\x12\x04\
+    \x89\x03\x02\x0f\n\r\n\x05\x042\x02\0\x01\x12\x04\x89\x03\x10\x16\n\r\n\
+    \x05\x042\x02\0\x03\x12\x04\x89\x03\x19\x1ab\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -6006,12 +7361,13 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
     static file_descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::FileDescriptor> = ::protobuf::rt::Lazy::new();
     file_descriptor.get(|| {
         let generated_file_descriptor = generated_file_descriptor_lazy.get(|| {
-            let mut deps = ::std::vec::Vec::with_capacity(4);
+            let mut deps = ::std::vec::Vec::with_capacity(5);
+            deps.push(super::sp_shared::file_descriptor().clone());
             deps.push(super::sp_common::file_descriptor().clone());
             deps.push(super::sp_info::file_descriptor().clone());
             deps.push(super::sp_notify::file_descriptor().clone());
             deps.push(super::sp_pipeline::file_descriptor().clone());
-            let mut messages = ::std::vec::Vec::with_capacity(41);
+            let mut messages = ::std::vec::Vec::with_capacity(51);
             messages.push(GetAllRequest::generated_message_descriptor_data());
             messages.push(GetAllResponse::generated_message_descriptor_data());
             messages.push(GetPipelinesRequest::generated_message_descriptor_data());
@@ -6051,8 +7407,18 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(AppRegisterRejectRequest::generated_message_descriptor_data());
             messages.push(PauseTailRequest::generated_message_descriptor_data());
             messages.push(ResumeTailRequest::generated_message_descriptor_data());
+            messages.push(GetWasmRequest::generated_message_descriptor_data());
+            messages.push(GetWasmResponse::generated_message_descriptor_data());
+            messages.push(GetAllWasmRequest::generated_message_descriptor_data());
+            messages.push(GetAllWasmResponse::generated_message_descriptor_data());
+            messages.push(CreateWasmRequest::generated_message_descriptor_data());
+            messages.push(CreateWasmResponse::generated_message_descriptor_data());
+            messages.push(UpdateWasmRequest::generated_message_descriptor_data());
+            messages.push(DeleteWasmRequest::generated_message_descriptor_data());
             messages.push(TestRequest::generated_message_descriptor_data());
             messages.push(TestResponse::generated_message_descriptor_data());
+            messages.push(GetConfigRequest::generated_message_descriptor_data());
+            messages.push(GetConfigResponse::generated_message_descriptor_data());
             let mut enums = ::std::vec::Vec::with_capacity(1);
             enums.push(app_registration_status_response::Status::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(

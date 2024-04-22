@@ -75,6 +75,7 @@ const TransformPath = (
                 setData={setData}
                 label="Path"
                 placeHolder="ex: object.field"
+                inputClass="w-full"
                 errors={errors}
               />
             )
@@ -112,6 +113,7 @@ export const TransformOptions = (
             setData={setData}
             label="Value"
             placeHolder="value to use as a replacement"
+            inputClass="w-full"
             errors={errors}
           />
         </>
@@ -197,14 +199,14 @@ export const TransformOptions = (
             label="Value"
             placeHolder={`Truncate after ${
               (step.step.oneofKind === "transform" &&
-                    Number(
-                      step?.step?.transform?.options?.truncateOptions?.type,
-                    ) ||
-                  TransformTruncateType.LENGTH) ===
-                  TransformTruncateType.LENGTH
+                  step?.step.transform?.options?.oneofKind ===
+                    "truncateOptions" &&
+                  step?.step.transform?.options.truncateOptions.type ===
+                    TransformTruncateType.LENGTH)
                 ? "this many bytes"
                 : "this percentage"
             } of the original value `}
+            inputClass="w-full"
             errors={errors}
           />
         </>

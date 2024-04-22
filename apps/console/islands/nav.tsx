@@ -1,17 +1,15 @@
-import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
-import IconListCheck from "tabler-icons/tsx/list-check.tsx";
-import IconBell from "tabler-icons/tsx/bell.tsx";
-import { signal } from "@preact/signals";
 import { useEffect, useRef } from "preact/hooks";
-import { tailEnabledSignal } from "./drawer/tail.tsx";
-
-export const showNav = signal<boolean>(false);
+import { showNav } from "root/components/nav/signals.ts";
+import IconBell from "tabler-icons/tsx/bell.tsx";
+import IconFileDownload from "tabler-icons/tsx/file-download.tsx";
+import IconListCheck from "tabler-icons/tsx/list-check.tsx";
+import IconMenu2 from "tabler-icons/tsx/menu-2.tsx";
 
 export const NavBar = () => {
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const clickAway = (event) => {
+    const clickAway = (event: any) => {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target)
@@ -26,11 +24,11 @@ export const NavBar = () => {
   }, [menuRef]);
 
   return (
-    <div ref={menuRef} onClick={() => tailEnabledSignal.value = false}>
+    <div ref={menuRef}>
       <ul
         class={`${
           showNav.value ? "" : "hidden"
-        } z-50 fixed mt-[70px] top-0 left-0 font-medium bg-white ml-4 w-64 rounded border shadow`}
+        } z-50 fixed mt-[70px] top-0 left-0 font-medium bg-white ml-4 w-72 rounded border shadow`}
         onClick={() => showNav.value = false}
       >
         <li>
@@ -70,6 +68,18 @@ export const NavBar = () => {
           >
             <IconBell class="w-6 h-6" />
             <span class="ml-3 text-gray-900">Notifications</span>
+          </a>
+        </li>
+        <li>
+          <a
+            className="flex items-center p-2 text-gray-500 hover:bg-sunset group"
+            target="_download"
+            href="/configs"
+          >
+            <IconFileDownload class="w-6 h-6" />
+            <span class="ml-3 text-gray-900">
+              Download Configs
+            </span>
           </a>
         </li>
         <li className="cursor-not-allowed">
@@ -113,7 +123,7 @@ export const NavBar = () => {
       >
         <IconMenu2
           class="w-6 h-6 ml-4 cursor-pointer"
-          onClick={(e) => {
+          onClick={(e: MouseEvent) => {
             e.stopPropagation();
             showNav.value = !showNav.value;
           }}

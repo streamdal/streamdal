@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
+
 	telTypes "github.com/streamdal/streamdal/apps/server/types"
 
 	"github.com/cactus/go-statsd-client/v5/statsd"
@@ -46,6 +48,8 @@ store any persistent state in memory!
 var (
 	ErrPipelineNotFound = errors.New("pipeline not found")
 	ErrConfigNotFound   = errors.New("config not found")
+	ErrMustExist        = errors.New("object does not exist and MustExist is set")
+	ErrNoOverwrite      = errors.New("object exists and NoOverwrite is set")
 )
 
 const (
@@ -58,7 +62,7 @@ const (
 	// InstallIDKey is a unique ID for this streamdal server cluster
 	// Each cluster will get a unique UUID. This is used to track the number of
 	// installs for telemetry and is completely random for anonymization purposes.
-	InstallIDKey = "install_id"
+	InstallIDKey = "streamdal_install_id"
 
 	RedisCreationDateKey = "streamdal_settings:creation_date"
 )
@@ -70,7 +74,7 @@ type IStore interface {
 	SeenRegistration(ctx context.Context, req *protos.RegisterRequest) bool
 	GetPipelines(ctx context.Context) (map[string]*protos.Pipeline, error)
 	GetPipeline(ctx context.Context, pipelineID string) (*protos.Pipeline, error)
-	GetAllConfig(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error)
+	GetAudienceMappings(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error)
 	GetPipelineConfigsByAudience(ctx context.Context, aud *protos.Audience) (*protos.PipelineConfigs, error)
 	GetLive(ctx context.Context) ([]*types.LiveEntry, error)
 	CreatePipeline(ctx context.Context, pipeline *protos.Pipeline) error
@@ -162,6 +166,129 @@ type IStore interface {
 
 	// GetAudiencesByPipelineID returns a slice of audiences that use a pipeline ID
 	GetAudiencesByPipelineID(ctx context.Context, pipelineID string) ([]*protos.Audience, error)
+
+	// BEGIN Wasm-related methods
+	GetAllWasm(ctx context.Context) ([]*shared.WasmModule, error)
+	GetWasm(ctx context.Context, name, id string) (*shared.WasmModule, error)
+	GetWasmByID(ctx context.Context, id string) (*shared.WasmModule, error)
+	GetWasmByName(ctx context.Context, name string) (*shared.WasmModule, error)
+	SetWasm(ctx context.Context, id, name string, wasm *shared.WasmModule) error
+	SetWasmByName(ctx context.Context, name string, wasm *shared.WasmModule) error
+	SetWasmByID(ctx context.Context, id string, wasm *shared.WasmModule) error
+	DeleteWasm(ctx context.Context, id, name string) error
+	DeleteWasmByID(ctx context.Context, id string) error
+	DeleteWasmByName(ctx context.Context, name string) error
+	// END Wasm-related methods
+
+	// GetPipelinesByWasmID returns a slice of pipelines that use a given Wasm ID
+	GetPipelinesByWasmID(ctx context.Context, wasmID string) ([]*protos.Pipeline, error)
+}
+
+// Option contains settings that can influence read, write or delete operations.
+//
+// NOTE: Redis transactions do NOT function like "traditional" txns as there is
+// no concept of a "rollback" or "commit". Txns in redis are essentially
+// grouped commands that are executed atomically. Due to this, Options currently
+// does not support TXNs and there is a _small_ potential for races.
+//
+// See: https://redis.io/docs/interact/transactions/
+// See: https://redis.com/blog/you-dont-need-transaction-rollbacks-in-redis/
+type Option struct {
+	// When set, the store will NOT overwrite an existing object. Applies to write().
+	NoOverwrite bool
+
+	// When set, the store will ensure that the object exists before performing
+	// the operation. Applies to write() and delete(). NOTE: MustExist
+	// and MustNotExist are mutually exclusive.
+	MustExist bool
+
+	// Optional TTL to set on the key. Applies to write().
+	TTL time.Duration
+}
+
+// Generic read method; will use optional transaction if provided (will only use
+// the first transaction provided).
+func (s *Store) read(ctx context.Context, key string, option ...*Option) ([]byte, error) {
+	if key == "" {
+		return nil, errors.New("key is required")
+	}
+
+	data, err := s.options.RedisBackend.Get(ctx, key).Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func (s *Store) write(ctx context.Context, key string, value []byte, option ...*Option) error {
+	if key == "" {
+		return errors.New("key is required")
+	}
+
+	var (
+		exists bool
+		ttl    time.Duration
+	)
+
+	// If MustExist is set, check if the object exists
+	if len(option) > 0 && option[0] != nil {
+		if option[0].MustExist {
+			_, err := s.read(ctx, key, option[0])
+			if err != nil {
+				if err == redis.Nil {
+					return ErrMustExist
+				}
+
+				return errors.Wrap(err, "unable to read object from redis")
+			}
+
+			// Object exists
+			exists = true
+		}
+
+		if option[0].NoOverwrite && exists {
+			return ErrNoOverwrite
+		}
+
+		if option[0].TTL > 0 {
+			ttl = option[0].TTL
+		}
+	}
+
+	// Safe toi write object
+	if err := s.options.RedisBackend.Set(ctx, key, value, ttl).Err(); err != nil {
+		return errors.Wrap(err, "unable to write object to redis")
+	}
+
+	return nil
+}
+
+func (s *Store) delete(ctx context.Context, key string, option ...*Option) error {
+	if key == "" {
+		return errors.New("key is required")
+	}
+
+	if len(option) > 0 && option[0] != nil {
+		// If MustExist is specified, first read object to make sure it exists
+		if option[0].MustExist {
+			_, err := s.read(ctx, key, option[0])
+			if err != nil {
+				if err == redis.Nil {
+					return ErrMustExist
+				}
+
+				return errors.Wrap(err, "unable to read object from redis for delete operation with MustExist option")
+			}
+		}
+	}
+
+	// Can safely delete
+	if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
+		return errors.Wrap(err, "unable to delete object from redis")
+	}
+
+	return nil
 }
 
 func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]*protos.Audience, error) {
@@ -169,7 +296,7 @@ func (s *Store) DeletePipelineConfig(ctx context.Context, pipelineID string) ([]
 	llog.Debug("received request to delete pipeline configs by pipeline ID")
 
 	// Fetch all pipeline configs
-	pipelineConfigs, err := s.GetAllConfig(ctx)
+	pipelineConfigs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		llog.Errorf("unable to fetch pipeline configs: %s", err)
 		return nil, errors.Wrap(err, "error fetching pipeline configs")
@@ -251,7 +378,7 @@ func (s *Store) GetAudiencesByPipelineID(ctx context.Context, pipelineID string)
 	llog.Debug("received request to get audiences by pipeline ID")
 
 	// Get all pipeline configs
-	pipelineConfigs, err := s.GetAllConfig(ctx)
+	pipelineConfigs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		llog.Errorf("unable to fetch pipeline configs: %s", err)
 		return nil, errors.Wrap(err, "error fetching pipeline configs")
@@ -490,7 +617,8 @@ func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesReques
 	}
 
 	pipelineConfigs := &protos.PipelineConfigs{
-		Configs: make([]*protos.PipelineConfig, 0),
+		Configs:    make([]*protos.PipelineConfig, 0),
+		XCreatedBy: req.XCreatedBy,
 	}
 
 	// Convert pipelines to pipeline config entries
@@ -736,6 +864,19 @@ func (s *Store) CreateAudience(ctx context.Context, aud *protos.Audience) error 
 		return errors.Wrap(err, "error saving audience to store")
 	}
 
+	// BEGIN CreatedBy hack
+	if aud.GetXCreatedBy() != "" {
+		s.log.Debugf("detected created_by for audience '%s' set to '%s' - saving to store",
+			util.AudienceToStr(aud), aud.GetXCreatedBy())
+
+		createdByKey := RedisAudienceCreatedByKey(util.AudienceToStr(aud), aud.GetXCreatedBy())
+
+		if err := s.options.RedisBackend.Set(ctx, createdByKey, nil, 0).Err(); err != nil {
+			return fmt.Errorf("error saving created_by audience '%s' to store: %s", createdByKey, err)
+		}
+	}
+	// END CreatedBy hack
+
 	s.sendAudienceTelemetry(ctx, aud, 1)
 
 	return nil
@@ -764,14 +905,29 @@ func (s *Store) DeleteAudience(ctx context.Context, req *protos.DeleteAudienceRe
 		return errors.Wrap(err, "error deleting audience from store")
 	}
 
+	// BEGIN CreatedBy hack -- do not leave any dangling created_by keys when an audience is deleted
+	createdByKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudienceCreatedByKey(audStr, "*")).Result()
+	if err != nil {
+		return errors.Wrap(err, "error fetching created_by keys")
+	}
+
+	for _, key := range createdByKeys {
+		s.log.Debugf("deleting created by key '%s'", key)
+
+		if err := s.options.RedisBackend.Del(ctx, key).Err(); err != nil {
+			return errors.Wrapf(err, "error deleting created_by key '%s'", key)
+		}
+	}
+	// END CreatedBy hack
+
 	// Send Analytics
 	s.sendAudienceTelemetry(ctx, req.Audience, -1)
 
 	return nil
 }
 
-// GetAllConfig returns all audience -> *protos.PipelineConfigs
-func (s *Store) GetAllConfig(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error) {
+// GetAudienceMappings returns all audience -> *protos.PipelineConfigs assignments
+func (s *Store) GetAudienceMappings(ctx context.Context) (map[*protos.Audience]*protos.PipelineConfigs, error) {
 	cfgs := make(map[*protos.Audience]*protos.PipelineConfigs)
 
 	audienceKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudiencePrefix+":*").Result()
@@ -942,7 +1098,7 @@ func (s *Store) GetSetPipelinesCommandsByService(ctx context.Context, serviceNam
 
 	cmds := make([]*protos.Command, 0)
 
-	allConfigs, err := s.GetAllConfig(ctx)
+	allConfigs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching all configs")
 	}
@@ -1190,6 +1346,36 @@ func (s *Store) GetAudiences(ctx context.Context) ([]*protos.Audience, error) {
 		audiences = append(audiences, aud)
 	}
 
+	// BEGIN XCreatedBy hack -- used for injecting XCreatedBy into the returned audiences (used by k8s operator)
+	createdByKeys, err := s.options.RedisBackend.Keys(ctx, RedisAudienceCreatedByPrefix+":*").Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching audience created_by keys from store")
+	}
+
+	for _, key := range createdByKeys {
+		segments := strings.Split(key, ":")
+		// Ex: streamdal_audience_created_by:$serviceName:$operationType:$operationName:$componentName:$createdBy
+		if len(segments) != 6 {
+			return nil, errors.Errorf("invalid audience created_by key '%s' (expected '6' segments, got '%d')",
+				key, len(segments))
+		}
+
+		aud := util.AudienceFromStr(strings.Join(segments[1:5], ":"))
+		if aud == nil {
+			return nil, errors.Errorf("invalid audience key '%s'", key)
+		}
+
+		createdBy := segments[5]
+
+		for _, a := range audiences {
+			if util.AudienceEquals(a, aud) {
+				a.XCreatedBy = proto.String(createdBy)
+			}
+		}
+	}
+
+	// END XCreatedBy hack
+
 	return audiences, nil
 }
 
@@ -1223,7 +1409,7 @@ func (s *Store) IsPipelineAttachedAny(ctx context.Context, pipelineID string) bo
 	}
 
 	// Get all configs
-	cfgs, err := s.GetAllConfig(ctx)
+	cfgs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		llog.Errorf("error getting all configs: %s", err)
 		return false
@@ -1255,7 +1441,7 @@ func (s *Store) GetPipelineUsage(ctx context.Context) ([]*PipelineUsage, error) 
 	usage := make([]*PipelineUsage, 0)
 
 	// Get config for all usage & audiences
-	cfgs, err := s.GetAllConfig(ctx)
+	cfgs, err := s.GetAudienceMappings(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error getting configs")
 	}
@@ -1679,4 +1865,23 @@ func (s *Store) SetCreationDate(ctx context.Context, ts int64) error {
 	}
 
 	return nil
+}
+
+func (s *Store) GetPipelinesByWasmID(ctx context.Context, wasmID string) ([]*protos.Pipeline, error) {
+	pipelines, err := s.GetPipelines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "error fetching all pipelines in GetPipelinesByWasmID")
+	}
+
+	pipelinesWithWasmID := make([]*protos.Pipeline, 0)
+
+	for _, p := range pipelines {
+		for _, step := range p.Steps {
+			if step.GetXWasmId() == wasmID {
+				pipelinesWithWasmID = append(pipelinesWithWasmID, p)
+			}
+		}
+	}
+
+	return pipelinesWithWasmID, nil
 }

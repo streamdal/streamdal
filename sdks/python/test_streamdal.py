@@ -93,6 +93,7 @@ class TestStreamdalClient:
             steps=[
                 protos.PipelineStep(
                     name="test",
+                    wasm_id=uuid.uuid4().__str__(),
                     on_false=protos.PipelineStepConditions(
                         abort=protos.AbortCondition.ABORT_CONDITION_ABORT_CURRENT
                     ),
@@ -105,13 +106,21 @@ class TestStreamdalClient:
             ],
         )
 
+        wasm_modules = {
+            pipeline.steps[0].wasm_id: protos.shared.WasmModule(
+                id=pipeline.steps[0].wasm_id,
+                bytes=b"{}",
+                function="f"
+            ),
+        }
+
         cmd = protos.Command(
             audience=protos.Audience(
                 component_name="test",
                 service_name="testing",
                 operation_type=protos.OperationType.OPERATION_TYPE_PRODUCER,
             ),
-            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline]),
+            set_pipelines=protos.SetPipelinesCommand(pipelines=[pipeline], wasm_modules=wasm_modules),
         )
 
         self.client._set_pipelines(cmd)

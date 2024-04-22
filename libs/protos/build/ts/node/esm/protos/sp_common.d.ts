@@ -4,6 +4,10 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { PipelineConfigs } from "./sp_pipeline.js";
+import { WasmModule } from "./shared/sp_shared.js";
+import { NotificationConfig } from "./sp_notify.js";
+import { Pipeline } from "./sp_pipeline.js";
 /**
  * Common response message for many gRPC methods
  *
@@ -56,6 +60,12 @@ export interface Audience {
      * @generated from protobuf field: string operation_name = 4;
      */
     operationName: string;
+    /**
+     * Used internally by server and k8s operator to determine who manages this resource
+     *
+     * @generated from protobuf field: optional string _created_by = 1000;
+     */
+    CreatedBy?: string;
 }
 /**
  * @generated from protobuf message protos.Metric
@@ -215,6 +225,35 @@ export interface SampleOptions {
      * @generated from protobuf field: uint32 sample_interval_seconds = 2;
      */
     sampleIntervalSeconds: number;
+}
+/**
+ * Config is returned by external.GetConfig() and is used by the K8S operator
+ *
+ * @generated from protobuf message protos.Config
+ */
+export interface Config {
+    /**
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
+     */
+    audiences: Audience[];
+    /**
+     * @generated from protobuf field: repeated protos.Pipeline pipelines = 2;
+     */
+    pipelines: Pipeline[];
+    /**
+     * @generated from protobuf field: repeated protos.NotificationConfig notifications = 3;
+     */
+    notifications: NotificationConfig[];
+    /**
+     * @generated from protobuf field: repeated protos.shared.WasmModule wasm_modules = 4;
+     */
+    wasmModules: WasmModule[];
+    /**
+     * @generated from protobuf field: map<string, protos.PipelineConfigs> audience_mappings = 5;
+     */
+    audienceMappings: {
+        [key: string]: PipelineConfigs;
+    };
 }
 /**
  * Common status codes used in gRPC method responses
@@ -392,4 +431,15 @@ declare class SampleOptions$Type extends MessageType<SampleOptions> {
  * @generated MessageType for protobuf message protos.SampleOptions
  */
 export declare const SampleOptions: SampleOptions$Type;
+declare class Config$Type extends MessageType<Config> {
+    constructor();
+    create(value?: PartialMessage<Config>): Config;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Config): Config;
+    private binaryReadMap5;
+    internalBinaryWrite(message: Config, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.Config
+ */
+export declare const Config: Config$Type;
 export {};
