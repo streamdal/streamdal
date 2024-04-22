@@ -616,6 +616,8 @@ func (s *Store) SetPipelines(ctx context.Context, req *protos.SetPipelinesReques
 		return errors.Wrap(err, "error validating request in store.SetPipelines()")
 	}
 
+	llog.Debugf("Requested to save audience '%s' with CreatedBy: '%s'", util.AudienceToStr(req.Audience), req.GetXCreatedBy())
+
 	pipelineConfigs := &protos.PipelineConfigs{
 		Configs:    make([]*protos.PipelineConfig, 0),
 		XCreatedBy: req.XCreatedBy,

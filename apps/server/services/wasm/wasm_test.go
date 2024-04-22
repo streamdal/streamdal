@@ -2,6 +2,7 @@ package wasm
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -19,6 +20,10 @@ import (
 	"github.com/streamdal/streamdal/apps/server/util"
 )
 
+const (
+	RedisDatabase = 2
+)
+
 var _ = Describe("Wasm", func() {
 	var (
 		storeService *store.Store
@@ -30,6 +35,7 @@ var _ = Describe("Wasm", func() {
 		// Redis backend
 		redisClient = redis.NewClient(&redis.Options{
 			Addr:     "localhost:6379",
+			DB:       RedisDatabase,
 			Protocol: 3,
 		})
 
@@ -92,7 +98,7 @@ var _ = Describe("Wasm", func() {
 				keyName := store.RedisWasmKey(name, expectedID)
 
 				data, err := redisClient.Get(context.Background(), keyName).Bytes()
-				Expect(err).ToNot(HaveOccurred())
+				Expect(err).ToNot(HaveOccurred(), fmt.Sprintf("failed to get key %s: %s", keyName, err))
 				Expect(data).ToNot(BeNil())
 
 				// Check that module can be unmarshalled

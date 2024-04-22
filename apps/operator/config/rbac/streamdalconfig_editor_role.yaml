@@ -1,0 +1,31 @@
+# permissions for end users to edit streamdalconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: streamdalconfig-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: operator
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: streamdalconfig-editor-role
+rules:
+- apiGroups:
+  - crd.streamdal.com
+  resources:
+  - streamdalconfigs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - crd.streamdal.com
+  resources:
+  - streamdalconfigs/status
+  verbs:
+  - get
