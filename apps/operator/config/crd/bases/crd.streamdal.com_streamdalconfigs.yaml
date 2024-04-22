@@ -52,7 +52,7 @@ spec:
                 type: string
               serverAuth:
                 type: string
-            required:g
+            required:
             - serverAddress
             - serverAuth
             type: object
