@@ -10,6 +10,8 @@ This directory contains apps that are used in the Streamdal ecosystem.
   * Astro app used for https://docs.streamdal.com
 * [server](./server)
   * Server component
+* [operator](./operator)
+  * Kubernetes operator used for managing Streamdal instances
 
 ## Usage - For Users
 You do not need to use these directly - you can install all of the components

@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -14,6 +15,10 @@ import (
 	"github.com/streamdal/streamdal/apps/server/services/encryption"
 	"github.com/streamdal/streamdal/apps/server/services/telemetry"
 	"github.com/streamdal/streamdal/apps/server/util"
+)
+
+const (
+	RedisDatabase = 1
 )
 
 var _ = Describe("Store", func() {
@@ -118,9 +123,10 @@ var _ = Describe("Store", func() {
 		Context("SetWasm()", func() {
 			It("should store Wasm by name and ID", func() {
 				// Existing entry should be there
-				keys, err := redisClient.Keys(context.Background(), RedisWasmKey(modules[0].Name, modules[0].Id)).Result()
-				Expect(err).ToNot(HaveOccurred())
-				Expect(keys).To(HaveLen(1))
+				redisKey := RedisWasmKey(modules[0].Name, modules[0].Id)
+				keys, err := redisClient.Keys(context.Background(), redisKey).Result()
+				Expect(err).ToNot(HaveOccurred(), "should not error during fetch")
+				Expect(keys).To(HaveLen(1), fmt.Sprintf("should have the required key %s", redisKey))
 
 				// Delete existing entry
 				err = redisClient.Del(context.Background(), RedisWasmKey(modules[0].Name, modules[0].Id)).Err()
