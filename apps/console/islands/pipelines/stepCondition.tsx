@@ -1,14 +1,14 @@
-import { ErrorType } from "../form/validate.ts";
 import { AbortCondition } from "streamdal-protos/protos/sp_pipeline.ts";
-import { RadioGroup } from "../form/radioGroup.tsx";
+import { RadioGroup } from "../../components/form/radioGroup.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
-import { Tooltip } from "../tooltip/tooltip.tsx";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { useState } from "preact/hooks";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
-import { FormStringKV } from "../form/formStringKV.tsx";
+import { FormStringKV } from "../../components/form/formStringKV.tsx";
 import { StepNotifications } from "./stepNotifications.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import { ErrorType } from "root/components/form/validate.ts";
 
 export type StepConditionType = {
   name: string;

@@ -1,16 +1,19 @@
-import { ErrorType } from "../components/form/validate.ts";
-import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
+import { ErrorType } from "root/components/form/validate.ts";
+import {
+  FormSelect,
+  optionsFromEnum,
+} from "root/components/form/formSelect.tsx";
 import {
   TransformTruncateType,
   TransformType,
 } from "streamdal-protos/protos/steps/sp_steps_transform.ts";
 import { PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
-import { FormInput } from "../components/form/formInput.tsx";
-import { FormBoolean } from "../components/form/formBoolean.tsx";
-import { FormNInput } from "../components/form/formNInput.tsx";
+import { FormInput } from "root/components/form/formInput.tsx";
+import { FormBoolean } from "root/components/form/formBoolean.tsx";
+import { FormNInput } from "root/components/form/formNInput.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { useState } from "preact/hooks";
-import { FormHidden } from "../components/form/formHidden.tsx";
+import { FormHidden } from "root/components/form/formHidden.tsx";
 
 export type PipelineTransformType = {
   stepNumber: number;

@@ -8,7 +8,7 @@ import {
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
 import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
-import Pipelines from "../../../islands/pipelines.tsx";
+import Pipelines from "root/islands/pipelines/pipelines.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
 export type DeletePipeline = {

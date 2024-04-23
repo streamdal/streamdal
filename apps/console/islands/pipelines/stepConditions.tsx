@@ -1,4 +1,4 @@
-import { ErrorType } from "../form/validate.ts";
+import { ErrorType } from "root/components/form/validate.ts";
 import { StepCondition } from "./stepCondition.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 

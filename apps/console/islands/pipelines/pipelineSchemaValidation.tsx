@@ -1,11 +1,14 @@
-import { ErrorType } from "../components/form/validate.ts";
-import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
+import { ErrorType } from "root/components/form/validate.ts";
+import {
+  FormSelect,
+  optionsFromEnum,
+} from "root/components/form/formSelect.tsx";
 import { PipelineStep } from "streamdal-protos/protos/sp_pipeline.ts";
 import {
   JSONSchemaDraft,
   SchemaValidationType,
 } from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
-import { FormTextArea } from "../components/form/formTextArea.tsx";
+import { FormTextArea } from "root/components/form/formTextArea.tsx";
 
 export type PipelineSchemaValidationType = {
   stepNumber: number;
