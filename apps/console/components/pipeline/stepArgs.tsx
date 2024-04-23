@@ -1,11 +1,11 @@
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
-import { FormInput } from "../../components/form/formInput.tsx";
-import { ErrorType } from "../../components/form/validate.ts";
+import { FormInput } from "../form/formInput.tsx";
+import { ErrorType } from "../form/validate.ts";
 import { useState } from "preact/hooks";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { FormSelect } from "../../components/form/formSelect.tsx";
+import { Tooltip } from "../tooltip/tooltip.tsx";
+import { FormSelect } from "../form/formSelect.tsx";
 import { titleCase } from "../../lib/utils.ts";
 import { nArgTypes, oneArgTypes } from "root/components/pipeline/pipeline.ts";
 

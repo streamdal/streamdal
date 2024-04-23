@@ -39,7 +39,7 @@ import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { PipelineHTTP } from "../pipelines/pipelineHTTP.tsx";
 import { PipelineSchemaValidation } from "../pipelines/pipelineSchemaValidation.tsx";
 import { PipelineTransform } from "../pipelines/pipelineTransform.tsx";
-import { argTypes, StepArgs } from "./stepArgs.tsx";
+import { argTypes, StepArgs } from "../../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "./stepConditions.tsx";
 
 import IconX from "tabler-icons/tsx/x.tsx";
