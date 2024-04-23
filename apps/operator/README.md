@@ -1,5 +1,6 @@
-# operator
-Kubernetes operator used that manages Streamdal configurations.
+operator
+=======
+Kubernetes operator used for managing [Streamdal](https://streamdal.com/) configs.
 
 ## Overview
 This operator will install a CRD that will allow you to manage Streamdal configurations
