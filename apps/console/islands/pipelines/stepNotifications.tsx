@@ -1,13 +1,9 @@
-import { ErrorType } from "../form/validate.ts";
-import { Tooltip } from "../tooltip/tooltip.tsx";
 import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 
-import {
-  StepNotificationCheck,
-  StepNotificationType,
-} from "./stepNotification.tsx";
-import { NotificationPayload } from "./notificationPayload.tsx";
+import { StepNotification, StepNotificationType } from "./stepNotification.tsx";
+import { ErrorType } from "root/components/form/validate.ts";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
 
 export type NotificationsType = {
   notifications: NotificationConfig[];
@@ -18,16 +14,17 @@ export type NotificationsType = {
 };
 
 export const PipelineNotifications = (
-  { notifications, name, data, setData }: NotificationsType,
+  { notifications, name, data, setData, errors }: NotificationsType,
 ) => (
   <>
     {notifications.map((n: NotificationConfig, i) => (
-      <StepNotificationCheck
+      <StepNotification
         key={`${name}-${i}`}
         notification={n}
         name={name}
         data={data}
         setData={setData}
+        errors={errors}
       />
     ))}
   </>
@@ -56,21 +53,13 @@ export const StepNotifications = (
       <div className="flex flex-col py-2 mb-2 border rounded-sm w-full">
         {notifications.length
           ? (
-            <>
-              <PipelineNotifications
-                notifications={notifications}
-                name={name}
-                data={data}
-                setData={() => null}
-                errors={errors}
-              />
-              <NotificationPayload
-                name={name}
-                data={data}
-                setData={setData}
-                errors={errors}
-              />
-            </>
+            <PipelineNotifications
+              notifications={notifications}
+              name={name}
+              data={data}
+              setData={() => null}
+              errors={errors}
+            />
           )
           : (
             <div class="p-2 text-sm text-stormCloud">

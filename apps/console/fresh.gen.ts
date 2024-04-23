@@ -2,139 +2,147 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $_500 from "./routes/_500.tsx";
-import * as $_app from "./routes/_app.tsx";
-import * as $_layout from "./routes/_layout.tsx";
-import * as $_middleware from "./routes/_middleware.ts";
-import * as $configs from "./routes/configs.tsx";
-import * as $demo_http_echo from "./routes/demo/http/echo.tsx";
-import * as $demo_http_index from "./routes/demo/http/index.tsx";
-import * as $email from "./routes/email.tsx";
-import * as $index from "./routes/index.tsx";
-import * as $notifications_id_delete from "./routes/notifications/[id]/delete.tsx";
-import * as $notifications_id_index from "./routes/notifications/[id]/index.tsx";
-import * as $notifications_add from "./routes/notifications/add.tsx";
-import * as $notifications_index from "./routes/notifications/index.tsx";
-import * as $notifications_save from "./routes/notifications/save.tsx";
-import * as $partials_index from "./routes/partials/index.tsx";
-import * as $partials_notifications_id_index from "./routes/partials/notifications/[id]/index.tsx";
-import * as $partials_notifications_add from "./routes/partials/notifications/add.tsx";
-import * as $partials_notifications_index from "./routes/partials/notifications/index.tsx";
-import * as $partials_pipelines_id_index from "./routes/partials/pipelines/[id]/index.tsx";
-import * as $partials_pipelines_add from "./routes/partials/pipelines/add.tsx";
-import * as $partials_pipelines_index from "./routes/partials/pipelines/index.tsx";
-import * as $partials_tail_id_index from "./routes/partials/tail/[id]/index.tsx";
-import * as $pipelines_id_delete from "./routes/pipelines/[id]/delete.tsx";
-import * as $pipelines_id_index from "./routes/pipelines/[id]/index.tsx";
-import * as $pipelines_add from "./routes/pipelines/add.tsx";
-import * as $pipelines_index from "./routes/pipelines/index.tsx";
-import * as $pipelines_save from "./routes/pipelines/save.tsx";
-import * as $service_service_component_component_operationType_op_operationName_delete from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
-import * as $service_service_component_component_operationType_op_operationName_pipeline_id_attach from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
-import * as $service_service_component_component_operationType_op_operationName_pipeline_id_detach from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
-import * as $service_service_component_component_operationType_op_operationName_pipeline_id_pause from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
-import * as $service_service_component_component_operationType_op_operationName_pipeline_id_resume from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx";
-import * as $service_service_component_component_operationType_op_operationName_schema from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
-import * as $service_service_delete from "./routes/service/[service]/delete.tsx";
-import * as $tail_id_index from "./routes/tail/[id]/index.tsx";
-import * as $ws_audience_metrics from "./routes/ws/audience-metrics.tsx";
-import * as $ws_demo_http_request from "./routes/ws/demo/http-request.tsx";
-import * as $ws_server_error from "./routes/ws/server-error.tsx";
-import * as $ws_service_map from "./routes/ws/service-map.tsx";
-import * as $ws_tail from "./routes/ws/tail.tsx";
-import * as $demo_http_request from "./islands/demo/http-request.tsx";
-import * as $drawer_component from "./islands/drawer/component.tsx";
-import * as $drawer_infoDrawer from "./islands/drawer/infoDrawer.tsx";
-import * as $drawer_operation from "./islands/drawer/operation.tsx";
-import * as $drawer_schema from "./islands/drawer/schema.tsx";
-import * as $drawer_service from "./islands/drawer/service.tsx";
-import * as $drawer_tail from "./islands/drawer/tail.tsx";
-import * as $emailCollectionForm from "./islands/emailCollectionForm.tsx";
-import * as $nav from "./islands/nav.tsx";
-import * as $notification from "./islands/notification.tsx";
-import * as $notifications from "./islands/notifications.tsx";
-import * as $pipeline from "./islands/pipeline.tsx";
-import * as $pipelineActionMenu from "./islands/pipelineActionMenu.tsx";
-import * as $pipelineHTTP from "./islands/pipelineHTTP.tsx";
-import * as $pipelineSchemaValidation from "./islands/pipelineSchemaValidation.tsx";
-import * as $pipelineTransform from "./islands/pipelineTransform.tsx";
-import * as $pipelines from "./islands/pipelines.tsx";
-import * as $serviceDisplay from "./islands/serviceDisplay.tsx";
-import * as $sockets from "./islands/sockets.tsx";
-import { type Manifest } from "$fresh/server.ts";
+import * as $0 from "./routes/_500.tsx";
+import * as $1 from "./routes/_app.tsx";
+import * as $2 from "./routes/_layout.tsx";
+import * as $3 from "./routes/_middleware.ts";
+import * as $4 from "./routes/configs.tsx";
+import * as $5 from "./routes/demo/http/echo.tsx";
+import * as $6 from "./routes/demo/http/index.tsx";
+import * as $7 from "./routes/email.tsx";
+import * as $8 from "./routes/index.tsx";
+import * as $9 from "./routes/notifications/[id]/delete.tsx";
+import * as $10 from "./routes/notifications/[id]/index.tsx";
+import * as $11 from "./routes/notifications/add.tsx";
+import * as $12 from "./routes/notifications/index.tsx";
+import * as $13 from "./routes/notifications/save.tsx";
+import * as $14 from "./routes/partials/index.tsx";
+import * as $15 from "./routes/partials/notifications/[id]/index.tsx";
+import * as $16 from "./routes/partials/notifications/add.tsx";
+import * as $17 from "./routes/partials/notifications/index.tsx";
+import * as $18 from "./routes/partials/pipelines/[id]/index.tsx";
+import * as $19 from "./routes/partials/pipelines/add.tsx";
+import * as $20 from "./routes/partials/pipelines/index.tsx";
+import * as $21 from "./routes/partials/tail/[id]/index.tsx";
+import * as $22 from "./routes/pipelines/[id]/delete.tsx";
+import * as $23 from "./routes/pipelines/[id]/index.tsx";
+import * as $24 from "./routes/pipelines/add.tsx";
+import * as $25 from "./routes/pipelines/index.tsx";
+import * as $26 from "./routes/pipelines/save.tsx";
+import * as $27 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
+import * as $28 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
+import * as $29 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
+import * as $30 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx";
+import * as $31 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx";
+import * as $32 from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx";
+import * as $33 from "./routes/service/[service]/delete.tsx";
+import * as $34 from "./routes/tail/[id]/index.tsx";
+import * as $35 from "./routes/ws/audience-metrics.tsx";
+import * as $36 from "./routes/ws/demo/http-request.tsx";
+import * as $37 from "./routes/ws/server-error.tsx";
+import * as $38 from "./routes/ws/service-map.tsx";
+import * as $39 from "./routes/ws/tail.tsx";
+import * as $$0 from "./islands/demo/http-request.tsx";
+import * as $$1 from "./islands/drawer/component.tsx";
+import * as $$2 from "./islands/drawer/infoDrawer.tsx";
+import * as $$3 from "./islands/drawer/operation.tsx";
+import * as $$4 from "./islands/drawer/schema.tsx";
+import * as $$5 from "./islands/drawer/service.tsx";
+import * as $$6 from "./islands/drawer/tail.tsx";
+import * as $$7 from "./islands/emailCollectionForm.tsx";
+import * as $$8 from "./islands/nav.tsx";
+import * as $$9 from "./islands/notification.tsx";
+import * as $$10 from "./islands/notifications.tsx";
+import * as $$11 from "./islands/pipelines/pipeline.tsx";
+import * as $$12 from "./islands/pipelines/pipelineActionMenu.tsx";
+import * as $$13 from "./islands/pipelines/pipelineHTTP.tsx";
+import * as $$14 from "./islands/pipelines/pipelineSchemaValidation.tsx";
+import * as $$15 from "./islands/pipelines/pipelineTransform.tsx";
+import * as $$16 from "./islands/pipelines/pipelines.tsx";
+import * as $$17 from "./islands/pipelines/stepArgs.tsx";
+import * as $$18 from "./islands/pipelines/stepCondition.tsx";
+import * as $$19 from "./islands/pipelines/stepConditions.tsx";
+import * as $$20 from "./islands/pipelines/stepNotification.tsx";
+import * as $$21 from "./islands/pipelines/stepNotifications.tsx";
+import * as $$22 from "./islands/serviceDisplay.tsx";
+import * as $$23 from "./islands/sockets.tsx";
 
 const manifest = {
   routes: {
-    "./routes/_500.tsx": $_500,
-    "./routes/_app.tsx": $_app,
-    "./routes/_layout.tsx": $_layout,
-    "./routes/_middleware.ts": $_middleware,
-    "./routes/configs.tsx": $configs,
-    "./routes/demo/http/echo.tsx": $demo_http_echo,
-    "./routes/demo/http/index.tsx": $demo_http_index,
-    "./routes/email.tsx": $email,
-    "./routes/index.tsx": $index,
-    "./routes/notifications/[id]/delete.tsx": $notifications_id_delete,
-    "./routes/notifications/[id]/index.tsx": $notifications_id_index,
-    "./routes/notifications/add.tsx": $notifications_add,
-    "./routes/notifications/index.tsx": $notifications_index,
-    "./routes/notifications/save.tsx": $notifications_save,
-    "./routes/partials/index.tsx": $partials_index,
-    "./routes/partials/notifications/[id]/index.tsx":
-      $partials_notifications_id_index,
-    "./routes/partials/notifications/add.tsx": $partials_notifications_add,
-    "./routes/partials/notifications/index.tsx": $partials_notifications_index,
-    "./routes/partials/pipelines/[id]/index.tsx": $partials_pipelines_id_index,
-    "./routes/partials/pipelines/add.tsx": $partials_pipelines_add,
-    "./routes/partials/pipelines/index.tsx": $partials_pipelines_index,
-    "./routes/partials/tail/[id]/index.tsx": $partials_tail_id_index,
-    "./routes/pipelines/[id]/delete.tsx": $pipelines_id_delete,
-    "./routes/pipelines/[id]/index.tsx": $pipelines_id_index,
-    "./routes/pipelines/add.tsx": $pipelines_add,
-    "./routes/pipelines/index.tsx": $pipelines_index,
-    "./routes/pipelines/save.tsx": $pipelines_save,
+    "./routes/_500.tsx": $0,
+    "./routes/_app.tsx": $1,
+    "./routes/_layout.tsx": $2,
+    "./routes/_middleware.ts": $3,
+    "./routes/configs.tsx": $4,
+    "./routes/demo/http/echo.tsx": $5,
+    "./routes/demo/http/index.tsx": $6,
+    "./routes/email.tsx": $7,
+    "./routes/index.tsx": $8,
+    "./routes/notifications/[id]/delete.tsx": $9,
+    "./routes/notifications/[id]/index.tsx": $10,
+    "./routes/notifications/add.tsx": $11,
+    "./routes/notifications/index.tsx": $12,
+    "./routes/notifications/save.tsx": $13,
+    "./routes/partials/index.tsx": $14,
+    "./routes/partials/notifications/[id]/index.tsx": $15,
+    "./routes/partials/notifications/add.tsx": $16,
+    "./routes/partials/notifications/index.tsx": $17,
+    "./routes/partials/pipelines/[id]/index.tsx": $18,
+    "./routes/partials/pipelines/add.tsx": $19,
+    "./routes/partials/pipelines/index.tsx": $20,
+    "./routes/partials/tail/[id]/index.tsx": $21,
+    "./routes/pipelines/[id]/delete.tsx": $22,
+    "./routes/pipelines/[id]/index.tsx": $23,
+    "./routes/pipelines/add.tsx": $24,
+    "./routes/pipelines/index.tsx": $25,
+    "./routes/pipelines/save.tsx": $26,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx":
-      $service_service_component_component_operationType_op_operationName_delete,
+      $27,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
-      $service_service_component_component_operationType_op_operationName_pipeline_id_attach,
+      $28,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx":
-      $service_service_component_component_operationType_op_operationName_pipeline_id_detach,
+      $29,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/pause.tsx":
-      $service_service_component_component_operationType_op_operationName_pipeline_id_pause,
+      $30,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/resume.tsx":
-      $service_service_component_component_operationType_op_operationName_pipeline_id_resume,
+      $31,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/schema.tsx":
-      $service_service_component_component_operationType_op_operationName_schema,
-    "./routes/service/[service]/delete.tsx": $service_service_delete,
-    "./routes/tail/[id]/index.tsx": $tail_id_index,
-    "./routes/ws/audience-metrics.tsx": $ws_audience_metrics,
-    "./routes/ws/demo/http-request.tsx": $ws_demo_http_request,
-    "./routes/ws/server-error.tsx": $ws_server_error,
-    "./routes/ws/service-map.tsx": $ws_service_map,
-    "./routes/ws/tail.tsx": $ws_tail,
+      $32,
+    "./routes/service/[service]/delete.tsx": $33,
+    "./routes/tail/[id]/index.tsx": $34,
+    "./routes/ws/audience-metrics.tsx": $35,
+    "./routes/ws/demo/http-request.tsx": $36,
+    "./routes/ws/server-error.tsx": $37,
+    "./routes/ws/service-map.tsx": $38,
+    "./routes/ws/tail.tsx": $39,
   },
   islands: {
-    "./islands/demo/http-request.tsx": $demo_http_request,
-    "./islands/drawer/component.tsx": $drawer_component,
-    "./islands/drawer/infoDrawer.tsx": $drawer_infoDrawer,
-    "./islands/drawer/operation.tsx": $drawer_operation,
-    "./islands/drawer/schema.tsx": $drawer_schema,
-    "./islands/drawer/service.tsx": $drawer_service,
-    "./islands/drawer/tail.tsx": $drawer_tail,
-    "./islands/emailCollectionForm.tsx": $emailCollectionForm,
-    "./islands/nav.tsx": $nav,
-    "./islands/notification.tsx": $notification,
-    "./islands/notifications.tsx": $notifications,
-    "./islands/pipeline.tsx": $pipeline,
-    "./islands/pipelineActionMenu.tsx": $pipelineActionMenu,
-    "./islands/pipelineHTTP.tsx": $pipelineHTTP,
-    "./islands/pipelineSchemaValidation.tsx": $pipelineSchemaValidation,
-    "./islands/pipelineTransform.tsx": $pipelineTransform,
-    "./islands/pipelines.tsx": $pipelines,
-    "./islands/serviceDisplay.tsx": $serviceDisplay,
-    "./islands/sockets.tsx": $sockets,
+    "./islands/demo/http-request.tsx": $$0,
+    "./islands/drawer/component.tsx": $$1,
+    "./islands/drawer/infoDrawer.tsx": $$2,
+    "./islands/drawer/operation.tsx": $$3,
+    "./islands/drawer/schema.tsx": $$4,
+    "./islands/drawer/service.tsx": $$5,
+    "./islands/drawer/tail.tsx": $$6,
+    "./islands/emailCollectionForm.tsx": $$7,
+    "./islands/nav.tsx": $$8,
+    "./islands/notification.tsx": $$9,
+    "./islands/notifications.tsx": $$10,
+    "./islands/pipelines/pipeline.tsx": $$11,
+    "./islands/pipelines/pipelineActionMenu.tsx": $$12,
+    "./islands/pipelines/pipelineHTTP.tsx": $$13,
+    "./islands/pipelines/pipelineSchemaValidation.tsx": $$14,
+    "./islands/pipelines/pipelineTransform.tsx": $$15,
+    "./islands/pipelines/pipelines.tsx": $$16,
+    "./islands/pipelines/stepArgs.tsx": $$17,
+    "./islands/pipelines/stepCondition.tsx": $$18,
+    "./islands/pipelines/stepConditions.tsx": $$19,
+    "./islands/pipelines/stepNotification.tsx": $$20,
+    "./islands/pipelines/stepNotifications.tsx": $$21,
+    "./islands/serviceDisplay.tsx": $$22,
+    "./islands/sockets.tsx": $$23,
   },
   baseUrl: import.meta.url,
-} satisfies Manifest;
+};
 
 export default manifest;

@@ -1,9 +1,12 @@
-import { ErrorType } from "../components/form/validate.ts";
-import { FormSelect, optionsFromEnum } from "../components/form/formSelect.tsx";
-import { FormInput } from "../components/form/formInput.tsx";
+import { ErrorType } from "root/components/form/validate.ts";
+import {
+  FormSelect,
+  optionsFromEnum,
+} from "root/components/form/formSelect.tsx";
+import { FormInput } from "root/components/form/formInput.tsx";
 import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
-import { FormTextArea } from "../components/form/formTextArea.tsx";
-import { FormStringKV } from "../components/form/formStringKV.tsx";
+import { FormTextArea } from "root/components/form/formTextArea.tsx";
+import { FormStringKV } from "root/components/form/formStringKV.tsx";
 
 export type PipelineHTTPType = {
   stepNumber: number;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import IconChevronDown from "tabler-icons/tsx/chevron-down.tsx";
 import IconChevronUp from "tabler-icons/tsx/chevron-up.tsx";
 import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
@@ -9,38 +9,38 @@ import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.
 
 import * as uuid from "$std/uuid/mod.ts";
 import { initFlowbite } from "https://esm.sh/v132/flowbite@1.7.0/denonext/flowbite.mjs";
+import { FormHidden } from "root/components/form/formHidden.tsx";
+import { FormInput } from "root/components/form/formInput.tsx";
 import { FormStringKV } from "root/components/form/formStringKV.tsx";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
-import { FormHidden } from "../components/form/formHidden.tsx";
-import { FormInput } from "../components/form/formInput.tsx";
 import {
   FormSelect,
   kvActionFromEnum,
   kvModeFromEnum,
   optionsFromEnum,
-} from "../components/form/formSelect.tsx";
-import { InlineInput } from "../components/form/inlineInput.tsx";
+} from "../../components/form/formSelect.tsx";
+import { InlineInput } from "../../components/form/inlineInput.tsx";
 import {
   ErrorType,
   resolveValue,
   validate,
-} from "../components/form/validate.ts";
-import { DeleteModal } from "../components/modals/deleteModal.tsx";
+} from "../../components/form/validate.ts";
+import { DeleteModal } from "../../components/modals/deleteModal.tsx";
 import {
   kinds,
   newStep,
   PipelineSchema,
-} from "../components/pipeline/pipeline.ts";
-import { PipelineMenu } from "../components/pipeline/pipelineMenu.tsx";
-import { argTypes, StepArgs } from "../components/pipeline/stepArgs.tsx";
-import { StepConditions } from "../components/pipeline/stepConditions.tsx";
-import { StepMenu } from "../components/pipeline/stepMenu.tsx";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { PipelineHTTP } from "./pipelineHTTP.tsx";
-import { PipelineSchemaValidation } from "./pipelineSchemaValidation.tsx";
-import { PipelineTransform } from "./pipelineTransform.tsx";
+} from "../../components/pipeline/pipeline.ts";
+import { PipelineMenu } from "../../components/pipeline/pipelineMenu.tsx";
+import { StepMenu } from "../../components/pipeline/stepMenu.tsx";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
+import { PipelineHTTP } from "../pipelines/pipelineHTTP.tsx";
+import { PipelineSchemaValidation } from "../pipelines/pipelineSchemaValidation.tsx";
+import { PipelineTransform } from "../pipelines/pipelineTransform.tsx";
+import { argTypes, StepArgs } from "./stepArgs.tsx";
+import { StepConditions } from "./stepConditions.tsx";
 
 import IconX from "tabler-icons/tsx/x.tsx";
 
@@ -59,18 +59,14 @@ export default function PipelineDetail({
   // properly type this since it doesn't support useState<type>
   const e: ErrorType = {};
   const [errors, setErrors] = useState(e);
-  const [data, setData] = useState<any>();
-
-  useEffect(() => {
-    setData({
-      ...pipeline,
-      steps: pipeline?.steps?.map((s: PipelineStep, i) => ({
-        ...s,
-        dragId: uuid.v1.generate(),
-        dragOrder: i,
-      })),
-    });
-  }, [pipeline]);
+  const [data, setData] = useState<any>({
+    ...pipeline,
+    steps: pipeline?.steps?.map((s: PipelineStep, i) => ({
+      ...s,
+      dragId: uuid.v1.generate(),
+      dragOrder: i,
+    })),
+  });
 
   const [dragId, setDragId] = useState(null);
   const [canDrag, setCanDrag] = useState(false);

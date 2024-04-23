@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { handler as pipelineHandler, PipelineRoute } from "./index.tsx";
-import Pipelines from "../../islands/pipelines.tsx";
+import Pipelines from "root/islands/pipelines/pipelines.tsx";
 
 export const handler: Handlers<PipelineRoute> = pipelineHandler;
 

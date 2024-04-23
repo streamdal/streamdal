@@ -1,15 +1,15 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 
-import { useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { newPipeline } from "root/components/pipeline/pipeline.ts";
 import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { initFlowBite } from "../components/flowbite/init.tsx";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { SuccessType } from "../routes/_middleware.ts";
+import { initFlowBite } from "root/components/flowbite/init.tsx";
+import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
+import { SuccessType } from "root/routes/_middleware.ts";
 import PipelineDetail from "./pipeline.tsx";
 
 export default function Pipelines(
@@ -21,15 +21,13 @@ export default function Pipelines(
     add?: boolean;
   },
 ) {
-  //
-  // wrapper supports adding a new entry
   const wrapper = [
-    ...pipelines ? pipelines : [],
-    ...pipelines?.length === 0 || add ? [newPipeline] : [],
+    ...pipelines?.length ? pipelines : [],
+    ...add ? [newPipeline] : [],
   ];
-
-  const index = id ? wrapper?.findIndex((p) => p.id === id) : 0;
-  const selected = add ? wrapper.length - 1 : index > -1 ? index : 0;
+  const selected = id
+    ? wrapper.findIndex((p) => p.id === id)
+    : Math.max(wrapper.length - 1, 0);
 
   if (success?.message) {
     toastSignal.value = {
@@ -89,6 +87,7 @@ export default function Pipelines(
             </div>
             <div class="w-full max-h-[88vh] overflow-y-auto">
               <PipelineDetail
+                key={`pipeline-${selected}`}
                 pipeline={wrapper[selected]}
                 notifications={notifications}
               />

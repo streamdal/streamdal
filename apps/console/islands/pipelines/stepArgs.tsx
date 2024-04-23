@@ -1,34 +1,13 @@
 import { DetectiveType } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
-import { FormInput } from "../form/formInput.tsx";
-import { ErrorType } from "../form/validate.ts";
+import { FormInput } from "../../components/form/formInput.tsx";
+import { ErrorType } from "../../components/form/validate.ts";
 import { useState } from "preact/hooks";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { Tooltip } from "../tooltip/tooltip.tsx";
-import { FormSelect } from "../form/formSelect.tsx";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
+import { FormSelect } from "../../components/form/formSelect.tsx";
 import { titleCase } from "../../lib/utils.ts";
-
-export const oneArgTypes: (keyof typeof DetectiveType)[] = [
-  "STRING_EQUAL",
-  "REGEX",
-  "STRING_LENGTH_MIN",
-  "STRING_LENGTH_MAX",
-  "NUMERIC_EQUAL_TO",
-  "STRING_CONTAINS_ANY",
-  "STRING_CONTAINS_ALL",
-  "NUMERIC_GREATER_THAN",
-  "NUMERIC_GREATER_EQUAL",
-  "NUMERIC_LESS_THAN",
-  "NUMERIC_LESS_EQUAL",
-  "NUMERIC_MIN",
-  "NUMERIC_MAX",
-  "IS_TYPE",
-];
-
-export const nArgTypes: (keyof typeof DetectiveType)[] = [
-  "STRING_LENGTH_RANGE",
-  "NUMERIC_RANGE",
-];
+import { nArgTypes, oneArgTypes } from "root/components/pipeline/pipeline.ts";
 
 export const argTypes = [...oneArgTypes, ...nArgTypes];
 

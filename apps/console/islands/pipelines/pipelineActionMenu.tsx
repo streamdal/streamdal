@@ -2,12 +2,12 @@ import { useEffect, useState } from "preact/hooks";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import IconPlayerPlay from "tabler-icons/tsx/player-play.tsx";
-import { opModal } from "../components/serviceMap/opModalSignal.ts";
-import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { audienceKey } from "../lib/utils.ts";
+import { opModal } from "root/components/serviceMap/opModalSignal.ts";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
+import { audienceKey } from "root/lib/utils.ts";
 
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
+import { serviceSignal } from "root/components/serviceMap/serviceSignal.ts";
 
 const AttachDetach = (
   { pipeline, attached }: { pipeline: Pipeline; attached: boolean },

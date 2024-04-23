@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
-import Pipelines from "../../islands/pipelines.tsx";
+import Pipelines from "root/islands/pipelines/pipelines.tsx";
 import { getNotifications, getPipelines } from "../../lib/fetch.ts";
 import { SuccessType } from "../_middleware.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
