@@ -10,9 +10,8 @@ Streamdal server configurations.
 
 ### Install
 
-```bash
-# For streamdal server
-helm install streamdal streamdal/streamdal-server
+```bash 
+helm install sd streamdal/streamdal-operator
 ```
 
 ### Verify Install
@@ -30,14 +29,20 @@ helm install streamdal streamdal/streamdal-server
     ```
  1. Verify that operator is running
     ```bash
-    kubectl get pods -n operator-system
+    kubectl get pods
     ```
     
     Output should look like this:
     
     ```bash
-    NAME                                           READY   STATUS    RESTARTS   AGE
-    operator-controller-manager-5cd6c64d9b-vgsf2   2/2     Running   0          47h
+    NAME                                     READY   STATUS    RESTARTS   AGE
+    op-streamdal-operator-5cd6c64d9b-vgsf2   2/2     Running   0          47h
     ```
 
 For additional info, follow the [Streamdal operator README](../../../../apps/operator).
+
+## Misc
+
+To test changes in the helm chart:
+
+`helm install myrelease ./ --debug`

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "streamdal-operator.fullname" . }}-controller-manager
+  name: {{ include "streamdal-operator.fullname" . }}
   labels:
     app.kubernetes.io/component: manager
     app.kubernetes.io/created-by: operator

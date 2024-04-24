@@ -10,8 +10,7 @@ Helm chart used for installing a Streamdal server + Console on K8S.
 ### Install
 
 ```bash
-# For streamdal server
-helm install streamdal streamdal/streamdal-server
+helm install sd streamdal/streamdal-server
 ```
 
 ### View console
