@@ -192,9 +192,9 @@ $(HELMIFY): $(LOCALBIN)
 
 helm: manifests kustomize helmify
 	$(KUSTOMIZE) build config/default | $(HELMIFY) streamdal-operator
-	rm -rf ../../helm/charts/streamdal-operator
-	mv -f streamdal-operator ../../helm/charts/
-	@echo "Helm chart is ready at ../../helm/charts/streamdal-operator -- make sure to bump versions!"
+	rm -rf ../../docs/install/helm/streamdal-operator
+	mv -f streamdal-operator ../../docs/install/helm/
+	@echo "Helm chart is ready at ../../docs/install/helm/streamdal-operator -- make sure to bump versions!"
 
 # go-install-tool will 'go install' any package with custom target and name of binary, if it doesn't exist
 # $1 - target path with name of binary (ideally with version)
