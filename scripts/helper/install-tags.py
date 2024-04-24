@@ -8,7 +8,8 @@ ecs_private_yaml = '../../docs/install/ecs/ecs-private.yml'
 ecs_public_yaml = '../../docs/install/ecs/ecs-public.yml'
 deployment_yaml = '../../docs/install/helm/streamdal-server/templates/streamdal-console-deployment.yaml'
 docker_compose_yaml = '../../docs/install/docker/docker-compose.yml'
-chart_yaml = '../../docs/install/helm/streamdal-server/Chart.yaml'
+server_chart_yaml = '../../docs/install/helm/streamdal-server/Chart.yaml'
+operator_chart_yaml = '../../docs/install/helm/streamdal-operator/Chart.yaml'
 
 def get_latest_tag(repository):
     try:
@@ -61,6 +62,8 @@ def increment_chart_version(file_path):
     with open(file_path, 'w') as file:
         file.write(new_version)
 
+    return new_version
+
 if __name__ == "__main__":
     server_tag = get_latest_tag('server')
     console_tag = get_latest_tag('console')
@@ -83,5 +86,8 @@ if __name__ == "__main__":
         update_ecs_yml(ecs_public_yaml, server_tag, console_tag)
         print(f"Updated server and console image tags in {ecs_private_yaml} and {ecs_public_yaml} to {server_tag} and {console_tag}")
 
-    increment_chart_version(chart_yaml)
-    print(f"Incremented Helm chart version in {chart_yaml}")
+    server_new_version = increment_chart_version(server_chart_yaml)
+    print(f"Updated server Helm chart version in {server_chart_yaml} to {server_new_version}")
+
+    operator_new_version = increment_chart_version(operator_chart_yaml)
+    print(f"Updated operator Helm chart version in {operator_chart_yaml} to {operator_new_version}")
