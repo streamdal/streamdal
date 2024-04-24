@@ -1,0 +1,522 @@
+# This file contains rules used by Streamdal's WASM PII detection engine.
+#
+# The section identifier in [] is the entity name - all the keys in the section
+# belong to that entity. The entity is used *primarily* for reporting.
+#
+# The number after the key indicates the "score" / "confidence" % for that key name.
+# The score is used to determine the likelihood of the key being PII.
+#
+# The keyname MUST be unique. This is done so that we can perform fast lookups
+# and retain O(1) complexity.
+#
+# Keynames can be prefixed with a path. Path-based lookups are performed AFTER
+# regular keyname lookups. Keys with paths are most useful when you have a
+# generic keyname (such as "zip") - that could be used in multiple context like
+# billing, shipping, credit card, etc.
+
+[IP_Information]
+ip = 100
+addr = 100
+ip_address = 100
+ipv4_address = 100
+ipv6_address = 100
+ip_address_v4 = 100
+ip_address_v6 = 100
+ip_addr = 100
+ipv4_addr = 100
+ipv6_addr = 100
+
+[Device]
+mac_address = 100
+mac_addr = 100
+hardware_id = 100
+device_id = 100
+serial_number = 100
+
+[HTTP]
+basic_auth = 100
+cookie = 75
+set_cookie = 75
+user_agent = 100
+session_id = 100
+x_forwarded_for = 100
+
+[Credentials]
+api_key = 100
+api_secret = 100
+api_token = 100
+secret = 100
+login = 100
+user = 100
+user_id = 100
+username = 100
+password = 100
+pass = 100
+passwd = 100
+registration = 100
+bearer = 100
+token = 100
+auth = 100
+authorization = 100
+auth_token = 100
+bearer_token = 100
+oauth_token = 100
+
+[Person]
+first_name = 100
+f_name = 100
+l_name = 100
+first = 50
+last = 50
+surname = 75
+age = 50
+dob = 100
+birthday = 100
+birth_date = 100
+birthdate = 100
+race = 20
+gender = 80
+salary = 100
+religion = 100
+ethnicity = 100
+email = 100
+email_address = 100
+ssn = 100
+social_security = 100
+social_security_number = 100
+drivers_license = 100
+passport = 100
+passport_id = 100
+nationality = 100
+phone_number = 80
+phone = 75
+work_number = 80
+home_number = 80
+biometric = 100
+
+[Address]
+home_address = 100
+work_address = 100
+billing_address = 100
+shipping_address = 100
+address = 80
+street = 70
+city = 70
+state = 70
+zip = 50
+zipcode = 70
+zip_code = 70
+postal_code = 75
+country = 80
+country_code = 80
+po_box = 75
+pobox = 75
+
+[SSH]
+ssh_key = 100
+rsa_key = 100
+dss_key = 100
+rsa = 100
+dss = 100
+authorized_keys = 100
+"ssh.key" = 100
+"openssh.key" = 100
+
+[AWS]
+aws_access_key_id = 100
+aws_secret_access_key = 100
+aws_access_key = 100
+aws_secret_key = 100
+aws_access = 100
+aws_secret = 100
+set-awscredential = 100
+"aws.key" = 100
+"aws.access" = 100
+"aws.secret" = 100
+"aws.region" = 100
+"amazon.key" = 100
+"amazon.access" = 100
+"amazon.secret" = 100
+"amz.key" = 100
+"amz.access" = 100
+"amz.secret" = 100
+"credentials.key" = 100
+"credentials.access" = 100
+"credentials.secret" = 100
+"creds.key" = 100
+"creds.access" = 100
+"creds.secret" = 100
+
+[Dynatrace]
+dynatrace_token = 100
+dynatrace_auth = 100
+"dynatrace.token" = 100
+"dynatrace.auth" = 100
+
+[NewRelic]
+newrelic_token = 100
+newrelic_auth = 100
+"newrelic.token" = 100
+"newrelic.auth" = 100
+
+[Facebook]
+"facebook.token" = 100
+"facebook.auth" = 100
+"facebook.user" = 100
+"facebook.pass" = 100
+"facebook.username" = 100
+"facebook.password" = 100
+"fb.token" = 100
+"fb.auth" = 100
+"fb.user" = 100
+"fb.pass" = 100
+"fb.username" = 100
+"fb.password" = 100
+
+[Instagram]
+"instagram.token" = 100
+"instagram.auth" = 100
+"instagram.user" = 100
+"instagram.pass" = 100
+"instagram.username" = 100
+"instagram.password" = 100
+
+[Twitter]
+twitter.token = 100
+twitter.auth = 100
+twitter.user = 100
+twitter.pass = 100
+twitter.username = 100
+twitter.password = 100
+
+[X]
+"x.token" = 100
+"x.auth" = 100
+"x.user" = 100
+"x.pass" = 100
+"x.username" = 100
+"x.password" = 100
+
+[Discord]
+discord_token = 100
+discord_secret = 100
+"discord.api_key" = 100
+"discord.oauth_token" = 100
+"discord.access_token" = 100
+"discord.client_id" = 100
+"discord.client_secret" = 100
+"discord.secret" = 100
+"discord.auth" = 100
+"discord.token" = 100
+
+[Billing]
+credit_card = 100
+debit_card = 100
+creditcard = 100
+debitcard = 100
+card_number = 100
+credit_card_number = 100
+debit_card_number = 100
+cc_number = 100
+cc_num = 100
+cc = 100
+cvv = 100
+cvv2 = 100
+cardSecurityCode = 100
+vcode = 100
+cvc = 100
+cvc2 = 100
+
+[GCP]
+gcp_token = 100
+gcp_key = 100
+project_id = 100
+gcp_credentials = 100
+"gcp.token" = 100
+"gcp.key" = 100
+"gcp.credentials" = 100
+"gcp.auth" = 100
+"gcp.token.auth" = 100
+
+[Azure]
+azure_key = 100
+azure_secret = 100
+tenant_id = 100
+subscription_id = 100
+azure.key = 100
+azure.secret = 100
+azure.tenant_id = 100
+azure.subscription_id = 100
+azure.auth = 100
+azure.token = 100
+
+[Heroku]
+heroku_api_key = 100
+heroku_app_id = 100
+heroku_secret_key = 100
+"heroku.api_key" = 100
+"heroku.app_id" = 100
+"heroku.auth" = 100
+"heroku.token" = 100
+"heroku.secret_key" = 100
+
+[DigitalOcean]
+do_api_key = 100
+do_project_id = 100
+"digitalocean.api_key" = 100
+"digitalocean.project_id" = 100
+"digitalocean.auth" = 100
+"digitalocean.token" = 100
+
+[Google]
+google_api_key = 100
+google_oauth_token = 100
+"google.api_key" = 100
+"google.oauth_token" = 100
+"google.auth" = 100
+"google.token" = 100
+
+[LinkedIn]
+linkedin_token = 100
+"linkedin.token" = 100
+"linkedin.auth" = 100
+
+[Slack]
+slack_token = 100
+slack_secret = 100
+"slack.api_key" = 100
+"slack.oauth_token" = 100
+"slack.access_token" = 100
+"slack.client_id" = 100
+"slack.client_secret" = 100
+"slack.auth" = 100
+"slack.token" = 100
+
+[Databricks]
+databricks_token = 100
+"databricks.token" = 100
+"databricks.auth" = 100
+
+[Twilio]
+twilio_key = 100
+twilio_secret = 100
+"twilio.key" = 100
+"twilio.secret" = 100
+"twilio.auth" = 100
+"twilio.token" = 100
+
+[Digital_Ocean]
+digitalocean_access_key = 100
+"digital_ocean.access_key" = 100
+"digital_ocean.auth" = 100
+"digital_ocean.token" = 100
+
+[Sendgrid]
+sendgrid_api_key = 100
+"sendgrid.api_key" = 100
+"sendgrid.auth" = 100
+"sendgrid.token" = 100
+
+[Github]
+github_token = 100
+github_secret = 100
+"github.api_key" = 100
+"github.oauth_token" = 100
+"github.access_token" = 100
+"github.client_id" = 100
+"github.client_secret" = 100
+"github.auth" = 100
+"github.token" = 100
+
+[Gitlab]
+gitlab_token = 100
+gitlab_secret = 100
+"gitlab.token" = 100
+"gitlab.secret" = 100
+"gitlab.auth" = 100
+
+[Okta]
+okta_api_key = 100
+"okta.api_key" = 100
+"okta.auth" = 100
+"okta.token" = 100
+"okta.secret" = 100
+
+[Stripe]
+stripe_key = 100
+stripe_secret = 100
+"stripe.key" = 100
+"stripe.secret" = 100
+"stripe.auth" = 100
+"stripe.token" = 100
+"stripe.api_key" = 100
+
+[Paypal]
+paypal_client_id = 100
+paypal_secret = 100
+"paypal.client_id" = 100
+"paypal.secret" = 100
+"paypal.auth" = 100
+"paypal.token" = 100
+"paypal.api_key" = 100
+
+[Ebay]
+ebay_api_key = 100
+ebay_token = 100
+"ebay.token" = 100
+"ebay.auth" = 100
+"ebay.api_key" = 100
+
+[Recharge]
+recharge_access_token = 100
+"recharge.access_token" = 100
+"recharge.auth" = 100
+"recharge.token" = 100
+"recharge.api_key" = 100
+
+[Shopify]
+shopify_api_key = 100
+shopify_access_token = 100
+"shopify.auth" = 100
+"shopify.token" = 100
+"shopify.api_key" = 100
+
+[Figma]
+figma_token = 100
+"figma.token" = 100
+"figma.auth" = 100
+
+[Mailgun]
+mailgun_api_key = 100
+"mailgun.api_key" = 100
+"mailgun.auth" = 100
+"mailgun.token" = 100
+
+[Mailchimp]
+mailchimp_api_key = 100
+"mailchimp.api_key" = 100
+"mailchimp.auth" = 100
+"mailchimp.token" = 100
+
+[Microsoft_Office365]
+office365_key = 100
+office365_token = 100
+office365_client_id = 100
+"office365.secret" = 100
+"office365.auth" = 100
+"office365.api_key" = 100
+
+[Apple_ID]
+apple_id = 100
+apple_id_token = 100
+apple_id_email = 100
+apple_id_auth = 100
+"apple.id" = 100
+"apple.auth" = 100
+"apple.email" = 100
+"apple.user" = 100
+"apple.pass" = 100
+"apple.username" = 100
+"apple.password" = 100
+
+[Google_Cloud_Messaging]
+gcm_key = 100
+firebase_key = 100
+gcm_token = 100
+"gcm.key" = 100
+"gcm.token" = 100
+"gcm.secret" = 100
+
+[Payment_Processors]
+square_token = 100
+square_key = 100
+square_auth = 100
+adyen_key = 100
+adyen_auth = 100
+adyen_token = 100
+braintree_key = 100
+braintree_token = 100
+braintree_auth = 100
+payment_processor_auth = 100
+processor_id = 100
+
+[HIPAA]
+patient_id = 100
+medical_record_number = 100
+health_insurance_info = 100
+insurance_id = 100
+insurance_policy_number = 100
+policy_id = 100
+healthcare_provider = 100
+healthcare_provider_id = 100
+provider_id = 100
+
+[FERPA]
+student_id = 100
+education_records = 100
+
+[Legal_Documents]
+case_number = 100
+docket_number = 100
+legal_document_id = 100
+document_id = 100
+signature = 100
+
+[Banking_and_Financial]
+bank_name = 100
+bank_account_number = 100
+bank_routing_number = 100
+iban = 100
+swift_code = 100
+account_number = 100
+routing_number = 100
+pin = 50
+pin_code = 100
+pin_number = 100
+
+[Vehicle_Information]
+driver_license_number = 100
+vehicle_registration_number = 100
+license_plate = 100
+
+[Telecommunications]
+carrier_name = 100
+phone_number = 100
+phone_num = 100
+mobile_number = 100
+mobile_num = 100
+landline_number = 100
+telecom_account_id = 100
+imei = 100
+imsi = 100
+
+[Geographic]
+latitude = 100
+longitude = 100
+lat = 70
+lon = 70
+coordinates = 100
+gps = 100
+
+[Encryption]
+# PGP keys, used for secure communication
+pgp_public_key = 100
+pgp_private_key = 100
+pgp_key_id = 100
+pgp_fingerprint = 100
+"pgp.key" = 100
+"pgp.fingerprint" = 100
+"pgp.id" = 100
+"pgp.private_key" = 100
+"pgp.private" = 100
+"pgp.public" = 100
+
+# General encryption keys
+encryption_key = 100
+private_key = 100
+public_key = 100
+
+# Cryptographic tokens and certificates
+certificate = 100
+ssl_cert = 100
+tls_cert = 100
