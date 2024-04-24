@@ -20,3 +20,17 @@ helm repo add streamdal https://streamdal.github.io/streamdal/helm-packages
 ```bash
 helm repo update
 ```
+
+### Verify Streamdal repo
+
+```bash
+helm search repo streamdal
+```
+
+You should see something like:
+
+```bash
+NAME                        	CHART VERSION	APP VERSION	DESCRIPTION
+streamdal/streamdal-operator	0.1.0        	0.1.0      	A Helm chart for Kubernetes
+streamdal/streamdal-server  	0.1.54       	0.0.4      	A Helm chart for Kubernetes
+```
