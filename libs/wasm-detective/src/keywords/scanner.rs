@@ -11,8 +11,6 @@ pub struct KeywordMatch {
     pub entity: String,
 }
 
-// TODO: implement new on KeywordMatch
-
 #[derive(Debug, Clone)]
 pub struct Field {
     pub parent_path: Vec<String>,
