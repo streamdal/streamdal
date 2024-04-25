@@ -49,7 +49,7 @@ impl Detective {
         }
     }
 
-    fn matches_keyword(&self, request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
+    pub fn matches_keyword(request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         let data_as_str = str::from_utf8(request.data)
             .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
@@ -57,20 +57,20 @@ impl Detective {
         let mut scanner = FieldPII::new(kw);
         let results = scanner.scan(data_as_str);
 
-        Ok(self.matches_keyword_results(results))
+        Ok(Self::matches_keyword_results(results))
     }
 
     /// Recurse through results of the keyword matcher and return Vec<DetectiveStepResultMatch>
     /// This is needed to keep the output from the keyword matcher verbose for future needs,
     /// but flatten things, so we can use them in an InterStepResult message
-    fn matches_keyword_results(&self, results: Vec<Field>) -> Vec::<DetectiveStepResultMatch> {
+    fn matches_keyword_results(results: Vec<Field>) -> Vec<DetectiveStepResultMatch> {
         let mut isr: Vec<DetectiveStepResultMatch> = Vec::<DetectiveStepResultMatch>::new();
 
         for field in results {
             // Add any PII matches from this field
             for pii_match in field.pii_matches {
                 let result = DetectiveStepResultMatch {
-                    type_: protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_KEYWORD),
+                    type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_KEYWORD),
                     path: pii_match.path.clone(),
                     value: pii_match.value.into_bytes(),
                     pii_type: pii_match.entity.clone(),
@@ -80,7 +80,7 @@ impl Detective {
                 isr.push(result)
             }
 
-            isr.append(&mut self.matches_keyword_results(field.children));
+            isr.append(&mut Self::matches_keyword_results(field.children));
         }
 
         isr
@@ -92,7 +92,7 @@ impl Detective {
     ) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         if request.match_type == DetectiveType::DETECTIVE_TYPE_PII_KEYWORD {
             // Recurse through keyword results
-            return self.matches_keyword(request)
+            return Self::matches_keyword(request)
         }
 
 
@@ -208,7 +208,7 @@ impl Detective {
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                         path: request.path.clone(),
                         value: field.str().to_owned().into_bytes(),
-                        pii_type: pii_type,
+                        pii_type,
                         ..Default::default()
                     };
 
@@ -372,7 +372,7 @@ fn recurse_field(
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                         path: path.join("."),
                         value: val.str().to_owned().into_bytes(),
-                        pii_type: pii_type,
+                        pii_type,
                         ..Default::default()
                     };
 

@@ -65,7 +65,7 @@ impl FieldPII {
         let mut partial_match_against = HashMap::new();
         let mut match_against = HashMap::new();
         for (key_name, def) in keywords {
-            if key_name.contains(".") {
+            if key_name.contains('.') {
                 // format!() is a bit of a hit over all the keywords every time, so let's precompute
                 let suffix = format!(".{}", key_name);
                 partial_match_against.insert(suffix, def.clone());
@@ -82,9 +82,7 @@ impl FieldPII {
 
     pub fn scan(&mut self, payload: &str) -> Vec<Field> {
         let parsed = gjson::parse(payload);
-        let fields = self.recurse_payload(parsed, vec![]);
-
-        fields
+        self.recurse_payload(parsed, vec![])
     }
 
     /// Recursively scan a JSON payload for PII based by matching keywords with the JSON
@@ -94,7 +92,7 @@ impl FieldPII {
 
         current.each(|key, value| {
             let mut key_str = key.to_string();
-            if key_str.len() == 0 {
+            if key_str.is_empty() {
                 // # indicates we're inside-of an array. This is gjson's syntax.
                 key_str = "#".to_string();
             }
@@ -248,7 +246,7 @@ impl FieldPII {
 /// Iterate over fields and print all PII matches.
 /// Used for debugging
 #[allow(dead_code)]
-pub fn print_paths(fields: &Vec<Field>) {
+pub fn print_paths(fields: &[Field]) {
     fields.iter().for_each(|f| {
         f.pii_matches.iter().for_each(|m| {
             println!("{:#?}", m);
