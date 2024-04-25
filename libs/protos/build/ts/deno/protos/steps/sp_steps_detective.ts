@@ -57,6 +57,14 @@ export interface DetectiveStepResultMatch {
      * @generated from protobuf field: bytes value = 5;
      */
     value: Uint8Array;
+    /**
+     * Used to return the type of PII we detected.
+     * This differs from `type` in that it is the type of PII we detected, not the type of match we used to detect it.
+     * This value is freeform and determined based on the values inside the keyword matcher.
+     *
+     * @generated from protobuf field: string pii_type = 6;
+     */
+    piiType: string;
 }
 /**
  * @generated from protobuf message protos.steps.DetectiveStepResult
@@ -344,6 +352,12 @@ export enum DetectiveType {
      */
     PII_BEARER_TOKEN = 2035,
     /**
+     * Uses field/path keyword matching to detect PII, rather than the field's value
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD = 2036;
+     */
+    PII_KEYWORD = 2036,
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     NUMERIC_EQUAL_TO = 3000,
@@ -450,11 +464,12 @@ class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch
         super("protos.steps.DetectiveStepResultMatch", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] },
             { no: 2, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 6, name: "pii_type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<DetectiveStepResultMatch>): DetectiveStepResultMatch {
-        const message = { type: 0, path: "", value: new Uint8Array(0) };
+        const message = { type: 0, path: "", value: new Uint8Array(0), piiType: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<DetectiveStepResultMatch>(this, message, value);
@@ -473,6 +488,9 @@ class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch
                     break;
                 case /* bytes value */ 5:
                     message.value = reader.bytes();
+                    break;
+                case /* string pii_type */ 6:
+                    message.piiType = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -495,6 +513,9 @@ class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch
         /* bytes value = 5; */
         if (message.value.length)
             writer.tag(5, WireType.LengthDelimited).bytes(message.value);
+        /* string pii_type = 6; */
+        if (message.piiType !== "")
+            writer.tag(6, WireType.LengthDelimited).string(message.piiType);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
