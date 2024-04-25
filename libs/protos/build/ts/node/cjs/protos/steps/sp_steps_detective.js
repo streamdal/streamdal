@@ -284,6 +284,12 @@ var DetectiveType;
      */
     DetectiveType[DetectiveType["PII_BEARER_TOKEN"] = 2035] = "PII_BEARER_TOKEN";
     /**
+     * Uses field/path keyword matching to detect PII, rather than the field's value
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD = 2036;
+     */
+    DetectiveType[DetectiveType["PII_KEYWORD"] = 2036] = "PII_KEYWORD";
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     DetectiveType[DetectiveType["NUMERIC_EQUAL_TO"] = 3000] = "NUMERIC_EQUAL_TO";
@@ -390,11 +396,12 @@ class DetectiveStepResultMatch$Type extends runtime_5.MessageType {
         super("protos.steps.DetectiveStepResultMatch", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] },
             { no: 2, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 6, name: "pii_type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0, path: "", value: new Uint8Array(0) };
+        const message = { type: 0, path: "", value: new Uint8Array(0), piiType: "" };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -413,6 +420,9 @@ class DetectiveStepResultMatch$Type extends runtime_5.MessageType {
                     break;
                 case /* bytes value */ 5:
                     message.value = reader.bytes();
+                    break;
+                case /* string pii_type */ 6:
+                    message.piiType = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -435,6 +445,9 @@ class DetectiveStepResultMatch$Type extends runtime_5.MessageType {
         /* bytes value = 5; */
         if (message.value.length)
             writer.tag(5, runtime_1.WireType.LengthDelimited).bytes(message.value);
+        /* string pii_type = 6; */
+        if (message.piiType !== "")
+            writer.tag(6, runtime_1.WireType.LengthDelimited).string(message.piiType);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -45,6 +45,14 @@ export interface DetectiveStepResultMatch {
      * @generated from protobuf field: bytes value = 5;
      */
     value: Uint8Array;
+    /**
+     * Used to return the type of PII we detected.
+     * This differs from `type` in that it is the type of PII we detected, not the type of match we used to detect it.
+     * This value is freeform and determined based on the values inside the keyword matcher.
+     *
+     * @generated from protobuf field: string pii_type = 6;
+     */
+    piiType: string;
 }
 /**
  * @generated from protobuf message protos.steps.DetectiveStepResult
@@ -331,6 +339,12 @@ export declare enum DetectiveType {
      * @generated from protobuf enum value: DETECTIVE_TYPE_PII_BEARER_TOKEN = 2035;
      */
     PII_BEARER_TOKEN = 2035,
+    /**
+     * Uses field/path keyword matching to detect PII, rather than the field's value
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD = 2036;
+     */
+    PII_KEYWORD = 2036,
     /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
