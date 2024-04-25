@@ -85,8 +85,33 @@ fn run_payload(b: &mut Bencher, size: usize) {
 }
 
 #[bench]
-fn bench_standard_pii(b: &mut Bencher) {
-    let payload = fs::read_to_string("assets/test-payload.json").unwrap();
+fn bench_standard_pii_small(b: &mut Bencher) {
+    let payload = fs::read_to_string("assets/test-payloads/small.json").unwrap();
+    let str_payload = payload.as_str();
+    let keywords = get_keywords();
+
+    b.iter(|| {
+        let mut pii = FieldPII::new(keywords.clone());
+        let _ = pii.scan(str_payload);
+    });
+}
+
+#[bench]
+fn bench_standard_pii_medium(b: &mut Bencher) {
+    let payload = fs::read_to_string("assets/test-payloads/medium.json").unwrap();
+    let str_payload = payload.as_str();
+    let keywords = get_keywords();
+
+    b.iter(|| {
+        let mut pii = FieldPII::new(keywords.clone());
+        let _ = pii.scan(str_payload);
+    });
+}
+
+
+#[bench]
+fn bench_standard_pii_large(b: &mut Bencher) {
+    let payload = fs::read_to_string("assets/test-payloads/large.json").unwrap();
     let str_payload = payload.as_str();
     let keywords = get_keywords();
 
