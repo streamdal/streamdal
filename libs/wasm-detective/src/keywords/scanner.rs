@@ -18,7 +18,6 @@ pub struct Field {
     pub key_name: String,
     pub value: String,
     pub pii_matches: Vec<KeywordMatch>,
-    pub json_type: gjson::Kind,
     pub confidence: f32,
 }
 
@@ -100,7 +99,6 @@ impl FieldPII {
             let mut f = Field {
                 key_name: key_str.clone(),
                 parent_path: parent.clone(),
-                json_type: value.kind(),
                 value: "".to_string(),
                 pii_matches: Vec::new(),
                 children: Vec::new(),
