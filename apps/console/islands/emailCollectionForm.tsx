@@ -21,8 +21,14 @@ export const EmailCollectionForm = () => {
 
   return (
     <div class="w-screen h-screen flex flex-col justify-center align-top items-center bg-login bg-cover bg-center  bg-no-repeat">
+      {
+        //
+        // Disabling partial nav here as downstream redirects don't work with fresh.
+        // Roundabout typecast as deno/fresh does not permit a straightforward f-client-nav="false"
+      }
       <div
         class={"rounded-xl px-6 py-10 items-center bg-white w-[400px] rounded-xl px-6 py-10 items-center bg-white w-[400px]"}
+        f-client-nav={"false" as unknown as boolean}
       >
         <form
           method="post"

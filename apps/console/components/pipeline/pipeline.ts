@@ -185,7 +185,9 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       })
       .superRefine((detective, ctx) => {
         if (
-          ["HAS_FIELD", "IS_TYPE"].includes(DetectiveType[detective.type]) &&
+          ["HAS_FIELD", "IS_TYPE", "IS_EMPTY"].includes(
+            DetectiveType[detective.type],
+          ) &&
           detective.path === ""
         ) {
           ctx.addIssue({

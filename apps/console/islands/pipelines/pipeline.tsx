@@ -140,7 +140,10 @@ export default function PipelineDetail({
   };
 
   return (
-    <>
+    //
+    // Disabling partial nav here as downstream redirects don't work with fresh.
+    // Roundabout typecast as deno/fresh does not permit a straightforward f-client-nav="false"
+    <div f-client-nav={"false" as unknown as boolean}>
       <form onSubmit={onSubmit} action="/pipelines/save" method="post">
         <div class="flex items-center justify-between rounded-t px-[18px] pb-[8px] pt-[18px]">
           <div class="flex flex-row items-center">
@@ -158,7 +161,7 @@ export default function PipelineDetail({
             </div>
             <PipelineMenu id={pipeline?.id} />
           </div>
-          <div class="ml-2">
+          <div class="ml-2" f-client-nav>
             <a href="/" f-partial="/partials">
               <IconX class="w-6 h-6 pointer-events-none" />
             </a>
@@ -411,6 +414,6 @@ export default function PipelineDetail({
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 }
