@@ -88,7 +88,6 @@ drivers_license = 100
 passport = 100
 passport_id = 100
 nationality = 100
-phone_number = 80
 phone = 75
 work_number = 80
 home_number = 80
