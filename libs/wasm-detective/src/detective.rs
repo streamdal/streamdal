@@ -4,10 +4,14 @@ use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
 use crate::matcher_pii_payments as pii_payments;
 use crate::matcher_pii_cloud as pii_cloud;
+use crate::matcher_pii_keywords as pii_keywords;
 use streamdal_gjson as gjson;
 
 use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType};
 use std::str;
+use protobuf::EnumFull;
+use crate::keywords::config::get_keywords;
+use crate::keywords::scanner::{Field, FieldPII};
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
@@ -45,10 +49,53 @@ impl Detective {
         }
     }
 
+    pub fn matches_keyword(request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
+        let data_as_str = str::from_utf8(request.data)
+            .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
+
+        let kw = get_keywords();
+        let mut scanner = FieldPII::new(kw);
+        let results = scanner.scan(data_as_str);
+
+        Ok(Self::matches_keyword_results(results))
+    }
+
+    /// Recurse through results of the keyword matcher and return Vec<DetectiveStepResultMatch>
+    /// This is needed to keep the output from the keyword matcher verbose for future needs,
+    /// but flatten things, so we can use them in an InterStepResult message
+    fn matches_keyword_results(results: Vec<Field>) -> Vec<DetectiveStepResultMatch> {
+        let mut isr: Vec<DetectiveStepResultMatch> = Vec::<DetectiveStepResultMatch>::new();
+
+        for field in results {
+            // Add any PII matches from this field
+            for pii_match in field.pii_matches {
+                let result = DetectiveStepResultMatch {
+                    type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_KEYWORD),
+                    path: pii_match.path.clone(),
+                    value: pii_match.value.into_bytes(),
+                    pii_type: pii_match.entity.clone(),
+                    special_fields: Default::default(),
+                };
+
+                isr.push(result)
+            }
+
+            isr.append(&mut Self::matches_keyword_results(field.children));
+        }
+
+        isr
+    }
+
     pub fn matches_payload(
         &self,
         request: &Request,
     ) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
+        if request.match_type == DetectiveType::DETECTIVE_TYPE_PII_KEYWORD {
+            // Recurse through keyword results
+            return Self::matches_keyword(request)
+        }
+
+
         let data_as_str = str::from_utf8(request.data)
             .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
@@ -88,6 +135,12 @@ impl Detective {
 
         let f = Detective::get_matcher_func(request)?;
 
+        let pii_type = request.match_type
+            .descriptor()
+            .name()
+            .replace("DETECTIVE_TYPE_", "")
+            .to_lowercase();
+
         // Don't iterate over these types
         let ignore_array: Vec<DetectiveType> = vec![
             DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
@@ -105,6 +158,7 @@ impl Detective {
                             type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                             path: request.path.clone(),
                             value: field.str().to_owned().into_bytes(),
+                            pii_type: pii_type.clone(),
                             special_fields: Default::default(),
                         };
 
@@ -129,6 +183,7 @@ impl Detective {
                             type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                             path: request.path.clone(),
                             value: field.str().to_owned().into_bytes(),
+                            pii_type: pii_type.clone(),
                             special_fields: Default::default(),
                         };
 
@@ -153,7 +208,8 @@ impl Detective {
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                         path: request.path.clone(),
                         value: field.str().to_owned().into_bytes(),
-                        special_fields: Default::default(),
+                        pii_type,
+                        ..Default::default()
                     };
 
                     return Ok(vec![result]);
@@ -237,6 +293,7 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN => pii_cloud::docker_swarm_token,
             DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN => pii::bearer_token,
             DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING => pii_cloud::azure_sql_connection_string,
+            DetectiveType::DETECTIVE_TYPE_PII_KEYWORD => pii_keywords::keywords,
             DetectiveType::DETECTIVE_TYPE_UNKNOWN => {
                 return Err(CustomError::Error(
                     "match type cannot be unknown".to_string(),
@@ -304,11 +361,19 @@ fn recurse_field(
 
             if let Ok(found) = f(request, v) {
                 if found {
+                    let pii_type = request.match_type
+                        .descriptor()
+                        .name()
+                        .to_string()
+                        .replace("DETECTIVE_TYPE_", "")
+                        .to_lowercase();
+
                     let result = DetectiveStepResultMatch {
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                         path: path.join("."),
                         value: val.str().to_owned().into_bytes(),
-                        special_fields: Default::default(),
+                        pii_type,
+                        ..Default::default()
                     };
 
                     res.push(result);
