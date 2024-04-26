@@ -1,21 +1,21 @@
-import { ConsumerIcon } from "../../components/icons/consumer.tsx";
-import { ProducerIcon } from "../../components/icons/producer.tsx";
-import { opModal } from "../../components/serviceMap/opModalSignal.ts";
-import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
+import { useSignalEffect } from "@preact/signals";
 import { useState } from "preact/hooks";
+import { tailSamplingSignal } from "root/components/tail/signals.ts";
+import { SchemaNav } from "root/islands/drawer/schemaNav.tsx";
+import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
+import IconEdit from "tabler-icons/tsx/edit.tsx";
+import { ConsumerIcon } from "../../components/icons/consumer.tsx";
+import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
+import { ProducerIcon } from "../../components/icons/producer.tsx";
+import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 import {
   ServiceSignal,
   serviceSignal,
 } from "../../components/serviceMap/serviceSignal.ts";
-import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
-import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
-import { Schema } from "./schema.tsx";
-import IconEdit from "tabler-icons/tsx/edit.tsx";
-import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { useSignalEffect } from "@preact/signals";
-import { tailSamplingSignal } from "root/components/tail/signals.ts";
-import { audienceKey } from "../../lib/utils.ts";
 import { tailRunningSignal } from "../../components/tail/signals.ts";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
+import { audienceKey } from "../../lib/utils.ts";
 
 export default function Operation(
   { serviceMap, audience }: { serviceMap: ServiceSignal; audience: Audience },
@@ -58,7 +58,7 @@ export default function Operation(
           >
             <h3 id="collapse-heading-1">
               <button
-                className="flex items-center w-full border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+                className="flex items-center w-full border-b border-violet-100 py-3 font-medium text-left text-web focus:ring-2"
                 onClick={() => setManagePipelines(!managePipelines)}
                 data-accordion-target="#collapse-body-1"
                 aria-expanded="true"
@@ -74,7 +74,7 @@ export default function Operation(
             </h3>
             <div
               id="collapse-body-1"
-              class={`p-2 border-b border-purple-100 ${
+              class={`p-2 border-b border-violet-100 ${
                 managePipelines ? "" : "hidden"
               }`}
               aria-labelledby="collapse-heading-1"
@@ -84,7 +84,7 @@ export default function Operation(
             <h3 id="collapse-heading-2">
               <button
                 type="button"
-                className={`flex items-center w-full border-y border-purple-100 py-3 font-medium text-left text-web`}
+                className={`flex items-center w-full border-y border-violet-100 py-3 font-medium text-left text-web`}
                 data-accordion-target="#collapse-body-2"
                 aria-expanded="true"
                 aria-controls="collapse-body-2"
@@ -97,7 +97,7 @@ export default function Operation(
             </h3>
             <div
               id="collapse-body-2"
-              class={`px-4 border-b border-purple-100 ${
+              class={`px-4 border-b border-violet-100 ${
                 tailNavOpen ? "" : "hidden"
               }`}
               aria-labelledby="collapse-heading-2"
@@ -154,7 +154,7 @@ export default function Operation(
             </div>
             <h3 id="collapse-heading-3">
               <button
-                className="flex items-center border-b border-purple-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
+                className="flex items-center border-b border-violet-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
                 data-accordion-target="#collapse-body-3"
                 aria-expanded="false"
                 aria-controls="collapse-body-3"
@@ -178,7 +178,7 @@ export default function Operation(
             </div>
             <h3 id="collapse-heading-4">
               <button
-                className="flex items-center w-full border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+                className="flex items-center w-full border-b border-violet-100 py-3 font-medium text-left text-web focus:ring-2"
                 data-accordion-target="#collapse-body-4"
                 aria-expanded="false"
                 aria-controls="collapse-body-4"
@@ -200,7 +200,7 @@ export default function Operation(
             </div>
             <h3 id="collapse-heading-5">
               <button
-                className="flex items-center w-full border-b border-purple-100 py-3 font-medium text-left text-web focus:ring-2"
+                className="flex items-center w-full border-b border-violet-100 py-3 font-medium text-left text-web focus:ring-2"
                 onClick={() => setSchemaNavOpen(!schemaNavOpen)}
                 data-accordion-target="#collapse-body-5"
                 aria-expanded="true"
@@ -220,7 +220,7 @@ export default function Operation(
                 aria-labelledby="collapse-heading-5"
                 class={"flex flex-col items-center justify-center px-4 pt-2"}
               >
-                <Schema audience={audience} />
+                <SchemaNav audience={audience} />
               </div>
             )}
           </div>

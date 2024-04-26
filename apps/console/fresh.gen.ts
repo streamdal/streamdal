@@ -29,6 +29,7 @@ import * as $pipelines_id_index from "./routes/pipelines/[id]/index.tsx";
 import * as $pipelines_add from "./routes/pipelines/add.tsx";
 import * as $pipelines_index from "./routes/pipelines/index.tsx";
 import * as $pipelines_save from "./routes/pipelines/save.tsx";
+import * as $schema_id_index from "./routes/schema/[id]/index.tsx";
 import * as $service_service_component_component_operationType_op_operationName_delete from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx";
 import * as $service_service_component_component_operationType_op_operationName_pipeline_id_attach from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx";
 import * as $service_service_component_component_operationType_op_operationName_pipeline_id_detach from "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/detach.tsx";
@@ -42,13 +43,13 @@ import * as $ws_demo_http_request from "./routes/ws/demo/http-request.tsx";
 import * as $ws_server_error from "./routes/ws/server-error.tsx";
 import * as $ws_service_map from "./routes/ws/service-map.tsx";
 import * as $ws_tail from "./routes/ws/tail.tsx";
+import * as $audienceModals from "./islands/audienceModals.tsx";
 import * as $demo_http_request from "./islands/demo/http-request.tsx";
 import * as $drawer_component from "./islands/drawer/component.tsx";
 import * as $drawer_infoDrawer from "./islands/drawer/infoDrawer.tsx";
 import * as $drawer_operation from "./islands/drawer/operation.tsx";
-import * as $drawer_schema from "./islands/drawer/schema.tsx";
+import * as $drawer_schemaNav from "./islands/drawer/schemaNav.tsx";
 import * as $drawer_service from "./islands/drawer/service.tsx";
-import * as $drawer_tail from "./islands/drawer/tail.tsx";
 import * as $emailCollectionForm from "./islands/emailCollectionForm.tsx";
 import * as $nav from "./islands/nav.tsx";
 import * as $notification from "./islands/notification.tsx";
@@ -63,8 +64,11 @@ import * as $pipelines_stepCondition from "./islands/pipelines/stepCondition.tsx
 import * as $pipelines_stepConditions from "./islands/pipelines/stepConditions.tsx";
 import * as $pipelines_stepNotification from "./islands/pipelines/stepNotification.tsx";
 import * as $pipelines_stepNotifications from "./islands/pipelines/stepNotifications.tsx";
+import * as $schema from "./islands/schema.tsx";
 import * as $serviceDisplay from "./islands/serviceDisplay.tsx";
+import * as $serviceModals from "./islands/serviceModals.tsx";
 import * as $sockets from "./islands/sockets.tsx";
+import * as $tail from "./islands/tail.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -97,6 +101,7 @@ const manifest = {
     "./routes/pipelines/add.tsx": $pipelines_add,
     "./routes/pipelines/index.tsx": $pipelines_index,
     "./routes/pipelines/save.tsx": $pipelines_save,
+    "./routes/schema/[id]/index.tsx": $schema_id_index,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/delete.tsx":
       $service_service_component_component_operationType_op_operationName_delete,
     "./routes/service/[service]/component/[component]/[operationType]/op/[operationName]/pipeline/[id]/attach.tsx":
@@ -118,13 +123,13 @@ const manifest = {
     "./routes/ws/tail.tsx": $ws_tail,
   },
   islands: {
+    "./islands/audienceModals.tsx": $audienceModals,
     "./islands/demo/http-request.tsx": $demo_http_request,
     "./islands/drawer/component.tsx": $drawer_component,
     "./islands/drawer/infoDrawer.tsx": $drawer_infoDrawer,
     "./islands/drawer/operation.tsx": $drawer_operation,
-    "./islands/drawer/schema.tsx": $drawer_schema,
+    "./islands/drawer/schemaNav.tsx": $drawer_schemaNav,
     "./islands/drawer/service.tsx": $drawer_service,
-    "./islands/drawer/tail.tsx": $drawer_tail,
     "./islands/emailCollectionForm.tsx": $emailCollectionForm,
     "./islands/nav.tsx": $nav,
     "./islands/notification.tsx": $notification,
@@ -140,8 +145,11 @@ const manifest = {
     "./islands/pipelines/stepConditions.tsx": $pipelines_stepConditions,
     "./islands/pipelines/stepNotification.tsx": $pipelines_stepNotification,
     "./islands/pipelines/stepNotifications.tsx": $pipelines_stepNotifications,
+    "./islands/schema.tsx": $schema,
     "./islands/serviceDisplay.tsx": $serviceDisplay,
+    "./islands/serviceModals.tsx": $serviceModals,
     "./islands/sockets.tsx": $sockets,
+    "./islands/tail.tsx": $tail,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

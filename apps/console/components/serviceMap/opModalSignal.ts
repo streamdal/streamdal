@@ -13,7 +13,6 @@ export type OpModalType = {
   deletePipeline?: Pipeline | null;
   deleteOperation?: boolean;
   schemaModal?: boolean;
-  schemaInfo?: any;
   deleteService?: boolean;
   tailRateModal?: boolean;
 };

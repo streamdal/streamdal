@@ -1,5 +1,4 @@
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import IconPlayerPauseFilled from "tabler-icons/tsx/player-pause-filled.tsx";
 import IconPlayerPlayFilled from "tabler-icons/tsx/player-play-filled.tsx";
 import IconWindowMinimize from "tabler-icons/tsx/window-minimize.tsx";
@@ -8,17 +7,17 @@ import IconColumns1 from "tabler-icons/tsx/columns-1.tsx";
 import IconColumns2 from "tabler-icons/tsx/columns-2.tsx";
 
 import { useEffect, useRef, useState } from "preact/hooks";
-import { longDateFormat } from "../../lib/utils.ts";
-import { tailSocket } from "../../lib/sockets.ts";
-import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { initFlowBite } from "../../components/flowbite/init.tsx";
+import { longDateFormat } from "root/lib/utils.ts";
+import { tailSocket } from "root/lib/sockets.ts";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
+import { initFlowBite } from "root/components/flowbite/init.tsx";
 import {
   TailData,
   tailDiffSignal,
   tailSamplingSignal,
   tailSignal,
 } from "root/components/tail/signals.ts";
-import { tailRunningSignal } from "../../components/tail/signals.ts";
+import { tailRunningSignal } from "../components/tail/signals.ts";
 import IconX from "tabler-icons/tsx/x.tsx";
 
 export const TailRow = ({ row }: { row: TailData }) => {
@@ -124,9 +123,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   return (
     <div
       className={`flex flex-col h-screen ${
-        fullScreen
-          ? "z-[51] absolute top-0 bottom-0 left-0 right-0"
-          : `relative w-[calc(100vw-${OP_MODAL_WIDTH})]`
+        fullScreen ? "z-[51] absolute top-0 bottom-0 left-0 right-0" : ""
       }`}
     >
       {!fullScreen && (

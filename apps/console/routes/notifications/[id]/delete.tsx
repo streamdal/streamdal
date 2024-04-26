@@ -1,14 +1,15 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { getNotification, getNotifications } from "../../../lib/fetch.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
-import { deleteNotification } from "../../../lib/mutation.ts";
-import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
+import { RoutedActionModal } from "../../../components/modals/routedActionModal.tsx";
 import Notifications from "../../../islands/notifications.tsx";
+import { getNotification, getNotifications } from "../../../lib/fetch.ts";
+import { deleteNotification } from "../../../lib/mutation.ts";
 
 export type DeleteNotification = {
   notification: NotificationConfig;
-  notifications: NotificationConfig[];
+  notifications: any[];
 };
 
 export const handler: Handlers<DeleteNotification> = {
@@ -48,11 +49,19 @@ export default function DeleteNotificationRoute(
 ) {
   return (
     <>
-      <RoutedDeleteModal
-        id={props?.params?.id}
-        entityType="notification"
-        entityName={props?.data?.notification?.name}
-        redirect={`/notifications/${props?.params?.id}`}
+      <RoutedActionModal
+        icon={<IconTrash class="w-10 h-10 mx-auto text-eyelid" />}
+        message={
+          <div>
+            Delete notification{"  "}
+            <span class="my-5 text-medium font-bold ">
+              {props?.data?.notification?.name}
+            </span>?
+          </div>
+        }
+        actionText="Delete"
+        cancelUrl={`/notifications/${props?.params?.id}`}
+        destructive={true}
       />
       <Notifications notifications={props?.data?.notifications} />
     </>

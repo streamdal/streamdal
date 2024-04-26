@@ -17,7 +17,6 @@ import {
 
 import { useSignalEffect } from "@preact/signals";
 import { useState } from "preact/hooks";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { ServerError } from "../components/error/server.tsx";
@@ -123,7 +122,7 @@ export default function ServiceDisplay(
 
   return (
     <div
-      class={`w-full h-screen m-0 w-[calc(100vw-${OP_MODAL_WIDTH})]`}
+      class={`w-full h-screen m-0 pr-[308px]`}
       onClick={() => showNav.value = false}
     >
       <ReactFlow
@@ -147,9 +146,9 @@ export default function ServiceDisplay(
           : null}
 
         <Background
-          style={{ height: "100vh" }}
+          style={{ height: "100%" }}
         />
-        <Controls position="bottom-right" style={{ marginBottom: "80px" }}>
+        <Controls position="bottom-right">
           <ControlButton
             onClick={() => {
               localStorage.removeItem(LAYOUT_KEY);

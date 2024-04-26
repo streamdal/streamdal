@@ -45,8 +45,8 @@ export const FormSelect = ({
         id={name}
         name={name}
         disabled={readonly}
-        class={`cursor-pointer rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
-          errors[name] ? "streamdalRed" : "twilight"
+        class={`cursor-pointer rounded-sm border outline-0 px-2 pe-6 h-[47px] ${
+          errors[name] ? "border-streamdalRed" : "border-twilight"
         } ${inputClass}`}
         value={value}
         onChange={(e: ChangeEvent<HTMLSelectElement>) =>

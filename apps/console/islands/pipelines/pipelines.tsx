@@ -1,15 +1,15 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { newPipeline } from "root/components/pipeline/pipeline.ts";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
+
+import { initFlowBite } from "root/components/flowbite/init.tsx";
+import { Toast, toastSignal } from "../../components/toasts/toast.tsx";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
+import { SuccessType } from "root/routes/_middleware.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { initFlowBite } from "root/components/flowbite/init.tsx";
-import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
-import { Tooltip } from "root/components/tooltip/tooltip.tsx";
-import { SuccessType } from "root/routes/_middleware.ts";
 import PipelineDetail from "./pipeline.tsx";
 
 export default function Pipelines(
@@ -44,7 +44,7 @@ export default function Pipelines(
   return (
     <>
       <div
-        className={`relative flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
+        className={`flex flex-col h-screen w-full`}
       >
         <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
           <span className="opacity-50">Home</span> / Manage Pipelines

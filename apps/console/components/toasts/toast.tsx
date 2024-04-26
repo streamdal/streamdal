@@ -23,20 +23,19 @@ export const Toast = ({ id }: { id: string }) => {
   }, 3000);
 
   const { type, message } = toastSignal.value;
-
   return (
     <div class="relative">
       <div
         id="toast-x"
-        class={`fixed top-[10%] left-[40%] z-50 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg border border-${
-          type === "error" ? "streamdalRed" : "streamdalGreen"
+        class={`fixed top-[10%] left-[40%] z-50 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg border ${
+          type === "error" ? "border-streamdalRed" : "border-streamdalGreen"
         }`}
         role="alert"
       >
         <div
-          class={`inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-${
-            type === "error" ? "red" : "green"
-          }-500 bg-${type === "error" ? "red" : "green"}-100 rounded-lg`}
+          class={`inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${
+            type === "error" ? "text-red-500" : "text-emerald-500"
+          } ${type === "error" ? "bg-red-100" : "bg-green-100"} rounded-lg`}
         >
           {type === "error"
             ? <IconExclamationCircle class="w-6 h-6 text-streamdalRed" />

@@ -1,18 +1,13 @@
-import IconX from "tabler-icons/tsx/x.tsx";
+import { ActionModal } from "root/components/modals/actionModal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
+import { toastSignal } from "../toasts/toast.tsx";
 import { getAudienceOpRoute } from "../../lib/utils.ts";
 import { opModal } from "../serviceMap/opModalSignal.ts";
-import { Toast, toastSignal } from "../toasts/toast.tsx";
-import { useState } from "preact/hooks";
 
 export const DeleteOperationModal = (
-  { audience, pipeline }: {
-    audience: Audience;
-    pipeline?: Pipeline;
-  },
+  { audience }: { audience: Audience },
 ) => {
-  const [open, setOpen] = useState(true);
   const close = () => opModal.value = { clients: 0 };
 
   const deleteOp = async () => {
@@ -32,75 +27,25 @@ export const DeleteOperationModal = (
         message: success.message,
       };
       opModal.value.deleteOperation = false;
-      setOpen(false);
     }
-    setTimeout(() => {
-      close();
-    }, 3000);
   };
 
   return (
     <>
-      <Toast id={"operationDelete"} />
-      {open && (
-        <div
-          class={"absolute top-[8%] left-[35%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-h-[80vh]"}
-        >
-          <div class="relative w-full max-w-md max-h-full">
-            <div class="relative bg-white rounded-lg border border-burnt shadow-xl shadow-burnt">
-              <button
-                type="button"
-                className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center"
-                onClick={close}
-              >
-                <IconX class="w-6 h-6" />
-              </button>
-              <div class="p-6 text-center">
-                {pipeline
-                  ? (
-                    <>
-                      <div class="my-4">
-                        <p class={"text-medium font-bold mb-2"}>
-                          A pipeline is attached to this operation
-                        </p>
-                        <p class={"text-medium"}>
-                          Do you want to detach{"  "}
-                          <span class="text-medium font-italic ">
-                            {pipeline.name}
-                          </span>{" "}
-                          and delete operation?
-                        </p>
-                      </div>
-                    </>
-                  )
-                  : (
-                    <>
-                      <div class="my-4">
-                        <p class={"text-medium font-bold"}>
-                          Are you sure you want to delete this operation?
-                        </p>
-                      </div>
-                    </>
-                  )}
-
-                <button
-                  className="btn-secondary mr-2"
-                  onClick={close}
-                >
-                  Cancel
-                </button>
-                <button
-                  class="btn-heimdal px-2"
-                  type="submit"
-                  onClick={deleteOp}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+      <ActionModal
+        icon={<IconTrash class="w-10 h-10text-eyelid" />}
+        message={
+          <div>
+            Delete operation{" "}
+            <span class="text-medium font-bold ">{audience.operationName}
+            </span>?
           </div>
-        </div>
-      )}
+        }
+        actionText="Delete"
+        destructive={true}
+        onClose={close}
+        onAction={deleteOp}
+      />
     </>
   );
 };

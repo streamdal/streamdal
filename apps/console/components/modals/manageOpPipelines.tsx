@@ -14,7 +14,7 @@ export const ManageOpPipelines = (
   return (
     audience
       ? (
-        <div class="w-full bg-purple-50 divide-gray-100 max-h-[260px] overflow-auto rounded">
+        <div class="w-full bg-violet-50 divide-gray-100 max-h-[260px] overflow-auto rounded">
           <ul
             class="text-sm text-gray-700 divide-y"
             aria-labelledby="dropdownDefaultButton"
@@ -29,7 +29,7 @@ export const ManageOpPipelines = (
                 )
                 : null
             ))}
-            <div class="flex items-center justify-center hover:bg-purple-100 py-3">
+            <div class="flex items-center justify-center hover:bg-violet-100 py-3">
               <a href="/pipelines/add">
                 <div
                   class={"flex justify-between items-center text-streamdalPurple font-semibold"}
