@@ -9,7 +9,6 @@ use streamdal_gjson as gjson;
 
 use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType};
 use std::str;
-use protobuf::EnumFull;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
 
@@ -135,12 +134,6 @@ impl Detective {
 
         let f = Detective::get_matcher_func(request)?;
 
-        let pii_type = request.match_type
-            .descriptor()
-            .name()
-            .replace("DETECTIVE_TYPE_", "")
-            .to_lowercase();
-
         // Don't iterate over these types
         let ignore_array: Vec<DetectiveType> = vec![
             DetectiveType::DETECTIVE_TYPE_HAS_FIELD,
@@ -158,8 +151,7 @@ impl Detective {
                             type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                             path: request.path.clone(),
                             value: field.str().to_owned().into_bytes(),
-                            pii_type: pii_type.clone(),
-                            special_fields: Default::default(),
+                            ..Default::default()
                         };
 
                         return Ok(vec![result]);
@@ -183,8 +175,7 @@ impl Detective {
                             type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                             path: request.path.clone(),
                             value: field.str().to_owned().into_bytes(),
-                            pii_type: pii_type.clone(),
-                            special_fields: Default::default(),
+                            ..Default::default()
                         };
 
                         results.push(result);
@@ -208,7 +199,6 @@ impl Detective {
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                         path: request.path.clone(),
                         value: field.str().to_owned().into_bytes(),
-                        pii_type,
                         ..Default::default()
                     };
 
@@ -361,18 +351,10 @@ fn recurse_field(
 
             if let Ok(found) = f(request, v) {
                 if found {
-                    let pii_type = request.match_type
-                        .descriptor()
-                        .name()
-                        .to_string()
-                        .replace("DETECTIVE_TYPE_", "")
-                        .to_lowercase();
-
                     let result = DetectiveStepResultMatch {
                         type_: ::protobuf::EnumOrUnknown::new(request.match_type),
                         path: path.join("."),
                         value: val.str().to_owned().into_bytes(),
-                        pii_type,
                         ..Default::default()
                     };
 
