@@ -22,7 +22,7 @@ export default function Pipelines(
   },
 ) {
   const wrapper = [
-    ...pipelines?.length ? pipelines : [],
+    ...pipelines?.length ? pipelines : [newPipeline],
     ...add ? [newPipeline] : [],
   ];
   const selected = id
