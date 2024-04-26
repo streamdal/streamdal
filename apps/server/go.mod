@@ -23,7 +23,7 @@ require (
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
 	github.com/sirupsen/logrus v1.9.3
 	github.com/slack-go/slack v0.12.3
-	github.com/streamdal/streamdal/libs/protos v0.1.44
+	github.com/streamdal/streamdal/libs/protos v0.1.45
 	github.com/tidwall/gjson v1.16.0
 	golang.org/x/crypto v0.19.0
 	google.golang.org/grpc v1.60.1
@@ -44,7 +44,6 @@ require (
 	github.com/DataDog/sketches-go v1.4.4 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bsm/redislock v0.9.4 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
