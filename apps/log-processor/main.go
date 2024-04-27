@@ -16,14 +16,6 @@ var (
 	version = "0.0.0"
 )
 
-type LogstashMessage struct {
-	Message string
-}
-
-type Work struct {
-	Payload *LogstashMessage
-}
-
 func main() {
 	cfg := config.New(version)
 	if err := cfg.Validate(); err != nil {
