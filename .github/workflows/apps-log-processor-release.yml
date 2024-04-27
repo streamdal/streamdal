@@ -43,14 +43,24 @@ jobs:
           echo "GITHUB_VERSION=${{ steps.create_tag.outputs.new_version }}" >> $GITHUB_ENV
 
       - name: Build
-      run: |
+        run: |
           make build
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            apps/cli/build/streamdal*
+            apps/log-processor/build/log-processor*
           tag_name: ${{ steps.create_tag.outputs.new_tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Run build & push (no need to manually push - buildx does it auto)
+        run: |
+          make docker/build
