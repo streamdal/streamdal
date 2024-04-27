@@ -43,7 +43,6 @@ import * as $ws_demo_http_request from "./routes/ws/demo/http-request.tsx";
 import * as $ws_server_error from "./routes/ws/server-error.tsx";
 import * as $ws_service_map from "./routes/ws/service-map.tsx";
 import * as $ws_tail from "./routes/ws/tail.tsx";
-import * as $audienceModals from "./islands/audienceModals.tsx";
 import * as $demo_http_request from "./islands/demo/http-request.tsx";
 import * as $drawer_component from "./islands/drawer/component.tsx";
 import * as $drawer_infoDrawer from "./islands/drawer/infoDrawer.tsx";
@@ -51,6 +50,15 @@ import * as $drawer_operation from "./islands/drawer/operation.tsx";
 import * as $drawer_schemaNav from "./islands/drawer/schemaNav.tsx";
 import * as $drawer_service from "./islands/drawer/service.tsx";
 import * as $emailCollectionForm from "./islands/emailCollectionForm.tsx";
+import * as $modals_actionModal from "./islands/modals/actionModal.tsx";
+import * as $modals_attachPipelineModal from "./islands/modals/attachPipelineModal.tsx";
+import * as $modals_deleteOperationModal from "./islands/modals/deleteOperationModal.tsx";
+import * as $modals_deleteServiceModal from "./islands/modals/deleteServiceModal.tsx";
+import * as $modals_detachPipelineModal from "./islands/modals/detachPipelineModal.tsx";
+import * as $modals_manageOpPipelines from "./islands/modals/manageOpPipelines.tsx";
+import * as $modals_pausePipelineModal from "./islands/modals/pausePipelineModal.tsx";
+import * as $modals_resumePipelineModal from "./islands/modals/resumePipelineModal.tsx";
+import * as $modals_serviceModals from "./islands/modals/serviceModals.tsx";
 import * as $nav from "./islands/nav.tsx";
 import * as $notification from "./islands/notification.tsx";
 import * as $notifications from "./islands/notifications.tsx";
@@ -66,9 +74,9 @@ import * as $pipelines_stepNotification from "./islands/pipelines/stepNotificati
 import * as $pipelines_stepNotifications from "./islands/pipelines/stepNotifications.tsx";
 import * as $schema from "./islands/schema.tsx";
 import * as $serviceDisplay from "./islands/serviceDisplay.tsx";
-import * as $serviceModals from "./islands/serviceModals.tsx";
 import * as $sockets from "./islands/sockets.tsx";
 import * as $tail from "./islands/tail.tsx";
+import * as $toasts from "./islands/toasts.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -123,7 +131,6 @@ const manifest = {
     "./routes/ws/tail.tsx": $ws_tail,
   },
   islands: {
-    "./islands/audienceModals.tsx": $audienceModals,
     "./islands/demo/http-request.tsx": $demo_http_request,
     "./islands/drawer/component.tsx": $drawer_component,
     "./islands/drawer/infoDrawer.tsx": $drawer_infoDrawer,
@@ -131,6 +138,15 @@ const manifest = {
     "./islands/drawer/schemaNav.tsx": $drawer_schemaNav,
     "./islands/drawer/service.tsx": $drawer_service,
     "./islands/emailCollectionForm.tsx": $emailCollectionForm,
+    "./islands/modals/actionModal.tsx": $modals_actionModal,
+    "./islands/modals/attachPipelineModal.tsx": $modals_attachPipelineModal,
+    "./islands/modals/deleteOperationModal.tsx": $modals_deleteOperationModal,
+    "./islands/modals/deleteServiceModal.tsx": $modals_deleteServiceModal,
+    "./islands/modals/detachPipelineModal.tsx": $modals_detachPipelineModal,
+    "./islands/modals/manageOpPipelines.tsx": $modals_manageOpPipelines,
+    "./islands/modals/pausePipelineModal.tsx": $modals_pausePipelineModal,
+    "./islands/modals/resumePipelineModal.tsx": $modals_resumePipelineModal,
+    "./islands/modals/serviceModals.tsx": $modals_serviceModals,
     "./islands/nav.tsx": $nav,
     "./islands/notification.tsx": $notification,
     "./islands/notifications.tsx": $notifications,
@@ -147,9 +163,9 @@ const manifest = {
     "./islands/pipelines/stepNotifications.tsx": $pipelines_stepNotifications,
     "./islands/schema.tsx": $schema,
     "./islands/serviceDisplay.tsx": $serviceDisplay,
-    "./islands/serviceModals.tsx": $serviceModals,
     "./islands/sockets.tsx": $sockets,
     "./islands/tail.tsx": $tail,
+    "./islands/toasts.tsx": $toasts,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

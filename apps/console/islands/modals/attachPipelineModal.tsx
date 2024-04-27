@@ -1,11 +1,11 @@
-import { ActionModal } from "root/components/modals/actionModal.tsx";
+import { ActionModal } from "./actionModal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconUnlink from "tabler-icons/tsx/unlink.tsx";
-import { toastSignal } from "../toasts/toast.tsx";
-import { getAudienceOpRoute } from "../../lib/utils.ts";
-import { opModal } from "../serviceMap/opModalSignal.ts";
-import { serviceSignal } from "../serviceMap/serviceSignal.ts";
+import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
+import { serviceSignal } from "../../components/serviceMap/serviceSignal.ts";
+import { showToast } from "root/islands/toasts.tsx";
 
 const updateSignal = (audience: Audience, pipeline: Pipeline) => {
   serviceSignal.value = {
@@ -46,11 +46,11 @@ export const AttachPipelineModal = (
 
     if (success.message) {
       updateSignal(audience, attachPipeline);
-      toastSignal.value = {
-        id: "pipelineCrud",
+      showToast({
+        id: audienceKey(audience),
         type: success.status ? "success" : "error",
         message: success.message,
-      };
+      });
     }
 
     close();

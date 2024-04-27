@@ -46,7 +46,7 @@ export const getNotifications = async () => {
   const { response } = await client.getNotifications({}, meta);
   return Object.values(response.notifications)?.sort((a: any, b: any) =>
     a.name.localeCompare(b.name)
-  );
+  ) ;
 };
 
 export const getSchema = async (audience: Audience) => {

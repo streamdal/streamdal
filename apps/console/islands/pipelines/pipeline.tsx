@@ -41,7 +41,7 @@ import { PipelineSchemaValidation } from "../pipelines/pipelineSchemaValidation.
 import { PipelineTransform } from "../pipelines/pipelineTransform.tsx";
 import { StepConditions } from "./stepConditions.tsx";
 
-import { ActionModal } from "root/components/modals/actionModal.tsx";
+import { ActionModal } from "../modals/actionModal.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 

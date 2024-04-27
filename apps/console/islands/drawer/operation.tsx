@@ -7,7 +7,7 @@ import IconEdit from "tabler-icons/tsx/edit.tsx";
 import { ConsumerIcon } from "../../components/icons/consumer.tsx";
 import { BetaTag, ComingSoonTag } from "../../components/icons/featureTags.tsx";
 import { ProducerIcon } from "../../components/icons/producer.tsx";
-import { ManageOpPipelines } from "../../components/modals/manageOpPipelines.tsx";
+import { ManageOpPipelines } from "../modals/manageOpPipelines.tsx";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 import {
   ServiceSignal,

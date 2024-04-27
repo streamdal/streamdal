@@ -1,14 +1,16 @@
-import { ActionModal } from "root/components/modals/actionModal.tsx";
+import { ActionModal } from "./actionModal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
-import { opModal } from "../serviceMap/opModalSignal.ts";
-import { toastSignal } from "../toasts/toast.tsx";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
+import { showToast } from "../toasts.tsx";
+import { audienceKey } from "root/lib/utils.ts";
 
 export const DeleteServiceModal = (
   { audience }: { audience: Audience },
 ) => {
   const close = () =>
     opModal.value = { ...opModal.value, deleteService: false };
+  const key = audienceKey(audience);
 
   const deleteService = async () => {
     const response = await fetch(
@@ -21,12 +23,12 @@ export const DeleteServiceModal = (
     const { success } = await response.json();
 
     if (success.message) {
-      toastSignal.value = {
-        id: "serviceModal",
+      opModal.value = { clients: 0 };
+      showToast({
+        id: key,
         type: success.status ? "success" : "error",
         message: success.message,
-      };
-      opModal.value = { clients: 0 };
+      });
     }
   };
 

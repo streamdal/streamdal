@@ -1,20 +1,19 @@
-import { ActionModal } from "root/components/modals/actionModal.tsx";
+import { ActionModal } from "./actionModal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import IconPlayerPlay from "tabler-icons/tsx/player-play.tsx";
-import { getAudienceOpRoute } from "../../lib/utils.ts";
-import { opModal } from "../serviceMap/opModalSignal.ts";
-import { toastSignal } from "../toasts/toast.tsx";
-import { togglePausePipeline } from "./pausePipelineModal.tsx";
+import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
+import { showToast } from "root/islands/toasts.tsx";
 
 export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
   const pipeline = opModal.value.resumePipeline;
 
   if (!pipeline) {
-    toastSignal.value = {
-      id: "pipelineCrud",
+    showToast({
+      id: audienceKey(audience),
       type: "error",
       message: "Pipeline not found",
-    };
+    });
     return null;
   }
 
@@ -33,11 +32,11 @@ export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
 
     if (success.message) {
       togglePausePipeline(false, audience, pipeline);
-      toastSignal.value = {
-        id: "pipelineCrud",
+      showToast({
+        id: audienceKey(audience),
         type: success.status ? "success" : "error",
         message: success.message,
-      };
+      });
     }
 
     close();

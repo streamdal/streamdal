@@ -6,10 +6,10 @@ import {
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { initFlowBite } from "../components/flowbite/init.tsx";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { SuccessType } from "../routes/_middleware.ts";
 import NotificationDetail from "./notification.tsx";
+import { showToast } from "root/islands/toasts.tsx";
 
 const slack = {
   botToken: "",
@@ -49,11 +49,11 @@ export default function Notifications(
   const selected = add ? wrapper.length - 1 : index && index > -1 ? index : 0;
 
   if (success?.message) {
-    toastSignal.value = {
-      id: "notifications",
+    showToast({
+      id: id ? id : "notifications-message",
       type: success.status ? "success" : "error",
       message: success.message,
-    };
+    });
   }
 
   return (
@@ -104,7 +104,6 @@ export default function Notifications(
           </div>
         </div>
       </div>
-      <Toast id="notifications" />
     </>
   );
 }

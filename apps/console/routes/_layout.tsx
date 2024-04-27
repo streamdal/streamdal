@@ -7,11 +7,10 @@ import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
 import { NavBar } from "../islands/nav.tsx";
 
 import ServiceDisplay from "../islands/serviceDisplay.tsx";
-import { ServiceModals } from "../islands/serviceModals.tsx";
+import { ServiceModals } from "../islands/modals/serviceModals.tsx";
 import { Sockets } from "../islands/sockets.tsx";
 import { GRPC_TOKEN } from "../lib/configs.ts";
 import { initAllServices } from "../lib/fetch.ts";
-import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
 
 const tokenError = () => (
   <CustomError
@@ -41,20 +40,10 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
   }
 
   await initAllServices();
-  const success = ctx.data?.success;
-
-  if (success?.message && globalThis?.location?.pathname === "/") {
-    toastSignal.value = {
-      id: "global",
-      type: success.status ? "success" : "error",
-      message: success.message,
-    };
-  }
 
   return (
     <div className="flex flex-col w-full text-web h-screen">
       <Sockets />
-      <Toast id={"global"} />
       <NavBar />
       <div className="flex flex-row w-full justify-between">
         <div className="grow">
@@ -74,6 +63,7 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
         <ServiceDisplay
           initNodes={serviceSignal.value?.displayNodes || []}
           initEdges={serviceSignal.value?.displayEdges || []}
+          success={ctx.data?.success}
         />
       </ReactFlowProvider>
 

@@ -4,13 +4,13 @@ import { useEffect } from "preact/hooks";
 import { newPipeline } from "root/components/pipeline/pipeline.ts";
 
 import { initFlowBite } from "root/components/flowbite/init.tsx";
-import { Toast, toastSignal } from "../../components/toasts/toast.tsx";
 import { Tooltip } from "root/components/tooltip/tooltip.tsx";
 import { SuccessType } from "root/routes/_middleware.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import PipelineDetail from "./pipeline.tsx";
+import { showToast } from "root/islands/toasts.tsx";
 
 export default function Pipelines(
   { id, pipelines, notifications, success, add = false }: {
@@ -30,11 +30,11 @@ export default function Pipelines(
     : Math.max(wrapper.length - 1, 0);
 
   if (success?.message) {
-    toastSignal.value = {
-      id: "pipeline",
+    showToast({
+      id: id ? id : "pipelines-message",
       type: success.status ? "success" : "error",
       message: success.message,
-    };
+    });
   }
 
   useEffect(() => {
@@ -95,7 +95,6 @@ export default function Pipelines(
           </div>
         </div>
       </div>
-      <Toast id="pipeline" />
     </>
   );
 }

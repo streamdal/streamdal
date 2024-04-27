@@ -4,7 +4,6 @@ import { initFlowBite } from "../../components/flowbite/init.tsx";
 import { EmptyStateBird } from "../../components/icons/emptyStateBird.tsx";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 import { ServiceSignal } from "../../components/serviceMap/serviceSignal.ts";
-import { Toast } from "../../components/toasts/toast.tsx";
 import Component from "./component.tsx";
 import Operation from "./operation.tsx";
 import Service from "./service.tsx";
@@ -52,7 +51,6 @@ export const InfoDrawer = ({
 
   return (
     <>
-      <Toast id="pipelineCrud" />
       <div
         className={`w-[308px] fixed top-0 right-0 z-50 h-screen overflow-y-scroll shadow-xl bg-white`}
       >

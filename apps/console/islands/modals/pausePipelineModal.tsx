@@ -1,11 +1,11 @@
-import { ActionModal } from "root/components/modals/actionModal.tsx";
+import { ActionModal } from "./actionModal.tsx";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPlayerPause from "tabler-icons/tsx/player-pause.tsx";
 import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
-import { opModal } from "../serviceMap/opModalSignal.ts";
-import { serviceSignal } from "../serviceMap/serviceSignal.ts";
-import { toastSignal } from "../toasts/toast.tsx";
+import { opModal } from "../../components/serviceMap/opModalSignal.ts";
+import { serviceSignal } from "../../components/serviceMap/serviceSignal.ts";
+import { showToast } from "root/islands/toasts.tsx";
 
 export const togglePausePipeline = (
   paused: boolean,
@@ -32,11 +32,11 @@ export const PausePipelineModal = ({ audience }: { audience: Audience }) => {
   const pipeline = opModal.value.pausePipeline;
 
   if (!pipeline) {
-    toastSignal.value = {
-      id: "pipelineCrud",
+    showToast({
+      id: audienceKey(audience),
       type: "error",
       message: "Pipeline not found",
-    };
+    });
     return null;
   }
 
@@ -54,11 +54,11 @@ export const PausePipelineModal = ({ audience }: { audience: Audience }) => {
 
     if (success.message) {
       togglePausePipeline(true, audience, pipeline);
-      toastSignal.value = {
-        id: "pipelineCrud",
+      showToast({
+        id: audienceKey(audience),
         type: success.status ? "success" : "error",
         message: success.message,
-      };
+      });
     }
 
     close();
