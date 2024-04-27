@@ -42,10 +42,6 @@ jobs:
         run: |
           echo "GITHUB_VERSION=${{ steps.create_tag.outputs.new_version }}" >> $GITHUB_ENV
 
-      - name: Build
-        run: |
-          make build
-
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
