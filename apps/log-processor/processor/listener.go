@@ -59,6 +59,8 @@ func (p *Processor) runListener() error {
 				break
 			}
 
+			p.metrics.ListenerErrorsTotal.Inc()
+
 			llog.Errorf("Failed to accept connection: %v", err)
 			continue
 		}
@@ -99,9 +101,11 @@ func (p *Processor) handleConnection(conn net.Conn) {
 		}
 
 		p.processCh <- []byte(line)
+		p.metrics.ListenerProcessedTotal.Inc()
 	}
 
 	if err := scanner.Err(); err != nil {
+		p.metrics.ListenerErrorsTotal.Inc()
 		llog.Errorf("Error reading from %s: %v", conn.RemoteAddr().String(), err)
 	}
 

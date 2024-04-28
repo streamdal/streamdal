@@ -191,8 +191,11 @@ MAIN:
 			break MAIN
 		case data := <-p.processCh:
 			if err := p.processorHandler(workerID, data); err != nil {
+				p.metrics.ProcessorErrorsTotal.Inc()
 				llog.Errorf("Error handling data: %v", err)
 			}
+
+			p.metrics.ProcessorProcessedTotal.Inc()
 		}
 	}
 
@@ -213,9 +216,13 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return errors.Wrap(err, "failed to unmarshal data")
 	}
 
-	llog.Debugf("Unmarshalled message: %s", string(logstashMessage.Message))
+	// Only process .Message via Streamdal if it contains valid json
+	if _, err := json.Marshal(logstashMessage.Message); err != nil {
+		p.sendCh <- logstashMessage
+		return nil
+	}
 
-	// Process .Message via Streamdal
+	// .Message contains valid JSON - process it via Streamdal
 	resp := p.streamdalClient.Process(p.shutdownContext, &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: operationName,

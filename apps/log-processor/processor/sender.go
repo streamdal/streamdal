@@ -70,13 +70,17 @@ MAIN:
 
 			dataStr, err := json.Marshal(data)
 			if err != nil {
+				p.metrics.SenderErrorsTotal.Inc()
 				llog.Errorf("Error marshalling data: %v", err)
 				continue
 			}
 
 			if err := p.sendWithRetry(workerID, dataStr, 0); err != nil {
+				p.metrics.SenderErrorsTotal.Inc()
 				return errors.Wrap(err, "failed to send with retry")
 			}
+
+			p.metrics.SenderProcessedTotal.Inc()
 		}
 	}
 
