@@ -15,7 +15,7 @@ The Streamdal Log Processor Helm chart is used for deploying the log processor c
 ```bash
 helm repo add streamdal https://streamdal.github.io/streamdal/helm-packages
 helm repo update
-helm install log-processor streamdal/streamdal-log-processor
+log-processor streamdal/log-processor-chart
 ```
 
 
