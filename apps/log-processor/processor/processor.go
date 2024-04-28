@@ -207,7 +207,7 @@ MAIN:
 func (p *Processor) processorHandler(workerID int, data []byte) error {
 	llog := p.log.With("method", "processorHandler", "worker_id", workerID)
 
-	llog.Debugf("Received data: %s", data)
+	// llog.Debugf("Received data: %s", data)
 
 	// Try to unmarshal data
 	logstashMessage := &LogstashMessage{}
@@ -240,7 +240,7 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 
 	p.sendCh <- logstashMessage
 
-	llog.Debugf("Processed message: %s", string(logstashMessage.Message))
+	// llog.Debugf("Processed message: %s", string(logstashMessage.Message))
 
 	return nil
 }
