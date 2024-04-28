@@ -18,8 +18,8 @@ spec:
         image: "{{ .Values.images.logProcessor.repository }}:{{ .Values.images.logProcessor.tag }}"
         imagePullPolicy: "{{ .Values.images.logProcessor.pullPolicy }}"
         env:
-          - name: STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER
-            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER }}"
+          - name: STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER_ADDRESS
+            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER_ADDRESS}}"
           - name: STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR
             value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR }}"
           - name: STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR
@@ -59,7 +59,7 @@ spec:
           - name: XPACK_MONITORING_ENABLED
             value: "{{ .Values.config.xpackMonitoringEnabled }}"
         ports:
-          - containerPort: 7002
+          - containerPort: 6001
         securityContext:   # Specify securityContext for the container
           runAsUser: 0     # Run as root user
         resources:

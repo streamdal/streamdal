@@ -4,39 +4,64 @@ metadata:
   name: {{ .Release.Name }}-logstash-config
 data:
   logstash.conf: |
+    # Data is read from log files in a local directory
     input {
       file {
-        path => "/var/log/pods/*/*/*.log"
+        path =>  "/var/log/pods/*/*/*.log"
         start_position => "beginning"
-        sincedb_path => "/dev/null"
-      }
-      tcp {
-        port => 7002
-        codec => json
+        sincedb_path => "/dev/null"  # Provide a valid path on your system
+        type => "file"
       }
     }
-
-    filter {
-      if [path] {
-        grok {
-          match => { "path" => "/var/log/pods/%{DATA:container}/%{DATA:service}/%{GREEDYDATA:filename}" }
-        }
-      }
-    }
-
+    
+    # Input data is sent to the streamdal-enabled log-processor service
     output {
-      if "_grokparsefailure" not in [tags] {
+      if [type] == "file" { # Only process events that have exactly ONE "file" tag
         tcp {
           host => "127.0.0.1"
           port => 6000
           codec => json_lines
+          reconnect_interval => 10
         }
       }
-      if [message] {
+    
+      stdout {
+        codec => rubydebug {
+          metadata => true
+        }
+      }
+    }
+    
+    # logstash listens on port 6001 for incoming data from log-processor
+    input {
+      tcp {
+        port => 6001
+        codec => json
+        type => "processor"
+      }
+    }
+    
+    # Parse log file payloads to determine what filenames to write output data to
+    filter {
+      # Only perform parse if this log entry came from the processor
+      if [type] == "processor" {
+        grok {
+            match => { "path" => "/var/log/pods/%{DATA:container}/%{DATA:service}/%{GREEDYDATA:filename}" }
+        }
+      }
+    }
+    
+    # logstash collects logs from :6001 and writes them out to a different local dir
+    output {
+      # Only write file if this log entry came from the processor
+      if [type] == "processor" {
+        # Output to file based on the parsed filename and Kubernetes pod name
         file {
           path => "/logs/%{container}/%{service}/%{filename}"
           codec => line { format => "%{message}" }
         }
+    
+        # Debug: output to console using rubydebug codec
         stdout {
           codec => rubydebug {
             metadata => true
