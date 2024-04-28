@@ -7,12 +7,13 @@ import (
 
 	"github.com/charmbracelet/log"
 
-	"github.com/streamdal/log-processor/config"
-	"github.com/streamdal/log-processor/processor"
+	"github.com/streamdal/streamdal/apps/log-processor/api"
+	"github.com/streamdal/streamdal/apps/log-processor/config"
+	"github.com/streamdal/streamdal/apps/log-processor/processor"
 )
 
 var (
-	// Gets set during compile time
+	// Gets set during build time
 	version = "0.0.0"
 )
 
@@ -26,12 +27,25 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
+	// Context everyone uses for shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	// Start processor-related components
 	p, err := processor.New(ctx, cancel, cfg)
 	if err != nil {
 		log.Fatalf("Failed to start: %v", err)
+	}
+
+	// Create API
+	a, err := api.New(version, ctx, cfg)
+	if err != nil {
+		log.Fatalf("unable to create API: %s", err)
+	}
+
+	// Start API
+	if err := a.Start(); err != nil {
+		log.Fatalf("unable to start API: %s", err)
 	}
 
 	log.Info("log-processor started")
@@ -50,7 +64,7 @@ func main() {
 
 func printConfig(cfg *config.Config) {
 	log.Debug("Config:")
-	log.Debugf("    ListenAddr                %s", cfg.ListenAddr)
+	log.Debugf("    LogstashListenAddr                %s", cfg.LogstashListenAddr)
 	log.Debugf("    LogstashAddr              %s", cfg.LogstashAddr)
 	log.Debugf("    LogstashReconnectInterval %s", cfg.LogstashReconnectInterval)
 	log.Debugf("    StreamdalServerAddress    %s", cfg.StreamdalServerAddress)

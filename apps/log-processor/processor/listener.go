@@ -41,9 +41,9 @@ func (p *Processor) setLogstashConn(workerID int, conn net.Conn) {
 func (p *Processor) runListener() error {
 	llog := p.log.With("method", "runListener")
 
-	listener, err := net.Listen("tcp", p.config.ListenAddr)
+	listener, err := net.Listen("tcp", p.config.LogstashListenAddr)
 	if err != nil {
-		return errors.Wrapf(err, "failed to listen to listen to '%s'", p.config.ListenAddr)
+		return errors.Wrapf(err, "failed to listen to listen to '%s'", p.config.LogstashListenAddr)
 	}
 
 	defer listener.Close()
