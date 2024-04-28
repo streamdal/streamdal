@@ -60,12 +60,5 @@ data:
           path => "/logs/%{container}/%{service}/%{filename}"
           codec => line { format => "%{message}" }
         }
-    
-        # Debug: output to console using rubydebug codec
-        stdout {
-          codec => rubydebug {
-            metadata => true
-          }
-        }
       }
     }
