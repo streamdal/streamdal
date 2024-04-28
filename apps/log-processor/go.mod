@@ -7,6 +7,7 @@ require (
 	github.com/charmbracelet/log v0.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.19.0
 	github.com/streamdal/streamdal/sdks/go v0.1.18
 )
 
@@ -23,7 +24,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
-	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
