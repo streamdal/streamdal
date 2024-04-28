@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-logstash-config
+data:
+  logstash.conf: |
+    input {
+      file {
+        path => "/var/log/pods/*/*/*.log"
+        start_position => "beginning"
+        sincedb_path => "/dev/null"
+      }
+      tcp {
+        port => 7002
+        codec => json
+      }
+    }
+
+    filter {
+      if [path] {
+        grok {
+          match => { "path" => "/var/log/pods/%{DATA:container}/%{DATA:service}/%{GREEDYDATA:filename}" }
+        }
+      }
+    }
+
+    output {
+      if "_grokparsefailure" not in [tags] {
+        tcp {
+          host => "127.0.0.1"
+          port => 6000
+          codec => json_lines
+        }
+      }
+      if [message] {
+        file {
+          path => "/logs/%{container}/%{service}/%{filename}"
+          codec => line { format => "%{message}" }
+        }
+        stdout {
+          codec => rubydebug {
+            metadata => true
+          }
+        }
+      }
+    }

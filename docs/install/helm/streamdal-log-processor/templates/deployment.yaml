@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}-log-processor-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: log-processor
+  template:
+    metadata:
+      labels:
+        app: log-processor
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64   
+      containers:
+      - name: log-processor
+        image: "{{ .Values.images.logProcessor.repository }}:{{ .Values.images.logProcessor.tag }}"
+        imagePullPolicy: "{{ .Values.images.logProcessor.pullPolicy }}"
+        env:
+          - name: STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER
+            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER }}"
+          - name: STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR
+            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR }}"
+          - name: STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR
+            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR }}"
+          - name: STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN
+            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN }}"
+        ports:
+          - containerPort: {{ .Values.service.logProcessorPort }}
+        volumeMounts:
+          - name: app-data
+            mountPath: /app
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.logProcessor.limits.cpu }}"
+            memory: "{{ .Values.resources.logProcessor.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.logProcessor.requests.cpu }}"
+            memory: "{{ .Values.resources.logProcessor.requests.memory }}"
+      - name: logstash
+        image: "{{ .Values.images.logstash.repository }}:{{ .Values.images.logstash.tag }}"
+        imagePullPolicy: "{{ .Values.images.logstash.pullPolicy }}"
+        volumeMounts:
+          - name: logstash-config-volume
+            mountPath: /usr/share/logstash/pipeline
+            readOnly: true
+          - name: docker-containers
+            mountPath: /var/lib/docker/containers
+            readOnly: true
+          - name: k8s-pods
+            mountPath: /var/log/pods
+            readOnly: true
+          - name: logs
+            mountPath: /logs
+        env:
+          - name: ELASTICSEARCH_HOSTS
+            value: "{{ .Values.config.elasticsearchHosts }}"  # Update with your Elasticsearch details if needed
+          - name: XPACK_MONITORING_ENABLED
+            value: "{{ .Values.config.xpackMonitoringEnabled }}"
+        ports:
+          - containerPort: 7002
+        securityContext:   # Specify securityContext for the container
+          runAsUser: 0     # Run as root user
+        resources:
+          limits:
+            cpu: "{{ .Values.resources.logstash.limits.cpu }}"
+            memory: "{{ .Values.resources.logstash.limits.memory }}"
+          requests:
+            cpu: "{{ .Values.resources.logstash.requests.cpu }}"
+            memory: "{{ .Values.resources.logstash.requests.memory }}"
+      volumes:
+        - name: logstash-config-volume
+          configMap:
+            name: {{ .Release.Name }}-logstash-config # Define a ConfigMap for Logstash configuration
+        - name: docker-containers
+          hostPath:
+            path: /var/lib/docker/containers
+            type: Directory
+        - name: k8s-pods
+          hostPath:
+            path: /var/log/pods
+            type: Directory
+        - name: app-data
+          emptyDir: {}
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-logs-pvc
