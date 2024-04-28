@@ -13,6 +13,7 @@ import (
 	streamdal "github.com/streamdal/streamdal/sdks/go"
 
 	"github.com/streamdal/streamdal/apps/log-processor/config"
+	"github.com/streamdal/streamdal/apps/log-processor/metrics"
 )
 
 const (
@@ -51,6 +52,7 @@ type Processor struct {
 	streamdalClient streamdal.IStreamdal  // used by processors
 	shutdownContext context.Context       // used by all goroutines
 	cancelFunc      context.CancelFunc    // used by main() and Close()
+	metrics         *metrics.Metrics      // used for prometheus instrumentation
 }
 
 // LogstashMessage is a struct that represents a log entry shipped from Logstash
@@ -76,6 +78,7 @@ func New(shutdownCtx context.Context, cancelFunc context.CancelFunc, cfg *config
 		log:             log.With("pkg", "processor"),
 		config:          cfg,
 		wg:              &sync.WaitGroup{},
+		metrics:         metrics.New(),
 		processCh:       make(chan []byte, cfg.ProcessBufferSize),
 		sendCh:          make(chan *LogstashMessage, cfg.SendBufferSize),
 		conns:           make(map[int]net.Conn),
@@ -155,6 +158,8 @@ func (p *Processor) startProcessors() error {
 		p.wg.Add(1)
 
 		go func() {
+			p.metrics.ProcessorGoroutines.Inc()
+			defer p.metrics.ProcessorGoroutines.Dec()
 			defer p.wg.Done()
 
 			if err := p.runProcessor(i); err != nil {

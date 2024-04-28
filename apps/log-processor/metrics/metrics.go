@@ -1,8 +1,7 @@
-package prometheus
+package metrics
 
 import (
 	"github.com/charmbracelet/log"
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -13,7 +12,6 @@ const (
 
 type Prometheus struct {
 	*Metrics
-	log *log.Logger
 }
 
 type Metrics struct {
@@ -37,21 +35,18 @@ type Metrics struct {
 	SenderProcessedTotal           prometheus.Counter
 	SenderProcessedPerSecond       prometheus.Gauge
 	SenderErrorsTotal              prometheus.Counter
+
+	log *log.Logger
 }
 
-func New() (*Prometheus, error) {
-	customMetrics, err := createMetrics()
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to create custom metrics")
-	}
+func New() *Metrics {
+	m := generateMetrics()
+	m.log = log.With("pkg", "metrics")
 
-	return &Prometheus{
-		Metrics: customMetrics,
-		log:     log.With("pkg", "prometheus"),
-	}, nil
+	return m
 }
 
-func createMetrics() (*Metrics, error) {
+func generateMetrics() *Metrics {
 	return &Metrics{
 		MessagesProcessedTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_messages_processed_total",
@@ -158,5 +153,5 @@ func createMetrics() (*Metrics, error) {
 			Name: appPrefix + "_sender_errors_total",
 			Help: "Total number of errors encountered by senders",
 		}),
-	}, nil
+	}
 }

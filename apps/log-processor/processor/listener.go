@@ -14,6 +14,9 @@ func (p *Processor) startListeners() error {
 	errCh := make(chan error, p.config.NumProcessors)
 
 	go func() {
+		p.metrics.ListenerGoroutines.Inc()
+		defer p.metrics.ListenerGoroutines.Dec()
+
 		if err := p.runListener(); err != nil {
 			llog.Errorf("Failed running listener: %v", err)
 			errCh <- errors.Wrap(err, "failed running listener")

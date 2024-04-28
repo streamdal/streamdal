@@ -64,7 +64,8 @@ func main() {
 
 func printConfig(cfg *config.Config) {
 	log.Debug("Config:")
-	log.Debugf("    LogstashListenAddr                %s", cfg.LogstashListenAddr)
+	log.Debugf("    APIListenAddress          %s", cfg.APIListenAddress)
+	log.Debugf("    LogstashListenAddr        %s", cfg.LogstashListenAddr)
 	log.Debugf("    LogstashAddr              %s", cfg.LogstashAddr)
 	log.Debugf("    LogstashReconnectInterval %s", cfg.LogstashReconnectInterval)
 	log.Debugf("    StreamdalServerAddress    %s", cfg.StreamdalServerAddress)

@@ -23,6 +23,8 @@ func (p *Processor) startSenders() error {
 		p.wg.Add(1)
 
 		go func() {
+			p.metrics.SenderGoroutines.Inc()
+			defer p.metrics.SenderGoroutines.Dec()
 			defer p.wg.Done()
 
 			// Create initial connection to logstash
