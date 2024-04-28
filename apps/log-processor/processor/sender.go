@@ -23,6 +23,8 @@ func (p *Processor) startSenders() error {
 		p.wg.Add(1)
 
 		go func() {
+			p.metrics.SenderGoroutines.Inc()
+			defer p.metrics.SenderGoroutines.Dec()
 			defer p.wg.Done()
 
 			// Create initial connection to logstash
@@ -68,13 +70,17 @@ MAIN:
 
 			dataStr, err := json.Marshal(data)
 			if err != nil {
+				p.metrics.SenderErrorsTotal.Inc()
 				llog.Errorf("Error marshalling data: %v", err)
 				continue
 			}
 
 			if err := p.sendWithRetry(workerID, dataStr, 0); err != nil {
+				p.metrics.SenderErrorsTotal.Inc()
 				return errors.Wrap(err, "failed to send with retry")
 			}
+
+			p.metrics.SenderProcessedTotal.Inc()
 		}
 	}
 

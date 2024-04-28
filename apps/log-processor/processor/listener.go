@@ -14,6 +14,9 @@ func (p *Processor) startListeners() error {
 	errCh := make(chan error, p.config.NumProcessors)
 
 	go func() {
+		p.metrics.ListenerGoroutines.Inc()
+		defer p.metrics.ListenerGoroutines.Dec()
+
 		if err := p.runListener(); err != nil {
 			llog.Errorf("Failed running listener: %v", err)
 			errCh <- errors.Wrap(err, "failed running listener")
@@ -56,6 +59,8 @@ func (p *Processor) runListener() error {
 				break
 			}
 
+			p.metrics.ListenerErrorsTotal.Inc()
+
 			llog.Errorf("Failed to accept connection: %v", err)
 			continue
 		}
@@ -96,9 +101,11 @@ func (p *Processor) handleConnection(conn net.Conn) {
 		}
 
 		p.processCh <- []byte(line)
+		p.metrics.ListenerProcessedTotal.Inc()
 	}
 
 	if err := scanner.Err(); err != nil {
+		p.metrics.ListenerErrorsTotal.Inc()
 		llog.Errorf("Error reading from %s: %v", conn.RemoteAddr().String(), err)
 	}
 

@@ -13,6 +13,7 @@ import (
 	streamdal "github.com/streamdal/streamdal/sdks/go"
 
 	"github.com/streamdal/streamdal/apps/log-processor/config"
+	"github.com/streamdal/streamdal/apps/log-processor/metrics"
 )
 
 const (
@@ -51,6 +52,7 @@ type Processor struct {
 	streamdalClient streamdal.IStreamdal  // used by processors
 	shutdownContext context.Context       // used by all goroutines
 	cancelFunc      context.CancelFunc    // used by main() and Close()
+	metrics         *metrics.Metrics      // used for prometheus instrumentation
 }
 
 // LogstashMessage is a struct that represents a log entry shipped from Logstash
@@ -76,6 +78,7 @@ func New(shutdownCtx context.Context, cancelFunc context.CancelFunc, cfg *config
 		log:             log.With("pkg", "processor"),
 		config:          cfg,
 		wg:              &sync.WaitGroup{},
+		metrics:         metrics.New(),
 		processCh:       make(chan []byte, cfg.ProcessBufferSize),
 		sendCh:          make(chan *LogstashMessage, cfg.SendBufferSize),
 		conns:           make(map[int]net.Conn),
@@ -155,6 +158,8 @@ func (p *Processor) startProcessors() error {
 		p.wg.Add(1)
 
 		go func() {
+			p.metrics.ProcessorGoroutines.Inc()
+			defer p.metrics.ProcessorGoroutines.Dec()
 			defer p.wg.Done()
 
 			if err := p.runProcessor(i); err != nil {
@@ -186,8 +191,11 @@ MAIN:
 			break MAIN
 		case data := <-p.processCh:
 			if err := p.processorHandler(workerID, data); err != nil {
+				p.metrics.ProcessorErrorsTotal.Inc()
 				llog.Errorf("Error handling data: %v", err)
 			}
+
+			p.metrics.ProcessorProcessedTotal.Inc()
 		}
 	}
 
@@ -208,9 +216,14 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return errors.Wrap(err, "failed to unmarshal data")
 	}
 
-	llog.Debugf("Unmarshalled message: %s", string(logstashMessage.Message))
+	// If .Message does not contain valid JSON, do not process it via Streamdal,
+	// ship back to logstash.
+	if _, err := json.Marshal(logstashMessage.Message); err != nil {
+		p.sendCh <- logstashMessage
+		return nil
+	}
 
-	// Process .Message via Streamdal
+	// .Message contains valid JSON - process it via Streamdal
 	resp := p.streamdalClient.Process(p.shutdownContext, &streamdal.ProcessRequest{
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: operationName,

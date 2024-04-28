@@ -1,8 +1,7 @@
-package prometheus
+package metrics
 
 import (
 	"github.com/charmbracelet/log"
-	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -13,13 +12,12 @@ const (
 
 type Prometheus struct {
 	*Metrics
-	log *log.Logger
 }
 
 type Metrics struct {
-	MessagesProcessedTotal         prometheus.Counter
-	MessagesProcessedPerSecond     prometheus.Gauge
-	MessagesProcessedErrorsTotal   prometheus.Counter
+	StreamdalProcessTotal          prometheus.Counter
+	StreamdalProcessPerSecond      prometheus.Gauge
+	StreamdalProcessErrorsTotal    prometheus.Counter
 	UptimeSecondsTotal             prometheus.Counter
 	IncomingConnectionsTotal       prometheus.Counter
 	IncomingConnectionsActiveTotal prometheus.Counter
@@ -37,35 +35,32 @@ type Metrics struct {
 	SenderProcessedTotal           prometheus.Counter
 	SenderProcessedPerSecond       prometheus.Gauge
 	SenderErrorsTotal              prometheus.Counter
+
+	log *log.Logger
 }
 
-func New() (*Prometheus, error) {
-	customMetrics, err := createMetrics()
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to create custom metrics")
-	}
+func New() *Metrics {
+	m := generateMetrics()
+	m.log = log.With("pkg", "metrics")
 
-	return &Prometheus{
-		Metrics: customMetrics,
-		log:     log.With("pkg", "prometheus"),
-	}, nil
+	return m
 }
 
-func createMetrics() (*Metrics, error) {
+func generateMetrics() *Metrics {
 	return &Metrics{
-		MessagesProcessedTotal: promauto.NewCounter(prometheus.CounterOpts{
-			Name: appPrefix + "_messages_processed_total",
-			Help: "Total number of processed events",
+		StreamdalProcessTotal: promauto.NewCounter(prometheus.CounterOpts{
+			Name: appPrefix + "_streamdal_process_total",
+			Help: "Total number of processed with Streamdal client",
 		}),
 
-		MessagesProcessedPerSecond: promauto.NewGauge(prometheus.GaugeOpts{
-			Name: appPrefix + "_messages_processed_per_second",
-			Help: "Number of messages log-processor is processing per second",
+		StreamdalProcessPerSecond: promauto.NewGauge(prometheus.GaugeOpts{
+			Name: appPrefix + "_streamdal_process_per_second",
+			Help: "Number of messages processed per second by Streamdal client",
 		}),
 
-		MessagesProcessedErrorsTotal: promauto.NewCounter(prometheus.CounterOpts{
-			Name: appPrefix + "_messages_processed_errors",
-			Help: "Total number of errors encountered during processing",
+		StreamdalProcessErrorsTotal: promauto.NewCounter(prometheus.CounterOpts{
+			Name: appPrefix + "_streamdal_process_errors_total",
+			Help: "Total number of errors encountered during Streamdal process call",
 		}),
 
 		UptimeSecondsTotal: promauto.NewCounter(prometheus.CounterOpts{
@@ -95,11 +90,13 @@ func createMetrics() (*Metrics, error) {
 
 		// Listener metrics
 
+		// DONE
 		ListenerGoroutines: promauto.NewGauge(prometheus.GaugeOpts{
 			Name: appPrefix + "_listener_goroutines",
 			Help: "Number of goroutines used for listeners",
 		}),
 
+		// DONE
 		ListenerProcessedTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_listener_processed_total",
 			Help: "Total number of messages processed by listeners",
@@ -110,6 +107,7 @@ func createMetrics() (*Metrics, error) {
 			Help: "Number of messages processed by listeners per second",
 		}),
 
+		// DONE
 		ListenerErrorsTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_listener_errors_total",
 			Help: "Total number of errors encountered by listeners",
@@ -117,11 +115,13 @@ func createMetrics() (*Metrics, error) {
 
 		// Processor
 
+		// DONE
 		ProcessorGoroutines: promauto.NewGauge(prometheus.GaugeOpts{
 			Name: appPrefix + "_processor_goroutines",
 			Help: "Number of goroutines used for processors",
 		}),
 
+		// DONE
 		ProcessorProcessedTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_processor_processed_total",
 			Help: "Total number of messages processed by processors",
@@ -132,6 +132,7 @@ func createMetrics() (*Metrics, error) {
 			Help: "Number of messages processed by processors per second",
 		}),
 
+		// DONE
 		ProcessorErrorsTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_processor_errors_total",
 			Help: "Total number of errors encountered by processors",
@@ -139,11 +140,13 @@ func createMetrics() (*Metrics, error) {
 
 		// Sender metrics
 
+		// DONE
 		SenderGoroutines: promauto.NewGauge(prometheus.GaugeOpts{
 			Name: appPrefix + "_sender_goroutines",
 			Help: "Number of goroutines used for senders",
 		}),
 
+		// DONE
 		SenderProcessedTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_sender_processed_total",
 			Help: "Total number of messages processed by senders",
@@ -154,9 +157,10 @@ func createMetrics() (*Metrics, error) {
 			Help: "Number of messages processed by senders per second",
 		}),
 
+		// DONE
 		SenderErrorsTotal: promauto.NewCounter(prometheus.CounterOpts{
 			Name: appPrefix + "_sender_errors_total",
 			Help: "Total number of errors encountered by senders",
 		}),
-	}, nil
+	}
 }
