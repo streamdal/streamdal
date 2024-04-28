@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 	streamdal "github.com/streamdal/streamdal/sdks/go"
 
-	"github.com/streamdal/log-processor/config"
+	"github.com/streamdal/streamdal/apps/log-processor/config"
 )
 
 const (
@@ -97,7 +97,7 @@ func New(shutdownCtx context.Context, cancelFunc context.CancelFunc, cfg *config
 
 	p.streamdalClient = streamdalClient
 
-	p.log.Debugf("Starting listener on '%s'", cfg.ListenAddr)
+	p.log.Debugf("Starting listener on '%s'", cfg.LogstashListenAddr)
 
 	// Start listeners
 	if err := p.startListeners(); err != nil {
