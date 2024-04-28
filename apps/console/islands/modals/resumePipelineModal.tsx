@@ -4,6 +4,7 @@ import IconPlayerPlay from "tabler-icons/tsx/player-play.tsx";
 import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
 import { opModal } from "../../components/serviceMap/opModalSignal.ts";
 import { showToast } from "root/islands/toasts.tsx";
+import { togglePausePipeline } from "root/islands/modals/pausePipelineModal.tsx";
 
 export const ResumePipelineModal = ({ audience }: { audience: Audience }) => {
   const pipeline = opModal.value.resumePipeline;
