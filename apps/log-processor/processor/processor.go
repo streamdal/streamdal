@@ -216,7 +216,8 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return errors.Wrap(err, "failed to unmarshal data")
 	}
 
-	// Only process .Message via Streamdal if it contains valid json
+	// If .Message does not contain valid JSON, do not process it via Streamdal,
+	// ship back to logstash.
 	if _, err := json.Marshal(logstashMessage.Message); err != nil {
 		p.sendCh <- logstashMessage
 		return nil
