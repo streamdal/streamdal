@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     bozos_buckets (0.0.2)
+    csv (3.2.8)
     google-protobuf (3.25.3)
     google-protobuf (3.25.3-aarch64-linux)
     google-protobuf (3.25.3-arm64-darwin)
@@ -28,6 +29,12 @@ GEM
     grpc (1.62.0-x86_64-linux)
       google-protobuf (~> 3.25)
       googleapis-common-protos-types (~> 1.0)
+    httparty (0.22.0)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
+    mini_mime (1.1.5)
+    multi_xml (0.6.0)
     rake (13.1.0)
     rb_sys (0.9.90)
     securerandom (0.3.1)
@@ -53,6 +60,7 @@ DEPENDENCIES
   bozos_buckets (~> 0.0.2)
   google-protobuf (~> 3.25)
   grpc (~> 1.62.0)
+  httparty
   rake (~> 13.1)
   securerandom (~> 0.3.1)
   streamdal-protos (~> 0.0.5)

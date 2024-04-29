@@ -2,12 +2,14 @@
 require "sp_internal_services_pb"
 require "sp_pipeline_pb"
 require "sp_wsm_pb"
+require "steps/sp_steps_httprequest_pb"
 require "securerandom"
 require "wasmtime"
 require "google/protobuf"
 require "base64"
 require 'logger'
 require 'sp_sdk_pb'
+require 'httparty'
 require_relative 'audiences'
 require_relative 'validation'
 require_relative 'metrics'
@@ -344,18 +346,79 @@ module Streamdal
       end
     end
 
-    #
-    # def kv_exists(caller, params)
-    #   puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
-    #
-    #   0
-    # end
-    #
-    # def http_request(caller, params)
-    #   puts "HTTPREQUEST HIT!!!!!!!!!!!!!!!!!!"
-    #
-    #   0
-    # end
+    def kv_exists(caller, ptr, len)
+      puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
+
+      0
+    end
+
+    def make_http_request(req)
+      if req.nil?
+        raise "req is required"
+      end
+
+      options = {
+        headers: { "Content-Type": "application/json", },
+      }
+
+      req.headers.each { |key, value| options.headers[key] = value }
+
+      case req.to_h[:method]
+      when :HTTP_REQUEST_METHOD_GET
+        return HTTParty.get(req.url)
+      when :HTTP_REQUEST_METHOD_POST
+        options.body = req.body
+        return HTTParty.post(req.url, options)
+      when :HTTP_REQUEST_METHOD_PUT
+        options.body = req.body
+        return HTTParty.put(req.url, options)
+      when :HTTP_REQUEST_METHOD_DELETE
+        return HTTParty.delete(req.url)
+      when :HTTP_REQUEST_METHOD_PATCH
+        options.body = req.body
+        return HTTParty.patch(req.url, options)
+      when :HTTP_REQUEST_METHOD_HEAD
+        return HTTParty.head(req.url)
+      when :HTTP_REQUEST_METHOD_OPTIONS
+        return HTTParty.options(req.url)
+      else
+        raise ArgumentError, "Invalid http request method: #{req.method}"
+      end
+    end
+
+    def http_request(caller, ptr, len)
+      data = caller.export("memory").to_memory.read(ptr, len)
+
+      # Read request from memory and decode into HttpRequest
+      req = Streamdal::Protos::HttpRequest.decode(data)
+
+      # Attempt to make HTTP request
+      # On error, return a mock 400 response with the error as the body
+      begin
+        response = make_http_request(req)
+      rescue => e
+        wasm_resp = Streamdal::Protos::HttpResponse.new
+        wasm_resp.code = 400
+        wasm_resp.body = "Unable to execute HTTP request: #{e}"
+        return wasm_resp
+      end
+
+      # Successful request, build the proto from the httparty response
+      wasm_resp = Streamdal::Protos::HttpResponse.new
+      wasm_resp.code = response.code
+      wasm_resp.body = response.body
+      wasm_resp.headers = Google::Protobuf::Map.new(:string, :string, {})
+
+      # Headers can have multiple values, but we just want a map[string]string here for simplicity
+      # The client can pase by the delimiter ";" if needed.
+      response.headers.each do |k, values|
+        wasm_resp.headers[k] = values.join("; ")
+      end
+
+      # Write the HttpResponse proto message to WASM memory
+      # The .wasm module will read/decode this data internally
+      write_to_memory(caller, wasm_resp)
+    end
 
     def _get_function(step)
       # We cache functions so we can eliminate the wasm bytes from steps to save on memory
@@ -368,13 +431,8 @@ module Streamdal
       mod = Wasmtime::Module.new(engine, step._wasm_bytes)
       linker = Wasmtime::Linker.new(engine, wasi: true)
 
-      httpreq = linker.func_new("env", "httpRequest", [:i32, :i32], [:i64]) do |caller, a|
-        puts "--------- HOSTFUNC CALLBACK -----------"
-
-        wasm_resp = Streamdal::Protos::HttpResponse.new
-
-        write_to_memory(caller, wasm_resp)
-
+      httpreq = linker.func_new("env", "httpRequest", [:i32, :i32], [:i64]) do |caller, ptr, len|
+        http_request(caller, ptr, len)
       end
 
       wasi_ctx = Wasmtime::WasiCtxBuilder.new
@@ -771,18 +829,22 @@ module Streamdal
       end
     end
 
+    # Called by host functions to write memory to wasm instance so that
+    # the wasm module can read the result of a host function call
     def write_to_memory(caller, res)
-      puts caller.inspect
-
-      # Serialize protobuf res message
-      resp = res.to_proto
-
       alloc = caller.export("alloc").to_func
       memory = caller.export("memory").to_memory
 
+      # Serialize protobuf message
+      resp = res.to_proto
+
+      # Allocate memory for response
       resp_ptr = alloc.call(resp.length)
+
+      # Write response to memory
       memory.write(resp_ptr, resp)
 
+      # return 64bit integer where first 32 bits is the pointer, and the last 32 is the length
       resp_ptr << 32 | resp.length
     end
 
