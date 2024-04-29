@@ -116,7 +116,6 @@ module Streamdal
       resp.data = data
 
       aud = audience.to_proto(@cfg[:service_name])
-      _add_audience(aud)
 
       labels = {
         "service": @cfg[:service_name],
@@ -155,7 +154,7 @@ module Streamdal
       pipelines = _get_pipelines(aud)
       if pipelines.length == 0
         _send_tail(aud, "", original_data, original_data)
-        resp
+        return resp
       end
 
       @metrics.incr(CounterEntry.new(bytes_processed, aud, labels, data.length))
@@ -339,6 +338,8 @@ module Streamdal
 
       resp = @stub.get_set_pipelines_commands_by_service(req, metadata: _metadata)
 
+      @logger.debug "Received '#{resp.set_pipeline_commands.length}' initial pipelines"
+
       resp.set_pipeline_commands.each do |cmd|
         cmd.set_pipelines.wasm_modules = resp.wasm_modules
         _set_pipelines(cmd)
@@ -505,6 +506,8 @@ module Streamdal
 
     def _get_pipelines(aud)
       aud_str = aud_to_str(aud)
+
+      _add_audience(aud)
 
       if @pipelines.key?(aud_str)
         return @pipelines[aud_str]

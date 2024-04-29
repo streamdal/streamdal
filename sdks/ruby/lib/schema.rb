@@ -18,11 +18,12 @@ module Schema
   def _handle_schema(aud, step, wasm_resp)
     # Only handle schema steps
     if step.infer_schema.nil?
+      @loger.debug("Not a schema inference step")
       return nil
     end
 
     # Only successful schema inferences
-    if wasm_resp.exit_code != Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_TRUE
+    if wasm_resp.exit_code != :WASM_EXIT_CODE_TRUE
       return nil
     end
 
