@@ -80,6 +80,7 @@ module Streamdal
       @publish_queue = Queue.new
       @workers = []
       @logger = cfg.log || Logger.new(STDOUT)
+      @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
 
       _start
     end
@@ -137,10 +138,12 @@ module Streamdal
       c = get_counter(ce)
 
       if c.nil?
+        @logger.debug("incr() is making a new counter for #{ce.name} #{ce.labels}")
         new_counter(ce)
         nil
       end
 
+      @logger.debug("incr() is incrementing counter for #{ce.name} #{ce.labels}")
       @incr_queue.push(ce)
     end
 
@@ -165,18 +168,15 @@ module Streamdal
     def _publish_metrics(ce)
       metric = Streamdal::Protos::Metric.new
       metric.name = ce.name
-      metric.labels = ce.labels
+      metric.labels = Google::Protobuf::Map.new(:string, :string, ce.labels)
       metric.value = ce.value
       metric.audience = ce.aud
 
       req = Streamdal::Protos::MetricsRequest.new
       req.metrics = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Metric, [metric])
 
-      begin
-        @cfg.stub.metrics(req, metadata: _metadata)
-      rescue => e
-        @cfg.log.error("Failed to publish metrics: #{e}")
-      end
+      @stub.metrics(req, metadata: _metadata)
+      @logger.debug("Published metric: #{ce.name} #{ce.labels} #{ce.value}")
     end
 
     def _run_publisher
@@ -221,7 +221,7 @@ module Streamdal
         begin
           _publish_metrics(ce)
         rescue => e
-          @cfg.log.error("Failed to publish metrics: #{e}")
+          @cfg.log.error("Failed to publish metrics: #{e}: #{ce.inspect}")
         end
       end
 
@@ -262,12 +262,20 @@ module Streamdal
 
       until @exit
         ce = @incr_queue.pop
+
+        next if ce.nil?
+
         c = get_counter(ce)
 
         c.incr(ce.value)
       end
 
       @cfg.log.debug("Exiting incrementer worker '#{worker_id}'")
+    end
+
+    # Returns metadata for gRPC requests to the internal gRPC API
+    def _metadata
+      { "auth-token" => @cfg[:streamdal_token].to_s }
     end
   end
 end
