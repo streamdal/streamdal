@@ -138,12 +138,10 @@ module Streamdal
       c = get_counter(ce)
 
       if c.nil?
-        @logger.debug("incr() is making a new counter for #{ce.name} #{ce.labels}")
         new_counter(ce)
         nil
       end
 
-      @logger.debug("incr() is incrementing counter for #{ce.name} #{ce.labels}")
       @incr_queue.push(ce)
     end
 

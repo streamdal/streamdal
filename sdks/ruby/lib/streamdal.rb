@@ -75,8 +75,6 @@ module Streamdal
       @workers = []
       @exit = false
 
-      # TODO: host funcs
-
       # # Connect to Streamdal External gRPC API
       @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
 
@@ -205,11 +203,11 @@ module Streamdal
           isr = wasm_resp.inter_step_result
 
           case wasm_resp.exit_code
-          when Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_FALSE
+          when :WASM_EXIT_CODE_FALSE
             cond = step.on_false
             cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_FALSE
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_FALSE
-          when Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
+          when :WASM_EXIT_CODE_ERROR
             cond = step.on_error
             cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_ERROR
             exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
@@ -346,17 +344,18 @@ module Streamdal
       end
     end
 
-    def kv_exists(caller, params)
-      puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
-
-      0
-    end
-
-    def http_request(caller, params)
-      puts "HTTPREQUEST HIT!!!!!!!!!!!!!!!!!!"
-
-      0
-    end
+    #
+    # def kv_exists(caller, params)
+    #   puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
+    #
+    #   0
+    # end
+    #
+    # def http_request(caller, params)
+    #   puts "HTTPREQUEST HIT!!!!!!!!!!!!!!!!!!"
+    #
+    #   0
+    # end
 
     def _get_function(step)
       # We cache functions so we can eliminate the wasm bytes from steps to save on memory
@@ -369,14 +368,14 @@ module Streamdal
       mod = Wasmtime::Module.new(engine, step._wasm_bytes)
       linker = Wasmtime::Linker.new(engine, wasi: true)
 
-      # TODO: figure out host functions
-      # linker.func_new("env", "kvExists", [:i32, :i32], :i64) do |caller, params, results|
-      #   results = kv_exists(caller, params)
-      # end
-      #
-      # linker.func_new("env", "httpRequest", [:i32, :i32], :i64) do |caller, params, results|
-      #   results = http_request(caller, params)
-      # end
+      httpreq = linker.func_new("env", "httpRequest", [:i32, :i32], [:i64]) do |caller, a|
+        puts "--------- HOSTFUNC CALLBACK -----------"
+
+        wasm_resp = Streamdal::Protos::HttpResponse.new
+
+        write_to_memory(caller, wasm_resp)
+
+      end
 
       wasi_ctx = Wasmtime::WasiCtxBuilder.new
                                          .inherit_stdout
@@ -384,9 +383,11 @@ module Streamdal
                                          .set_argv(ARGV)
                                          .set_env(ENV)
                                          .build
-
       store = Wasmtime::Store.new(engine, wasi_ctx: wasi_ctx)
+
       instance = linker.instantiate(store, mod)
+
+      # TODO: host funcs
 
       # Store in cache
       func = WasmFunction.new
@@ -419,7 +420,7 @@ module Streamdal
         return Streamdal::Protos::WASMResponse.decode(_exec_wasm(req))
       rescue => e
         resp = Streamdal::Protos::WASMResponse.new
-        resp.exit_code = Streamdal::Protos::WASMResponse::WASMExitCode::WASM_EXIT_CODE_ERROR
+        resp.exit_code = :WASM_EXIT_CODE_ERROR
         resp.exit_msg = "Failed to execute WASM: #{e}"
         resp.output_payload = ""
         return resp
@@ -768,6 +769,21 @@ module Streamdal
 
         t
       end
+    end
+
+    def write_to_memory(caller, res)
+      puts caller.inspect
+
+      # Serialize protobuf res message
+      resp = res.to_proto
+
+      alloc = caller.export("alloc").to_func
+      memory = caller.export("memory").to_memory
+
+      resp_ptr = alloc.call(resp.length)
+      memory.write(resp_ptr, resp)
+
+      resp_ptr << 32 | resp.length
     end
 
   end

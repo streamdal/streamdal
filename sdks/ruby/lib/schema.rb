@@ -18,7 +18,6 @@ module Schema
   def _handle_schema(aud, step, wasm_resp)
     # Only handle schema steps
     if step.infer_schema.nil?
-      @loger.debug("Not a schema inference step")
       return nil
     end
 
