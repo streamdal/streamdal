@@ -114,9 +114,11 @@ export const Tail = ({ audience }: { audience: Audience }) => {
   useEffect(() => {
     //
     // When the tail sample rate changes, we need to restart the websocket
+    console.log("shit tail sample signal change", tailSamplingSignal.value);
     if (tailSamplingSignal.value.default === false) {
       stop();
       setTimeout(() => {
+        start();
       }, 1000);
     }
   }, [tailSamplingSignal.value.rate, tailSamplingSignal.value.intervalSeconds]);
