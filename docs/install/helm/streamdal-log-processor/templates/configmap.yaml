@@ -24,12 +24,6 @@ data:
           reconnect_interval => 10
         }
       }
-    
-      stdout {
-        codec => rubydebug {
-          metadata => true
-        }
-      }
     }
     
     # logstash listens on port 6001 for incoming data from log-processor
@@ -59,13 +53,6 @@ data:
         file {
           path => "/logs/%{container}/%{service}/%{filename}"
           codec => line { format => "%{message}" }
-        }
-    
-        # Debug: output to console using rubydebug codec
-        stdout {
-          codec => rubydebug {
-            metadata => true
-          }
         }
       }
     }
