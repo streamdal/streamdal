@@ -24,12 +24,6 @@ data:
           reconnect_interval => 10
         }
       }
-    
-      stdout {
-        codec => rubydebug {
-          metadata => true
-        }
-      }
     }
     
     # logstash listens on port 6001 for incoming data from log-processor
