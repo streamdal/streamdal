@@ -27,6 +27,14 @@ config:
   STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR: "127.0.0.1:6001"
   STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN: "1234"
 
+logrotate:
+  name: logrotate-deployment
+  replicas: 1
+  image: blacklabelops/logrotate
+  env:
+    LOGS_DIRECTORIES: "/var/log/pods"
+    LOGROTATE_SIZE: "1G"
+
 resources:
   logProcessor:
     limits:
