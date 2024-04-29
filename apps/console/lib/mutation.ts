@@ -68,10 +68,7 @@ export const upsertPipeline = async (
   }
 
   const { response: createResponse } = await client
-    .createPipeline(
-      CreatePipelineRequest.create({ pipeline }),
-      meta,
-    );
+    .createPipeline(CreatePipelineRequest.create({ pipeline }), meta);
 
   //
   // Create pipeline returns a non-standard response with no code so

@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- crd_v1_streamdalconfig.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

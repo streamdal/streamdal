@@ -72,3 +72,7 @@ console.
 
 <sub>If you'd like to skip running the release action on push/merge to `main`,
 include "norelease" anywhere in the commit message.</sub>
+
+## Protos
+
+To update protos, set the `streamdal-protos` version number in `deno.json`.

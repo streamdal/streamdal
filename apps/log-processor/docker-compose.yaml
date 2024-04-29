@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  log-processor:
+    image: streamdal/log-processor:latest
+    container_name: log-processor
+    volumes:
+     - .:/app
+    environment:
+     - STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR=:6000
+     - STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR=logstash:6001
+     - STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER_ADDRESS=streamdal-server:8082
+     - STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER_TOKEN=1234
+     - STREAMDAL_LOG_PROCESSOR_DEBUG=true
+    entrypoint: ["sh", "-c", "sleep 10 && ./log-processor"]
+    ports:
+      - "6000:6000"
+    networks:
+      - streamdal_streamdal-network
+    depends_on:
+      - logstash
+
+  logstash:
+    image: logstash:7.17.20
+    volumes:
+      - ./assets/configs/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./assets/configs/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logs/input:/logs/input
+      - ./logs/output:/logs/output
+    ports:
+      - "6001:6001"
+    networks:
+      - streamdal_streamdal-network
+
+networks:
+  streamdal_streamdal-network:
+    external: true

@@ -19,6 +19,7 @@ import {
   tailSignal,
 } from "root/components/tail/signals.ts";
 import { tailRunningSignal } from "../../components/tail/signals.ts";
+import IconX from "tabler-icons/tsx/x.tsx";
 
 export const TailRow = ({ row }: { row: TailData }) => {
   return (
@@ -192,10 +193,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
                 className="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
                 data-tooltip-target="tail-close"
               >
-                <img
-                  src="/images/x-white.svg"
-                  class="w-[14px]"
-                />
+                <IconX class="w-6 h-6 text-white pointer-events-none" />
                 <Tooltip targetId="tail-close" message="Close Tail" />
               </div>
             </a>

@@ -89,6 +89,9 @@ enum DetectiveType {
   DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN = 2034;
   DETECTIVE_TYPE_PII_BEARER_TOKEN = 2035;
 
+  // Uses field/path keyword matching to detect PII, rather than the field's value
+  DETECTIVE_TYPE_PII_KEYWORD = 2036;
+
 
   // Numeric matchers (3000-3999)
 
@@ -122,6 +125,11 @@ message DetectiveStepResultMatch {
 
   // Value of the match
   bytes value = 5;
+
+  // Used to return the type of PII we detected.
+  // This differs from `type` in that it is the type of PII we detected, not the type of match we used to detect it.
+  // This value is freeform and determined based on the values inside the keyword matcher.
+  string pii_type = 6;
 }
 
 message DetectiveStepResult {

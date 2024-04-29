@@ -25,6 +25,7 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 
 import { showNav } from "root/components/nav/signals.ts";
+import IconX from "tabler-icons/tsx/x.tsx";
 import {
   ComponentEdge,
   ServiceEdge,
@@ -66,7 +67,7 @@ const mergeNodes = (
   left: FlowNode[],
   right: FlowNode[],
 ) =>
-  left.map((i) => ({
+  left?.map((i) => ({
     ...i,
     ...right.find(({ id }) => id === i.id),
   }));
@@ -141,7 +142,7 @@ export default function ServiceDisplay(
       >
         {serverErrorSignal.value
           ? <ServerError message={serverErrorSignal.value} />
-          : nodes.length === 0
+          : nodes?.length === 0
           ? <EmptyService />
           : null}
 
@@ -156,7 +157,7 @@ export default function ServiceDisplay(
             }}
             title="reset view"
           >
-            <img src="/images/x.svg" className="max-w-[12px]" />
+            <IconX class="max-w-[18px] max-h-[18px] pointer-events-none" />
           </ControlButton>
         </Controls>
       </ReactFlow>
