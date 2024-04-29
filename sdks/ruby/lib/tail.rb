@@ -43,7 +43,7 @@ module Streamdal
       sleep(1)
 
       @workers.each do |worker|
-        if worker.active?
+        if worker.alive?
           worker.exit
         end
       end
