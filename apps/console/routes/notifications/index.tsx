@@ -32,7 +32,6 @@ export const NotificationsRoute = (
   return (
     <Notifications
       notifications={props?.data?.notifications}
-      success={props?.data?.success}
     />
   );
 };

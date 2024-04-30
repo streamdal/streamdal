@@ -1,5 +1,4 @@
-import { debounce } from "$std/async/debounce.ts";
-import { signal, useSignalEffect } from "@preact/signals";
+import { signal } from "@preact/signals";
 import IconCheck from "tabler-icons/tsx/check.tsx";
 import IconExclamationCircle from "tabler-icons/tsx/exclamation-circle.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
@@ -12,49 +11,35 @@ export type ToastType = {
   autoClose?: boolean;
 };
 
-export const toastSignal = signal<ToastType | null>(null);
 export const toastsSignal = signal<ToastType[]>([]);
 
 export const showToast = (
   { id, message, type, autoClose = true }: ToastType,
 ) => {
-  toastSignal.value = { id, message, type, autoClose };
+  addToast({ id, message, type, autoClose });
+};
+
+const addToast = (toast: ToastType) => {
+  if (toastsSignal.value.find((t: ToastType) => t.id === toast.id)) {
+    return;
+  }
+
+  toastsSignal.value = [...toastsSignal.value, ...[toast]];
+
+  if (toast.autoClose) {
+    setTimeout(() => {
+      removeToast(toast);
+    }, 3000);
+  }
+};
+
+const removeToast = (toast: ToastType) => {
+  toastsSignal.value = toastsSignal.value.filter((t: ToastType) =>
+    t.id !== toast.id
+  );
 };
 
 export const Toasts = () => {
-  const addToast = debounce(
-    (toast: ToastType) => {
-      if (toastsSignal.value.find((t: ToastType) => t.id === toast.id)) {
-        return;
-      }
-
-      toastsSignal.value = [...toastsSignal.value, ...[toast]];
-
-      if (toast.autoClose) {
-        setTimeout(() => {
-          removeToast(toast);
-        }, 3000);
-      }
-    },
-    10,
-  );
-
-  const removeToast = (toast: ToastType) => {
-    toastsSignal.value = toastsSignal.value.filter((t: ToastType) =>
-      t.id !== toast.id
-    );
-  };
-
-  useSignalEffect(() => {
-    if (
-      toastSignal.value
-    ) {
-      addToast(toastSignal.value);
-    }
-
-    toastSignal.value = null;
-  });
-
   if (toastsSignal.value.length === 0) {
     return null;
   }

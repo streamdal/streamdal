@@ -5,19 +5,16 @@ import { newPipeline } from "root/components/pipeline/pipeline.ts";
 
 import { initFlowBite } from "root/components/flowbite/init.tsx";
 import { Tooltip } from "root/components/tooltip/tooltip.tsx";
-import { SuccessType } from "root/routes/_middleware.ts";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import PipelineDetail from "./pipeline.tsx";
-import { showToast } from "root/islands/toasts.tsx";
 
 export default function Pipelines(
-  { id, pipelines, notifications, success, add = false }: {
+  { id, pipelines, notifications, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
     notifications: NotificationConfig[];
-    success?: SuccessType;
     add?: boolean;
   },
 ) {
@@ -28,14 +25,6 @@ export default function Pipelines(
   const selected = id
     ? wrapper.findIndex((p) => p.id === id)
     : Math.max(wrapper.length - 1, 0);
-
-  if (success?.message) {
-    showToast({
-      id: id ? id : "pipelines-message",
-      type: success.status ? "success" : "error",
-      message: success.message,
-    });
-  }
 
   useEffect(() => {
     void initFlowBite();
