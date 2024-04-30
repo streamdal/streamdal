@@ -12,6 +12,8 @@ require 'sp_sdk_pb'
 require 'httparty'
 require 'sp_pipeline_pb'
 require 'sp_info_pb'
+require 'sp_internal_pb'
+require 'sp_common_pb'
 require_relative 'audiences'
 require_relative 'hostfunc'
 require_relative 'kv'
@@ -200,7 +202,7 @@ module Streamdal
             wasm_resp = _call_wasm(step, data, isr)
           rescue => e
             @logger.error "Error running step '#{step.name}': #{e}"
-            step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
+            step_status.status = :EXEC_STATUS_ERROR
             step_status.error = e.to_s
             pipeline_status.step_status.push(step_status)
             break
@@ -221,12 +223,12 @@ module Streamdal
           case wasm_resp.exit_code
           when :WASM_EXIT_CODE_FALSE
             cond = step.on_false
-            cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_FALSE
-            exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_FALSE
+            cond_type = :CONDITION_TYPE_ON_FALSE
+            exec_status = :EXEC_STATUS_FALSE
           when :WASM_EXIT_CODE_ERROR
             cond = step.on_error
-            cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_ERROR
-            exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
+            cond_type = :CONDITION_TYPE_ON_ERROR
+            exec_status = :EXEC_STATUS_ERROR
             isr = nil
 
             # errors_counter, 1, labels, aud
@@ -234,7 +236,7 @@ module Streamdal
           else
             cond = step.on_true
             exec_status = :EXEC_STATUS_TRUE
-            cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_TRUE
+            cond_type = :CONDITION_TYPE_ON_TRUE
           end
 
           _notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
@@ -575,7 +577,7 @@ module Streamdal
 
       tails.each do |tail|
         req = Streamdal::Protos::TailResponse.new
-        req.type = Streamdal::Protos::TailResponseType::TAIL_RESPONSE_TYPE_PAYLOAD
+        req.type = :TAIL_RESPONSE_TYPE_PAYLOAD
         req.audience = aud
         req.pipeline_id = pipeline_id
         req.session_id = @session_id

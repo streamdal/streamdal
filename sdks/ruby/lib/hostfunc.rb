@@ -60,7 +60,7 @@ module Streamdal
       # Headers can have multiple values, but we just want a map[string]string here for simplicity
       # The client can pase by the delimiter ";" if needed.
       response.headers.each do |k, values|
-        wasm_resp.headers[k] = values.join("; ")
+        wasm_resp.headers[k] = values.kind_of?(Array) ? values.join("; ") : values
       end
 
       # Write the HttpResponse proto message to WASM memory
