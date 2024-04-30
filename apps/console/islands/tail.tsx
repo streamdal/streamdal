@@ -116,6 +116,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
     if (tailSamplingSignal.value.default === false) {
       stop();
       setTimeout(() => {
+        start();
       }, 1000);
     }
   }, [tailSamplingSignal.value.rate, tailSamplingSignal.value.intervalSeconds]);
