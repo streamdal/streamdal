@@ -63,6 +63,29 @@ module Streamdal
     end
   end
 
+  Config = Struct.new(:streamdal_url, :streamdal_token, :service_name, :dry_run, :log) do |obj|
+    attr_accessor :streamdal_url, :streamdal_token, :service_name, :dry_run, :log
+
+    def validate
+      if log.nil?
+        @log = Logger.new($stdout)
+      end
+
+      if streamdal_url.nil? || streamdal_url.empty?
+        raise ArgumentError, "streamdal_url is required"
+      end
+
+      if streamdal_token.nil? || streamdal_token.empty?
+        raise ArgumentError, "streamdal_token is required"
+      end
+
+      if service_name.nil? || service_name.empty?
+        raise ArgumentError, "service_name is required"
+      end
+    end
+
+  end
+
   class Client
 
     ##
@@ -77,24 +100,25 @@ module Streamdal
     CounterEntry = Streamdal::Metrics::CounterEntry
     Metrics = Streamdal::Metrics
 
-    def initialize(cfg = {})
+    def initialize(cfg)
+      cfg.validate
+
       @cfg = cfg
       @functions = {}
       @session_id = SecureRandom.uuid
       @pipelines = {}
       @audiences = {}
       @schemas = {}
-      @logger = cfg[:logger].nil? ? Logger.new($stdout) : cfg[:logger]
       @tails = {}
       @paused_tails = {}
-      @metrics = Metrics.new(Metrics::Config.new(cfg[:streamdal_url], cfg[:streamdal_token], @logger))
+      @metrics = Metrics.new(cfg)
       @workers = []
       @exit = false
       @kv = Streamdal::KeyValue.new
       @hostfunc = Streamdal::HostFunc.new(@kv)
 
       # # Connect to Streamdal External gRPC API
-      @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
+      @stub = Streamdal::Protos::Internal::Stub.new(@cfg.streamdal_url, :this_channel_is_insecure)
 
       _pull_initial_pipelines
 
@@ -131,10 +155,10 @@ module Streamdal
       resp.pipeline_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::PipelineStatus, [])
       resp.data = data
 
-      aud = audience.to_proto(@cfg[:service_name])
+      aud = audience.to_proto(@cfg.service_name)
 
       labels = {
-        "service": @cfg[:service_name],
+        "service": @cfg.service_name,
         "operation_type": aud.operation_type,
         "operation": aud.operation_name,
         "component": aud.component_name,
@@ -185,7 +209,7 @@ module Streamdal
         pipeline_status.name = pipeline.name
         pipeline_status.step_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::StepStatus, [])
 
-        @logger.debug "Running pipeline: '#{pipeline.name}'"
+        @cfg.log.debug "Running pipeline: '#{pipeline.name}'"
 
         labels[:pipeline_id] = pipeline.id
         labels[:pipeline_name] = pipeline.name
@@ -201,15 +225,15 @@ module Streamdal
           begin
             wasm_resp = _call_wasm(step, data, isr)
           rescue => e
-            @logger.error "Error running step '#{step.name}': #{e}"
+            @cfg.log.error "Error running step '#{step.name}': #{e}"
             step_status.status = :EXEC_STATUS_ERROR
             step_status.error = e.to_s
             pipeline_status.step_status.push(step_status)
             break
           end
 
-          if @cfg[:dry_run]
-            @logger.debug "Running step '#{step.name}' in dry-run mode"
+          if @cfg.dry_run
+            @cfg.log.debug "Running step '#{step.name}' in dry-run mode"
           end
 
           if wasm_resp.output_payload.length > 0
@@ -241,8 +265,8 @@ module Streamdal
 
           _notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
 
-          if @cfg[:dry_run]
-            @logger.debug("Step '#{step.name}' completed with status: #{exec_status}, continuing to next step")
+          if @cfg.dry_run
+            @cfg.log.debug("Step '#{step.name}' completed with status: #{exec_status}, continuing to next step")
             next
           end
 
@@ -290,8 +314,8 @@ module Streamdal
 
       _send_tail(aud, "", original_data, resp.data)
 
-      if @cfg[:dry_run]
-        @logger.debug "Dry-run, setting response data to original data"
+      if @cfg.dry_run
+        @cfg.log.debug "Dry-run, setting response data to original data"
         resp.data = original_data
       end
 
@@ -311,7 +335,7 @@ module Streamdal
       when "keep_alive"
         # Do nothing
       else
-        @logger.error "unknown command type #{cmd.command}"
+        @cfg.log.error "unknown command type #{cmd.command}"
       end
     end
 
@@ -319,7 +343,7 @@ module Streamdal
       begin
         validate_kv_command(cmd)
       rescue => e
-        @logger.error "KV command validation failed: #{e}"
+        @cfg.log.error "KV command validation failed: #{e}"
         nil
       end
 
@@ -338,7 +362,7 @@ module Streamdal
               step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
               cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
             else
-              @logger.error "WASM module not found for step: #{step._wasm_id}"
+              @cfg.log.error "WASM module not found for step: #{step._wasm_id}"
             end
           end
         }
@@ -350,11 +374,11 @@ module Streamdal
 
     def _pull_initial_pipelines
       req = Streamdal::Protos::GetSetPipelinesCommandsByServiceRequest.new
-      req.service_name = @cfg[:service_name]
+      req.service_name = @cfg.service_name
 
       resp = @stub.get_set_pipelines_commands_by_service(req, metadata: _metadata)
 
-      @logger.debug "Received '#{resp.set_pipeline_commands.length}' initial pipelines"
+      @cfg.log.debug "Received '#{resp.set_pipeline_commands.length}' initial pipelines"
 
       resp.set_pipeline_commands.each do |cmd|
         cmd.set_pipelines.wasm_modules = resp.wasm_modules
@@ -435,7 +459,7 @@ module Streamdal
       req = Streamdal::Protos::RegisterRequest.new
       req.service_name = "demo-ruby"
       req.session_id = @session_id
-      req.dry_run = @cfg[:dry_run] || false
+      req.dry_run = @cfg.dry_run || false
       req.client_info = _gen_client_info
 
       req
@@ -457,11 +481,11 @@ module Streamdal
 
     # Returns metadata for gRPC requests to the internal gRPC API
     def _metadata
-      { "auth-token" => @cfg[:streamdal_token].to_s }
+      { "auth-token" => @cfg.streamdal_token.to_s }
     end
 
     def _register
-      @logger.info("register started")
+      @cfg.log.info("register started")
 
       # Register with Streamdal External gRPC API
       resps = @stub.register(_gen_register_request, metadata: _metadata)
@@ -473,7 +497,7 @@ module Streamdal
         _handle_command(r)
       end
 
-      @logger.info("register exited")
+      @cfg.log.info("register exited")
     end
 
     def _exec_wasm(req)
@@ -532,7 +556,7 @@ module Streamdal
         end
 
         req.client_info = _gen_client_info
-        req.service_name = @cfg[:service_name]
+        req.service_name = @cfg.service_name
 
         @stub.heartbeat(req, metadata: _metadata)
         sleep(DEFAULT_HEARTBEAT_INTERVAL)
@@ -598,14 +622,14 @@ module Streamdal
         return nil
       end
 
-      @logger.debug "Notifying"
+      @cfg.log.debug "Notifying"
 
-      if @cfg[:dry_run]
+      if @cfg.dry_run
         return nil
       end
 
       @metrics.incr(CounterEntry.new(Metrics::COUNTER_NOTIFY, aud, {
-        "service": @cfg[:service_name],
+        "service": @cfg.service_name,
         "component_name": aud.component_name,
         "pipeline_name": pipeline.name,
         "pipeline_id": pipeline.id,
@@ -629,23 +653,23 @@ module Streamdal
       validate_tail_request(cmd)
 
       req = cmd.tail.request
-      @logger.debug "Starting tail '#{req.id}'"
+      @cfg.log.debug "Starting tail '#{req.id}'"
 
       aud_str = aud_to_str(cmd.tail.request.audience)
 
       # Do we already have a tail for this audience
       if @tails.key?(aud_str) && @tails[aud_str].key?(req.id)
-        @logger.error "Tail '#{req.id}' already exists, skipping TailCommand"
+        @cfg.log.error "Tail '#{req.id}' already exists, skipping TailCommand"
         return
       end
 
-      @logger.debug "Tailing audience: #{aud_str}"
+      @cfg.log.debug "Tailing audience: #{aud_str}"
 
       t = Streamdal::Tail.new(
         req,
-        @cfg[:streamdal_url],
-        @cfg[:streamdal_token],
-        @logger,
+        @cfg.streamdal_url,
+        @cfg.streamdal_token,
+        @cfg.log,
         @metrics
       )
 
@@ -676,7 +700,7 @@ module Streamdal
     end
 
     def _stop_tail(cmd)
-      @logger.debug "Stopping tail '#{cmd.tail.request.id}'"
+      @cfg.log.debug "Stopping tail '#{cmd.tail.request.id}'"
       key = aud_to_str(cmd.tail.request.audience)
 
       if @tails.key?(key) && @tails[key].key?(cmd.tail.request.id)
@@ -725,13 +749,13 @@ module Streamdal
 
       _set_paused_tail(t)
 
-      @logger.debug "Paused tail '#{cmd.tail.request.tail.id}'"
+      @cfg.log.debug "Paused tail '#{cmd.tail.request.tail.id}'"
     end
 
     def _resume_tail(cmd)
       t = _remove_paused_tail(cmd.tail.request.audience, cmd.tail.request.tail.id)
       if t.nil?
-        @logger.error "Tail '#{cmd.tail.request.tail.id}' not found in paused tails"
+        @cfg.log.error "Tail '#{cmd.tail.request.tail.id}' not found in paused tails"
         return nil
       end
 
@@ -739,7 +763,7 @@ module Streamdal
 
       _set_active_tail(t)
 
-      @logger.debug "Resumed tail '#{cmd.tail.request.tail.id}'"
+      @cfg.log.debug "Resumed tail '#{cmd.tail.request.tail.id}'"
     end
 
     def _remove_active_tail(aud, tail_id)

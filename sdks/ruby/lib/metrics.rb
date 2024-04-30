@@ -53,24 +53,10 @@ module Streamdal
 
     CounterEntry = Struct.new(:name, :aud, :labels, :value)
 
-    Config = Struct.new(:streamdal_url, :streamdal_token, :log) do
-      def validate
-        if streamdal_url.nil? || streamdal_url.empty?
-          raise ArgumentError, "streamdal_url is required"
-        end
-
-        if streamdal_token.nil? || streamdal_token.empty?
-          raise ArgumentError, "streamdal_token is required"
-        end
-      end
-    end
-
     def initialize(cfg)
       if cfg.nil?
         raise ArgumentError, "cfg is nil"
       end
-
-      cfg.validate
 
       @cfg = cfg
       @counters = {}
@@ -79,8 +65,7 @@ module Streamdal
       @incr_queue = Queue.new
       @publish_queue = Queue.new
       @workers = []
-      @logger = cfg.log || Logger.new(STDOUT)
-      @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
+      @stub = Streamdal::Protos::Internal::Stub.new(@cfg.streamdal_url, :this_channel_is_insecure)
 
       _start
     end
@@ -174,7 +159,7 @@ module Streamdal
       req.metrics = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Metric, [metric])
 
       @stub.metrics(req, metadata: _metadata)
-      @logger.debug("Published metric: #{ce.name} #{ce.labels} #{ce.value}")
+      @cfg.log.debug("Published metric: #{ce.name} #{ce.labels} #{ce.value}")
     end
 
     def _run_publisher
@@ -273,7 +258,7 @@ module Streamdal
 
     # Returns metadata for gRPC requests to the internal gRPC API
     def _metadata
-      { "auth-token" => @cfg[:streamdal_token].to_s }
+      { "auth-token" => @cfg.streamdal_token.to_s }
     end
   end
 end

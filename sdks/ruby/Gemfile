@@ -9,4 +9,5 @@ gem "rake", "~> 13.1"
 gem "bozos_buckets", "~> 0.0.2"
 gem "httparty"
 
-gem "rspec", :group => [:development]
+gem "rspec", :group => [:test]
+gem 'simplecov', require: false, group: :test

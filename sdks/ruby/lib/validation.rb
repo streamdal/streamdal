@@ -1,22 +1,7 @@
+##
+# Validation mix-in module
+
 module Validation
-  def validate_cfg(cfg)
-    if cfg.nil?
-      raise "cfg is required"
-    end
-
-    if cfg[:service_name] == ""
-      raise "service_name is required"
-    end
-
-    if cfg[:streamdal_url] == ""
-      raise "streamdal_url is required"
-    end
-
-    if cfg[:streamdal_token] == ""
-      raise "streamdal_token is required"
-    end
-  end
-
   def validate_set_pipelines(cmd)
     if cmd.nil?
       raise "cmd is required"
@@ -68,7 +53,7 @@ module Validation
       raise "instruction action is required"
     end
 
-    if inst.action == Streamdal::Protos::KVAction::KV_ACTION_UNSET
+    if inst.action == :KV_ACTION_UNSET
       raise "instruction action is required"
     end
 
@@ -101,6 +86,10 @@ module Validation
 
     if cmd.audience.nil?
       raise "audience is required"
+    end
+
+    if cmd.tail.nil?
+      raise "tail is required"
     end
   end
 end

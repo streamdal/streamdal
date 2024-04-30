@@ -1,6 +1,11 @@
-require "./lib/streamdal"
+require_relative "./lib/streamdal"
 
-a = Streamdal::Client.new({ service_name: "demo-ruby", streamdal_token: "1234", streamdal_url: "localhost:8082" })
+cfg = Streamdal::Config.new
+cfg.streamdal_url = "localhost:8082"
+cfg.streamdal_token = "1234"
+cfg.service_name = "demo"
+
+client = Streamdal::Client.new(cfg)
 # a.tmp
 
 audience = Streamdal::Audience.new
@@ -9,7 +14,7 @@ audience.operation_name = "consume"
 audience.operation_type = Streamdal::OPERATION_TYPE_CONSUMER
 
 while true
-  resp = a.process('{"email": "mark@streamdal.com"}', audience)
+  resp = client.process('{"email": "mark@streamdal.com"}', audience)
   puts "Response: "
   puts "-----------------------------------"
   puts resp.inspect.gsub(/\\n/, "\n")
@@ -20,4 +25,4 @@ while true
   sleep(3)
 end
 
-a.shutdown
+client.shutdown
