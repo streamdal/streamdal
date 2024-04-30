@@ -14,7 +14,7 @@ export const RoutedActionModal = (
     //
     // Disabling partial nav here as downstream redirects don't work with fresh.
     // Roundabout typecast as deno/fresh does not permit a straightforward f-client-nav="false"
-    <div className="fixed top-[8%] left-[30%] z-50">
+    <div className="fixed top-[16%] left-[30%] z-50">
       <div
         class="relative min-w-96 max-h-[80vh] max-w-[80vw] p-4 overflow-x-hidden overflow-y-auto"
         f-client-nav={"false" as unknown as boolean}
