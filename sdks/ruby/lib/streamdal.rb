@@ -10,11 +10,15 @@ require "base64"
 require 'logger'
 require 'sp_sdk_pb'
 require 'httparty'
+require 'sp_pipeline_pb'
+require 'sp_info_pb'
 require_relative 'audiences'
-require_relative 'validation'
+require_relative 'hostfunc'
+require_relative 'kv'
 require_relative 'metrics'
 require_relative 'schema'
 require_relative 'tail'
+require_relative 'validation'
 
 DEFAULT_GRPC_RECONNECT_INTERVAL = 5 # 5 seconds
 DEFAULT_PIPELINE_TIMEOUT = 1 / 10 # 100 milliseconds
@@ -31,6 +35,9 @@ module Streamdal
   # Data class to hold instantiated wasm functions
   class WasmFunction
 
+    ##
+    # Instance of an initialized wasm module and associated memory store
+
     attr_accessor :instance, :store
 
     def initialize
@@ -40,9 +47,9 @@ module Streamdal
 
   end
 
-  # Sharon.schadler@pltitle.com
-
+  ##
   # Data class to store/pass audiences
+
   Audience = Struct.new(:operation_type, :operation_name, :component_name) do
     def to_proto(service_name)
       Streamdal::Protos::Audience.new(
@@ -55,11 +62,16 @@ module Streamdal
   end
 
   class Client
+
+    ##
+    # Streamdal SDK Client
+    #
+    # There is only one public method: process(data, audience)
     include Audiences
     include Validation
     include Schema
 
-    # Aliases
+    # Aliases to keep lines short
     CounterEntry = Streamdal::Metrics::CounterEntry
     Metrics = Streamdal::Metrics
 
@@ -76,6 +88,8 @@ module Streamdal
       @metrics = Metrics.new(Metrics::Config.new(cfg[:streamdal_url], cfg[:streamdal_token], @logger))
       @workers = []
       @exit = false
+      @kv = Streamdal::KeyValue.new
+      @hostfunc = Streamdal::HostFunc.new(@kv)
 
       # # Connect to Streamdal External gRPC API
       @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
@@ -111,7 +125,7 @@ module Streamdal
       end
 
       resp = Streamdal::Protos::SDKResponse.new
-      resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+      resp.status = :EXEC_STATUS_TRUE
       resp.pipeline_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::PipelineStatus, [])
       resp.data = data
 
@@ -143,7 +157,7 @@ module Streamdal
 
       if payload_size > MAX_PAYLOAD_SIZE
         # TODO: add metrics
-        resp.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_ERROR
+        resp.status = :EXEC_STATUS_ERROR
         resp.error = "payload size exceeds maximum allowed size"
         resp
       end
@@ -180,7 +194,7 @@ module Streamdal
         pipeline.steps.each do |step|
           step_status = Streamdal::Protos::StepStatus.new
           step_status.name = step.name
-          step_status.status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+          step_status.status = :EXEC_STATUS_TRUE
 
           begin
             wasm_resp = _call_wasm(step, data, isr)
@@ -219,7 +233,7 @@ module Streamdal
             @metrics.incr(CounterEntry.new(errors_counter, aud, labels, 1))
           else
             cond = step.on_true
-            exec_status = Streamdal::Protos::ExecStatus::EXEC_STATUS_TRUE
+            exec_status = :EXEC_STATUS_TRUE
             cond_type = Streamdal::Protos::NotifyRequest::ConditionType::CONDITION_TYPE_ON_TRUE
           end
 
@@ -239,14 +253,14 @@ module Streamdal
             resp.metadata = cond.metadata
 
             case cond.abort
-            when Streamdal::Protos::AbortCondition::ABORT_CONDITION_ABORT_CURRENT
+            when :ABORT_CONDITION_ABORT_CURRENT
               step_status.status = exec_status
               step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
               pipeline_status.step_status.push(step_status)
               resp.pipeline_status.push(pipeline_status)
               # Continue outer pipeline loop, there might be additional pipelines
               break
-            when Streamdal::Protos::AbortCondition::ABORT_CONDITION_ABORT_ALL
+            when :ABORT_CONDITION_ABORT_ALL
               # Set step status and push to pipeline status
               step_status.status = exec_status
               step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
@@ -346,80 +360,6 @@ module Streamdal
       end
     end
 
-    def kv_exists(caller, ptr, len)
-      puts "KVEXISTS HIT!!!!!!!!!!!!!!!!!!"
-
-      0
-    end
-
-    def make_http_request(req)
-      if req.nil?
-        raise "req is required"
-      end
-
-      options = {
-        headers: { "Content-Type": "application/json", },
-      }
-
-      req.headers.each { |key, value| options.headers[key] = value }
-
-      case req.to_h[:method]
-      when :HTTP_REQUEST_METHOD_GET
-        return HTTParty.get(req.url)
-      when :HTTP_REQUEST_METHOD_POST
-        options.body = req.body
-        return HTTParty.post(req.url, options)
-      when :HTTP_REQUEST_METHOD_PUT
-        options.body = req.body
-        return HTTParty.put(req.url, options)
-      when :HTTP_REQUEST_METHOD_DELETE
-        return HTTParty.delete(req.url)
-      when :HTTP_REQUEST_METHOD_PATCH
-        options.body = req.body
-        return HTTParty.patch(req.url, options)
-      when :HTTP_REQUEST_METHOD_HEAD
-        return HTTParty.head(req.url)
-      when :HTTP_REQUEST_METHOD_OPTIONS
-        return HTTParty.options(req.url)
-      else
-        raise ArgumentError, "Invalid http request method: #{req.method}"
-      end
-    end
-
-    def http_request(caller, ptr, len)
-      data = caller.export("memory").to_memory.read(ptr, len)
-
-      # Read request from memory and decode into HttpRequest
-      req = Streamdal::Protos::HttpRequest.decode(data)
-
-      # Attempt to make HTTP request
-      # On error, return a mock 400 response with the error as the body
-      begin
-        response = make_http_request(req)
-      rescue => e
-        wasm_resp = Streamdal::Protos::HttpResponse.new
-        wasm_resp.code = 400
-        wasm_resp.body = "Unable to execute HTTP request: #{e}"
-        return wasm_resp
-      end
-
-      # Successful request, build the proto from the httparty response
-      wasm_resp = Streamdal::Protos::HttpResponse.new
-      wasm_resp.code = response.code
-      wasm_resp.body = response.body
-      wasm_resp.headers = Google::Protobuf::Map.new(:string, :string, {})
-
-      # Headers can have multiple values, but we just want a map[string]string here for simplicity
-      # The client can pase by the delimiter ";" if needed.
-      response.headers.each do |k, values|
-        wasm_resp.headers[k] = values.join("; ")
-      end
-
-      # Write the HttpResponse proto message to WASM memory
-      # The .wasm module will read/decode this data internally
-      write_to_memory(caller, wasm_resp)
-    end
-
     def _get_function(step)
       # We cache functions so we can eliminate the wasm bytes from steps to save on memory
       # And also to avoid re-initializing the same function multiple times
@@ -431,8 +371,12 @@ module Streamdal
       mod = Wasmtime::Module.new(engine, step._wasm_bytes)
       linker = Wasmtime::Linker.new(engine, wasi: true)
 
-      httpreq = linker.func_new("env", "httpRequest", [:i32, :i32], [:i64]) do |caller, ptr, len|
-        http_request(caller, ptr, len)
+      linker.func_new("env", "httpRequest", [:i32, :i32], [:i64]) do |caller, ptr, len|
+        @hostfunc.http_request(caller, ptr, len)
+      end
+
+      linker.func_new("env", "kvExists", [:i32, :i32], [:i64]) do |caller, ptr, len|
+        @hostfunc.kv_exists(caller, ptr, len)
       end
 
       wasi_ctx = Wasmtime::WasiCtxBuilder.new
@@ -499,7 +443,7 @@ module Streamdal
       arch, os = RUBY_PLATFORM.split(/-/)
 
       ci = Streamdal::Protos::ClientInfo.new
-      ci.client_type = Streamdal::Protos::ClientType::CLIENT_TYPE_SDK
+      ci.client_type = :CLIENT_TYPE_SDK
       ci.library_name = "ruby-sdk"
       ci.library_version = "0.0.1" # TODO: inject via github action
       ci.language = "ruby"
