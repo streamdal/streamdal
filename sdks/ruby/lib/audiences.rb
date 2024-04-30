@@ -1,6 +1,5 @@
 module Audiences
   def aud_to_str(aud)
-    # TODO: move to common package
     "#{aud.service_name}.#{aud.component_name}.#{aud.operation_type}.#{aud.operation_name}"
   end
 

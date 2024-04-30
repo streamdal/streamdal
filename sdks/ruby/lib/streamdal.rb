@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'base64'
 require "sp_internal_services_pb"
 require "sp_pipeline_pb"
 require "sp_wsm_pb"
