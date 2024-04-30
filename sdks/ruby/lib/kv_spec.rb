@@ -1,4 +1,5 @@
 require 'rspec'
+require_relative 'spec_helper'
 require_relative 'kv'
 
 RSpec.describe 'KeyValue' do
