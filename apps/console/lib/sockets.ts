@@ -74,6 +74,7 @@ export const serviceMapSocket = (path: string) => {
       const serviceMap: ServiceSignal = JSON.parse(
         new TextDecoder().decode(view),
       );
+
       serviceSignal.value = {
         ...serviceMap,
         //

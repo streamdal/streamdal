@@ -6,9 +6,8 @@ import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { InfoDrawer } from "../islands/drawer/infoDrawer.tsx";
 import { NavBar } from "../islands/nav.tsx";
 
-import ServiceDisplay from "../islands/serviceDisplay.tsx";
 import { ServiceModals } from "../islands/modals/serviceModals.tsx";
-import { Sockets } from "../islands/sockets.tsx";
+import ServiceDisplay from "../islands/serviceDisplay.tsx";
 import { GRPC_TOKEN } from "../lib/configs.ts";
 import { initAllServices } from "../lib/fetch.ts";
 
@@ -43,7 +42,6 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
 
   return (
     <div className="flex flex-col w-full text-web h-screen">
-      <Sockets />
       <NavBar />
       <div className="flex flex-row w-full justify-between">
         <div className="grow">
@@ -61,8 +59,7 @@ export default async function Layout(req: Request, ctx: LayoutContext) {
 
       <ReactFlowProvider>
         <ServiceDisplay
-          initNodes={serviceSignal.value?.displayNodes || []}
-          initEdges={serviceSignal.value?.displayEdges || []}
+          serviceMap={serviceSignal.value}
           success={ctx.data?.success}
         />
       </ReactFlowProvider>

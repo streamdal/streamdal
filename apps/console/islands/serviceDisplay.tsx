@@ -20,7 +20,10 @@ import { useEffect, useState } from "preact/hooks";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { ServerError } from "../components/error/server.tsx";
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
+import {
+  ServiceSignal,
+  serviceSignal,
+} from "../components/serviceMap/serviceSignal.ts";
 import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 
 import { showNav } from "root/components/nav/signals.ts";
@@ -37,6 +40,8 @@ import {
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
 import { showToast, Toasts } from "root/islands/toasts.tsx";
 import { SuccessType } from "root/routes/_middleware.ts";
+import { mapLiveAudiences } from "root/lib/serviceMapper.ts";
+import { Sockets } from "root/islands/sockets.tsx";
 const LAYOUT_KEY = "service-display-layout";
 
 const DEFAULT_VIEWPORT = {
@@ -94,9 +99,8 @@ const deserializeDisplay = () => {
 };
 
 export default function ServiceDisplay(
-  { initNodes, initEdges, success }: {
-    initNodes: FlowNode[];
-    initEdges: FlowEdge[];
+  { serviceMap, success }: {
+    serviceMap?: ServiceSignal;
     success?: SuccessType;
   },
 ) {
@@ -105,10 +109,12 @@ export default function ServiceDisplay(
   const viewPort = savedDisplay?.viewPort || DEFAULT_VIEWPORT;
   const [rfInstance, setRfInstance] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    mergeNodes(initNodes, savedNodes),
+    mergeNodes(serviceMap?.displayNodes || [], savedNodes),
   );
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(
+    serviceMap?.displayEdges || [],
+  );
 
   useSignalEffect(() => {
     localStorage.setItem(OP_MODAL_KEY, JSON.stringify(opModal.value));
@@ -135,10 +141,18 @@ export default function ServiceDisplay(
         message: success.message,
       });
     }
+
+    if (serviceMap) {
+      serviceSignal.value = {
+        ...serviceMap,
+        liveAudiences: mapLiveAudiences(serviceMap.live),
+      };
+    }
   }, []);
 
   return (
     <>
+      <Sockets />
       <Toasts />
       <div
         class={`w-full h-screen m-0 pr-[308px]`}
@@ -167,7 +181,7 @@ export default function ServiceDisplay(
           <Background
             style={{ height: "100%" }}
           />
-          <Controls position="bottom-right">
+          <Controls position="bottom-right" className="mb-6">
             <ControlButton
               onClick={() => {
                 localStorage.removeItem(LAYOUT_KEY);
