@@ -1,6 +1,6 @@
 [package]
 name = "streamdal-protos"
-version = "0.1.45"
+version = "0.1.46"
 edition = "2021"
 authors = ["Daniel Selans <daniel@streamdal.com>"]
 categories = ["development-tools"]
