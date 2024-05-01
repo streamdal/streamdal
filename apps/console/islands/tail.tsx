@@ -199,7 +199,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
         </div>
         <div
           class={`flex flex-col ${
-            fullScreen ? "h-[calc(100vh-120px)]" : "h-[calc(100vh-240px)]"
+            fullScreen
+              ? "h-[calc(100vh-120px)]"
+              : "h-[calc(100vh-240px)] max-w-[calc(100vw-410px)]"
           } dark-scrollbar overflow-y-scroll rounded-md bg-black text-white`}
         >
           {tailSignal.value?.map((tail: TailData) => <TailRow row={tail} />)}
