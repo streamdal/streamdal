@@ -185,7 +185,7 @@ export default function ServiceDisplay(
           <Background
             style={{ height: "100%" }}
           />
-          <Controls position="bottom-right" className="mb-6">
+          <Controls position="bottom-right">
             <ControlButton
               onClick={() => {
                 localStorage.removeItem(LAYOUT_KEY);
