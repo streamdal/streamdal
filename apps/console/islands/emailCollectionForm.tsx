@@ -57,7 +57,7 @@ export const EmailCollectionForm = () => {
             data={data}
             setData={setData}
             wrapperClass={"w-[350px]"}
-            inputClass={"border-2 border-purple-100 rounded-md text-sm my-2"}
+            inputClass={"border-2 border-violet-100 rounded-md text-sm my-2"}
             placeHolder={"name@company.com"}
           />
           <input type="submit" class="hidden" />

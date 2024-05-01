@@ -27,21 +27,22 @@ import {
   resolveValue,
   validate,
 } from "../../components/form/validate.ts";
-import { DeleteModal } from "../../components/modals/deleteModal.tsx";
 import {
   kinds,
   newStep,
   PipelineSchema,
 } from "../../components/pipeline/pipeline.ts";
 import { PipelineMenu } from "../../components/pipeline/pipelineMenu.tsx";
+import { argTypes, StepArgs } from "../../components/pipeline/stepArgs.tsx";
 import { StepMenu } from "../../components/pipeline/stepMenu.tsx";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 import { PipelineHTTP } from "../pipelines/pipelineHTTP.tsx";
 import { PipelineSchemaValidation } from "../pipelines/pipelineSchemaValidation.tsx";
 import { PipelineTransform } from "../pipelines/pipelineTransform.tsx";
-import { argTypes, StepArgs } from "../../components/pipeline/stepArgs.tsx";
 import { StepConditions } from "./stepConditions.tsx";
 
+import { ActionModal } from "../modals/actionModal.tsx";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 
 export default function PipelineDetail({
@@ -227,11 +228,22 @@ export default function PipelineDetail({
                       />
                       {deleteOpen === i
                         ? (
-                          <DeleteModal
-                            entityType="Pipeline step"
-                            entityName={step.name}
+                          <ActionModal
+                            icon={
+                              <IconTrash class="w-10 h-10 mx-auto text-eyelid" />
+                            }
+                            message={
+                              <div>
+                                Delete pipeline step{"  "}
+                                <span class="text-medium font-bold ">
+                                  {step.name}
+                                </span>?
+                              </div>
+                            }
+                            actionText="Delete Step"
+                            destructive={true}
                             onClose={() => setDeleteOpen(null)}
-                            onDelete={() => deleteStep(i)}
+                            onAction={() => deleteStep(i)}
                           />
                         )
                         : null}

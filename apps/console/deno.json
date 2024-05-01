@@ -6,9 +6,9 @@
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts",
-    "check:types": "deno check **/*.ts && deno check **/*.tsx",
-    "fmt": "deno fmt --check **/*.ts && deno fmt --check **/*.tsx",
-    "lint": "deno lint **/*.ts && deno lint **/*.tsx",
+    "check:types": "deno check --node-modules-dir=true **/*.ts && deno check --node-modules-dir=true **/*.tsx",
+    "fmt": "deno fmt --ignore=node_modules --check **/*.ts && deno fmt --ignore=node_modules --check **/*.tsx",
+    "lint": "deno lint --ignore=node_modules **/*.ts && deno lint --ignore=node_modules **/*.tsx",
     "ok": "deno task fmt && deno task lint && deno task check:types && deno task test"
   },
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
@@ -18,6 +18,7 @@
       "tags": ["fresh", "recommended"]
     }
   },
+  "nodeModulesDir": true,
   "imports": {
     "root/": "./",
     "$std/": "https://deno.land/std@0.190.0/",
@@ -31,8 +32,9 @@
     "react-dom": "https://esm.sh/v132/preact@10.17.1/compat",
     "react/jsx-runtime": "https://esm.sh/v132/preact@10.19.6",
     "reactflow": "https://esm.sh/v132/reactflow@11.8.2?alias=react:preact/compat,react-dom:preact/compat,@types/react:preact/compat&external=preact/compat&deps=preact@10.17.1",
-    "twind": "https://esm.sh/v132/twind@0.16.19",
-    "twind/": "https://esm.sh/v132/twind@0.16.19/",
+    "tailwindcss": "npm:tailwindcss@3.4.3",
+    "tailwindcss/": "npm:/tailwindcss@3.4.3/",
+    "tailwindcss/plugin": "npm:/tailwindcss@3.4.3/plugin.js",
     "flowbite": "https://esm.sh/v132/flowbite@1.7.0",
     "@protobuf-ts/runtime": "https://esm.sh/v132/@protobuf-ts/runtime@2.9.4",
     "@protobuf-ts/runtime-rpc": "https://esm.sh/v132/@protobuf-ts/runtime-rpc@2.9.4",
@@ -40,10 +42,7 @@
     "streamdal-protos/": "https://deno.land/x/streamdal_protos@v0.1.45/",
     "zod/": "https://deno.land/x/zod@v3.22.4/",
     "tabler-icons/": "https://deno.land/x/tabler_icons_tsx@0.0.5/",
-    "fresh-session/": "https://deno.land/x/fresh_session@0.2.2/",
-    "@twind/core": "https://esm.sh/@twind/core@1.1.3",
-    "@twind/preset-tailwind": "https://esm.sh/@twind/preset-tailwind@1.1.4/",
-    "@twind/preset-autoprefix": "https://esm.sh/@twind/preset-autoprefix@1.0.7/"
+    "fresh-session/": "https://deno.land/x/fresh_session@0.2.2/"
   },
   "exclude": ["**/_fresh/*"]
 }

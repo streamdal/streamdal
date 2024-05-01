@@ -16,12 +16,14 @@ import {
 } from "../components/serviceMap/customNodes.tsx";
 
 import { useSignalEffect } from "@preact/signals";
-import { useState } from "preact/hooks";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
+import { useEffect, useState } from "preact/hooks";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import { ServerError } from "../components/error/server.tsx";
-import { serviceSignal } from "../components/serviceMap/serviceSignal.ts";
+import {
+  ServiceSignal,
+  serviceSignal,
+} from "../components/serviceMap/serviceSignal.ts";
 import { FlowEdge, FlowNode } from "../lib/nodeMapper.ts";
 
 import { showNav } from "root/components/nav/signals.ts";
@@ -36,6 +38,10 @@ import {
   opModal,
 } from "../components/serviceMap/opModalSignal.ts";
 import { serverErrorSignal } from "../components/serviceMap/serverErrorSignal.tsx";
+import { showToast, Toasts } from "root/islands/toasts.tsx";
+import { SuccessType } from "root/routes/_middleware.ts";
+import { mapLiveAudiences } from "root/lib/serviceMapper.ts";
+import { Sockets } from "root/islands/sockets.tsx";
 const LAYOUT_KEY = "service-display-layout";
 
 const DEFAULT_VIEWPORT = {
@@ -64,13 +70,17 @@ const edgeTypes: EdgeTypes = {
 };
 
 const mergeNodes = (
-  left: FlowNode[],
-  right: FlowNode[],
+  incoming: FlowNode[],
+  saved: FlowNode[],
 ) =>
-  left?.map((i) => ({
-    ...i,
-    ...right.find(({ id }) => id === i.id),
-  }));
+  incoming?.map((i) => {
+    const found = saved.find(({ id }) => id === i.id);
+
+    return {
+      ...i,
+      ...found ? found : {},
+    };
+  });
 
 const serializeDisplay = debounce(
   (rfInstance: ReactFlowInstance) => {
@@ -89,9 +99,9 @@ const deserializeDisplay = () => {
 };
 
 export default function ServiceDisplay(
-  { initNodes, initEdges }: {
-    initNodes: FlowNode[];
-    initEdges: FlowEdge[];
+  { serviceMap, success }: {
+    serviceMap?: ServiceSignal;
+    success?: SuccessType;
   },
 ) {
   const savedDisplay = deserializeDisplay();
@@ -99,10 +109,12 @@ export default function ServiceDisplay(
   const viewPort = savedDisplay?.viewPort || DEFAULT_VIEWPORT;
   const [rfInstance, setRfInstance] = useState(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    mergeNodes(initNodes, savedNodes),
+    mergeNodes(serviceMap?.displayNodes || [], savedNodes),
   );
 
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(
+    serviceMap?.displayEdges || [],
+  );
 
   useSignalEffect(() => {
     localStorage.setItem(OP_MODAL_KEY, JSON.stringify(opModal.value));
@@ -121,46 +133,71 @@ export default function ServiceDisplay(
     }
   };
 
-  return (
-    <div
-      class={`w-full h-screen m-0 w-[calc(100vw-${OP_MODAL_WIDTH})]`}
-      onClick={() => showNav.value = false}
-    >
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={(change: any) => {
-          onNodesChange(change);
-          rfInstance && serializeDisplay(rfInstance);
-        }}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        defaultViewport={viewPort}
-        edgeTypes={edgeTypes}
-        onClick={(e: any) => clearModal(e)}
-        onInit={setRfInstance}
-      >
-        {serverErrorSignal.value
-          ? <ServerError message={serverErrorSignal.value} />
-          : nodes?.length === 0
-          ? <EmptyService />
-          : null}
+  useEffect(() => {
+    if (success?.message) {
+      showToast({
+        id: "global",
+        type: success.status ? "success" : "error",
+        message: success.message,
+      });
+    }
 
-        <Background
-          style={{ height: "100vh" }}
-        />
-        <Controls position="bottom-right" style={{ marginBottom: "80px" }}>
-          <ControlButton
-            onClick={() => {
-              localStorage.removeItem(LAYOUT_KEY);
-              setNodes(serviceSignal.value.displayNodes);
-            }}
-            title="reset view"
-          >
-            <IconX class="max-w-[18px] max-h-[18px] pointer-events-none" />
-          </ControlButton>
-        </Controls>
-      </ReactFlow>
-    </div>
+    //
+    // init client side serviceSignal from props so we
+    // don't have a flicker before socket-based updates
+    // start streaming in
+    if (serviceMap) {
+      serviceSignal.value = {
+        ...serviceMap,
+        liveAudiences: mapLiveAudiences(serviceMap.live),
+      };
+    }
+  }, []);
+
+  return (
+    <>
+      <Sockets />
+      <Toasts />
+      <div
+        class={`w-full h-screen m-0 pr-[308px]`}
+        onClick={() => showNav.value = false}
+      >
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={(change: any) => {
+            onNodesChange(change);
+            rfInstance && serializeDisplay(rfInstance);
+          }}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          defaultViewport={viewPort}
+          edgeTypes={edgeTypes}
+          onClick={(e: any) => clearModal(e)}
+          onInit={setRfInstance}
+        >
+          {serverErrorSignal.value
+            ? <ServerError message={serverErrorSignal.value} />
+            : nodes?.length === 0
+            ? <EmptyService />
+            : null}
+
+          <Background
+            style={{ height: "100%" }}
+          />
+          <Controls position="bottom-right">
+            <ControlButton
+              onClick={() => {
+                localStorage.removeItem(LAYOUT_KEY);
+                setNodes(serviceSignal.value.displayNodes);
+              }}
+              title="reset view"
+            >
+              <IconX class="max-w-[18px] max-h-[18px] pointer-events-none" />
+            </ControlButton>
+          </Controls>
+        </ReactFlow>
+      </div>
+    </>
   );
 }

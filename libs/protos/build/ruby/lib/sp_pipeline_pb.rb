@@ -23,6 +23,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       repeated :steps, :message, 3, "protos.PipelineStep"
       repeated :_notification_configs, :message, 4, "protos.NotificationConfig"
       proto3_optional :_paused, :bool, 1000
+      proto3_optional :_description, :string, 1001
+      proto3_optional :_version, :string, 1002
+      proto3_optional :_url, :string, 1003
+      proto3_optional :_created_at_unix_ts_utc, :int64, 1004
+      proto3_optional :_updated_at_unix_ts_utc, :int64, 1005
+      proto3_optional :_created_by, :string, 1006
     end
     add_message "protos.PipelineStepConditions" do
       optional :abort, :enum, 1, "protos.AbortCondition"
@@ -66,6 +72,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "protos.PipelineConfigs" do
       repeated :configs, :message, 1, "protos.PipelineConfig"
       proto3_optional :_is_empty, :bool, 1000
+      proto3_optional :_created_by, :string, 1001
     end
     add_message "protos.PipelineConfig" do
       optional :id, :string, 1

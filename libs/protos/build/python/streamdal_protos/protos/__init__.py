@@ -572,6 +572,8 @@ class Schema(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class SampleOptions(betterproto.Message):
+    """ """
+
     sample_rate: int = betterproto.uint32_field(1)
     sample_interval_seconds: int = betterproto.uint32_field(2)
 

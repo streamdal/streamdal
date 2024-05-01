@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.logrotate.name }}
+  labels:
+    app: {{ .Values.logrotate.name }}
+spec:
+  replicas: {{ .Values.logrotate.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.logrotate.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.logrotate.name }}
+    spec:
+      containers:
+      - name: logrotate
+        image: {{ .Values.logrotate.image }}
+        env:
+        - name: LOGS_DIRECTORIES
+          value: "{{ .Values.logrotate.env.LOGS_DIRECTORIES }}"
+        - name: LOGROTATE_SIZE
+          value: "{{ .Values.logrotate.env.LOGROTATE_SIZE }}"
+        volumeMounts:
+          - name: logs
+            mountPath: /var/log/pods
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-logs-pvc

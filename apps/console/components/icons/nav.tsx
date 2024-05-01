@@ -28,7 +28,7 @@ export const Kebab = (props: any) => {
 
 export const Loading = (props: any) => (
   <svg
-    className="animate-spin -ml-1 mr-3 h-5 w-5 text-purple-500"
+    className="animate-spin -ml-1 mr-3 h-5 w-5 text-violet-500"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"

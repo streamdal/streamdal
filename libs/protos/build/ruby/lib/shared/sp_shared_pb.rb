@@ -9,6 +9,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :id, :string, 1
       optional :bytes, :bytes, 2
       optional :function, :string, 3
+      optional :name, :string, 4
+      optional :_filename, :string, 5
+      optional :_bundled, :bool, 6
+      proto3_optional :description, :string, 101
+      proto3_optional :version, :string, 102
+      proto3_optional :url, :string, 103
+      proto3_optional :_created_at_unix_ts_ns_utc, :int64, 1000
+      proto3_optional :_updated_at_unix_ts_ns_utc, :int64, 1001
+      proto3_optional :_created_by, :string, 1002
     end
     add_enum "protos.shared.KVAction" do
       value :KV_ACTION_UNSET, 0

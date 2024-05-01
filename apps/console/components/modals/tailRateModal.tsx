@@ -8,6 +8,7 @@ import {
   defaultTailSampleRate,
   tailSamplingSignal,
 } from "root/components/tail/signals.ts";
+import { showToast } from "root/islands/toasts.tsx";
 
 export const SampleRateSchema = z.object({
   rate: z.coerce.number().int().min(1),
@@ -62,13 +63,19 @@ export const TailRateModal = () => {
       default: false,
     };
 
+    showToast({
+      id: "tailRate",
+      type: "success",
+      message: "Rate updated",
+    });
+
     opModal.value = { ...opModal.value, tailRateModal: false };
   };
 
   return (
     <div
       ref={modalRef}
-      class="absolute top-[8%] left-[30%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-w-md max-h-full"
+      class="absolute top-[16%] left-[30%] z-50 p-4 overflow-x-hidden overflow-y-auto inset-0 max-w-md max-h-full"
     >
       <div class="relative bg-white rounded-lg border border-burnt shadow-2xl shadow-burnt flex flex-col">
         <div class="h-[20px]">

@@ -9,9 +9,19 @@ import {
 
 export const Sockets = () => {
   useEffect(() => {
-    const serviceSocket = serviceMapSocket("/ws/service-map");
-    const audienceSocket = audienceMetricsSocket("/ws/audience-metrics");
-    const errorSocket = serverErrorSocket("/ws/server-error");
+    let serviceSocket: WebSocket;
+    let audienceSocket: WebSocket;
+    let errorSocket: WebSocket;
+
+    //
+    // Wait a few ticks to open sockets to allow previous upstream closes to finish,
+    // sometimes they are not on refreshes and redirects
+    setTimeout(() => {
+      serviceSocket = serviceMapSocket("/ws/service-map");
+      audienceSocket = audienceMetricsSocket("/ws/audience-metrics");
+      errorSocket = serverErrorSocket("/ws/server-error");
+    }, 500);
+
     return () => {
       serviceSocket?.close();
       audienceSocket?.close();

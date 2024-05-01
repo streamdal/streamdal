@@ -22,7 +22,7 @@ export default function Component() {
             <h3 id="collapse-heading-10">
               <button
                 type="button"
-                className="flex items-center border-b border-purple-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
+                className="flex items-center border-b border-violet-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
                 data-accordion-target="#collapse-body-3"
                 aria-expanded="true"
                 aria-controls="collapse-body-10"

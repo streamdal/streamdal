@@ -14,7 +14,7 @@ export default function Service(
     <>
       <div class="z-[20] flex items-center justify-start px-4 w-full h-16 bg-web">
         <div
-          className={"rounded-full w-[40px] h-[40px] bg-purple-200 flex justify-center items-center p-1"}
+          className={"rounded-full w-[40px] h-[40px] bg-violet-200 flex justify-center items-center p-1"}
         >
           <div className={"w-[25px] flex justify-center items-center"}>
             <ServiceLanguage language={serviceLanguage} />
@@ -30,7 +30,7 @@ export default function Service(
         <h3 id="collapse-heading-10">
           <button
             type="button"
-            className="flex items-center border-b border-purple-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
+            className="flex items-center border-b border-violet-100 w-full py-3 font-medium text-left text-gray-500 focus:ring-2"
             data-accordion-target="#collapse-body-3"
             aria-expanded="true"
             aria-controls="collapse-body-10"

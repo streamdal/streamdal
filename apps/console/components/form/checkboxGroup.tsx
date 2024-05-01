@@ -33,9 +33,9 @@ export const CheckboxGroup = ({
         </label>
       )}
       <div
-        class={`flex flex-col p-2 rounded-sm border border-${
-          errors[name] ? "streamdalRed" : "twilight"
-        }  `}
+        class={`flex flex-col p-2 rounded-sm border ${
+          errors[name] ? "border-streamdalRed" : "border-twilight"
+        }`}
       >
         {Object.entries(options).filter((
           [k, _],

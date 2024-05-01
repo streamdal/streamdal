@@ -30,8 +30,8 @@ export const InlineInput = ({
       <input
         id={name}
         name={name}
-        class={`px-2 rounded-sm border border-${
-          errors[name] ? "streamdalRed" : "white"
+        class={`px-2 rounded-sm border ${
+          errors[name] ? "border-streamdalRed" : "border-white"
         } ${inputClass}`}
         value={value}
         onChange={(e: ChangeEvent<HTMLInputElement>) =>
