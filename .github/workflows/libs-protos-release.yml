@@ -104,4 +104,4 @@ jobs:
           gem build build/ruby/streamdal.gemspec
           gem push streamdal-protos-${{ steps.get_new_version.outputs.new_version }}.gem
         env:
-          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
