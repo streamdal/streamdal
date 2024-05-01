@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from "$fresh/src/server/types.ts";
-import { Tail } from "../../../islands/drawer/tail.tsx";
-import { audienceFromKey } from "../../../lib/utils.ts";
+import { Tail } from "root/islands/tail.tsx";
+import { audienceFromKey } from "root/lib/utils.ts";
 
 export const handler: Handlers = {};
 

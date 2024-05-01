@@ -413,6 +413,11 @@ func (s *ExternalServer) UpdatePipeline(ctx context.Context, req *protos.UpdateP
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, errors.Wrap(err, "unable to repopulate WASM data").Error()), nil
 	}
 
+	// This is a temp hack to make sure we do not lose knowing who "owns" this
+	// resource. This is needed so that automation tools can continue to manage
+	// this resource, even if someone manually changed it.
+	req.Pipeline.XCreatedBy = originalPipeline.XCreatedBy
+
 	// Update pipeline in storage
 	if err := s.Options.StoreService.UpdatePipeline(ctx, pipeline); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
@@ -755,6 +760,21 @@ func (s *ExternalServer) UpdateNotification(ctx context.Context, req *protos.Upd
 	if s.Options.DemoMode {
 		return demoResponse(ctx)
 	}
+
+	// Does this notification exist?
+	existingResp, err := s.Options.StoreService.GetNotificationConfig(ctx, &protos.GetNotificationRequest{
+		NotificationId: req.Notification.GetId(),
+	})
+	if err != nil {
+		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
+	}
+
+	// TODO: Merge existing notification with new notification
+	//
+	// This is a temp hack to make sure we do not lose knowing who "owns" this
+	// resource. This is needed so that automation tools can continue to manage
+	// this resource, even if someone manually changed it.
+	req.Notification.XCreatedBy = existingResp.XCreatedBy
 
 	if err := s.Options.StoreService.UpdateNotificationConfig(ctx, req); err != nil {
 		return util.StandardResponse(ctx, protos.ResponseCode_RESPONSE_CODE_INTERNAL_SERVER_ERROR, err.Error()), nil
@@ -1413,6 +1433,9 @@ func (s *ExternalServer) UpdateWasm(ctx context.Context, req *protos.UpdateWasmR
 
 	// Update the updated_at timestamp
 	req.Wasm.XUpdatedAtUnixTsNsUtc = util.Pointer(time.Now().UTC().UnixNano())
+
+	// Retain the original created_by field
+	req.Wasm.XCreatedBy = existingWasm.XCreatedBy
 
 	// Let's update it
 	if err := s.Options.StoreService.SetWasm(ctx, req.Wasm.Name, req.Wasm.Id, req.Wasm); err != nil {

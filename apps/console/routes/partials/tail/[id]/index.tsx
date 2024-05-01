@@ -1,6 +1,6 @@
 import { Handlers, PageProps, RouteConfig } from "$fresh/src/server/types.ts";
 import { Partial } from "$fresh/runtime.ts";
-import { Tail } from "root/islands/drawer/tail.tsx";
+import { Tail } from "root/islands/tail.tsx";
 import { audienceFromKey } from "root/lib/utils.ts";
 
 export const config: RouteConfig = {

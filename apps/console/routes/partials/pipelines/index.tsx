@@ -4,7 +4,7 @@ import {
   handler as pipelineHandler,
   PipelineRoute,
 } from "../../pipelines/index.tsx";
-import Pipelines from "root/islands/pipelines.tsx";
+import Pipelines from "root/islands/pipelines/pipelines.tsx";
 
 export const config: RouteConfig = {
   skipAppWrapper: true,
@@ -23,7 +23,6 @@ const PartialPipelinesRoute = (
       <Pipelines
         pipelines={props?.data?.pipelines}
         notifications={props?.data?.notifications}
-        success={props?.data?.success}
       />
     </Partial>
   );

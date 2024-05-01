@@ -7,28 +7,7 @@ import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { Tooltip } from "../tooltip/tooltip.tsx";
 import { FormSelect } from "../form/formSelect.tsx";
 import { titleCase } from "../../lib/utils.ts";
-
-export const oneArgTypes: (keyof typeof DetectiveType)[] = [
-  "STRING_EQUAL",
-  "REGEX",
-  "STRING_LENGTH_MIN",
-  "STRING_LENGTH_MAX",
-  "NUMERIC_EQUAL_TO",
-  "STRING_CONTAINS_ANY",
-  "STRING_CONTAINS_ALL",
-  "NUMERIC_GREATER_THAN",
-  "NUMERIC_GREATER_EQUAL",
-  "NUMERIC_LESS_THAN",
-  "NUMERIC_LESS_EQUAL",
-  "NUMERIC_MIN",
-  "NUMERIC_MAX",
-  "IS_TYPE",
-];
-
-export const nArgTypes: (keyof typeof DetectiveType)[] = [
-  "STRING_LENGTH_RANGE",
-  "NUMERIC_RANGE",
-];
+import { nArgTypes, oneArgTypes } from "root/components/pipeline/pipeline.ts";
 
 export const argTypes = [...oneArgTypes, ...nArgTypes];
 

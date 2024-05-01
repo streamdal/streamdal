@@ -50,6 +50,8 @@ jobs:
     - name: Package Helm Chart
       run: |
         helm package docs/install/helm/streamdal-server -d docs/install/helm-packages
+        helm package docs/install/helm/streamdal-operator -d docs/install/helm-packages
+        helm package docs/install/helm/streamdal-log-processor -d docs/install/helm-packages
 
     - name: Update Helm repo index
       run: |

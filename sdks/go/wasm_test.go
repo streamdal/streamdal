@@ -702,9 +702,86 @@ var _ = Describe("WASM Modules", func() {
 				Data:          payload,
 			})
 
+			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Transform Email' returned true: Successfully transformed payload (no abort condition)"))
-			Expect(resp.Data).To(MatchJSON(`{"users": [{"name":"Bob","email":"REDACTED"},{"name":"Mary","email":"REDACTED"}]}`))
+		})
+
+	})
+	//
+	Context("keyword matching", func() {
+		It("finds and transforms PII in a payload without a path or type", func() {
+			payload := []byte(`{"github": {"token": "pat_abc123", "size": "Medium"}}`)
+			detectiveWASM, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+			transformWASM, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Test Pipeline",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Find PII",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    detectiveWASM,
+						XWasmFunction: stringPtr("f"),
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr(""), // No path, we're searching the entire payload
+								Negate: boolPtr(false),
+								Type:   steps.DetectiveType_DETECTIVE_TYPE_PII_KEYWORD,
+							},
+						},
+					},
+					{
+						Dynamic:       true,
+						Name:          "Redact PII",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    transformWASM,
+						XWasmFunction: stringPtr("f"),
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_ALL,
+						},
+						Step: &protos.PipelineStep_Transform{
+							Transform: &steps.TransformStep{
+								Type: steps.TransformType_TRANSFORM_TYPE_REPLACE_VALUE,
+								Options: &steps.TransformStep_ReplaceValueOptions{
+									ReplaceValueOptions: &steps.TransformReplaceValueOptions{
+										Path:  "", // No path, we're getting the result from the detective step
+										Value: `"REDACTED"`,
+									},
+								},
+							},
+						},
+					},
+				},
+			}
+
+			aud := &protos.Audience{
+				ServiceName:   "mysvc1",
+				ComponentName: "kafka",
+				OperationType: protos.OperationType_OPERATION_TYPE_PRODUCER,
+				OperationName: "mytopic",
+			}
+
+			s := createStreamdalClientFull("mysvc1", aud, pipeline)
+			s.config.PipelineTimeout = time.Second
+			s.config.StepTimeout = time.Second
+
+			resp := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          payload,
+			})
+
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Redact PII' returned true: Successfully transformed payload (no abort condition)"))
+			Expect(resp.Data).To(MatchJSON(`{"github": {"token": "REDACTED", "size": "Medium"}}`))
 		})
 
 	})

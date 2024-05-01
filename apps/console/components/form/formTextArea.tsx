@@ -45,8 +45,8 @@ export const FormTextArea = ({
         name={name}
         class={`resize-y rounded-sm border outline-0 p-2 pe-6 min-h-[${
           rows * 27
-        }px] border-${
-          errors[name] ? "streamdalRed" : "border-twilight"
+        }px] ${
+          errors[name] ? "border-streamdalRed" : "border-twilight"
         } ${inputClass}`}
         value={v}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>

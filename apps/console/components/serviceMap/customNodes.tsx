@@ -3,7 +3,6 @@ import IconGripVertical from "tabler-icons/tsx/grip-vertical.tsx";
 import IconDatabase from "tabler-icons/tsx/database.tsx";
 import IconBrandStripe from "tabler-icons/tsx/brand-stripe.tsx";
 import IconBrandAws from "tabler-icons/tsx/brand-aws.tsx";
-import "twind";
 import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
 import { ProducerIcon } from "../icons/producer.tsx";
 import { ConsumerIcon } from "../icons/consumer.tsx";
@@ -55,10 +54,10 @@ export const ServiceNode = ({ data: { audience } }: FlowNode) => {
   return (
     <div>
       <div
-        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 p-2 hover:border-purple-600 hover:shadow-lg ${
+        class={`min-h-[80px] w-[320px] group flex items-center justify-between bg-white rounded-lg z-10 p-2 hover:border-violet-600 hover:shadow-lg ${
           highlighted
-            ? "border-2 border-purple-600"
-            : "border-1 border-purple-200"
+            ? "border-2 border-violet-600"
+            : "border-1 border-violet-200"
         }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}
@@ -75,11 +74,11 @@ export const ServiceNode = ({ data: { audience } }: FlowNode) => {
           }}
         >
           <div class="w-8">
-            <IconGripVertical class="w-6 h-6 text-purple-100" />
+            <IconGripVertical class="w-6 h-6 text-violet-100" />
           </div>
           <div class="mx-2">
             <div
-              className={"rounded-full w-[60px] h-[60px] bg-purple-200 flex justify-center items-center p-1"}
+              className={"rounded-full w-[60px] h-[60px] bg-violet-200 flex justify-center items-center p-1"}
               data-tooltip-target={key}
             >
               <ServiceLanguage language={serviceLanguage} />
@@ -143,12 +142,12 @@ export const GroupNode = ({ data: { audience, group } }: FlowNode) => {
 
   return (
     <div
-      className={`rounded-lg bg-sunset border border-purple-200 w-[${GROUP_WIDTH}px] pb-4 hover:shadow-lg hover:border-purple-600`}
+      className={`rounded-lg bg-sunset border border-violet-200 w-[280px] pb-4 hover:shadow-lg hover:border-violet-600`}
       onMouseOver={() => setHover()}
       onMouseLeave={() => resetHover()}
     >
       <div id="dragHandle" class="flex flex-row items-center pt-2">
-        <IconGripVertical class="w-6 h-6 mx-2 text-purple-100 bg-white border border-purple-200" />
+        <IconGripVertical class="w-6 h-6 mx-2 text-violet-100 bg-white border border-violet-200" />
         {producer
           ? <ProducerIcon class="w-5 h-5 mr-2" />
           : <ConsumerIcon class="w-5 h-5 mr-2" />}
@@ -185,7 +184,7 @@ export const OperationNode = ({ audience }: { audience: Audience }) => {
     <div
       type="button"
       class={`flex items-center justify-between w-[260px] min-h-[64px] group bg-white rounded-lg shadow-lg ${
-        highlight ? "border-2 border-purple-600" : "border-1 border-purple-200"
+        highlight ? "border-2 border-violet-600" : "border-1 border-violet-200"
       } pl-1 pr-2 mt-2`}
     >
       <div
@@ -322,8 +321,8 @@ export const ComponentNode = ({ data: { audience } }: FlowNode) => {
       </div>
       <div
         id={`${cKey}-dragHandle`}
-        class={`z-0 flex justify-center items-center bg-web rounded-md border-4 hover:shadow-xl hover:border-4 hover:border-purple-600 min-h-[145px] w-[145px] ${
-          highlighted && "border-4 border-purple-600"
+        class={`z-0 flex justify-center items-center bg-web rounded-md border-4 hover:shadow-xl hover:border-4 hover:border-violet-600 min-h-[145px] w-[145px] ${
+          highlighted && "border-4 border-violet-600"
         }`}
         onMouseOver={() => setHover()}
         onMouseLeave={() => resetHover()}

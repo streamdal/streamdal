@@ -1,0 +1,1 @@
+{"message":"Hello, world!","@timestamp":"2024-04-27T12:34:56.789Z","@version":"1","host":"your_hostname","type":"file"}

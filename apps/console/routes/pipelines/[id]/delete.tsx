@@ -7,9 +7,10 @@ import {
 } from "../../../lib/fetch.ts";
 import { ResponseCode } from "streamdal-protos/protos/sp_common.ts";
 import { deletePipeline } from "../../../lib/mutation.ts";
-import { RoutedDeleteModal } from "../../../components/modals/routedDeleteModal.tsx";
-import Pipelines from "../../../islands/pipelines.tsx";
+import Pipelines from "root/islands/pipelines/pipelines.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
+import IconTrash from "tabler-icons/tsx/trash.tsx";
+import { RoutedActionModal } from "root/components/modals/routedActionModal.tsx";
 
 export type DeletePipeline = {
   pipeline: Pipeline;
@@ -57,11 +58,19 @@ export default function DeletePipelineRoute(
 ) {
   return (
     <>
-      <RoutedDeleteModal
-        id={props?.params?.id}
-        entityType="pipeline"
-        entityName={props?.data?.pipeline?.name}
-        redirect={`/pipelines/${props?.params?.id}`}
+      <RoutedActionModal
+        icon={<IconTrash class="w-10 h-10 mx-auto text-eyelid" />}
+        message={
+          <div>
+            Delete pipeline{"  "}
+            <span class="text-medium font-bold ">
+              {props?.data?.pipeline?.name}
+            </span>?
+          </div>
+        }
+        actionText="Delete"
+        cancelUrl={`/pipelines/${props?.params?.id}`}
+        destructive={true}
       />
       <Pipelines
         notifications={props?.data?.notifications}

@@ -27,6 +27,12 @@ jobs:
         with:
           deno-version: v1.x
 
+      - name: Build Console
+        ##
+        ## Fresh build emits errors even when assets are generated
+        continue-on-error: true
+        run: deno task build
+
       - name: Check Formatting, Linting, Types & run Test
         run: deno task ok
 
@@ -84,6 +90,7 @@ jobs:
         with:
           context: ./apps/console
           file: ./apps/console/Dockerfile
+          build-args: DEPLOY_VERSION=$(cat VERSION)
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |

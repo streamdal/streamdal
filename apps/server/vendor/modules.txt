@@ -108,8 +108,6 @@ github.com/aws/aws-sdk-go/service/sts/stsiface
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
 github.com/beorn7/perks/quantile
-# github.com/bsm/redislock v0.9.4
-## explicit; go 1.17
 # github.com/cactus/go-statsd-client/v5 v5.1.0
 ## explicit; go 1.11
 github.com/cactus/go-statsd-client/v5/statsd
@@ -286,7 +284,7 @@ github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx
 github.com/slack-go/slack/internal/timex
 github.com/slack-go/slack/slackutilsx
-# github.com/streamdal/streamdal/libs/protos v0.1.44
+# github.com/streamdal/streamdal/libs/protos v0.1.45
 ## explicit; go 1.20
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared

@@ -1,0 +1,9 @@
+apiVersion: crd.streamdal.com/v1
+kind: StreamdalConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: sample-config-empty
+spec:
+  serverAddress: foo

@@ -133,6 +133,12 @@ class DetectiveType(betterproto.Enum):
     DETECTIVE_TYPE_PII_JWT = 2033
     DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN = 2034
     DETECTIVE_TYPE_PII_BEARER_TOKEN = 2035
+    DETECTIVE_TYPE_PII_KEYWORD = 2036
+    """
+    Uses field/path keyword matching to detect PII, rather than the field's
+    value
+    """
+
     DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000
     DETECTIVE_TYPE_NUMERIC_GREATER_THAN = 3001
     DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL = 3002
@@ -257,6 +263,14 @@ class DetectiveStepResultMatch(betterproto.Message):
 
     value: bytes = betterproto.bytes_field(5)
     """Value of the match"""
+
+    pii_type: str = betterproto.string_field(6)
+    """
+    Used to return the type of PII we detected. This differs from `type` in
+    that it is the type of PII we detected, not the type of match we used to
+    detect it. This value is freeform and determined based on the values inside
+    the keyword matcher.
+    """
 
 
 @dataclass(eq=False, repr=False)

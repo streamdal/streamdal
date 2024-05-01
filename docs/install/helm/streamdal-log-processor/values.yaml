@@ -1,0 +1,52 @@
+replicaCount: 1
+
+images:
+  logProcessor:
+    repository: streamdal/log-processor
+    pullPolicy: Always
+    tag: "94f3a6f"
+  logstash:
+    repository: logstash
+    tag: "7.17.20"
+    pullPolicy: IfNotPresent
+
+service:
+  logProcessorPort: 6000
+  logstashPort: 6001
+
+persistence:
+  logs:
+    size: 10Gi
+    storageClass: efs-sc
+
+config:
+  elasticsearchHosts: ""
+  xpackMonitoringEnabled: false
+  STREAMDAL_LOG_PROCESSOR_STREAMDAL_SERVER_ADDRESS: "server.vector.svc.cluster.local:8082"
+  STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR: "0.0.0.0:6000"
+  STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR: "127.0.0.1:6001"
+  STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN: "1234"
+
+logrotate:
+  name: logrotate-deployment
+  replicas: 1
+  image: blacklabelops/logrotate
+  env:
+    LOGS_DIRECTORIES: "/var/log/pods"
+    LOGROTATE_SIZE: "1G"
+
+resources:
+  logProcessor:
+    limits:
+      cpu: "1000m"  # 500 millicores
+      memory: "1Gi"  # 512 Mebibytes
+    requests:
+      cpu: "500m"  # 100 millicores
+      memory: "512Mi"  # 256 Mebibytes
+  logstash:
+    limits:
+      cpu: "1000m"  # 1 core
+      memory: "1Gi"  # 1 Gibibyte
+    requests:
+      cpu: "500m"  # 500 millicores
+      memory: "512Mi"  # 512 Mebibytes

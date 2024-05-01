@@ -18,12 +18,33 @@ import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
 import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
 import { numeric, repeatable, text } from "../form/validate.ts";
-import { nArgTypes, oneArgTypes } from "./stepArgs.tsx";
 import { isNumeric } from "../../lib/utils.ts";
 import { z } from "zod/mod.ts";
 
+export const oneArgTypes: (keyof typeof DetectiveType)[] = [
+  "STRING_EQUAL",
+  "REGEX",
+  "STRING_LENGTH_MIN",
+  "STRING_LENGTH_MAX",
+  "NUMERIC_EQUAL_TO",
+  "STRING_CONTAINS_ANY",
+  "STRING_CONTAINS_ALL",
+  "NUMERIC_GREATER_THAN",
+  "NUMERIC_GREATER_EQUAL",
+  "NUMERIC_LESS_THAN",
+  "NUMERIC_LESS_EQUAL",
+  "NUMERIC_MIN",
+  "NUMERIC_MAX",
+  "IS_TYPE",
+];
+
+export const nArgTypes: (keyof typeof DetectiveType)[] = [
+  "STRING_LENGTH_RANGE",
+  "NUMERIC_RANGE",
+];
+
 const detective = {
-  type: DetectiveType.BOOLEAN_TRUE,
+  type: DetectiveType.IS_EMPTY,
   path: "",
   args: [""],
 };
@@ -34,17 +55,17 @@ export const newStep: PipelineStep = {
   onTrue: {
     abort: AbortCondition.UNSET,
     notify: false,
-    metadata: { key: "value" },
+    metadata: {},
   },
   onFalse: {
     abort: AbortCondition.UNSET,
     notify: false,
-    metadata: { key: "value" },
+    metadata: {},
   },
   onError: {
     abort: AbortCondition.UNSET,
     notify: false,
-    metadata: { key: "value" },
+    metadata: {},
   },
   step: {
     oneofKind: "detective",
@@ -164,7 +185,9 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
       })
       .superRefine((detective, ctx) => {
         if (
-          ["HAS_FIELD", "IS_TYPE"].includes(DetectiveType[detective.type]) &&
+          ["HAS_FIELD", "IS_TYPE", "IS_EMPTY"].includes(
+            DetectiveType[detective.type],
+          ) &&
           detective.path === ""
         ) {
           ctx.addIssue({
@@ -320,7 +343,9 @@ const resultConditionSchema = z.object({
 
       return z.never;
     }
-  }).optional(),
+  }).optional().transform((v) =>
+    v?.notificationConfigIds?.length === 0 ? undefined : v
+  ),
 });
 
 const stepSchema = z
