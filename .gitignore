@@ -2,3 +2,4 @@
 .DS_Store
 libs/protos/build/ts/node_modules
 settings.json
+libs/protos/build/ruby/*.gem

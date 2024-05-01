@@ -5,6 +5,7 @@ package protos;
 import "shared/sp_shared.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option ruby_package = "Streamdal::Protos";
 
 // KVObject represents a single KV object used in protos.KVInstruction; this is
 // constructed by server and broadcast out to other server nodes.

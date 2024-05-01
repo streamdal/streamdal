@@ -6,6 +6,7 @@ import "sp_common.proto";
 import "sp_pipeline.proto";
 
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
+option ruby_package = "Streamdal::Protos";
 
 message LiveInfo {
   // If empty, client has not announced any audiences
