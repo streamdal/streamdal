@@ -100,12 +100,10 @@ jobs:
 
       - name: Build ruby gem
         run: |
-          cd build/ruby
           sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/ruby/streamdal.gemspec
-          gem build streamdal.gemspec
+          gem build build/ruby/streamdal.gemspec
       - name: Push ruby gem to RubyGems
         run: |
-          cd build/ruby
           gem push streamdal-${{ steps.get_new_version.outputs.new_version }}.gem
         env:
           RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
