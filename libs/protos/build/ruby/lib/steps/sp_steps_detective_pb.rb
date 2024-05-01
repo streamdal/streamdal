@@ -15,6 +15,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :type, :enum, 1, "protos.steps.DetectiveType"
       optional :path, :string, 2
       optional :value, :bytes, 5
+      optional :pii_type, :string, 6
     end
     add_message "protos.steps.DetectiveStepResult" do
       repeated :matches, :message, 1, "protos.steps.DetectiveStepResultMatch"
@@ -79,6 +80,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :DETECTIVE_TYPE_PII_JWT, 2033
       value :DETECTIVE_TYPE_PII_DOCKER_SWARM_TOKEN, 2034
       value :DETECTIVE_TYPE_PII_BEARER_TOKEN, 2035
+      value :DETECTIVE_TYPE_PII_KEYWORD, 2036
       value :DETECTIVE_TYPE_NUMERIC_EQUAL_TO, 3000
       value :DETECTIVE_TYPE_NUMERIC_GREATER_THAN, 3001
       value :DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL, 3002
