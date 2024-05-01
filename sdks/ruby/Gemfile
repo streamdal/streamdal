@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "streamdal-protos", "~>0.0.5"
+gem "streamdal-protos", "0.1.51"
 gem "securerandom", "~> 0.3.1"
 gem "wasmtime", "~> 18.0.0"
 gem "google-protobuf", "~> 3.25"
