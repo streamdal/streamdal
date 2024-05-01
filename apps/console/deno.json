@@ -7,7 +7,7 @@
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts",
     "check:types": "deno check --node-modules-dir=true **/*.ts && deno check --node-modules-dir=true **/*.tsx",
-    "fmt": "deno fmt --ignore=node_modules --check components/**/*.ts && deno fmt --ignore=node_modules --check components/**/*.tsx",
+    "fmt": "deno fmt --ignore=node_modules --check **/*.ts && deno fmt --ignore=node_modules --check **/*.tsx",
     "lint": "deno lint --ignore=node_modules **/*.ts && deno lint --ignore=node_modules **/*.tsx",
     "ok": "deno task fmt && deno task lint && deno task check:types && deno task test"
   },
