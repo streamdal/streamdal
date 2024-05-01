@@ -1,15 +1,15 @@
 FROM denoland/deno
 
-EXPOSE 8080
+ARG DEPLOY_VERSION
+ENV DENO_DEPLOYMENT_ID=${DEPLOY_VERSION}
 
 WORKDIR /app
 
 ADD . /app
 
 RUN deno cache main.ts
-#
-# Deno returns error even when the build succeeds
-RUN deno task build || true
+
+EXPOSE 8080
 
 CMD ["run", "--allow-net", "--allow-read", "--allow-env", "--allow-write", "--allow-run", "main.ts"]
 
