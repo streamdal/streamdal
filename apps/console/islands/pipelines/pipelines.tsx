@@ -1,23 +1,20 @@
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 
-import { useEffect, useState } from "preact/hooks";
+import { useEffect } from "preact/hooks";
 import { newPipeline } from "root/components/pipeline/pipeline.ts";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
+
+import { initFlowBite } from "root/components/flowbite/init.tsx";
+import { Tooltip } from "root/components/tooltip/tooltip.tsx";
 import { NotificationConfig } from "streamdal-protos/protos/sp_notify.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
-import { initFlowBite } from "root/components/flowbite/init.tsx";
-import { Toast, toastSignal } from "root/components/toasts/toast.tsx";
-import { Tooltip } from "root/components/tooltip/tooltip.tsx";
-import { SuccessType } from "root/routes/_middleware.ts";
 import PipelineDetail from "./pipeline.tsx";
 
 export default function Pipelines(
-  { id, pipelines, notifications, success, add = false }: {
+  { id, pipelines, notifications, add = false }: {
     id?: string;
     pipelines?: Pipeline[];
     notifications: NotificationConfig[];
-    success?: SuccessType;
     add?: boolean;
   },
 ) {
@@ -29,14 +26,6 @@ export default function Pipelines(
     ? wrapper.findIndex((p) => p.id === id)
     : Math.max(wrapper.length - 1, 0);
 
-  if (success?.message) {
-    toastSignal.value = {
-      id: "pipeline",
-      type: success.status ? "success" : "error",
-      message: success.message,
-    };
-  }
-
   useEffect(() => {
     void initFlowBite();
   }, []);
@@ -44,7 +33,7 @@ export default function Pipelines(
   return (
     <>
       <div
-        className={`relative flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
+        className={`flex flex-col h-screen w-full`}
       >
         <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
           <span className="opacity-50">Home</span> / Manage Pipelines
@@ -95,7 +84,6 @@ export default function Pipelines(
           </div>
         </div>
       </div>
-      <Toast id="pipeline" />
     </>
   );
 }

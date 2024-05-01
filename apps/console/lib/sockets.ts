@@ -15,19 +15,22 @@ import {
 import { mapLiveAudiences } from "./serviceMapper.ts";
 
 const SOCKET_KEEPALIVE = 30000;
-const socketPing = (webSocket: WebSocket) =>
+
+const socketPing = (webSocket: WebSocket) => {
+  webSocket.send("ping");
   setInterval(
-    () => webSocket.readyState === WebSocket.OPEN && webSocket.send("ping"),
+    () => {
+      webSocket.readyState === WebSocket.OPEN && webSocket.send("ping");
+    },
     SOCKET_KEEPALIVE,
   );
+};
 
 export const getSocket = (path: string) => {
   const url = new URL(path, location.href);
   url.protocol = url.protocol.replace("http", "ws");
   url.pathname = path;
-  const webSocket = new WebSocket(url);
-  socketPing(webSocket);
-  return webSocket;
+  return new WebSocket(url);
 };
 
 export const demoHttpRequestSocket = (path: string) => {
@@ -57,7 +60,7 @@ export const serviceMapSocket = (path: string) => {
   webSocket.binaryType = "arraybuffer";
 
   webSocket.addEventListener("open", () => {
-    webSocket.send("ping");
+    socketPing(webSocket);
   });
 
   webSocket.addEventListener("message", (event) => {
@@ -71,6 +74,7 @@ export const serviceMapSocket = (path: string) => {
       const serviceMap: ServiceSignal = JSON.parse(
         new TextDecoder().decode(view),
       );
+
       serviceSignal.value = {
         ...serviceMap,
         //
@@ -90,7 +94,7 @@ export const audienceMetricsSocket = (path: string) => {
   const webSocket = getSocket(path);
 
   webSocket.addEventListener("open", () => {
-    webSocket.send("ping");
+    socketPing(webSocket);
   });
 
   webSocket.addEventListener("message", (event) => {
@@ -116,7 +120,7 @@ export const tailSocket = (path: string, audience: Audience) => {
   const webSocket = getSocket(path);
 
   webSocket.addEventListener("open", () => {
-    webSocket.send("ping");
+    socketPing(webSocket);
     webSocket.send(
       JSON.stringify({
         audience,
@@ -154,7 +158,7 @@ export const tailSocket = (path: string, audience: Audience) => {
 export const serverErrorSocket = (path: string) => {
   const webSocket = getSocket(path);
   webSocket.addEventListener("open", () => {
-    webSocket.send("ping");
+    socketPing(webSocket);
   });
 
   webSocket.addEventListener("message", (event) => {

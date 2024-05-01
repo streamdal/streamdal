@@ -39,8 +39,8 @@ export const FormInput = ({
       <input
         id={name}
         name={name}
-        class={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-${
-          errors && errors[name] ? "streamdalRed" : "border-twilight"
+        class={`rounded-sm border outline-0 px-2 pe-6 h-[47px] ${
+          errors && errors[name] ? "border-streamdalRed" : "border-twilight"
         } ${inputClass}`}
         value={value}
         onChange={(e: ChangeEvent<HTMLInputElement>) =>

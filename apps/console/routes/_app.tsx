@@ -67,11 +67,11 @@ export default async function App(
           rel="stylesheet"
           href="/vendor/reactflow@11.8.2.base.css"
         />
-        <link rel="stylesheet" type="text/css" href="/style.css" />
         <link
           rel="stylesheet"
           href="/vendor/highlight.js@11.8.0.dark-violet.min.css"
         />
+        <link rel="stylesheet" type="text/css" href="/style.css" />
         {DEMO && GOOGLE_ANALYTICS_KEY &&
           (
             <script
@@ -95,7 +95,7 @@ export default async function App(
             </>
           )}
       </Head>
-      <body className="h-screen bg-purple-50 m-0 overflow-hidden" f-client-nav>
+      <body className="h-screen bg-violet-50 m-0 overflow-hidden" f-client-nav>
         {DEMO && GOOGLE_ANALYTICS_KEY &&
           (
             <noscript>

@@ -57,8 +57,8 @@ export const StepCondition = (
           : <IconChevronDown class="w-6 h-6 text-twilight" />}
       </div>
       <div
-        className={`flex flex-col p-2 w-full border-t md:${
-          expanded ? "visible" : "hidden"
+        className={`flex flex-col p-2 w-full border-t ${
+          expanded ? "" : "hidden"
         }`}
       >
         <RadioGroup

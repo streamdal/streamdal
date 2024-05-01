@@ -17,7 +17,6 @@ export default function PipelinesRoute(
       id={props?.params?.id}
       notifications={props?.data?.notifications}
       pipelines={props?.data?.pipelines}
-      success={props?.data?.success}
     />
   );
 }

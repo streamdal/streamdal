@@ -39,7 +39,6 @@ export const PipelinesRoute = (
     <Pipelines
       pipelines={props?.data?.pipelines}
       notifications={props?.data?.notifications}
-      success={props?.data?.success}
     />
   );
 };

@@ -1,25 +1,25 @@
+import { useEffect, useState } from "preact/hooks";
+import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import IconWindowMaximize from "tabler-icons/tsx/window-maximize.tsx";
 import { Tooltip } from "../../components/tooltip/tooltip.tsx";
-import { getAudienceOpRoute } from "../../lib/utils.ts";
-import { Audience } from "streamdal-protos/protos/sp_common.ts";
-import { useEffect } from "preact/hooks";
-import { opModal } from "../../components/serviceMap/opModalSignal.ts";
+import { audienceKey, getAudienceOpRoute } from "../../lib/utils.ts";
 
-export const Schema = (
+export const SchemaNav = (
   { audience }: { audience: Audience },
 ) => {
+  const key = audienceKey(audience);
+  const [schema, setSchema] = useState({
+    schema: "",
+    version: 0,
+    metaData: "",
+  });
   const getSchema = async () => {
     try {
       const response = await fetch(`${getAudienceOpRoute(audience)}/schema`, {
         method: "GET",
       });
 
-      const schemaInfo = await response.json();
-
-      opModal.value = {
-        ...opModal.value,
-        schemaInfo,
-      };
+      setSchema(await response.json());
     } catch (e) {
       console.error("Error fetching schema", e);
     }
@@ -33,17 +33,15 @@ export const Schema = (
     <>
       <div className="w-full rounded flex overflow-x-scroll bg-black text-white pt-2 pb-6 px-4 text-sm flex flex-col justify-start">
         <div class={"w-full flex justify-end"}>
-          <button
-            className={"cursor-pointer"}
-            onClick={() =>
-              opModal.value = {
-                ...opModal.value,
-                schemaModal: !opModal.value?.schemaModal,
-              }}
+          <a
+            href={`/schema/${encodeURIComponent(key)}`}
+            f-partial={`/partials/schema/${encodeURIComponent(key)}`}
+            className="cursor-pointer"
             data-tooltip-target="maximize"
           >
-            <IconWindowMaximize class="w-5 h-5 text-white mx-1 my-1" />
-          </button>
+            <IconWindowMaximize class="w-5 h-5 text-white mx-1 my-1 pointer-events-none" />
+          </a>
+
           <Tooltip
             targetId="maximize"
             message={"Click to maximize schema"}
@@ -54,8 +52,7 @@ export const Schema = (
             <div
                 class={"font-sm "}
                 dangerouslySetInnerHTML={{
-                    __html: opModal.value?.schemaInfo?.schema ? opModal.value.schemaInfo?.schema:
-                        ""
+                    __html: schema.schema
                 }}
             >
             </div>

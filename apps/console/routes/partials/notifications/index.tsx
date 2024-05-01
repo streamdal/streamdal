@@ -20,7 +20,6 @@ const PartialNotificationsRoute = (
     <Partial name="overlay-content">
       <Notifications
         notifications={props?.data?.notifications}
-        success={props?.data?.success}
       />
     </Partial>
   );

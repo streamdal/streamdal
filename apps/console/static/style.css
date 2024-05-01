@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 select {
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
@@ -43,3 +47,6 @@ input[type='checkbox'].checkmark-streamdal:checked:after {
   color:white;
 }
 
+.react-flow__attribution {
+  display: none !important;
+}

@@ -1,5 +1,4 @@
 import { useEffect } from "preact/hooks";
-import { OP_MODAL_WIDTH } from "root/lib/const.ts";
 import {
   NotificationConfig,
   NotificationType,
@@ -7,9 +6,7 @@ import {
 import IconPencil from "tabler-icons/tsx/pencil.tsx";
 import IconPlus from "tabler-icons/tsx/plus.tsx";
 import { initFlowBite } from "../components/flowbite/init.tsx";
-import { Toast, toastSignal } from "../components/toasts/toast.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
-import { SuccessType } from "../routes/_middleware.ts";
 import NotificationDetail from "./notification.tsx";
 
 const slack = {
@@ -28,10 +25,9 @@ const newNotificationConfig: NotificationConfig = {
 };
 
 export default function Notifications(
-  { id, notifications, success, add = false }: {
+  { id, notifications, add = false }: {
     id?: string;
     notifications?: NotificationConfig[];
-    success?: SuccessType;
     add?: boolean;
   },
 ) {
@@ -49,18 +45,10 @@ export default function Notifications(
   const index = id && wrapper?.findIndex((n) => n.id === id);
   const selected = add ? wrapper.length - 1 : index && index > -1 ? index : 0;
 
-  if (success?.message) {
-    toastSignal.value = {
-      id: "notifications",
-      type: success.status ? "success" : "error",
-      message: success.message,
-    };
-  }
-
   return (
     <>
       <div
-        className={`relative flex flex-col h-screen w-full mr-[${OP_MODAL_WIDTH}]`}
+        className={`relative flex flex-col h-screen w-full`}
       >
         <div className="h-46 w-full bg-streamdalPurple p-4 text-white font-semibold text-sm">
           <span className="opacity-50">Home</span> / Manage Notifications
@@ -105,7 +93,6 @@ export default function Notifications(
           </div>
         </div>
       </div>
-      <Toast id="notifications" />
     </>
   );
 }

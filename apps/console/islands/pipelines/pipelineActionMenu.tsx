@@ -114,7 +114,7 @@ export const PipelineActionMenu = (
     <div
       class={`p-2 flex flex-row justify-between items-center ${
         p ? "" : "bg-gray-100"
-      } hover:bg-purple-100`}
+      } hover:bg-violet-100`}
     >
       <div class="flex flex-row justify-start items-center">
         <AttachDetach pipeline={pipeline} attached={!!p} />

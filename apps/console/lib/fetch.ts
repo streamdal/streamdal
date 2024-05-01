@@ -4,7 +4,9 @@ import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
 import { setServiceSignal } from "../components/serviceMap/serviceSignal.ts";
 import { serverErrorSignal } from "root/lib/serverError.ts";
+import hljs from "root/static/vendor/highlight@11.8.0.min.js";
 import { SERVER_ERROR } from "./serverError.ts";
+import { SchemaType } from "root/routes/schema/[id]/index.tsx";
 
 export type PipelinesType = { [key: string]: PipelineInfo };
 
@@ -42,7 +44,7 @@ export const getNotification = async (notificationId: string) => {
 
 export const getNotifications = async () => {
   const { response } = await client.getNotifications({}, meta);
-  return Object.values(response.notifications)?.sort((a, b) =>
+  return Object.values(response.notifications)?.sort((a: any, b: any) =>
     a.name.localeCompare(b.name)
   );
 };
@@ -54,6 +56,31 @@ export const getSchema = async (audience: Audience) => {
   } catch (e) {
     console.error("Error fetching schema", e);
     return {};
+  }
+};
+
+export const getFormattedSchema = async (
+  audience: Audience,
+): Promise<SchemaType> => {
+  try {
+    const { schema } = await getSchema(audience);
+    const decoded = new TextDecoder().decode(schema?.jsonSchema);
+    const parsed = JSON.parse(decoded);
+    const highlighted =
+      hljs.highlight(JSON.stringify(parsed, null, 2), { language: "json" })
+        .value;
+
+    return {
+      schema: highlighted,
+      version: schema?.Version || 0,
+      lastUpdated: schema?.Metadata?.last_updated,
+    };
+  } catch (e) {
+    console.error("error fetching and parsing json schema", e);
+    return {
+      schema: "",
+      version: 0,
+    };
   }
 };
 

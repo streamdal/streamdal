@@ -31,7 +31,6 @@ export const NotificationRoute = (
     <Notifications
       id={props?.params?.id}
       notifications={props?.data?.notifications}
-      success={props?.data?.success}
     />
   );
 };
