@@ -142,6 +142,10 @@ export default function ServiceDisplay(
       });
     }
 
+    //
+    // init client side serviceSignal from props so we
+    // don't have a flicker before socket-based updates
+    // start streaming in
     if (serviceMap) {
       serviceSignal.value = {
         ...serviceMap,
