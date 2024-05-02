@@ -95,7 +95,7 @@ module Streamdal
     # There is only one public method: process(data, audience)
     include Audiences
     include Validation
-    include Schema
+    include Schemas
 
     # Aliases to keep lines short
     CounterEntry = Streamdal::Metrics::CounterEntry

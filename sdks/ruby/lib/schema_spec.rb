@@ -10,7 +10,7 @@ require_relative 'audiences'
 
 module Streamdal
   class TestObj
-    include Schema
+    include Schemas
     include Audiences
 
     @schemas

@@ -1,6 +1,6 @@
 include Streamdal::Protos
 
-module Schema
+module Schemas
   def _set_schema(aud, schema)
     s = Streamdal::Protos::Schema.new
     s.json_schema = schema
