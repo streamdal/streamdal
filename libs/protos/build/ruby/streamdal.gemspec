@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "streamdal-protos"
-  s.version = "0.0.7"
+  s.version = "0.1.52"
   s.summary = "Streamdal SDK Protocol Buffers"
   s.authors = ["Mark Gregan"]
   s.email = "mark@streamdal.com"
