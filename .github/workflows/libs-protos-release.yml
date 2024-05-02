@@ -35,11 +35,13 @@ jobs:
           fetch_all_tags: true
           tag_prefix: "libs/protos/v"
 
-      - name: Update Cargo.toml version
+      - name: Update version in Cargo.toml, setup.py, and streamdal.gemspec
         run: |
           pwd
           ls -l
           sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/rust/protos/Cargo.toml
+          sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" build/python/setup.py
+          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/ruby/streamdal.gemspec
           grep version build/rust/protos/Cargo.toml
 
       # We do this because other jobs might have written to the repo while this
@@ -90,7 +92,6 @@ jobs:
       - name: Build python dist
         run: |
           cd build/python
-          sed -i "s/version=.*/version='${{ steps.get_new_version.outputs.new_version }}',/" setup.py
           python3 setup.py sdist
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -99,9 +100,9 @@ jobs:
           password: ${{ secrets.PYPI_API_TOKEN }}
 
       - name: Build ruby gem
+        working-directory: ./libs/protos/build/ruby/
         run: |
-          sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" build/ruby/streamdal.gemspec
-          gem build build/ruby/streamdal.gemspec
+          gem build streamdal.gemspec
           gem push streamdal-protos-${{ steps.get_new_version.outputs.new_version }}.gem
         env:
           GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
