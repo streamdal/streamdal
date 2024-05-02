@@ -8,7 +8,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
-	github.com/streamdal/streamdal/sdks/go v0.1.18
+	github.com/streamdal/streamdal/sdks/go v0.1.20
 )
 
 require (
@@ -29,7 +29,7 @@ require (
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/streamdal/streamdal/libs/protos v0.1.39 // indirect
+	github.com/streamdal/streamdal/libs/protos v0.1.45 // indirect
 	github.com/tetratelabs/wazero v1.6.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/net v0.21.0 // indirect
