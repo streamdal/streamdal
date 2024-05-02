@@ -60,7 +60,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
-    streamdal-protos (0.1.51)
+    streamdal-protos (0.1.52)
       google-protobuf (~> 3.15)
       grpc (~> 1.32)
     wasmtime (18.0.3)
@@ -88,7 +88,7 @@ DEPENDENCIES
   rspec
   securerandom (~> 0.3.1)
   simplecov
-  streamdal-protos (= 0.1.51)
+  streamdal-protos (= 0.1.52)
   wasmtime (~> 18.0.0)
 
 BUNDLED WITH
