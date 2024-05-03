@@ -47,6 +47,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                             method: wasm_request.step.http_request().request.method,
                             headers: wasm_request.step.http_request().request.headers.clone(),
                             body: wasm_request.input_payload.clone(),
+                            body_mode: wasm_request.step.http_request().request.body_mode,
                             ..Default::default()
                         }
                     )
