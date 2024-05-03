@@ -1,5 +1,5 @@
 ---
-title: Ruby Client Support (TBA)
+title: Ruby Client Support
 metaTitle: "Elevate Your Ruby Applications with Streamdal"
 description: Streamdal Ruby support
 layout: ../../../layouts/MainLayout.astro
@@ -11,9 +11,69 @@ import Changes from "@components/Misc/Changes.astro";
 
 <Changes />
 
-Support for Ruby is currently not available, but we're planning to add it.
+<br />
+<br />
 
-*However, we could use your input!*
+<Notification type="information">
+  <img src={info} alt="Information" width="30px" height="30px" />
+  <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
+    <p>For detailed information on the Ruby SDK and its functionalities, refer to the [Ruby SDK README](https://github.com/streamdal/streamdal/blob/main/sdks/ruby/README.md).</p>
+  </div>
+</Notification>
+
+## Instrumentation
+
+Start with the [instrumentation guide](/en/guides/instrumentation/) if you
+haven't already. It will walk you through the process of setting up Streamdal
+and its components.
+
+## Getting Started
+
+1. Install the gem
+
+```bash
+gem install streamdal
+```
+
+### Prerequisites
+
+- Ruby 3.0.0 or higher
+
+### Example
+
+Here's a basic example of how to use the Ruby SDK:
+
+```ruby
+require 'streamdal'
+
+# Create a new client
+logger = Logger.new(STDOUT)
+logger.level = Logger::INFO
+
+client = Streamdal::Client.new({
+                                 streamdal_url: "localhost:8082",
+                                 streamdal_token:"1234",
+                                 service_name: "demo",
+                                 log: logger,
+                                 dry_run: false
+                               })
+
+# Define the audience
+audience = Streamdal::Audience.new(Streamdal::OPERATION_TYPE_CONSUMER, "consume", "kafka-consumer")
+
+while true
+  sleep(2)
+  resp = client.process('{"email": "someuser@streamdal.com"}', audience)
+  puts "Response: "
+  puts "-----------------------------------"
+  puts resp.inspect.gsub(/\\n/, "\n")
+  puts "-----------------------------------"
+end
+```
+This example demonstrates how to initialize a new instance of the Streamdal
+SDK, and how to process data through a method call.
+
+A more full featured demo is located within the [Ruby SDK](https://github.com/streamdal/streamdal/tree/main/sdks/ruby/demo)
 
 ## Libraries
 Along with additional language support, we plan forking specific libraries that 
