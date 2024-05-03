@@ -1456,6 +1456,7 @@ class InterStepResult(betterproto.Message):
     detective_result: "steps.DetectiveStepResult" = betterproto.message_field(
         1, group="input_from"
     )
+    audience: "Audience" = betterproto.message_field(1000)
 
 
 class ExternalStub(betterproto.ServiceStub):

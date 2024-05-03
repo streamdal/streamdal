@@ -3,6 +3,7 @@ import { UnknownFieldHandler } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Audience } from "./sp_common.js";
 import { DetectiveStepResult } from "./steps/sp_steps_detective.js";
 import { PipelineStep } from "./sp_pipeline.js";
 /**
@@ -190,7 +191,8 @@ export const WASMResponse = new WASMResponse$Type();
 class InterStepResult$Type extends MessageType {
     constructor() {
         super("protos.InterStepResult", [
-            { no: 1, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult }
+            { no: 1, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => DetectiveStepResult },
+            { no: 1000, name: "audience", kind: "message", T: () => Audience }
         ]);
     }
     create(value) {
@@ -211,6 +213,9 @@ class InterStepResult$Type extends MessageType {
                         detectiveResult: DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
                     };
                     break;
+                case /* protos.Audience audience */ 1000:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -226,6 +231,9 @@ class InterStepResult$Type extends MessageType {
         /* protos.steps.DetectiveStepResult detective_result = 1; */
         if (message.inputFrom.oneofKind === "detectiveResult")
             DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* protos.Audience audience = 1000; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1000, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

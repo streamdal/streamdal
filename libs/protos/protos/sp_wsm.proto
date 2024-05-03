@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package protos;
 
+import "sp_common.proto";
 import "sp_pipeline.proto";
 import "steps/sp_steps_detective.proto";
 
@@ -81,4 +82,6 @@ message InterStepResult {
   oneof input_from {
     steps.DetectiveStepResult detective_result = 1;
   }
+
+  protos.Audience audience = 1000;
 }

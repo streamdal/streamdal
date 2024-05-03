@@ -26,6 +26,10 @@ export interface HttpRequest {
     headers: {
         [key: string]: string;
     };
+    /**
+     * @generated from protobuf field: protos.steps.HttpRequestBodyMode body_mode = 5;
+     */
+    bodyMode: HttpRequestBodyMode;
 }
 /**
  * @generated from protobuf message protos.steps.HttpResponse
@@ -91,6 +95,23 @@ export declare enum HttpRequestMethod {
      * @generated from protobuf enum value: HTTP_REQUEST_METHOD_OPTIONS = 7;
      */
     OPTIONS = 7
+}
+/**
+ * @generated from protobuf enum protos.steps.HttpRequestBodyMode
+ */
+export declare enum HttpRequestBodyMode {
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_BODY_MODE_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_BODY_MODE_STATIC = 1;
+     */
+    STATIC = 1,
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT = 2;
+     */
+    INTER_STEP_RESULT = 2
 }
 declare class HttpRequest$Type extends MessageType<HttpRequest> {
     constructor();

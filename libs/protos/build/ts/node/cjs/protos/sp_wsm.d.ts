@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Audience } from "./sp_common";
 import { DetectiveStepResult } from "./steps/sp_steps_detective";
 import { PipelineStep } from "./sp_pipeline";
 /**
@@ -105,6 +106,10 @@ export interface InterStepResult {
     } | {
         oneofKind: undefined;
     };
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1000;
+     */
+    audience?: Audience;
 }
 /**
  * Included in Wasm response; the SDK should use the WASMExitCode to determine

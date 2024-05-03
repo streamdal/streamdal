@@ -41,6 +41,24 @@ export var HttpRequestMethod;
      */
     HttpRequestMethod[HttpRequestMethod["OPTIONS"] = 7] = "OPTIONS";
 })(HttpRequestMethod || (HttpRequestMethod = {}));
+/**
+ * @generated from protobuf enum protos.steps.HttpRequestBodyMode
+ */
+export var HttpRequestBodyMode;
+(function (HttpRequestBodyMode) {
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_BODY_MODE_UNSET = 0;
+     */
+    HttpRequestBodyMode[HttpRequestBodyMode["UNSET"] = 0] = "UNSET";
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_BODY_MODE_STATIC = 1;
+     */
+    HttpRequestBodyMode[HttpRequestBodyMode["STATIC"] = 1] = "STATIC";
+    /**
+     * @generated from protobuf enum value: HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT = 2;
+     */
+    HttpRequestBodyMode[HttpRequestBodyMode["INTER_STEP_RESULT"] = 2] = "INTER_STEP_RESULT";
+})(HttpRequestBodyMode || (HttpRequestBodyMode = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class HttpRequest$Type extends MessageType {
     constructor() {
@@ -48,11 +66,12 @@ class HttpRequest$Type extends MessageType {
             { no: 1, name: "method", kind: "enum", T: () => ["protos.steps.HttpRequestMethod", HttpRequestMethod, "HTTP_REQUEST_METHOD_"] },
             { no: 2, name: "url", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "body", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
-            { no: 4, name: "headers", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 4, name: "headers", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 5, name: "body_mode", kind: "enum", T: () => ["protos.steps.HttpRequestBodyMode", HttpRequestBodyMode, "HTTP_REQUEST_BODY_MODE_"] }
         ]);
     }
     create(value) {
-        const message = { method: 0, url: "", body: new Uint8Array(0), headers: {} };
+        const message = { method: 0, url: "", body: new Uint8Array(0), headers: {}, bodyMode: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -74,6 +93,9 @@ class HttpRequest$Type extends MessageType {
                     break;
                 case /* map<string, string> headers */ 4:
                     this.binaryReadMap4(message.headers, reader, options);
+                    break;
+                case /* protos.steps.HttpRequestBodyMode body_mode */ 5:
+                    message.bodyMode = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -115,6 +137,9 @@ class HttpRequest$Type extends MessageType {
         /* map<string, string> headers = 4; */
         for (let k of Object.keys(message.headers))
             writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.headers[k]).join();
+        /* protos.steps.HttpRequestBodyMode body_mode = 5; */
+        if (message.bodyMode !== 0)
+            writer.tag(5, WireType.Varint).int32(message.bodyMode);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
