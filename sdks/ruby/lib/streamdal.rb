@@ -12,6 +12,7 @@ require "sp_internal_services_pb"
 require 'sp_pipeline_pb'
 require "sp_wsm_pb"
 require "steps/sp_steps_httprequest_pb"
+require "steps/sp_steps_kv_pb"
 require 'timeout'
 require 'google/protobuf'
 require_relative 'audiences'
@@ -355,10 +356,25 @@ module Streamdal
         validate_kv_command(cmd)
       rescue => e
         @log.error "KV command validation failed: #{e}"
-        nil
+        return nil
       end
 
-      # TODO: implement
+      cmd.kv.instructions.each do |inst|
+        validate_kv_instruction(inst)
+
+        case inst.action
+        when :KV_ACTION_CREATE
+          @kv.set(inst.key, inst.value)
+        when :KV_ACTION_UPDATE
+          @kv.set(inst.key, inst.value)
+        when :KV_ACTION_DELETE
+          @kv.delete(inst.key)
+        when :KV_ACTION_DELETE_ALL
+          @kv.purge
+        else
+          @log.error "Unknown KV action: '#{inst.action}'"
+        end
+      end
     end
 
     def _set_pipelines(cmd)

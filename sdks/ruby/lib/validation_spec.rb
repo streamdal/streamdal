@@ -22,22 +22,6 @@ RSpec.describe "Validation" do
       cmd = Streamdal::Protos::Command.new
       expect { validation.validate_kv_command(cmd) }.to raise_error("kv command is required")
     end
-
-    it "raises an error if cmd.kv.instructions is nil" do
-      cmd = Streamdal::Protos::Command.new(kv: Streamdal::Protos::KVCommand.new)
-      expect { validation.validate_kv_command(cmd) }.to raise_error("instructions are required")
-    end
-
-    it "raises an error if cmd.kv.instructions is empty" do
-      cmd = Streamdal::Protos::Command.new(kv: Streamdal::Protos::KVCommand.new(instructions: []))
-      expect { validation.validate_kv_command(cmd) }.to raise_error("instructions are required")
-    end
-
-    it "validates each instruction" do
-      cmd = Streamdal::Protos::Command.new(kv: Streamdal::Protos::KVCommand.new(instructions: [Streamdal::Protos::KVInstruction.new]))
-      expect(validation).to receive(:validate_kv_instruction).with(any_args).once
-      validation.validate_kv_command(cmd)
-    end
   end
 
   context "#validate_kv_instruction" do

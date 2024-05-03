@@ -1,5 +1,6 @@
 ##
 # Validation mix-in module
+require "steps/sp_steps_kv_pb"
 
 module Validation
   def validate_set_pipelines(cmd)
@@ -30,14 +31,6 @@ module Validation
     if cmd.kv.nil?
       raise "kv command is required"
     end
-
-    if cmd.kv.instructions.nil? || cmd.kv.instructions.length == 0
-      raise "instructions are required"
-    end
-
-    cmd.kv.instructions.each do |inst|
-      validate_kv_instruction(inst)
-    end
   end
 
   def validate_kv_instruction(inst)
@@ -57,7 +50,7 @@ module Validation
       raise "instruction action is required"
     end
 
-    if inst.object.nil?
+    if inst.object.nil? and inst.action != :KV_ACTION_DELETE_ALL
       raise "instruction object is required"
     end
 
