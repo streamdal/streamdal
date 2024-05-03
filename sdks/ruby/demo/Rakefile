@@ -1,0 +1,9 @@
+task default: %w[run]
+
+task :setup do
+  sh "bundle install"
+end
+
+task :run do
+  sh "ruby demo.rb"
+end

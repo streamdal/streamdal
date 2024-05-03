@@ -136,6 +136,10 @@ func (n *Notify) handle(ctx context.Context, event *protos.NotifyRequest) error 
 		return errors.New("Unknown condition type")
 	}
 
+	if cond.Notification == nil {
+		return errors.New("No notification config found")
+	}
+
 	for _, cfgID := range cond.Notification.NotificationConfigIds {
 		cfg, err := n.Store.GetNotificationConfig(ctx, &protos.GetNotificationRequest{NotificationId: cfgID})
 		if err != nil {

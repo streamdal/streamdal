@@ -1,0 +1,95 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    base64 (0.2.0)
+    bozos_buckets (0.0.2)
+    csv (3.2.8)
+    diff-lcs (1.5.1)
+    docile (1.4.0)
+    google-protobuf (3.25.3)
+    google-protobuf (3.25.3-aarch64-linux)
+    google-protobuf (3.25.3-arm64-darwin)
+    google-protobuf (3.25.3-x86-linux)
+    google-protobuf (3.25.3-x86_64-darwin)
+    google-protobuf (3.25.3-x86_64-linux)
+    googleapis-common-protos-types (1.14.0)
+      google-protobuf (~> 3.18)
+    grpc (1.62.0)
+      google-protobuf (~> 3.25)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.62.0-aarch64-linux)
+      google-protobuf (~> 3.25)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.62.0-arm64-darwin)
+      google-protobuf (~> 3.25)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.62.0-x86-linux)
+      google-protobuf (~> 3.25)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.62.0-x86_64-darwin)
+      google-protobuf (~> 3.25)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.62.0-x86_64-linux)
+      google-protobuf (~> 3.25)
+      googleapis-common-protos-types (~> 1.0)
+    httparty (0.22.0)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
+    mini_mime (1.1.5)
+    multi_xml (0.6.0)
+    rake (13.1.0)
+    rb_sys (0.9.90)
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.0)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.1)
+    securerandom (0.3.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
+    streamdal-protos (0.1.52)
+      google-protobuf (~> 3.15)
+      grpc (~> 1.32)
+    wasmtime (18.0.3)
+      rb_sys (~> 0.9.86)
+    wasmtime (18.0.3-aarch64-linux)
+    wasmtime (18.0.3-arm64-darwin)
+    wasmtime (18.0.3-x86_64-darwin)
+    wasmtime (18.0.3-x86_64-linux)
+
+PLATFORMS
+  aarch64-linux
+  arm64-darwin
+  ruby
+  x86-linux
+  x86_64-darwin
+  x86_64-linux
+
+DEPENDENCIES
+  base64
+  bozos_buckets (~> 0.0.2)
+  google-protobuf (~> 3.25)
+  grpc (~> 1.62.0)
+  httparty
+  rake (~> 13.1)
+  rspec
+  securerandom (~> 0.3.1)
+  simplecov
+  streamdal-protos (= 0.1.52)
+  wasmtime (~> 18.0.0)
+
+BUNDLED WITH
+   2.5.4
