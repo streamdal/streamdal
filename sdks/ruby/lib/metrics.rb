@@ -158,8 +158,8 @@ module Streamdal
       req = Streamdal::Protos::MetricsRequest.new
       req.metrics = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Metric, [metric])
 
-      @stub.metrics(req, metadata: _metadata)
       @cfg.log.debug("Published metric: #{ce.name} #{ce.labels} #{ce.value}")
+      @stub.metrics(req, metadata: _metadata)
     end
 
     def _run_publisher
