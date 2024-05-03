@@ -797,6 +797,7 @@ PIPELINE:
 			}
 
 			isr = wasmResp.InterStepResult // Pass inter-step result to next step
+			isr.Audience = aud             // Ensure audience is set on ISR for HttpRequests
 
 			var (
 				stepCondStr    string
