@@ -485,7 +485,7 @@ module Streamdal
       ci = Streamdal::Protos::ClientInfo.new
       ci.client_type = :CLIENT_TYPE_SDK
       ci.library_name = "ruby-sdk"
-      ci.library_version = "0.0.1" # TODO: inject via github action
+      ci.library_version = "0.0.1"
       ci.language = "ruby"
       ci.arch = arch
       ci.os = os
