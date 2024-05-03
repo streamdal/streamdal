@@ -44,6 +44,7 @@ import { StepConditions } from "./stepConditions.tsx";
 import { ActionModal } from "../modals/actionModal.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
+import React from "react";
 
 export default function PipelineDetail({
   pipeline,
