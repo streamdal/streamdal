@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("lib/**/*.rb")
   s.homepage = "https://docs.streamdal.com"
   s.license = "Apache-2.0"
-  s.required_ruby_version = ">= 3.0.0"
+  s.required_ruby_version = "0.0.1"
 end
