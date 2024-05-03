@@ -6,6 +6,7 @@ const runtime_2 = require("@protobuf-ts/runtime");
 const runtime_3 = require("@protobuf-ts/runtime");
 const runtime_4 = require("@protobuf-ts/runtime");
 const runtime_5 = require("@protobuf-ts/runtime");
+const sp_common_1 = require("./sp_common");
 const sp_steps_detective_1 = require("./steps/sp_steps_detective");
 const sp_pipeline_1 = require("./sp_pipeline");
 /**
@@ -193,7 +194,8 @@ exports.WASMResponse = new WASMResponse$Type();
 class InterStepResult$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.InterStepResult", [
-            { no: 1, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => sp_steps_detective_1.DetectiveStepResult }
+            { no: 1, name: "detective_result", kind: "message", oneof: "inputFrom", T: () => sp_steps_detective_1.DetectiveStepResult },
+            { no: 1000, name: "audience", kind: "message", T: () => sp_common_1.Audience }
         ]);
     }
     create(value) {
@@ -214,6 +216,9 @@ class InterStepResult$Type extends runtime_5.MessageType {
                         detectiveResult: sp_steps_detective_1.DetectiveStepResult.internalBinaryRead(reader, reader.uint32(), options, message.inputFrom.detectiveResult)
                     };
                     break;
+                case /* protos.Audience audience */ 1000:
+                    message.audience = sp_common_1.Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -229,6 +234,9 @@ class InterStepResult$Type extends runtime_5.MessageType {
         /* protos.steps.DetectiveStepResult detective_result = 1; */
         if (message.inputFrom.oneofKind === "detectiveResult")
             sp_steps_detective_1.DetectiveStepResult.internalBinaryWrite(message.inputFrom.detectiveResult, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.Audience audience = 1000; */
+        if (message.audience)
+            sp_common_1.Audience.internalBinaryWrite(message.audience, writer.tag(1000, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

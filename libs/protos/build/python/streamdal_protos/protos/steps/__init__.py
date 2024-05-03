@@ -160,6 +160,12 @@ class HttpRequestMethod(betterproto.Enum):
     HTTP_REQUEST_METHOD_OPTIONS = 7
 
 
+class HttpRequestBodyMode(betterproto.Enum):
+    HTTP_REQUEST_BODY_MODE_UNSET = 0
+    HTTP_REQUEST_BODY_MODE_STATIC = 1
+    HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT = 2
+
+
 class KvMode(betterproto.Enum):
     """
     Used by frontend when constructing a pipeline that contains a KV step that
@@ -293,6 +299,7 @@ class HttpRequest(betterproto.Message):
     headers: Dict[str, str] = betterproto.map_field(
         4, betterproto.TYPE_STRING, betterproto.TYPE_STRING
     )
+    body_mode: "HttpRequestBodyMode" = betterproto.enum_field(5)
 
 
 @dataclass(eq=False, repr=False)

@@ -16,11 +16,18 @@ enum HttpRequestMethod {
   HTTP_REQUEST_METHOD_OPTIONS = 7;
 }
 
+enum HttpRequestBodyMode {
+  HTTP_REQUEST_BODY_MODE_UNSET = 0;
+  HTTP_REQUEST_BODY_MODE_STATIC = 1;
+  HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT = 2;
+}
+
 message HttpRequest {
   HttpRequestMethod method = 1;
   string url = 2;
   bytes body = 3;
   map<string,string> headers = 4;
+  HttpRequestBodyMode body_mode = 5;
 }
 
 message HttpResponse {

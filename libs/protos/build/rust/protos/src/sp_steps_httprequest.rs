@@ -37,6 +37,8 @@ pub struct HttpRequest {
     pub body: ::std::vec::Vec<u8>,
     // @@protoc_insertion_point(field:protos.steps.HttpRequest.headers)
     pub headers: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+    // @@protoc_insertion_point(field:protos.steps.HttpRequest.body_mode)
+    pub body_mode: ::protobuf::EnumOrUnknown<HttpRequestBodyMode>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.steps.HttpRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -54,7 +56,7 @@ impl HttpRequest {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(4);
+        let mut fields = ::std::vec::Vec::with_capacity(5);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "method",
@@ -75,6 +77,11 @@ impl HttpRequest {
             "headers",
             |m: &HttpRequest| { &m.headers },
             |m: &mut HttpRequest| { &mut m.headers },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "body_mode",
+            |m: &HttpRequest| { &m.body_mode },
+            |m: &mut HttpRequest| { &mut m.body_mode },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<HttpRequest>(
             "HttpRequest",
@@ -118,6 +125,9 @@ impl ::protobuf::Message for HttpRequest {
                     is.pop_limit(old_limit);
                     self.headers.insert(key, value);
                 },
+                40 => {
+                    self.body_mode = is.read_enum_or_unknown()?;
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -145,6 +155,9 @@ impl ::protobuf::Message for HttpRequest {
             entry_size += ::protobuf::rt::string_size(2, &v);
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
         };
+        if self.body_mode != ::protobuf::EnumOrUnknown::new(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(5, self.body_mode.value());
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -169,6 +182,9 @@ impl ::protobuf::Message for HttpRequest {
             os.write_string(1, &k)?;
             os.write_string(2, &v)?;
         };
+        if self.body_mode != ::protobuf::EnumOrUnknown::new(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET) {
+            os.write_enum(5, ::protobuf::EnumOrUnknown::value(&self.body_mode))?;
+        }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -190,6 +206,7 @@ impl ::protobuf::Message for HttpRequest {
         self.url.clear();
         self.body.clear();
         self.headers.clear();
+        self.body_mode = ::protobuf::EnumOrUnknown::new(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET);
         self.special_fields.clear();
     }
 
@@ -605,73 +622,153 @@ impl HttpRequestMethod {
     }
 }
 
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.steps.HttpRequestBodyMode)
+pub enum HttpRequestBodyMode {
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestBodyMode.HTTP_REQUEST_BODY_MODE_UNSET)
+    HTTP_REQUEST_BODY_MODE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestBodyMode.HTTP_REQUEST_BODY_MODE_STATIC)
+    HTTP_REQUEST_BODY_MODE_STATIC = 1,
+    // @@protoc_insertion_point(enum_value:protos.steps.HttpRequestBodyMode.HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT)
+    HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT = 2,
+}
+
+impl ::protobuf::Enum for HttpRequestBodyMode {
+    const NAME: &'static str = "HttpRequestBodyMode";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<HttpRequestBodyMode> {
+        match value {
+            0 => ::std::option::Option::Some(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET),
+            1 => ::std::option::Option::Some(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_STATIC),
+            2 => ::std::option::Option::Some(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    fn from_str(str: &str) -> ::std::option::Option<HttpRequestBodyMode> {
+        match str {
+            "HTTP_REQUEST_BODY_MODE_UNSET" => ::std::option::Option::Some(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET),
+            "HTTP_REQUEST_BODY_MODE_STATIC" => ::std::option::Option::Some(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_STATIC),
+            "HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT" => ::std::option::Option::Some(HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [HttpRequestBodyMode] = &[
+        HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET,
+        HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_STATIC,
+        HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT,
+    ];
+}
+
+impl ::protobuf::EnumFull for HttpRequestBodyMode {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("HttpRequestBodyMode").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for HttpRequestBodyMode {
+    fn default() -> Self {
+        HttpRequestBodyMode::HTTP_REQUEST_BODY_MODE_UNSET
+    }
+}
+
+impl HttpRequestBodyMode {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<HttpRequestBodyMode>("HttpRequestBodyMode")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x20steps/sp_steps_httprequest.proto\x12\x0cprotos.steps\"\xea\x01\n\
+    \n\x20steps/sp_steps_httprequest.proto\x12\x0cprotos.steps\"\xaa\x02\n\
     \x0bHttpRequest\x127\n\x06method\x18\x01\x20\x01(\x0e2\x1f.protos.steps.\
     HttpRequestMethodR\x06method\x12\x10\n\x03url\x18\x02\x20\x01(\tR\x03url\
     \x12\x12\n\x04body\x18\x03\x20\x01(\x0cR\x04body\x12@\n\x07headers\x18\
     \x04\x20\x03(\x0b2&.protos.steps.HttpRequest.HeadersEntryR\x07headers\
+    \x12>\n\tbody_mode\x18\x05\x20\x01(\x0e2!.protos.steps.HttpRequestBodyMo\
+    deR\x08bodyMode\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01\x20\x01(\
+    \tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\"\
+    \xb5\x01\n\x0cHttpResponse\x12\x12\n\x04code\x18\x01\x20\x01(\x05R\x04co\
+    de\x12\x12\n\x04body\x18\x02\x20\x01(\x0cR\x04body\x12A\n\x07headers\x18\
+    \x03\x20\x03(\x0b2'.protos.steps.HttpResponse.HeadersEntryR\x07headers\
     \x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\
-    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\"\xb5\x01\n\x0cHt\
-    tpResponse\x12\x12\n\x04code\x18\x01\x20\x01(\x05R\x04code\x12\x12\n\x04\
-    body\x18\x02\x20\x01(\x0cR\x04body\x12A\n\x07headers\x18\x03\x20\x03(\
-    \x0b2'.protos.steps.HttpResponse.HeadersEntryR\x07headers\x1a:\n\x0cHead\
-    ersEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\
-    \x18\x02\x20\x01(\tR\x05value:\x028\x01\"F\n\x0fHttpRequestStep\x123\n\
-    \x07request\x18\x01\x20\x01(\x0b2\x19.protos.steps.HttpRequestR\x07reque\
-    st*\x88\x02\n\x11HttpRequestMethod\x12\x1d\n\x19HTTP_REQUEST_METHOD_UNSE\
-    T\x10\0\x12\x1b\n\x17HTTP_REQUEST_METHOD_GET\x10\x01\x12\x1c\n\x18HTTP_R\
-    EQUEST_METHOD_POST\x10\x02\x12\x1b\n\x17HTTP_REQUEST_METHOD_PUT\x10\x03\
-    \x12\x1e\n\x1aHTTP_REQUEST_METHOD_DELETE\x10\x04\x12\x1d\n\x19HTTP_REQUE\
-    ST_METHOD_PATCH\x10\x05\x12\x1c\n\x18HTTP_REQUEST_METHOD_HEAD\x10\x06\
-    \x12\x1f\n\x1bHTTP_REQUEST_METHOD_OPTIONS\x10\x07BVZ@github.com/streamda\
-    l/streamdal/libs/protos/build/go/protos/steps\xea\x02\x11Streamdal::Prot\
-    osJ\xa6\x07\n\x06\x12\x04\0\0!\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\
-    \n\x01\x02\x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\
-    \x08\x0b\x12\x03\x04\0W\n\x08\n\x01\x08\x12\x03\x05\0*\n\t\n\x02\x08-\
-    \x12\x03\x05\0*\n\n\n\x02\x05\0\x12\x04\x07\0\x10\x01\n\n\n\x03\x05\0\
-    \x01\x12\x03\x07\x05\x16\n\x0b\n\x04\x05\0\x02\0\x12\x03\x08\x02\x20\n\
-    \x0c\n\x05\x05\0\x02\0\x01\x12\x03\x08\x02\x1b\n\x0c\n\x05\x05\0\x02\0\
-    \x02\x12\x03\x08\x1e\x1f\n\x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02\x1e\n\
-    \x0c\n\x05\x05\0\x02\x01\x01\x12\x03\t\x02\x19\n\x0c\n\x05\x05\0\x02\x01\
-    \x02\x12\x03\t\x1c\x1d\n\x0b\n\x04\x05\0\x02\x02\x12\x03\n\x02\x1f\n\x0c\
-    \n\x05\x05\0\x02\x02\x01\x12\x03\n\x02\x1a\n\x0c\n\x05\x05\0\x02\x02\x02\
-    \x12\x03\n\x1d\x1e\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0b\x02\x1e\n\x0c\n\
-    \x05\x05\0\x02\x03\x01\x12\x03\x0b\x02\x19\n\x0c\n\x05\x05\0\x02\x03\x02\
-    \x12\x03\x0b\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0c\x02!\n\x0c\n\
-    \x05\x05\0\x02\x04\x01\x12\x03\x0c\x02\x1c\n\x0c\n\x05\x05\0\x02\x04\x02\
-    \x12\x03\x0c\x1f\x20\n\x0b\n\x04\x05\0\x02\x05\x12\x03\r\x02\x20\n\x0c\n\
-    \x05\x05\0\x02\x05\x01\x12\x03\r\x02\x1b\n\x0c\n\x05\x05\0\x02\x05\x02\
-    \x12\x03\r\x1e\x1f\n\x0b\n\x04\x05\0\x02\x06\x12\x03\x0e\x02\x1f\n\x0c\n\
-    \x05\x05\0\x02\x06\x01\x12\x03\x0e\x02\x1a\n\x0c\n\x05\x05\0\x02\x06\x02\
-    \x12\x03\x0e\x1d\x1e\n\x0b\n\x04\x05\0\x02\x07\x12\x03\x0f\x02\"\n\x0c\n\
-    \x05\x05\0\x02\x07\x01\x12\x03\x0f\x02\x1d\n\x0c\n\x05\x05\0\x02\x07\x02\
-    \x12\x03\x0f\x20!\n\n\n\x02\x04\0\x12\x04\x12\0\x17\x01\n\n\n\x03\x04\0\
-    \x01\x12\x03\x12\x08\x13\n\x0b\n\x04\x04\0\x02\0\x12\x03\x13\x02\x1f\n\
-    \x0c\n\x05\x04\0\x02\0\x06\x12\x03\x13\x02\x13\n\x0c\n\x05\x04\0\x02\0\
-    \x01\x12\x03\x13\x14\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x13\x1d\x1e\
-    \n\x0b\n\x04\x04\0\x02\x01\x12\x03\x14\x02\x11\n\x0c\n\x05\x04\0\x02\x01\
-    \x05\x12\x03\x14\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x14\t\x0c\
-    \n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x14\x0f\x10\n\x0b\n\x04\x04\0\x02\
-    \x02\x12\x03\x15\x02\x11\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x15\x02\
-    \x07\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x15\x08\x0c\n\x0c\n\x05\x04\0\
-    \x02\x02\x03\x12\x03\x15\x0f\x10\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x16\
-    \x02!\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x16\x02\x14\n\x0c\n\x05\x04\
-    \0\x02\x03\x01\x12\x03\x16\x15\x1c\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\
-    \x16\x1f\x20\n\n\n\x02\x04\x01\x12\x04\x19\0\x1d\x01\n\n\n\x03\x04\x01\
-    \x01\x12\x03\x19\x08\x14\n\x0b\n\x04\x04\x01\x02\0\x12\x03\x1a\x02\x11\n\
-    \x0c\n\x05\x04\x01\x02\0\x05\x12\x03\x1a\x02\x07\n\x0c\n\x05\x04\x01\x02\
-    \0\x01\x12\x03\x1a\x08\x0c\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03\x1a\x0f\
-    \x10\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\x1b\x02\x11\n\x0c\n\x05\x04\x01\
-    \x02\x01\x05\x12\x03\x1b\x02\x07\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x03\
-    \x1b\x08\x0c\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03\x1b\x0f\x10\n\x0b\n\
-    \x04\x04\x01\x02\x02\x12\x03\x1c\x02!\n\x0c\n\x05\x04\x01\x02\x02\x06\
-    \x12\x03\x1c\x02\x14\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03\x1c\x15\x1c\
-    \n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03\x1c\x1f\x20\n\n\n\x02\x04\x02\
-    \x12\x04\x1f\0!\x01\n\n\n\x03\x04\x02\x01\x12\x03\x1f\x08\x17\n\x0b\n\
-    \x04\x04\x02\x02\0\x12\x03\x20\x02\x1a\n\x0c\n\x05\x04\x02\x02\0\x06\x12\
-    \x03\x20\x02\r\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03\x20\x0e\x15\n\x0c\n\
-    \x05\x04\x02\x02\0\x03\x12\x03\x20\x18\x19b\x06proto3\
+    \x14\n\x05value\x18\x02\x20\x01(\tR\x05value:\x028\x01\"F\n\x0fHttpReque\
+    stStep\x123\n\x07request\x18\x01\x20\x01(\x0b2\x19.protos.steps.HttpRequ\
+    estR\x07request*\x88\x02\n\x11HttpRequestMethod\x12\x1d\n\x19HTTP_REQUES\
+    T_METHOD_UNSET\x10\0\x12\x1b\n\x17HTTP_REQUEST_METHOD_GET\x10\x01\x12\
+    \x1c\n\x18HTTP_REQUEST_METHOD_POST\x10\x02\x12\x1b\n\x17HTTP_REQUEST_MET\
+    HOD_PUT\x10\x03\x12\x1e\n\x1aHTTP_REQUEST_METHOD_DELETE\x10\x04\x12\x1d\
+    \n\x19HTTP_REQUEST_METHOD_PATCH\x10\x05\x12\x1c\n\x18HTTP_REQUEST_METHOD\
+    _HEAD\x10\x06\x12\x1f\n\x1bHTTP_REQUEST_METHOD_OPTIONS\x10\x07*\x88\x01\
+    \n\x13HttpRequestBodyMode\x12\x20\n\x1cHTTP_REQUEST_BODY_MODE_UNSET\x10\
+    \0\x12!\n\x1dHTTP_REQUEST_BODY_MODE_STATIC\x10\x01\x12,\n(HTTP_REQUEST_B\
+    ODY_MODE_INTER_STEP_RESULT\x10\x02BVZ@github.com/streamdal/streamdal/lib\
+    s/protos/build/go/protos/steps\xea\x02\x11Streamdal::ProtosJ\xf0\x08\n\
+    \x06\x12\x04\0\0(\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\
+    \x12\x03\x02\0\x15\n\x08\n\x01\x08\x12\x03\x04\0W\n\t\n\x02\x08\x0b\x12\
+    \x03\x04\0W\n\x08\n\x01\x08\x12\x03\x05\0*\n\t\n\x02\x08-\x12\x03\x05\0*\
+    \n\n\n\x02\x05\0\x12\x04\x07\0\x10\x01\n\n\n\x03\x05\0\x01\x12\x03\x07\
+    \x05\x16\n\x0b\n\x04\x05\0\x02\0\x12\x03\x08\x02\x20\n\x0c\n\x05\x05\0\
+    \x02\0\x01\x12\x03\x08\x02\x1b\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x08\
+    \x1e\x1f\n\x0b\n\x04\x05\0\x02\x01\x12\x03\t\x02\x1e\n\x0c\n\x05\x05\0\
+    \x02\x01\x01\x12\x03\t\x02\x19\n\x0c\n\x05\x05\0\x02\x01\x02\x12\x03\t\
+    \x1c\x1d\n\x0b\n\x04\x05\0\x02\x02\x12\x03\n\x02\x1f\n\x0c\n\x05\x05\0\
+    \x02\x02\x01\x12\x03\n\x02\x1a\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\n\
+    \x1d\x1e\n\x0b\n\x04\x05\0\x02\x03\x12\x03\x0b\x02\x1e\n\x0c\n\x05\x05\0\
+    \x02\x03\x01\x12\x03\x0b\x02\x19\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\
+    \x0b\x1c\x1d\n\x0b\n\x04\x05\0\x02\x04\x12\x03\x0c\x02!\n\x0c\n\x05\x05\
+    \0\x02\x04\x01\x12\x03\x0c\x02\x1c\n\x0c\n\x05\x05\0\x02\x04\x02\x12\x03\
+    \x0c\x1f\x20\n\x0b\n\x04\x05\0\x02\x05\x12\x03\r\x02\x20\n\x0c\n\x05\x05\
+    \0\x02\x05\x01\x12\x03\r\x02\x1b\n\x0c\n\x05\x05\0\x02\x05\x02\x12\x03\r\
+    \x1e\x1f\n\x0b\n\x04\x05\0\x02\x06\x12\x03\x0e\x02\x1f\n\x0c\n\x05\x05\0\
+    \x02\x06\x01\x12\x03\x0e\x02\x1a\n\x0c\n\x05\x05\0\x02\x06\x02\x12\x03\
+    \x0e\x1d\x1e\n\x0b\n\x04\x05\0\x02\x07\x12\x03\x0f\x02\"\n\x0c\n\x05\x05\
+    \0\x02\x07\x01\x12\x03\x0f\x02\x1d\n\x0c\n\x05\x05\0\x02\x07\x02\x12\x03\
+    \x0f\x20!\n\n\n\x02\x05\x01\x12\x04\x12\0\x16\x01\n\n\n\x03\x05\x01\x01\
+    \x12\x03\x12\x05\x18\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x13\x02#\n\x0c\n\
+    \x05\x05\x01\x02\0\x01\x12\x03\x13\x02\x1e\n\x0c\n\x05\x05\x01\x02\0\x02\
+    \x12\x03\x13!\"\n\x0b\n\x04\x05\x01\x02\x01\x12\x03\x14\x02$\n\x0c\n\x05\
+    \x05\x01\x02\x01\x01\x12\x03\x14\x02\x1f\n\x0c\n\x05\x05\x01\x02\x01\x02\
+    \x12\x03\x14\"#\n\x0b\n\x04\x05\x01\x02\x02\x12\x03\x15\x02/\n\x0c\n\x05\
+    \x05\x01\x02\x02\x01\x12\x03\x15\x02*\n\x0c\n\x05\x05\x01\x02\x02\x02\
+    \x12\x03\x15-.\n\n\n\x02\x04\0\x12\x04\x18\0\x1e\x01\n\n\n\x03\x04\0\x01\
+    \x12\x03\x18\x08\x13\n\x0b\n\x04\x04\0\x02\0\x12\x03\x19\x02\x1f\n\x0c\n\
+    \x05\x04\0\x02\0\x06\x12\x03\x19\x02\x13\n\x0c\n\x05\x04\0\x02\0\x01\x12\
+    \x03\x19\x14\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x19\x1d\x1e\n\x0b\n\
+    \x04\x04\0\x02\x01\x12\x03\x1a\x02\x11\n\x0c\n\x05\x04\0\x02\x01\x05\x12\
+    \x03\x1a\x02\x08\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x1a\t\x0c\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x03\x1a\x0f\x10\n\x0b\n\x04\x04\0\x02\x02\x12\
+    \x03\x1b\x02\x11\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x03\x1b\x02\x07\n\x0c\
+    \n\x05\x04\0\x02\x02\x01\x12\x03\x1b\x08\x0c\n\x0c\n\x05\x04\0\x02\x02\
+    \x03\x12\x03\x1b\x0f\x10\n\x0b\n\x04\x04\0\x02\x03\x12\x03\x1c\x02!\n\
+    \x0c\n\x05\x04\0\x02\x03\x06\x12\x03\x1c\x02\x14\n\x0c\n\x05\x04\0\x02\
+    \x03\x01\x12\x03\x1c\x15\x1c\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03\x1c\
+    \x1f\x20\n\x0b\n\x04\x04\0\x02\x04\x12\x03\x1d\x02$\n\x0c\n\x05\x04\0\
+    \x02\x04\x06\x12\x03\x1d\x02\x15\n\x0c\n\x05\x04\0\x02\x04\x01\x12\x03\
+    \x1d\x16\x1f\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03\x1d\"#\n\n\n\x02\x04\
+    \x01\x12\x04\x20\0$\x01\n\n\n\x03\x04\x01\x01\x12\x03\x20\x08\x14\n\x0b\
+    \n\x04\x04\x01\x02\0\x12\x03!\x02\x11\n\x0c\n\x05\x04\x01\x02\0\x05\x12\
+    \x03!\x02\x07\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03!\x08\x0c\n\x0c\n\x05\
+    \x04\x01\x02\0\x03\x12\x03!\x0f\x10\n\x0b\n\x04\x04\x01\x02\x01\x12\x03\
+    \"\x02\x11\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03\"\x02\x07\n\x0c\n\x05\
+    \x04\x01\x02\x01\x01\x12\x03\"\x08\x0c\n\x0c\n\x05\x04\x01\x02\x01\x03\
+    \x12\x03\"\x0f\x10\n\x0b\n\x04\x04\x01\x02\x02\x12\x03#\x02!\n\x0c\n\x05\
+    \x04\x01\x02\x02\x06\x12\x03#\x02\x14\n\x0c\n\x05\x04\x01\x02\x02\x01\
+    \x12\x03#\x15\x1c\n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03#\x1f\x20\n\n\n\
+    \x02\x04\x02\x12\x04&\0(\x01\n\n\n\x03\x04\x02\x01\x12\x03&\x08\x17\n\
+    \x0b\n\x04\x04\x02\x02\0\x12\x03'\x02\x1a\n\x0c\n\x05\x04\x02\x02\0\x06\
+    \x12\x03'\x02\r\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03'\x0e\x15\n\x0c\n\
+    \x05\x04\x02\x02\0\x03\x12\x03'\x18\x19b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -693,8 +790,9 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(HttpRequest::generated_message_descriptor_data());
             messages.push(HttpResponse::generated_message_descriptor_data());
             messages.push(HttpRequestStep::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(1);
+            let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(HttpRequestMethod::generated_enum_descriptor_data());
+            enums.push(HttpRequestBodyMode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
