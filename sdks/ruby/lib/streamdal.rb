@@ -1,20 +1,19 @@
 # frozen_string_literal: true
 require 'base64'
-require "sp_internal_services_pb"
-require "sp_pipeline_pb"
-require "sp_wsm_pb"
-require "steps/sp_steps_httprequest_pb"
-require "securerandom"
-require "wasmtime"
-require "google/protobuf"
-require "base64"
-require 'logger'
-require 'sp_sdk_pb'
 require 'httparty'
-require 'sp_pipeline_pb'
+require 'logger'
+require 'securerandom'
+require 'wasmtime'
+require 'sp_sdk_pb'
+require 'sp_common_pb'
 require 'sp_info_pb'
 require 'sp_internal_pb'
-require 'sp_common_pb'
+require "sp_internal_services_pb"
+require 'sp_pipeline_pb'
+require "sp_wsm_pb"
+require "steps/sp_steps_httprequest_pb"
+require 'timeout'
+require 'google/protobuf'
 require_relative 'audiences'
 require_relative 'hostfunc'
 require_relative 'kv'
@@ -34,6 +33,8 @@ module Streamdal
 
   OPERATION_TYPE_PRODUCER = 2
   OPERATION_TYPE_CONSUMER = 1
+  CLIENT_TYPE_SDK = 1
+  CLIENT_TYPE_SHIM = 2
 
   # Data class to hold instantiated wasm functions
   class WasmFunction
@@ -64,28 +65,6 @@ module Streamdal
     end
   end
 
-  Config = Struct.new(:streamdal_url, :streamdal_token, :service_name, :dry_run, :log) do |obj|
-    attr_accessor :streamdal_url, :streamdal_token, :service_name, :dry_run, :log
-
-    def validate
-      if log.nil?
-        @log = Logger.new($stdout)
-      end
-
-      if streamdal_url.nil? || streamdal_url.empty?
-        raise ArgumentError, "streamdal_url is required"
-      end
-
-      if streamdal_token.nil? || streamdal_token.empty?
-        raise ArgumentError, "streamdal_token is required"
-      end
-
-      if service_name.nil? || service_name.empty?
-        raise ArgumentError, "service_name is required"
-      end
-    end
-
-  end
 
   class Client
 
@@ -102,9 +81,10 @@ module Streamdal
     Metrics = Streamdal::Metrics
 
     def initialize(cfg)
-      cfg.validate
+      _validate_cfg(cfg)
 
       @cfg = cfg
+      @log = cfg[:log]
       @functions = {}
       @session_id = SecureRandom.uuid
       @pipelines = {}
@@ -119,7 +99,7 @@ module Streamdal
       @hostfunc = Streamdal::HostFunc.new(@kv)
 
       # # Connect to Streamdal External gRPC API
-      @stub = Streamdal::Protos::Internal::Stub.new(@cfg.streamdal_url, :this_channel_is_insecure)
+      @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
 
       _pull_initial_pipelines
 
@@ -156,10 +136,10 @@ module Streamdal
       resp.pipeline_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::PipelineStatus, [])
       resp.data = data
 
-      aud = audience.to_proto(@cfg.service_name)
+      aud = audience.to_proto(@cfg[:service_name])
 
       labels = {
-        "service": @cfg.service_name,
+        "service": @cfg[:service_name],
         "operation_type": aud.operation_type,
         "operation": aud.operation_name,
         "component": aud.component_name,
@@ -204,119 +184,121 @@ module Streamdal
       # Used for passing data between steps
       isr = nil
 
-      pipelines.each do |pipeline|
-        pipeline_status = Streamdal::Protos::PipelineStatus.new
-        pipeline_status.id = pipeline.id
-        pipeline_status.name = pipeline.name
-        pipeline_status.step_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::StepStatus, [])
+      Timeout::timeout(@cfg[:pipeline_timeout]) do
+        pipelines.each do |pipeline|
+          pipeline_status = Streamdal::Protos::PipelineStatus.new
+          pipeline_status.id = pipeline.id
+          pipeline_status.name = pipeline.name
+          pipeline_status.step_status = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::StepStatus, [])
 
-        @cfg.log.debug "Running pipeline: '#{pipeline.name}'"
+          @log.debug "Running pipeline: '#{pipeline.name}'"
 
-        labels[:pipeline_id] = pipeline.id
-        labels[:pipeline_name] = pipeline.name
+          labels[:pipeline_id] = pipeline.id
+          labels[:pipeline_name] = pipeline.name
 
-        @metrics.incr(CounterEntry.new(total_counter, aud, labels, 1))
-        @metrics.incr(CounterEntry.new(bytes_processed, aud, labels, data.length))
+          @metrics.incr(CounterEntry.new(total_counter, aud, labels, 1))
+          @metrics.incr(CounterEntry.new(bytes_processed, aud, labels, data.length))
 
-        pipeline.steps.each do |step|
-          step_status = Streamdal::Protos::StepStatus.new
-          step_status.name = step.name
-          step_status.status = :EXEC_STATUS_TRUE
+          pipeline.steps.each do |step|
+            step_status = Streamdal::Protos::StepStatus.new
+            step_status.name = step.name
+            step_status.status = :EXEC_STATUS_TRUE
 
-          begin
-            wasm_resp = _call_wasm(step, data, isr)
-          rescue => e
-            @cfg.log.error "Error running step '#{step.name}': #{e}"
-            step_status.status = :EXEC_STATUS_ERROR
-            step_status.error = e.to_s
-            pipeline_status.step_status.push(step_status)
-            break
-          end
-
-          if @cfg.dry_run
-            @cfg.log.debug "Running step '#{step.name}' in dry-run mode"
-          end
-
-          if wasm_resp.output_payload.length > 0
-            resp.data = wasm_resp.output_payload
-          end
-
-          _handle_schema(aud, step, wasm_resp)
-
-          isr = wasm_resp.inter_step_result
-
-          case wasm_resp.exit_code
-          when :WASM_EXIT_CODE_FALSE
-            cond = step.on_false
-            cond_type = :CONDITION_TYPE_ON_FALSE
-            exec_status = :EXEC_STATUS_FALSE
-          when :WASM_EXIT_CODE_ERROR
-            cond = step.on_error
-            cond_type = :CONDITION_TYPE_ON_ERROR
-            exec_status = :EXEC_STATUS_ERROR
-            isr = nil
-
-            # errors_counter, 1, labels, aud
-            @metrics.incr(CounterEntry.new(errors_counter, aud, labels, 1))
-          else
-            cond = step.on_true
-            exec_status = :EXEC_STATUS_TRUE
-            cond_type = :CONDITION_TYPE_ON_TRUE
-          end
-
-          _notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
-
-          if @cfg.dry_run
-            @cfg.log.debug("Step '#{step.name}' completed with status: #{exec_status}, continuing to next step")
-            next
-          end
-
-          # Whether we are aborting early, aborting current, or continuing, we need to set the step status
-          step_status.status = exec_status
-          step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
-
-          # Pull metadata from step into SDKResponse
-          unless cond.nil?
-            resp.metadata = cond.metadata
-
-            case cond.abort
-            when :ABORT_CONDITION_ABORT_CURRENT
-              step_status.status = exec_status
-              step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+            begin
+              wasm_resp = _call_wasm(step, data, isr)
+            rescue => e
+              @log.error "Error running step '#{step.name}': #{e}"
+              step_status.status = :EXEC_STATUS_ERROR
+              step_status.error = e.to_s
               pipeline_status.step_status.push(step_status)
-              resp.pipeline_status.push(pipeline_status)
-              # Continue outer pipeline loop, there might be additional pipelines
               break
-            when :ABORT_CONDITION_ABORT_ALL
-              # Set step status and push to pipeline status
-              step_status.status = exec_status
-              step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
-              pipeline_status.step_status.push(step_status)
-              resp.pipeline_status.push(pipeline_status)
-
-              # Since we're returning early here, also need to set the response status
-              resp.status = exec_status
-              resp.status_message = "Step returned: #{wasm_resp.exit_msg}"
-
-              _send_tail(aud, pipeline.id, original_data, resp.data)
-              return resp
-            else
-              # Do nothing
             end
+
+            if @cfg[:dry_run]
+              @log.debug "Running step '#{step.name}' in dry-run mode"
+            end
+
+            if wasm_resp.output_payload.length > 0
+              resp.data = wasm_resp.output_payload
+            end
+
+            _handle_schema(aud, step, wasm_resp)
+
+            isr = wasm_resp.inter_step_result
+
+            case wasm_resp.exit_code
+            when :WASM_EXIT_CODE_FALSE
+              cond = step.on_false
+              cond_type = :CONDITION_TYPE_ON_FALSE
+              exec_status = :EXEC_STATUS_FALSE
+            when :WASM_EXIT_CODE_ERROR
+              cond = step.on_error
+              cond_type = :CONDITION_TYPE_ON_ERROR
+              exec_status = :EXEC_STATUS_ERROR
+              isr = nil
+
+              # errors_counter, 1, labels, aud
+              @metrics.incr(CounterEntry.new(errors_counter, aud, labels, 1))
+            else
+              cond = step.on_true
+              exec_status = :EXEC_STATUS_TRUE
+              cond_type = :CONDITION_TYPE_ON_TRUE
+            end
+
+            _notify_condition(pipeline, step, aud, cond, resp.data, cond_type)
+
+            if @cfg[:dry_run]
+              @log.debug("Step '#{step.name}' completed with status: #{exec_status}, continuing to next step")
+              next
+            end
+
+            # Whether we are aborting early, aborting current, or continuing, we need to set the step status
+            step_status.status = exec_status
+            step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+
+            # Pull metadata from step into SDKResponse
+            unless cond.nil?
+              resp.metadata = cond.metadata
+
+              case cond.abort
+              when :ABORT_CONDITION_ABORT_CURRENT
+                step_status.status = exec_status
+                step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+                pipeline_status.step_status.push(step_status)
+                resp.pipeline_status.push(pipeline_status)
+                # Continue outer pipeline loop, there might be additional pipelines
+                break
+              when :ABORT_CONDITION_ABORT_ALL
+                # Set step status and push to pipeline status
+                step_status.status = exec_status
+                step_status.status_message = "Step returned: #{wasm_resp.exit_msg}"
+                pipeline_status.step_status.push(step_status)
+                resp.pipeline_status.push(pipeline_status)
+
+                # Since we're returning early here, also need to set the response status
+                resp.status = exec_status
+                resp.status_message = "Step returned: #{wasm_resp.exit_msg}"
+
+                _send_tail(aud, pipeline.id, original_data, resp.data)
+                return resp
+              else
+                # Do nothing
+              end
+            end
+
+            # Append step status to the current pipeline status' array
+            pipeline_status.step_status.push(step_status)
           end
 
-          # Append step status to the current pipeline status' array
-          pipeline_status.step_status.push(step_status)
-        end
-
-        # Append pipeline status to the response
-        resp.pipeline_status.push(pipeline_status)
-      end
+          # Append pipeline status to the response
+          resp.pipeline_status.push(pipeline_status)
+        end # pipelines.each
+      end # timeout
 
       _send_tail(aud, "", original_data, resp.data)
 
-      if @cfg.dry_run
-        @cfg.log.debug "Dry-run, setting response data to original data"
+      if @cfg[:dry_run]
+        @log.debug "Dry-run, setting response data to original data"
         resp.data = original_data
       end
 
@@ -324,6 +306,34 @@ module Streamdal
     end
 
     private
+
+    def _validate_cfg(cfg)
+      if cfg[:streamdal_url].nil? || cfg[:streamdal_url].empty?
+        raise "streamdal_url is required"
+      end
+
+      if cfg[:streamdal_token].nil? || cfg[:streamdal_token].empty?
+        raise "streamdal_token is required"
+      end
+
+      if cfg[:service_name].nil? || cfg[:streamdal_token].empty?
+        raise "service_name is required"
+      end
+
+      if cfg[:log].nil? || cfg[:streamdal_token].empty?
+        logger = Logger.new(STDOUT)
+        logger.level = Logger::ERROR
+        cfg[:log] = logger
+      end
+
+      if cfg[:pipeline_timeout].nil?
+        cfg[:pipeline_timeout] = DEFAULT_PIPELINE_TIMEOUT
+      end
+
+      if cfg[:step_timeout].nil?
+        cfg[:step_timeout] = DEFAULT_STEP_TIMEOUT
+      end
+    end
 
     def _handle_command(cmd)
       case cmd.command.to_s
@@ -336,7 +346,7 @@ module Streamdal
       when "keep_alive"
         # Do nothing
       else
-        @cfg.log.error "unknown command type #{cmd.command}"
+        @log.error "unknown command type #{cmd.command}"
       end
     end
 
@@ -344,7 +354,7 @@ module Streamdal
       begin
         validate_kv_command(cmd)
       rescue => e
-        @cfg.log.error "KV command validation failed: #{e}"
+        @log.error "KV command validation failed: #{e}"
         nil
       end
 
@@ -363,7 +373,7 @@ module Streamdal
               step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
               cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
             else
-              @cfg.log.error "WASM module not found for step: #{step._wasm_id}"
+              @log.error "WASM module not found for step: #{step._wasm_id}"
             end
           end
         }
@@ -375,11 +385,11 @@ module Streamdal
 
     def _pull_initial_pipelines
       req = Streamdal::Protos::GetSetPipelinesCommandsByServiceRequest.new
-      req.service_name = @cfg.service_name
+      req.service_name = @cfg[:service_name]
 
       resp = @stub.get_set_pipelines_commands_by_service(req, metadata: _metadata)
 
-      @cfg.log.debug "Received '#{resp.set_pipeline_commands.length}' initial pipelines"
+      @log.debug "Received '#{resp.set_pipeline_commands.length}' initial pipelines"
 
       resp.set_pipeline_commands.each do |cmd|
         cmd.set_pipelines.wasm_modules = resp.wasm_modules
@@ -446,7 +456,10 @@ module Streamdal
       req.inter_step_result = isr
 
       begin
-        return Streamdal::Protos::WASMResponse.decode(_exec_wasm(req))
+        Timeout::timeout(@cfg[:step_timeout]) do
+          wasm_resp = _exec_wasm(req)
+          return Streamdal::Protos::WASMResponse.decode(wasm_resp)
+        end
       rescue => e
         resp = Streamdal::Protos::WASMResponse.new
         resp.exit_code = :WASM_EXIT_CODE_ERROR
@@ -460,7 +473,7 @@ module Streamdal
       req = Streamdal::Protos::RegisterRequest.new
       req.service_name = "demo-ruby"
       req.session_id = @session_id
-      req.dry_run = @cfg.dry_run || false
+      req.dry_run = @cfg[:dry_run] || false
       req.client_info = _gen_client_info
 
       req
@@ -482,11 +495,11 @@ module Streamdal
 
     # Returns metadata for gRPC requests to the internal gRPC API
     def _metadata
-      { "auth-token" => @cfg.streamdal_token.to_s }
+      { "auth-token" => @cfg[:streamdal_token].to_s }
     end
 
     def _register
-      @cfg.log.info("register started")
+      @log.info("register started")
 
       # Register with Streamdal External gRPC API
       resps = @stub.register(_gen_register_request, metadata: _metadata)
@@ -498,7 +511,7 @@ module Streamdal
         _handle_command(r)
       end
 
-      @cfg.log.info("register exited")
+      @log.info("register exited")
     end
 
     def _exec_wasm(req)
@@ -557,7 +570,7 @@ module Streamdal
         end
 
         req.client_info = _gen_client_info
-        req.service_name = @cfg.service_name
+        req.service_name = @cfg[:service_name]
 
         @stub.heartbeat(req, metadata: _metadata)
         sleep(DEFAULT_HEARTBEAT_INTERVAL)
@@ -623,14 +636,14 @@ module Streamdal
         return nil
       end
 
-      @cfg.log.debug "Notifying"
+      @log.debug "Notifying"
 
-      if @cfg.dry_run
+      if @cfg[:dry_run]
         return nil
       end
 
       @metrics.incr(CounterEntry.new(Metrics::COUNTER_NOTIFY, aud, {
-        "service": @cfg.service_name,
+        "service": @cfg[:service_name],
         "component_name": aud.component_name,
         "pipeline_name": pipeline.name,
         "pipeline_id": pipeline.id,
@@ -654,23 +667,23 @@ module Streamdal
       validate_tail_request(cmd)
 
       req = cmd.tail.request
-      @cfg.log.debug "Starting tail '#{req.id}'"
+      @log.debug "Starting tail '#{req.id}'"
 
       aud_str = aud_to_str(cmd.tail.request.audience)
 
       # Do we already have a tail for this audience
       if @tails.key?(aud_str) && @tails[aud_str].key?(req.id)
-        @cfg.log.error "Tail '#{req.id}' already exists, skipping TailCommand"
+        @log.error "Tail '#{req.id}' already exists, skipping TailCommand"
         return
       end
 
-      @cfg.log.debug "Tailing audience: #{aud_str}"
+      @log.debug "Tailing audience: #{aud_str}"
 
       t = Streamdal::Tail.new(
         req,
-        @cfg.streamdal_url,
-        @cfg.streamdal_token,
-        @cfg.log,
+        @cfg[:streamdal_url],
+        @cfg[:streamdal_token],
+        @cfg[:log],
         @metrics
       )
 
@@ -701,7 +714,7 @@ module Streamdal
     end
 
     def _stop_tail(cmd)
-      @cfg.log.debug "Stopping tail '#{cmd.tail.request.id}'"
+      @log.debug "Stopping tail '#{cmd.tail.request.id}'"
       key = aud_to_str(cmd.tail.request.audience)
 
       if @tails.key?(key) && @tails[key].key?(cmd.tail.request.id)
@@ -750,13 +763,13 @@ module Streamdal
 
       _set_paused_tail(t)
 
-      @cfg.log.debug "Paused tail '#{cmd.tail.request.tail.id}'"
+      @log.debug "Paused tail '#{cmd.tail.request.tail.id}'"
     end
 
     def _resume_tail(cmd)
       t = _remove_paused_tail(cmd.tail.request.audience, cmd.tail.request.tail.id)
       if t.nil?
-        @cfg.log.error "Tail '#{cmd.tail.request.tail.id}' not found in paused tails"
+        @log.error "Tail '#{cmd.tail.request.tail.id}' not found in paused tails"
         return nil
       end
 
@@ -764,7 +777,7 @@ module Streamdal
 
       _set_active_tail(t)
 
-      @cfg.log.debug "Resumed tail '#{cmd.tail.request.tail.id}'"
+      @log.debug "Resumed tail '#{cmd.tail.request.tail.id}'"
     end
 
     def _remove_active_tail(aud, tail_id)

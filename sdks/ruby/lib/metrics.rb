@@ -59,13 +59,14 @@ module Streamdal
       end
 
       @cfg = cfg
+      @log = cfg[:log]
       @counters = {}
       @counters_mtx = Mutex.new
       @exit = false
       @incr_queue = Queue.new
       @publish_queue = Queue.new
       @workers = []
-      @stub = Streamdal::Protos::Internal::Stub.new(@cfg.streamdal_url, :this_channel_is_insecure)
+      @stub = Streamdal::Protos::Internal::Stub.new(@cfg[:streamdal_url], :this_channel_is_insecure)
 
       _start
     end
@@ -158,7 +159,7 @@ module Streamdal
       req = Streamdal::Protos::MetricsRequest.new
       req.metrics = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Metric, [metric])
 
-      @cfg.log.debug("Published metric: #{ce.name} #{ce.labels} #{ce.value}")
+      @log.debug("Published metric: #{ce.name} #{ce.labels} #{ce.value}")
       @stub.metrics(req, metadata: _metadata)
     end
 
@@ -166,7 +167,7 @@ module Streamdal
       # Background thread that reads values from counters, adds them to the publish queue, and then
       # resets the counter's value back to zero
       unless @exit
-        @cfg.log.debug("Starting publisher")
+        @log.debug("Starting publisher")
 
         # Sleep on startup and then and between each loop run
         sleep(DEFAULT_COUNTER_PUBLISH_INTERVAL)
@@ -194,7 +195,7 @@ module Streamdal
     end
 
     def _run_publisher_worker(worker_id)
-      @cfg.log.debug("Starting publisher worker '#{worker_id}'")
+      @log.debug("Starting publisher worker '#{worker_id}'")
 
       until @exit
         ce = @incr_queue.pop
@@ -204,15 +205,15 @@ module Streamdal
         begin
           _publish_metrics(ce)
         rescue => e
-          @cfg.log.error("Failed to publish metrics: #{e}: #{ce.inspect}")
+          @log.error("Failed to publish metrics: #{e}: #{ce.inspect}")
         end
       end
 
-      @cfg.log.debug("Exiting publisher worker '#{worker_id}'")
+      @log.debug("Exiting publisher worker '#{worker_id}'")
     end
 
     def _run_reaper
-      @cfg.log.debug("Starting reaper")
+      @log.debug("Starting reaper")
 
       until @exit
         # Sleep on startup and then and between each loop run
@@ -230,18 +231,18 @@ module Streamdal
             end
 
             if Time::now - counter.last_updated > DEFAULT_COUNTER_TTL
-              @cfg.log.debug("Reaping counter '#{name}'")
+              @log.debug("Reaping counter '#{name}'")
               @counters.delete(name)
             end
           end
         end
       end
 
-      @cfg.log.debug("Exiting reaper")
+      @log.debug("Exiting reaper")
     end
 
     def _run_incrementer_worker(worker_id)
-      @cfg.log.debug("Starting incrementer worker '#{worker_id}'")
+      @log.debug("Starting incrementer worker '#{worker_id}'")
 
       until @exit
         ce = @incr_queue.pop
@@ -253,12 +254,12 @@ module Streamdal
         c.incr(ce.value)
       end
 
-      @cfg.log.debug("Exiting incrementer worker '#{worker_id}'")
+      @log.debug("Exiting incrementer worker '#{worker_id}'")
     end
 
     # Returns metadata for gRPC requests to the internal gRPC API
     def _metadata
-      { "auth-token" => @cfg.streamdal_token.to_s }
+      { "auth-token" => @cfg[:streamdal_token].to_s }
     end
   end
 end

@@ -5,13 +5,13 @@ require 'terminal-table'
 logger = Logger.new(STDOUT)
 logger.level = Logger::INFO
 
-cfg = Streamdal::Config.new
-cfg.streamdal_url = "localhost:8082"
-cfg.streamdal_token = "1234"
-cfg.service_name = "demo"
-cfg.log = logger
-
-client = Streamdal::Client.new(cfg)
+client = Streamdal::Client.new({
+                                 streamdal_url: "localhost:8082",
+                                 streamdal_token:"1234",
+                                 service_name: "demo",
+                                 log: logger,
+                                 dry_run: false
+                               })
 
 audience = Streamdal::Audience.new
 audience.component_name = "kafka"

@@ -26,23 +26,35 @@ gem install streamdal
 require 'streamdal'
 
 # Create a new client
-cfg.streamdal_url = "localhost:8082"
-cfg.streamdal_token = "<server-token>"
-cfg.service_name = "demo"
+logger = Logger.new(STDOUT)
+logger.level = Logger::INFO
 
-client = Streamdal::Client.new(cfg)
+client = Streamdal::Client.new({
+                                 streamdal_url: "localhost:8082",
+                                 streamdal_token:"<server-token>",
+                                 service_name: "demo",
+                                 log: logger,
+                                 dry_run: false
+                               })
 
 # Define the audience
 audience = Streamdal::Audience.new(Streamdal::OPERATION_TYPE_CONSUMER, "consume", "kafka-consumer")
 
 while true
-  sleep(2)
+  sleep(1)
   resp = client.process('{"email": "someuser@streamdal.com"}', audience)
   puts "Response: "
   puts "-----------------------------------"
   puts resp.inspect.gsub(/\\n/, "\n")
   puts "-----------------------------------"
 end
+```
+
+A demo application is available in the `demo` directory. To run the demo, execute the following commands:
+
+```bash
+rake setup
+rake run
 ```
 
 ### Configuration
