@@ -5,8 +5,11 @@ import {
 } from "root/components/form/formSelect.tsx";
 import { FormInput } from "root/components/form/formInput.tsx";
 import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
+import { HttpRequestBodyMode } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
 import { FormTextArea } from "root/components/form/formTextArea.tsx";
 import { FormStringKV } from "root/components/form/formStringKV.tsx";
+import React from "react";
+import {RadioGroup} from "../../components/form/radioGroup.tsx";
 
 export type PipelineHTTPType = {
   stepNumber: number;
@@ -36,6 +39,17 @@ export const PipelineHTTP = (
         inputClass="w-64"
         children={optionsFromEnum(HttpRequestMethod)}
       />
+
+      <RadioGroup
+        name={`${name}.bodyMode`}
+        data={data}
+        errors={errors}
+        options={{
+          [HttpRequestBodyMode.STATIC]: "Specify Static Body",
+          [HttpRequestBodyMode.INTER_STEP_RESULT]: "Use Previous Step Result",
+        }}
+      />
+
       <FormInput
         name={`steps.${stepNumber}.step.httpRequest.request.url`}
         data={data}
