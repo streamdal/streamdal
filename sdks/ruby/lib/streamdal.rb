@@ -471,7 +471,7 @@ module Streamdal
 
     def _gen_register_request
       req = Streamdal::Protos::RegisterRequest.new
-      req.service_name = "demo-ruby"
+      req.service_name = @cfg[:service_name]
       req.session_id = @session_id
       req.dry_run = @cfg[:dry_run] || false
       req.client_info = _gen_client_info
