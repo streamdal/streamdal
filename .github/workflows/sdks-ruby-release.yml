@@ -32,7 +32,7 @@ jobs:
       - name: Inject version into streamdal.gemspec and lib/streamdal.rb
         run: |
           sed -i "s/version = \".*\"/version = \"${{ steps.get_new_version.outputs.new_version }}\"/" streamdal.gemspec
-          sed -i "s/library_version = \".*\"/library_version = \"${{ steps.get_new_version.outputs.new_version }}\"/" lib/stremadal.rb
+          sed -i "s/library_version = \".*\"/library_version = \"${{ steps.get_new_version.outputs.new_version }}\"/" lib/streamdal.rb
 
       # We do this because other jobs might have written to the repo while this
       # job was running and making local changes; without this pull step, we
