@@ -24,6 +24,12 @@ export interface DetectiveStep {
      * @generated from protobuf field: protos.steps.DetectiveType type = 4;
      */
     type: DetectiveType;
+    /**
+     * Only used if DetectiveType is set to DETECTIVE_TYPE_PII_KEYWORD
+     *
+     * @generated from protobuf field: optional protos.steps.DetectiveTypePIIKeywordMode pii_keyword_mode = 5;
+     */
+    piiKeywordMode?: DetectiveTypePIIKeywordMode;
 }
 /**
  * @generated from protobuf message protos.steps.DetectiveStepResultMatch
@@ -377,6 +383,30 @@ export declare enum DetectiveType {
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_MAX = 3007;
      */
     NUMERIC_MAX = 3007
+}
+/**
+ * DetectiveTypePIIKeywordMode is used by Wasm to determine what method to use
+ * when performing keyword matching. Performance == hashmap lookups;
+ * accuracy == hashmap lookups and "string contains".
+ * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+ *
+ * @generated from protobuf enum protos.steps.DetectiveTypePIIKeywordMode
+ */
+export declare enum DetectiveTypePIIKeywordMode {
+    /**
+     * default "performance"
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET = 0;
+     */
+    DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET = 0,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE = 1;
+     */
+    DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE = 1,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY = 2;
+     */
+    DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY = 2
 }
 declare class DetectiveStep$Type extends MessageType<DetectiveStep> {
     constructor();

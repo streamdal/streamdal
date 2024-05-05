@@ -105,11 +105,24 @@ enum DetectiveType {
   DETECTIVE_TYPE_NUMERIC_MAX = 3007;
 }
 
+// DetectiveTypePIIKeywordMode is used by Wasm to determine what method to use
+// when performing keyword matching. Performance == hashmap lookups;
+// accuracy == hashmap lookups and "string contains".
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+enum DetectiveTypePIIKeywordMode {
+  DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET = 0; // default "performance"
+  DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE = 1;
+  DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY = 2;
+}
+
 message DetectiveStep {
   optional string path = 1;
   repeated string args = 2; // args determined by match_type
   optional bool negate = 3;
   DetectiveType type = 4;
+
+  // Only used if DetectiveType is set to DETECTIVE_TYPE_PII_KEYWORD
+  optional DetectiveTypePIIKeywordMode pii_keyword_mode = 5;
 }
 
 message DetectiveStepResultMatch {
