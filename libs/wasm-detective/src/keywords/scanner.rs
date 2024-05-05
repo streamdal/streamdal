@@ -62,13 +62,11 @@ impl FieldPII {
     /// Keywords are a HashMap of keyword name to Keyword struct
     /// Keyword is struct contains the entity type and score
     pub fn new(keywords: HashMap<String, Keyword>) -> FieldPII {
-        let mut partial_match_against = HashMap::new();
+        let mut match_against_path = HashMap::new();
         let mut match_against = HashMap::new();
         for (key_name, def) in keywords {
             if key_name.contains('.') {
-                // format!() is a bit of a hit over all the keywords every time, so let's precompute
-                let suffix = format!(".{}", key_name);
-                partial_match_against.insert(suffix, def.clone());
+                match_against_path.insert(key_name.clone(), def.clone());
             } else {
                 match_against.insert(key_name.clone(), def.clone());
             }
@@ -76,7 +74,7 @@ impl FieldPII {
 
         FieldPII {
             scalar_keywords: match_against,
-            path_keywords: partial_match_against,
+            path_keywords: match_against_path,
         }
     }
 
@@ -166,7 +164,7 @@ impl FieldPII {
     fn match_against_fields(&mut self, f: &Field, mode: DetectiveTypePIIKeywordMode) -> Vec<KeywordMatch> {
         let mut matches: Vec<KeywordMatch> = Vec::new();
 
-        // Single keyword lookup
+        // Single keyword lookup - no dots
         //
         // Example payload {"config": {"github": {"token": "pat_90210"}}}
         // Example key match: "token"
@@ -220,7 +218,35 @@ impl FieldPII {
             return matches;
         }
 
-        // Partial match check here
+        // MAX_KEY_LEN is the maximum length of a key that we'll check for partial matches
+        // We do this to avoid false positives with short keywords like "cc", "ip", "last", etc...
+        const MIN_KEY_LEN: usize = 4;
+
+        // Partial key name check here
+        //
+        // Example payload {"github_token": "pat_90210"}
+        // Example key match: "github_token"
+        //
+        // O(n) lookup
+        for (key_name, def) in &self.scalar_keywords {
+            if key_name.len() <= MIN_KEY_LEN {
+                continue;
+            }
+
+            if cur_path.contains(key_name.as_str()) {
+                let m = KeywordMatch {
+                    path: cur_path,
+                    value: f.value.clone(),
+                    confidence: def.score as f32,
+                    entity: def.entity.clone(),
+                };
+
+                matches.push(m);
+                return matches;
+            }
+        }
+
+        // Partial path check here
         // We didn't match on the whole key, such as "cvv", and we didn't match
         // on a whole path, such as "config.github.token". So let's check each keyword path
         // and see if our current path ends with that keyword path
@@ -242,6 +268,7 @@ impl FieldPII {
                 return matches;
             }
         }
+
 
         matches
     }
