@@ -319,6 +319,31 @@ export var DetectiveType;
      */
     DetectiveType[DetectiveType["NUMERIC_MAX"] = 3007] = "NUMERIC_MAX";
 })(DetectiveType || (DetectiveType = {}));
+/**
+ * DetectiveTypePIIKeywordMode is used by Wasm to determine what method to use
+ * when performing keyword matching. Performance == hashmap lookups;
+ * accuracy == hashmap lookups and "string contains".
+ * protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+ *
+ * @generated from protobuf enum protos.steps.DetectiveTypePIIKeywordMode
+ */
+export var DetectiveTypePIIKeywordMode;
+(function (DetectiveTypePIIKeywordMode) {
+    /**
+     * default "performance"
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET = 0;
+     */
+    DetectiveTypePIIKeywordMode[DetectiveTypePIIKeywordMode["DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET"] = 0] = "DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE = 1;
+     */
+    DetectiveTypePIIKeywordMode[DetectiveTypePIIKeywordMode["DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE"] = 1] = "DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY = 2;
+     */
+    DetectiveTypePIIKeywordMode[DetectiveTypePIIKeywordMode["DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY"] = 2] = "DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY";
+})(DetectiveTypePIIKeywordMode || (DetectiveTypePIIKeywordMode = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class DetectiveStep$Type extends MessageType {
     constructor() {
@@ -326,7 +351,8 @@ class DetectiveStep$Type extends MessageType {
             { no: 1, name: "path", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "args", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "negate", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] }
+            { no: 4, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] },
+            { no: 5, name: "pii_keyword_mode", kind: "enum", opt: true, T: () => ["protos.steps.DetectiveTypePIIKeywordMode", DetectiveTypePIIKeywordMode] }
         ]);
     }
     create(value) {
@@ -353,6 +379,9 @@ class DetectiveStep$Type extends MessageType {
                 case /* protos.steps.DetectiveType type */ 4:
                     message.type = reader.int32();
                     break;
+                case /* optional protos.steps.DetectiveTypePIIKeywordMode pii_keyword_mode */ 5:
+                    message.piiKeywordMode = reader.int32();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -377,6 +406,9 @@ class DetectiveStep$Type extends MessageType {
         /* protos.steps.DetectiveType type = 4; */
         if (message.type !== 0)
             writer.tag(4, WireType.Varint).int32(message.type);
+        /* optional protos.steps.DetectiveTypePIIKeywordMode pii_keyword_mode = 5; */
+        if (message.piiKeywordMode !== undefined)
+            writer.tag(5, WireType.Varint).int32(message.piiKeywordMode);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -149,6 +149,19 @@ class DetectiveType(betterproto.Enum):
     DETECTIVE_TYPE_NUMERIC_MAX = 3007
 
 
+class DetectiveTypePiiKeywordMode(betterproto.Enum):
+    """
+    DetectiveTypePIIKeywordMode is used by Wasm to determine what method to use
+    when performing keyword matching. Performance == hashmap lookups; accuracy
+    == hashmap lookups and "string contains". protolint:disable:next
+    ENUM_FIELD_NAMES_PREFIX
+    """
+
+    DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET = 0
+    DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE = 1
+    DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY = 2
+
+
 class HttpRequestMethod(betterproto.Enum):
     HTTP_REQUEST_METHOD_UNSET = 0
     HTTP_REQUEST_METHOD_GET = 1
@@ -259,6 +272,10 @@ class DetectiveStep(betterproto.Message):
     args: List[str] = betterproto.string_field(2)
     negate: Optional[bool] = betterproto.bool_field(3, optional=True, group="_negate")
     type: "DetectiveType" = betterproto.enum_field(4)
+    pii_keyword_mode: Optional["DetectiveTypePiiKeywordMode"] = betterproto.enum_field(
+        5, optional=True, group="_pii_keyword_mode"
+    )
+    """Only used if DetectiveType is set to DETECTIVE_TYPE_PII_KEYWORD"""
 
 
 @dataclass(eq=False, repr=False)

@@ -10,6 +10,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       repeated :args, :string, 2
       proto3_optional :negate, :bool, 3
       optional :type, :enum, 4, "protos.steps.DetectiveType"
+      proto3_optional :pii_keyword_mode, :enum, 5, "protos.steps.DetectiveTypePIIKeywordMode"
     end
     add_message "protos.steps.DetectiveStepResultMatch" do
       optional :type, :enum, 1, "protos.steps.DetectiveType"
@@ -90,6 +91,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :DETECTIVE_TYPE_NUMERIC_MIN, 3006
       value :DETECTIVE_TYPE_NUMERIC_MAX, 3007
     end
+    add_enum "protos.steps.DetectiveTypePIIKeywordMode" do
+      value :DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET, 0
+      value :DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, 1
+      value :DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, 2
+    end
   end
 end
 
@@ -99,5 +105,6 @@ module Streamdal
     DetectiveStepResultMatch = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.DetectiveStepResultMatch").msgclass
     DetectiveStepResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.DetectiveStepResult").msgclass
     DetectiveType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.DetectiveType").enummodule
+    DetectiveTypePIIKeywordMode = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.DetectiveTypePIIKeywordMode").enummodule
   end
 end
