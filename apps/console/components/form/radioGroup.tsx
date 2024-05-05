@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 export type RadioGroupProps = {
   name: string;
   data: any;
-  options: { [k: number]: string};
+  options: { [k: number]: string };
   errors: ErrorType;
   wrapperClass?: string;
 };

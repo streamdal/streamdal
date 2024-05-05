@@ -9,7 +9,7 @@ import { HttpRequestBodyMode } from "streamdal-protos/protos/steps/sp_steps_http
 import { FormTextArea } from "root/components/form/formTextArea.tsx";
 import { FormStringKV } from "root/components/form/formStringKV.tsx";
 import React from "react";
-import {RadioGroup} from "../../components/form/radioGroup.tsx";
+import { RadioGroup } from "../../components/form/radioGroup.tsx";
 
 export type PipelineHTTPType = {
   stepNumber: number;
