@@ -50,7 +50,7 @@ pub extern "C" fn f(ptr: *mut u8, length: usize) -> u64 {
                         special_fields: Default::default(),
                     },
                 )),
-                special_fields: Default::default(),
+                ..Default::default()
             };
 
             return common::write_response(

@@ -176,6 +176,11 @@ export const SIDEBAR: Sidebar = {
             link: "en/sdks/python",
           },
           {
+            text: "Ruby",
+            slug: "ruby",
+            link: "en/sdks/ruby"
+          },
+          {
             text: "Java (TBA)",
             slug: "java",
             link: "en/sdks/java"
@@ -189,11 +194,6 @@ export const SIDEBAR: Sidebar = {
             text: "Rust (TBA)",
             slug: "rust",
             link: "en/sdks/rust"
-          },
-          {
-            text: "Ruby (TBA)",
-            slug: "ruby",
-            link: "en/sdks/ruby"
           },
           {
             text: ".NET (TBA)",
