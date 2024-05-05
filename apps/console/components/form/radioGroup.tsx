@@ -4,7 +4,7 @@ import { useState } from "preact/hooks";
 export type RadioGroupProps = {
   name: string;
   data: any;
-  options: { [k: number]: string };
+  options: { [k: number]: string};
   errors: ErrorType;
   wrapperClass?: string;
 };
@@ -17,6 +17,7 @@ export const RadioGroup = ({
   wrapperClass,
 }: RadioGroupProps) => {
   const [selected, setSelected] = useState(resolveValue(data, name) || 0);
+
   return (
     <div class={`flex flex-col border rounded my-2 pt-2 px-2 pb-1 w-full`}>
       <div

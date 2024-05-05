@@ -41,11 +41,11 @@ export const PipelineHTTP = (
       />
 
       <RadioGroup
-        name={`${name}.bodyMode`}
+        name={`steps.${stepNumber}.step.httpRequest.request.bodyMode`}
         data={data}
         errors={errors}
         options={{
-          [HttpRequestBodyMode.STATIC]: "Specify Static Body",
+          [HttpRequestBodyMode.STATIC]: "Static Body",
           [HttpRequestBodyMode.INTER_STEP_RESULT]: "Use Previous Step Result",
         }}
       />
