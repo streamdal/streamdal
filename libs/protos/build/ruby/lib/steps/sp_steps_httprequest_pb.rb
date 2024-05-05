@@ -10,6 +10,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :url, :string, 2
       optional :body, :bytes, 3
       map :headers, :string, :string, 4
+      optional :body_mode, :enum, 5, "protos.steps.HttpRequestBodyMode"
     end
     add_message "protos.steps.HttpResponse" do
       optional :code, :int32, 1
@@ -29,6 +30,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :HTTP_REQUEST_METHOD_HEAD, 6
       value :HTTP_REQUEST_METHOD_OPTIONS, 7
     end
+    add_enum "protos.steps.HttpRequestBodyMode" do
+      value :HTTP_REQUEST_BODY_MODE_UNSET, 0
+      value :HTTP_REQUEST_BODY_MODE_STATIC, 1
+      value :HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT, 2
+    end
   end
 end
 
@@ -38,5 +44,6 @@ module Streamdal
     HttpResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.HttpResponse").msgclass
     HttpRequestStep = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.HttpRequestStep").msgclass
     HttpRequestMethod = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.HttpRequestMethod").enummodule
+    HttpRequestBodyMode = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.steps.HttpRequestBodyMode").enummodule
   end
 end

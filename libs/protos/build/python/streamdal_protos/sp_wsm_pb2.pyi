@@ -1,3 +1,4 @@
+import sp_common_pb2 as _sp_common_pb2
 import sp_pipeline_pb2 as _sp_pipeline_pb2
 from steps import sp_steps_detective_pb2 as _sp_steps_detective_pb2
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -12,10 +13,12 @@ WASM_EXIT_CODE_TRUE: WASMExitCode
 WASM_EXIT_CODE_UNSET: WASMExitCode
 
 class InterStepResult(_message.Message):
-    __slots__ = ["detective_result"]
+    __slots__ = ["audience", "detective_result"]
+    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
     DETECTIVE_RESULT_FIELD_NUMBER: _ClassVar[int]
+    audience: _sp_common_pb2.Audience
     detective_result: _sp_steps_detective_pb2.DetectiveStepResult
-    def __init__(self, detective_result: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStepResult, _Mapping]] = ...) -> None: ...
+    def __init__(self, detective_result: _Optional[_Union[_sp_steps_detective_pb2.DetectiveStepResult, _Mapping]] = ..., audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
 
 class WASMRequest(_message.Message):
     __slots__ = ["input_payload", "input_step", "inter_step_result", "step"]

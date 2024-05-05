@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'sp_common_pb'
 require 'sp_pipeline_pb'
 require 'steps/sp_steps_detective_pb'
 
@@ -22,6 +23,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       proto3_optional :inter_step_result, :message, 5, "protos.InterStepResult"
     end
     add_message "protos.InterStepResult" do
+      optional :audience, :message, 1000, "protos.Audience"
       oneof :input_from do
         optional :detective_result, :message, 1, "protos.steps.DetectiveStepResult"
       end
