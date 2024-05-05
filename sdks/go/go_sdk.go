@@ -797,6 +797,11 @@ PIPELINE:
 			}
 
 			isr = wasmResp.InterStepResult // Pass inter-step result to next step
+			if isr != nil {
+				// Ensure audience is set on ISR for HttpRequests
+				// ISR might be nil since not all WASM modules return it, so only set if ISR is not nil
+				isr.Audience = aud
+			}
 
 			var (
 				stepCondStr    string

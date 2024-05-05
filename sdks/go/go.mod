@@ -3,12 +3,13 @@ module github.com/streamdal/streamdal/sdks/go
 go 1.19
 
 require (
+	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.5.0
 	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/pkg/errors v0.9.1
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
-	github.com/streamdal/streamdal/libs/protos v0.1.45
+	github.com/streamdal/streamdal/libs/protos v0.1.53
 	github.com/tetratelabs/wazero v1.6.0
 	golang.org/x/time v0.5.0
 	google.golang.org/grpc v1.60.1
@@ -18,7 +19,6 @@ require (
 require (
 	github.com/go-logr/logr v1.4.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/pprof v0.0.0-20231212022811-ec68065c825e // indirect
 	golang.org/x/net v0.21.0 // indirect
