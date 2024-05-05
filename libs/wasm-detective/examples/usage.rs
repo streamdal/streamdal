@@ -2,6 +2,8 @@ use protos::sp_steps_detective::DetectiveType;
 use streamdal_wasm_detective::detective;
 use streamdal_wasm_detective::detective::Request;
 
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
+
 fn main() {
     let det = detective::Detective::new();
 
@@ -17,6 +19,7 @@ fn main() {
         path: "field1".to_string(),
         args: vec!["1".to_string()],
         negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET
     };
 
     match det.matches(&request) {

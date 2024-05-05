@@ -2,6 +2,7 @@ use crate::detective::Request;
 use crate::test_utils;
 #[cfg(test)]
 use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
 
 // Q: Is there a community-agreed-upon test framework that people use?
 // Q: How do folks feel about table driven tests?
@@ -19,6 +20,7 @@ fn string_tests() {
                 path: "object.field".to_string(),
                 args: vec!["value".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "string should equal".to_string(),
@@ -31,6 +33,7 @@ fn string_tests() {
                 path: "object.field".to_string(),
                 args: vec!["should not match".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "string should not equals".to_string(),
@@ -43,6 +46,7 @@ fn string_tests() {
                 path: "does not exist".to_string(),
                 args: vec!["foo".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "bad path should error".to_string(),
@@ -58,6 +62,7 @@ fn string_tests() {
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lue".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "string should contain all".to_string(),
@@ -70,6 +75,7 @@ fn string_tests() {
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "string should NOT contain all".to_string(),
@@ -83,6 +89,7 @@ fn string_tests() {
                 path: "object.field".to_string(),
                 args: vec!["va".to_string(), "lueeeeeeee".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "string should contain any".to_string(),
@@ -95,6 +102,7 @@ fn string_tests() {
                 path: "object.field".to_string(),
                 args: vec!["vvvva".to_string().to_string(), "lueeeeeeee".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "string should NOT contain any".to_string(),
@@ -108,6 +116,7 @@ fn string_tests() {
                 path: "".to_string(),
                 args: vec!["example".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 6,
             text: "find multiple string matches".to_string(),
@@ -129,6 +138,7 @@ fn is_empty() {
                 path: "object.empty_string".to_string(),
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "empty string should be empty".to_string(),
@@ -141,6 +151,7 @@ fn is_empty() {
                 path: "object.null_field".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "null field should be considered empty".to_string(),
@@ -153,6 +164,7 @@ fn is_empty() {
                 path: "object.empty_array".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "empty array should be considered empty".to_string(),
@@ -165,6 +177,7 @@ fn is_empty() {
                 path: "object2.does_not_exist".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "non-existent path should error".to_string(),
@@ -177,6 +190,7 @@ fn is_empty() {
                 path: "object.field".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "Non-empty string should be false".to_string(),
@@ -189,6 +203,7 @@ fn is_empty() {
                 path: "array".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "Non-empty array should be false".to_string(),
@@ -209,6 +224,7 @@ fn has_field() {
                 path: "object".to_string(),
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field exists, should return true".to_string(),
@@ -221,6 +237,7 @@ fn has_field() {
                 path: "does not exist".to_string(),
                 args: vec![], // is_empty doesn't have any args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field does not exist - should return false".to_string(),
@@ -241,6 +258,7 @@ fn is_type() {
                 path: "object.field".to_string(),
                 args: vec!["string".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should be of string type".to_string(),
@@ -253,6 +271,7 @@ fn is_type() {
                 path: "boolean_t".to_string(),
                 args: vec!["bool".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should be of boolean type".to_string(),
@@ -265,6 +284,7 @@ fn is_type() {
                 path: "array".to_string(),
                 args: vec!["array".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should be of array type".to_string(),
@@ -277,6 +297,7 @@ fn is_type() {
                 path: "object".to_string(),
                 args: vec!["object".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should be of object type".to_string(),
@@ -289,6 +310,7 @@ fn is_type() {
                 path: "number_int".to_string(),
                 args: vec!["number".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should be of number type".to_string(),
@@ -301,6 +323,7 @@ fn is_type() {
                 path: "array".to_string(),
                 args: vec!["bool".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field should NOT be of boolean type".to_string(),
@@ -313,6 +336,7 @@ fn is_type() {
                 path: "does not exist".to_string(),
                 args: vec!["bool".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "non-existent field should error".to_string(),
@@ -333,6 +357,7 @@ fn ipv4_address() {
                 path: "object.ipv4_address".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should contain an IPv4 address".to_string(),
@@ -345,6 +370,7 @@ fn ipv4_address() {
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field does not exist should cause an error".to_string(),
@@ -357,6 +383,7 @@ fn ipv4_address() {
                 path: "object.field".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field exists but does not contain an IP address".to_string(),
@@ -377,6 +404,7 @@ fn ipv6_address() {
                 path: "object.ipv6_address".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field is an ipv6 address".to_string(),
@@ -389,6 +417,7 @@ fn ipv6_address() {
                 path: "object.field".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field is not an ipv6 address".to_string(),
@@ -401,6 +430,7 @@ fn ipv6_address() {
                 path: "object.non-existent-field".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field does not exist".to_string(),
@@ -421,6 +451,7 @@ fn boolean() {
                 path: "boolean_t".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field has a bool true".to_string(),
@@ -433,6 +464,7 @@ fn boolean() {
                 path: "boolean_f".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field has a bool false".to_string(),
@@ -445,6 +477,7 @@ fn boolean() {
                 path: "boolean_t".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "incorrect bool check".to_string(),
@@ -457,6 +490,7 @@ fn boolean() {
                 path: "object".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "bool check should error on incorrect type".to_string(),
@@ -469,6 +503,7 @@ fn boolean() {
                 path: "does-not-exist".to_string(),
                 args: vec![], // No need for args
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "bool check should error on non-existent field".to_string(),
@@ -489,6 +524,7 @@ fn regex() {
                 path: "object.field".to_string(),
                 args: vec![r#"^[a-zA-Z0-9]+$"#.to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match word".to_string(),
@@ -501,6 +537,7 @@ fn regex() {
                 path: "object.number_as_string".to_string(),
                 args: vec![r#"\d+"#.to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match number".to_string(),
@@ -513,6 +550,7 @@ fn regex() {
                 path: "object.field".to_string(),
                 args: vec![r#"\d+"#.to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should not match number".to_string(),
@@ -525,6 +563,7 @@ fn regex() {
                 path: "object.field".to_string(),
                 args: vec![r#"\d+++]["#.to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "bad regex should error".to_string(),
@@ -545,6 +584,7 @@ fn mac_address() {
                 path: "object.mac_address".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match mac address".to_string(),
@@ -557,6 +597,7 @@ fn mac_address() {
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should NOT match mac address".to_string(),
@@ -569,6 +610,7 @@ fn mac_address() {
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "mac_address should error for non-existing field".to_string(),
@@ -589,6 +631,7 @@ fn uuid() {
                 path: "object.uuid_dash".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match uuid with dashes".to_string(),
@@ -601,6 +644,7 @@ fn uuid() {
                 path: "object.uuid_colon".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match uuid with colons".to_string(),
@@ -613,6 +657,7 @@ fn uuid() {
                 path: "object.uuid_stripped".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match uuid with no separators".to_string(),
@@ -625,6 +670,7 @@ fn uuid() {
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should NOT match uuid".to_string(),
@@ -637,6 +683,7 @@ fn uuid() {
                 path: "object.does_not_exist".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should error when field does not exist".to_string(),
@@ -657,6 +704,7 @@ fn timestamp_unix() {
                 path: "timestamp_unix_str".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "timestamp str should be true".to_string(),
@@ -669,6 +717,7 @@ fn timestamp_unix() {
                 path: "timestamp_unix_num".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "timestamp num should be true".to_string(),
@@ -681,6 +730,7 @@ fn timestamp_unix() {
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "non-ts field should be false".to_string(),
@@ -693,6 +743,7 @@ fn timestamp_unix() {
                 path: "unknown_field_123".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "bad ts field should throw error".to_string(),
@@ -713,6 +764,7 @@ fn timestamp_unix_nano() {
                 path: "timestamp_unix_nano_str".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match nano ts str".to_string(),
@@ -725,6 +777,7 @@ fn timestamp_unix_nano() {
                 path: "timestamp_unix_nano_num".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match nano ts num".to_string(),
@@ -737,6 +790,7 @@ fn timestamp_unix_nano() {
                 path: "object.field".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should not error on non-ts value".to_string(),
@@ -749,6 +803,7 @@ fn timestamp_unix_nano() {
                 path: "does-not-exist".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should error with unknown field".to_string(),
@@ -769,6 +824,7 @@ fn timestamp_rfc3339() {
                 path: "timestamp_rfc3339".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "should match rfc3339 ts".to_string(),
@@ -781,6 +837,7 @@ fn timestamp_rfc3339() {
                 path: "timestamp_unix_str".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "should not match non-rfc3339 ts".to_string(),
@@ -793,6 +850,7 @@ fn timestamp_rfc3339() {
                 path: "unknown-field-123".to_string(),
                 args: vec![], // no args needed
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "unknown field should error".to_string(),
@@ -813,6 +871,7 @@ fn string_length() {
                 path: "object.ipv4_address".to_string(),
                 args: vec!["10".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "string should be <10 length".to_string(),
@@ -825,6 +884,7 @@ fn string_length() {
                 path: "object.ipv4_address".to_string(),
                 args: vec!["5".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "string should NOT be <5".to_string(),
@@ -837,6 +897,7 @@ fn string_length() {
                 path: "object.ipv4_address".to_string(),
                 args: vec!["1".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field should contain more than 1 char and cause match to return true"
@@ -850,6 +911,7 @@ fn string_length() {
                 path: "object.ipv4_address".to_string(),
                 args: vec!["10".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field should contain less than 10 chars and cause match to return false"
@@ -863,6 +925,7 @@ fn string_length() {
                 path: "object.ipv4_address".to_string(),
                 args: vec!["5".to_string(), "10".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "field contains less than 10 chars so 5-10 range should return true".to_string(),
@@ -875,6 +938,7 @@ fn string_length() {
                 path: "object.ipv4_address".to_string(),
                 args: vec!["99".to_string(), "100".to_string()],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "field contains less than 10 chars so 99-100 range should return false"
@@ -896,6 +960,7 @@ fn semver() {
                 path: "object.semver".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "valid semver".to_string(),
@@ -908,6 +973,7 @@ fn semver() {
                 path: "object.ipv4_address".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "invalid semver".to_string(),
@@ -928,6 +994,7 @@ fn hostname() {
                 path: "object.valid_hostname".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "valid hostname".to_string(),
@@ -940,6 +1007,7 @@ fn hostname() {
                 path: "object.invalid_hostname".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "invalid semver".to_string(),
@@ -958,6 +1026,7 @@ fn recursive_path_tracking_object() {
         path: "".to_string(),
         args: vec!["4111111111111112".to_string()],
         negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
     };
 
     let result = crate::detective::Detective::new().matches(&request);
@@ -976,6 +1045,7 @@ fn recursive_path_tracking_arrays() {
         path: "".to_string(),
         args: vec!["user1@streamdal.com".to_string()],
         negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
     };
 
     let result = crate::detective::Detective::new().matches(&request);

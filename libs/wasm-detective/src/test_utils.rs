@@ -1,6 +1,7 @@
 use crate::detective::Request;
 use lazy_static::lazy_static;
 use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
 
 pub const SAMPLE_JSON: &str = r#"{
     "boolean_t": true,
@@ -502,5 +503,6 @@ pub fn generate_request_for_bench(
         path: path.to_string(),
         args,
         negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET
     }
 }

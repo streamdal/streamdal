@@ -7,7 +7,7 @@ use crate::matcher_pii_cloud as pii_cloud;
 use crate::matcher_pii_keywords as pii_keywords;
 use streamdal_gjson as gjson;
 
-use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType};
+use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType, DetectiveTypePIIKeywordMode};
 use std::str;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
@@ -23,6 +23,7 @@ pub struct Request<'a> {
     pub path: String,
     pub args: Vec<String>,
     pub negate: bool,
+    pub mode: DetectiveTypePIIKeywordMode,
 }
 
 impl Default for Detective {
@@ -54,7 +55,7 @@ impl Detective {
 
         let kw = get_keywords();
         let mut scanner = FieldPII::new(kw);
-        let results = scanner.scan(data_as_str);
+        let results = scanner.scan(data_as_str, request.mode);
 
         Ok(Self::matches_keyword_results(results))
     }

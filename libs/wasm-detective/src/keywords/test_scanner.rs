@@ -3,6 +3,7 @@ extern crate test;
 use std::collections::HashMap;
 use std::fs;
 use test::Bencher;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE};
 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -80,43 +81,80 @@ fn run_payload(b: &mut Bencher, size: usize) {
     let mut pii = FieldPII::new(random_strings);
 
     b.iter(|| {
-        let _ = pii.scan(payload);
+        let _ = pii.scan(payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
     });
 }
 
 #[bench]
-fn bench_standard_pii_small(b: &mut Bencher) {
+fn bench_standard_pii_small_accuracy(b: &mut Bencher) {
     let payload = fs::read_to_string("assets/test-payloads/small.json").unwrap();
     let str_payload = payload.as_str();
     let keywords = get_keywords();
 
     b.iter(|| {
         let mut pii = FieldPII::new(keywords.clone());
-        let _ = pii.scan(str_payload);
+        let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
     });
 }
 
 #[bench]
-fn bench_standard_pii_medium(b: &mut Bencher) {
+fn bench_standard_pii_medium_accuracy(b: &mut Bencher) {
     let payload = fs::read_to_string("assets/test-payloads/medium.json").unwrap();
     let str_payload = payload.as_str();
     let keywords = get_keywords();
 
     b.iter(|| {
         let mut pii = FieldPII::new(keywords.clone());
-        let _ = pii.scan(str_payload);
+        let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
     });
 }
 
 
 #[bench]
-fn bench_standard_pii_large(b: &mut Bencher) {
+fn bench_standard_pii_large_accuracy(b: &mut Bencher) {
     let payload = fs::read_to_string("assets/test-payloads/large.json").unwrap();
     let str_payload = payload.as_str();
     let keywords = get_keywords();
 
     b.iter(|| {
         let mut pii = FieldPII::new(keywords.clone());
-        let _ = pii.scan(str_payload);
+        let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
+    });
+}
+
+#[bench]
+fn bench_standard_pii_small_performance(b: &mut Bencher) {
+    let payload = fs::read_to_string("assets/test-payloads/small.json").unwrap();
+    let str_payload = payload.as_str();
+    let keywords = get_keywords();
+
+    b.iter(|| {
+        let mut pii = FieldPII::new(keywords.clone());
+        let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE);
+    });
+}
+
+#[bench]
+fn bench_standard_pii_medium_performance(b: &mut Bencher) {
+    let payload = fs::read_to_string("assets/test-payloads/medium.json").unwrap();
+    let str_payload = payload.as_str();
+    let keywords = get_keywords();
+
+    b.iter(|| {
+        let mut pii = FieldPII::new(keywords.clone());
+        let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE);
+    });
+}
+
+
+#[bench]
+fn bench_standard_pii_large_performance(b: &mut Bencher) {
+    let payload = fs::read_to_string("assets/test-payloads/large.json").unwrap();
+    let str_payload = payload.as_str();
+    let keywords = get_keywords();
+
+    b.iter(|| {
+        let mut pii = FieldPII::new(keywords.clone());
+        let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE);
     });
 }

@@ -1,6 +1,7 @@
 use crate::detective::Request;
 #[cfg(test)]
 use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
 
 #[test]
 fn test_braintree_access_token() {
@@ -14,6 +15,7 @@ fn test_braintree_access_token() {
                 path: "cloud.paypal.braintree_access_token".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.paypal.braintree_access_token".to_string(),
@@ -36,6 +38,7 @@ fn test_databricks_pat() {
                 path: "cloud.databricks.pat".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.databricks.pat".to_string(),
@@ -58,6 +61,7 @@ pub fn test_sendgrid_key() {
                 path: "cloud.sendgrid.api_key".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.sendgrid.api_key".to_string(),
@@ -80,6 +84,7 @@ pub fn test_docker_swarm_token() {
                 path: "cloud.docker.swarm_join_token".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.docker.swarm_join_token".to_string(),
@@ -92,6 +97,7 @@ pub fn test_docker_swarm_token() {
                 path: "cloud.docker.swarm_unlock_token".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.docker.swarm_unlock_token".to_string(),
@@ -114,6 +120,7 @@ pub fn test_bearer_token() {
                 path: "bearer_token".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal bearer_token".to_string(),
@@ -136,6 +143,7 @@ pub fn test_azure_sql_conn_string() {
                 path: "cloud.azure.sql_connection_string".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.azure.sql_connection_string".to_string(),
@@ -159,6 +167,7 @@ fn test_aws_key_id() {
                 path: "cloud.aws.key_id".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal cloud.aws.key_id".to_string(),
@@ -171,6 +180,7 @@ fn test_aws_key_id() {
                 path: "cloud.github.pat".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "not equal cloud.github.pat".to_string(),
@@ -193,6 +203,7 @@ fn test_github_pat() {
                 path: "cloud.github.pat".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal github_pat_valid".to_string(),
@@ -205,6 +216,7 @@ fn test_github_pat() {
                 path: "cloud.aws.key_id".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 0,
             text: "equal github_pat_invalid".to_string(),
@@ -228,6 +240,7 @@ fn test_slack_token() {
                 path: "slack".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal slack".to_string(),
