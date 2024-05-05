@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode;
 
 use streamdal_gjson as gjson;
 use streamdal_gjson::Value;
@@ -61,13 +62,11 @@ impl FieldPII {
     /// Keywords are a HashMap of keyword name to Keyword struct
     /// Keyword is struct contains the entity type and score
     pub fn new(keywords: HashMap<String, Keyword>) -> FieldPII {
-        let mut partial_match_against = HashMap::new();
+        let mut match_against_path = HashMap::new();
         let mut match_against = HashMap::new();
         for (key_name, def) in keywords {
             if key_name.contains('.') {
-                // format!() is a bit of a hit over all the keywords every time, so let's precompute
-                let suffix = format!(".{}", key_name);
-                partial_match_against.insert(suffix, def.clone());
+                match_against_path.insert(key_name.clone(), def.clone());
             } else {
                 match_against.insert(key_name.clone(), def.clone());
             }
@@ -75,18 +74,18 @@ impl FieldPII {
 
         FieldPII {
             scalar_keywords: match_against,
-            path_keywords: partial_match_against,
+            path_keywords: match_against_path,
         }
     }
 
-    pub fn scan(&mut self, payload: &str) -> Vec<Field> {
+    pub fn scan(&mut self, payload: &str, mode: DetectiveTypePIIKeywordMode) -> Vec<Field> {
         let parsed = gjson::parse(payload);
-        self.recurse_payload(parsed, vec![])
+        self.recurse_payload(parsed, vec![], mode)
     }
 
     /// Recursively scan a JSON payload for PII based by matching keywords with the JSON
     /// field name or path
-    fn recurse_payload(&mut self, current: Value, parent: Vec<String>) -> Vec<Field> {
+    fn recurse_payload(&mut self, current: Value, parent: Vec<String>, mode: DetectiveTypePIIKeywordMode) -> Vec<Field> {
         let mut fields: Vec<Field> = Vec::new();
 
         current.each(|key, value| {
@@ -109,12 +108,12 @@ impl FieldPII {
                 gjson::Kind::Object => {
                     let mut pp = parent.clone();
                     pp.push(key_str.clone());
-                    f.children = self.recurse_payload(value, pp);
+                    f.children = self.recurse_payload(value, pp, mode);
                 }
                 gjson::Kind::Array => {
                     let mut pp = parent.clone();
                     pp.push(key_str.clone());
-                    f.children = self.recurse_payload(value, pp);
+                    f.children = self.recurse_payload(value, pp, mode);
                 }
                 gjson::Kind::Null | gjson::Kind::True | gjson::Kind::False => {
                     // Ignore null/bool values, since there's no way they could contain PII
@@ -131,7 +130,7 @@ impl FieldPII {
                 }
             }
 
-            f.pii_matches.extend(self.match_against_fields(&f));
+            f.pii_matches.extend(self.match_against_fields(&f, mode));
 
             let mut confidence_sum: f32 = 0.0;
             f.pii_matches.iter().for_each(|m| {
@@ -162,10 +161,10 @@ impl FieldPII {
     /// scalar_keywords will be a O(1) lookup
     /// strict path_keywords will be a O(1) lookup
     /// fuzzy path_keywords will be a O(n) lookup
-    fn match_against_fields(&mut self, f: &Field) -> Vec<KeywordMatch> {
+    fn match_against_fields(&mut self, f: &Field, mode: DetectiveTypePIIKeywordMode) -> Vec<KeywordMatch> {
         let mut matches: Vec<KeywordMatch> = Vec::new();
 
-        // Single keyword lookup
+        // Single keyword lookup - no dots
         //
         // Example payload {"config": {"github": {"token": "pat_90210"}}}
         // Example key match: "token"
@@ -214,7 +213,40 @@ impl FieldPII {
             return matches;
         }
 
-        // Partial match check here
+        // If we're not in accuracy mode, we don't need to check partial matches
+        if mode != DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY {
+            return matches;
+        }
+
+        // MAX_KEY_LEN is the maximum length of a key that we'll check for partial matches
+        // We do this to avoid false positives with short keywords like "cc", "ip", "last", etc...
+        const MIN_KEY_LEN: usize = 4;
+
+        // Partial key name check here
+        //
+        // Example payload {"github_token": "pat_90210"}
+        // Example key match: "github_token"
+        //
+        // O(n) lookup
+        for (key_name, def) in &self.scalar_keywords {
+            if key_name.len() <= MIN_KEY_LEN {
+                continue;
+            }
+
+            if cur_path.contains(key_name.as_str()) {
+                let m = KeywordMatch {
+                    path: cur_path,
+                    value: f.value.clone(),
+                    confidence: def.score as f32,
+                    entity: def.entity.clone(),
+                };
+
+                matches.push(m);
+                return matches;
+            }
+        }
+
+        // Partial path check here
         // We didn't match on the whole key, such as "cvv", and we didn't match
         // on a whole path, such as "config.github.token". So let's check each keyword path
         // and see if our current path ends with that keyword path
@@ -236,6 +268,7 @@ impl FieldPII {
                 return matches;
             }
         }
+
 
         matches
     }
@@ -259,7 +292,7 @@ fn clean_key(input: &str) -> String {
     let cleaned: String = input.chars().filter(|&c| !c.is_numeric()).collect();
 
     // Strip underscores from prefix and suffix
-    cleaned.trim_matches('_').to_string()
+    cleaned.replace('_', "").to_string()
 }
 
 // Used to load a keyword toml file into a HashMap
@@ -295,3 +328,4 @@ fn clean_key(input: &str) -> String {
 //
 //     map
 // }
+

@@ -85,6 +85,7 @@ fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
         path: path,
         args: wasm_request.step.detective().args.clone(),
         negate: wasm_request.step.detective().negate.clone().unwrap(),
+        mode: wasm_request.step.detective().pii_keyword_mode.unwrap_or_default().enum_value_or_default(),
     }
 }
 

@@ -11,9 +11,9 @@ help: HELP_SCRIPT = \
 help:
 	@perl -ne '$(HELP_SCRIPT)' $(MAKEFILE_LIST)
 
-.PHONY: test/benchmarks
-test/benchmarks: description = Generate benchmarks.txt file
+.PHONY: test/bench
+test/benchmarks: description = Generate BENCHMARKS.md file
 test/benchmarks:
 	@echo "# Benchmark Results\n\n\`\`\`" > BENCHMARKS.md
-	cargo bench | grep -v ignore >> benchmarks.md
+	cargo bench | grep -v ignore >> BENCHMARKS.md
 	@echo "\`\`\`" >> benchmarks.md

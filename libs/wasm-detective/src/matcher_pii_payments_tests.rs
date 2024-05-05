@@ -1,6 +1,7 @@
 use crate::detective::Request;
 #[cfg(test)]
 use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
 
 #[test]
 pub fn test_stripe_secret() {
@@ -14,6 +15,7 @@ pub fn test_stripe_secret() {
                 path: "payments.stripe.secret_key".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal payments.stripe.secret_key".to_string(),
@@ -36,6 +38,7 @@ fn test_iban() {
                 path: "payments.iban".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal payments.iban".to_string(),
@@ -58,6 +61,7 @@ fn test_routing_number() {
                 path: "payments.routing_number".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal payments.routing_number".to_string(),
@@ -80,6 +84,7 @@ fn test_swift_bic() {
                 path: "payments.swift_bic".to_string(),
                 args: vec![],
                 negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
             },
             expected_matches: 1,
             text: "equal payments.swift_bic".to_string(),
