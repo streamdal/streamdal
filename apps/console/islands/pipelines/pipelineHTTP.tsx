@@ -40,16 +40,6 @@ export const PipelineHTTP = (
         children={optionsFromEnum(HttpRequestMethod)}
       />
 
-      <RadioGroup
-        name={`steps.${stepNumber}.step.httpRequest.request.bodyMode`}
-        data={data}
-        errors={errors}
-        options={{
-          [HttpRequestBodyMode.STATIC]: "Static Body",
-          [HttpRequestBodyMode.INTER_STEP_RESULT]: "Use Previous Step Result",
-        }}
-      />
-
       <FormInput
         name={`steps.${stepNumber}.step.httpRequest.request.url`}
         data={data}
@@ -58,6 +48,16 @@ export const PipelineHTTP = (
         placeHolder={"https://www.example.com/entity"}
         inputClass="w-full"
         errors={errors}
+      />
+
+      <RadioGroup
+        name={`steps.${stepNumber}.step.httpRequest.request.bodyMode`}
+        data={data}
+        errors={errors}
+        options={{
+          [HttpRequestBodyMode.UNSET]: "Static",
+          [HttpRequestBodyMode.INTER_STEP_RESULT]: "Use Previous Step Result",
+        }}
       />
 
       <FormTextArea
