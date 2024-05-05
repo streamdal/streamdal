@@ -16,6 +16,7 @@ import {
 } from "streamdal-protos/protos/steps/sp_steps_schema_validation.ts";
 import { KVAction } from "streamdal-protos/protos/shared/sp_shared.ts";
 import { KVMode } from "streamdal-protos/protos/steps/sp_steps_kv.ts";
+import { HttpRequestBodyMode } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
 import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httprequest.ts";
 import { numeric, repeatable, text } from "../form/validate.ts";
 import { isNumeric } from "../../lib/utils.ts";
@@ -90,6 +91,7 @@ const JSONSchemaDraftEnum = z.nativeEnum(JSONSchemaDraft);
 const KVActionTypeEnum = z.nativeEnum(KVAction);
 const KVModeTypeEnum = z.nativeEnum(KVMode);
 const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
+const HTTPBodyModeEnum = z.nativeEnum(HttpRequestBodyMode);
 const NotificationPayloadTypeEnum = z.nativeEnum(
   PipelineStepNotification_PayloadType,
 );
@@ -279,6 +281,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         method: numeric(HTTPMethodEnum),
         url: z.string().url(),
         body: z.string().transform((v) => new TextEncoder().encode(v)),
+        bodyMode: numeric(HTTPBodyModeEnum),
         headers: z
           .record(
             z.string().min(1, { message: "Required" }),
