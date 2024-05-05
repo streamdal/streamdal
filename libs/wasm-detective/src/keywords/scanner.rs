@@ -292,7 +292,7 @@ fn clean_key(input: &str) -> String {
     let cleaned: String = input.chars().filter(|&c| !c.is_numeric()).collect();
 
     // Strip underscores from prefix and suffix
-    cleaned.trim_matches('_').to_string()
+    cleaned.replace('_', "").to_string()
 }
 
 // Used to load a keyword toml file into a HashMap
@@ -328,3 +328,4 @@ fn clean_key(input: &str) -> String {
 //
 //     map
 // }
+
