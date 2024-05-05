@@ -81,6 +81,16 @@ func getRequestBodyForMode(request *protos.WASMRequest) (io.Reader, error) {
 			return nil, errors.New("inter step result is empty")
 		}
 
+		detectiveRes := request.InterStepResult.GetDetectiveResult()
+		if detectiveRes == nil {
+			return nil, errors.New("no detective result found in inter step result")
+		}
+
+		for _, match := range detectiveRes.Matches {
+			// Clear value from match
+			match.Value = nil
+		}
+
 		m := jsonpb.Marshaler{
 			EnumsAsInts:  false,
 			EmitDefaults: true,
