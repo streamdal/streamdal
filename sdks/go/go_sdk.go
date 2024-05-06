@@ -25,6 +25,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
@@ -53,6 +54,14 @@ const (
 	// DefaultStepTimeoutDurationStr is the default timeout for a single step.
 	DefaultStepTimeoutDurationStr = "10ms"
 
+	// DefaultSamplingRate is the default number at which messages will be sampled per SamplingIntervalSeconds
+	// if SamplingEnabled is set to true and SampleRate is not specified in the config
+
+	DefaultSamplingRate = 1
+	// DefaultSamplingIntervalSeconds is the default interval at which sampling will be done
+	// if SamplingEnabled is set to true and SamplingIntervalSeconds is not specified in the config
+	DefaultSamplingIntervalSeconds = 1
+
 	// ReconnectSleep determines the length of time to wait between reconnect attempts to streamdal server©
 	ReconnectSleep = time.Second * 5
 
@@ -75,9 +84,10 @@ const (
 
 	// ExecStatusTrue ExecStatusFalse ExecStatusError are used to indicate
 	// the execution status of the _last_ step in the _last_ pipeline.
-	ExecStatusTrue  = protos.ExecStatus_EXEC_STATUS_TRUE
-	ExecStatusFalse = protos.ExecStatus_EXEC_STATUS_FALSE
-	ExecStatusError = protos.ExecStatus_EXEC_STATUS_ERROR
+	ExecStatusTrue    = protos.ExecStatus_EXEC_STATUS_TRUE
+	ExecStatusFalse   = protos.ExecStatus_EXEC_STATUS_FALSE
+	ExecStatusError   = protos.ExecStatus_EXEC_STATUS_ERROR
+	ExecStatusSkipped = protos.ExecStatus_EXEC_STATUS_SKIPPED
 )
 
 var (
@@ -130,6 +140,9 @@ type Streamdal struct {
 	schemas        map[string]*protos.Schema   // k: audienceStr
 	schemasMtx     *sync.RWMutex
 	cancelFunc     context.CancelFunc
+
+	// Sampling rate limiter, uses token bucket algo
+	limiter *rate.Limiter
 
 	// Set to true when .Close() is called; used to prevent calling .Process()
 	// when library instance is stopped.
@@ -196,14 +209,16 @@ type Config struct {
 
 	// EnableStderr enables ability for wasm modules to write to stderr
 	EnableStderr bool
-}
 
-// Audience is used to announce an audience to the Streamdal server on library initialization
-// We use this to avoid end users having to import our protos
-type Audience struct {
-	ComponentName string
-	OperationType OperationType
-	OperationName string
+	// SamplingEnabled enables sampling of data
+	// This will cause Process() to ignore some messages if the rate exceeds the SamplingRate per SamplingIntervalSeconds
+	SamplingEnabled bool
+
+	// SamplingRate is the rate at which messages will be sampled per SamplingIntervalSeconds
+	SamplingRate int
+
+	// SamplingIntervalSeconds is the interval at which sampling will be done
+	SamplingIntervalSeconds int
 }
 
 // ProcessRequest is used to maintain a consistent API for the Process() call
@@ -285,6 +300,11 @@ func New(cfg *Config) (*Streamdal, error) {
 
 	if cfg.DryRun {
 		cfg.Logger.Warn("data pipelines running in dry run mode")
+	}
+
+	if cfg.SamplingEnabled {
+		interval := time.Duration(cfg.SamplingIntervalSeconds/cfg.SamplingRate) * time.Second
+		s.limiter = rate.NewLimiter(rate.Every(interval), cfg.SamplingRate)
 	}
 
 	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
@@ -389,6 +409,16 @@ func validateConfig(cfg *Config) error {
 	// Default to ClientTypeSDK
 	if cfg.ClientType != ClientTypeShim && cfg.ClientType != ClientTypeSDK {
 		cfg.ClientType = ClientTypeSDK
+	}
+
+	if cfg.SamplingEnabled {
+		if cfg.SamplingRate == 0 {
+			cfg.SamplingRate = DefaultSamplingRate
+		}
+
+		if cfg.SamplingIntervalSeconds == 0 {
+			cfg.SamplingIntervalSeconds = DefaultSamplingIntervalSeconds
+		}
 	}
 
 	return nil
@@ -593,6 +623,16 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 			Data:          req.Data,
 			Status:        ExecStatusError,
 			StatusMessage: proto.String(ErrClosedClient.Error()),
+		}
+	}
+
+	if !s.shouldProcess() {
+		return &ProcessResponse{
+			Data:           req.Data,
+			Status:         ExecStatusSkipped,
+			StatusMessage:  proto.String("skipped processing due to sampling rate"),
+			PipelineStatus: make([]*protos.PipelineStatus, 0),
+			Metadata:       make(map[string]string),
 		}
 	}
 
@@ -1059,11 +1099,12 @@ func (s *Streamdal) updateStatus(resp *ProcessResponse, pipelineStatus *protos.P
 	}
 }
 
-func (a *Audience) toProto(serviceName string) *protos.Audience {
-	return &protos.Audience{
-		ServiceName:   strings.ToLower(serviceName),
-		ComponentName: strings.ToLower(a.ComponentName),
-		OperationType: protos.OperationType(a.OperationType),
-		OperationName: strings.ToLower(a.OperationName),
+// shouldProcess determines if a message should be processed based on
+// whether sampling is enabled and the rate limiter allows the message
+func (s *Streamdal) shouldProcess() bool {
+	if s.limiter == nil {
+		return true
 	}
+
+	return s.limiter.Allow()
 }
