@@ -44,6 +44,11 @@ type OperationType int
 // ClientType is used to indicate if this library is being used by a shim or directly (as an SDK)
 type ClientType int
 
+// SDKMode is how Process() will handle messages
+// ModeSync = Process() will block until the pipeline is complete
+// ModeAsync = Process() will return immediately and the pipeline will run in the background
+type SDKMode int
+
 // ProcessResponse is the response struct from a Process() call
 type ProcessResponse protos.SDKResponse
 
@@ -62,6 +67,8 @@ const (
 	// if SamplingEnabled is set to true and SamplingIntervalSeconds is not specified in the config
 	DefaultSamplingIntervalSeconds = 1
 
+	DefaultModeAsyncWorkers = 3
+
 	// ReconnectSleep determines the length of time to wait between reconnect attempts to streamdal server©
 	ReconnectSleep = time.Second * 5
 
@@ -77,6 +84,9 @@ const (
 	// type of operation the Process() call is performing.
 	OperationTypeConsumer OperationType = 1
 	OperationTypeProducer OperationType = 2
+
+	ModeSync  SDKMode = SDKMode(protos.SDKMode_SDK_MODE_SYNC)
+	ModeAsync SDKMode = SDKMode(protos.SDKMode_SDK_MODE_ASYNC)
 
 	AbortAllStr     = "aborted all pipelines"
 	AbortCurrentStr = "aborted current pipeline"
@@ -122,7 +132,7 @@ type IStreamdal interface {
 // Streamdal is the main struct for this library
 type Streamdal struct {
 	config         *Config
-	functions      map[string]*function
+	functions      map[int]map[string]*function
 	functionsMtx   *sync.RWMutex
 	pipelines      map[string][]*protos.Pipeline // k: audienceStr
 	pipelinesMtx   *sync.RWMutex
@@ -140,9 +150,13 @@ type Streamdal struct {
 	schemas        map[string]*protos.Schema   // k: audienceStr
 	schemasMtx     *sync.RWMutex
 	cancelFunc     context.CancelFunc
+	wasmCache      map[string][]byte
+	wasmCacheMtx   *sync.RWMutex
 
 	// Sampling rate limiter, uses token bucket algo
 	limiter *rate.Limiter
+
+	asyncCh chan *ProcessRequest
 
 	// Set to true when .Close() is called; used to prevent calling .Process()
 	// when library instance is stopped.
@@ -219,6 +233,13 @@ type Config struct {
 
 	// SamplingIntervalSeconds is the interval at which sampling will be done
 	SamplingIntervalSeconds int
+
+	// SDKMode is how Process() will handle messages.
+	// ModeSync = Process() will block until the pipeline is complete
+	// ModeAsync = Process() will return immediately and the pipeline will run in the background via workers
+	Mode SDKMode
+
+	ModeAsyncNumWorkers int
 }
 
 // ProcessRequest is used to maintain a consistent API for the Process() call
@@ -277,7 +298,7 @@ func New(cfg *Config) (*Streamdal, error) {
 	}
 
 	s := &Streamdal{
-		functions:      make(map[string]*function),
+		functions:      make(map[int]map[string]*function),
 		functionsMtx:   &sync.RWMutex{},
 		serverClient:   serverClient,
 		pipelines:      make(map[string][]*protos.Pipeline),
@@ -296,6 +317,8 @@ func New(cfg *Config) (*Streamdal, error) {
 		schemasMtx:     &sync.RWMutex{},
 		schemas:        make(map[string]*protos.Schema),
 		cancelFunc:     cancelFunc,
+		wasmCache:      make(map[string][]byte),
+		wasmCacheMtx:   &sync.RWMutex{},
 	}
 
 	if cfg.DryRun {
@@ -331,6 +354,12 @@ func New(cfg *Config) (*Streamdal, error) {
 	case err := <-errCh:
 		return nil, errors.Wrap(err, "received error on startup")
 	case <-time.After(time.Second * 5):
+		// Start async workers if necessary
+		if cfg.Mode == ModeAsync {
+			s.asyncCh = make(chan *ProcessRequest, cfg.ModeAsyncNumWorkers*10)
+			s.startAsyncWorkers()
+		}
+
 		return s, nil
 	}
 }
@@ -419,6 +448,15 @@ func validateConfig(cfg *Config) error {
 		if cfg.SamplingIntervalSeconds == 0 {
 			cfg.SamplingIntervalSeconds = DefaultSamplingIntervalSeconds
 		}
+	}
+
+	// Default to sync mode if none is specified
+	if cfg.Mode == 0 {
+		cfg.Mode = ModeSync
+	}
+
+	if cfg.ModeAsyncNumWorkers == 0 {
+		cfg.ModeAsyncNumWorkers = DefaultModeAsyncWorkers
 	}
 
 	return nil
@@ -526,11 +564,11 @@ func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 	s.config.Logger.Debug("heartbeat() exit")
 }
 
-func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult) (*protos.WASMResponse, error) {
+func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult, workerID int) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
-	f, err := s.getFunction(ctx, step)
+	f, err := s.getFunction(ctx, step, workerID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
@@ -539,7 +577,7 @@ func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *pro
 	defer f.mtx.Unlock()
 
 	// Don't need this anymore, and don't want to send it to the wasm function
-	step.XWasmBytes = nil
+	//step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
 		InputPayload:    data,
@@ -616,29 +654,73 @@ func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
 		OperationName: req.OperationName,
 	}
 }
-
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
-	if s.closed {
+	switch s.config.Mode {
+	case ModeSync:
+		// workerID is "1" here since we only have one worker in sync mode
+		return s.processSync(ctx, req, 1)
+	case ModeAsync:
+		s.asyncCh <- req
 		return &ProcessResponse{
-			Data:          req.Data,
-			Status:        ExecStatusError,
-			StatusMessage: proto.String(ErrClosedClient.Error()),
-		}
-	}
-
-	if !s.shouldProcess() {
-		return &ProcessResponse{
+			Status:         ExecStatusTrue,
+			StatusMessage:  proto.String("queued message for async processing"),
 			Data:           req.Data,
-			Status:         ExecStatusSkipped,
-			StatusMessage:  proto.String("skipped processing due to sampling rate"),
 			PipelineStatus: make([]*protos.PipelineStatus, 0),
 			Metadata:       make(map[string]string),
+			SdkMode:        protos.SDKMode(s.config.Mode),
+		}
+	default:
+		return &ProcessResponse{
+			Status:         ExecStatusError,
+			StatusMessage:  proto.String(fmt.Sprintf("unknown SDK mode '%d'", s.config.Mode)),
+			Data:           req.Data,
+			PipelineStatus: make([]*protos.PipelineStatus, 0),
+			Metadata:       make(map[string]string),
+			SdkMode:        protos.SDKMode(s.config.Mode),
 		}
 	}
+}
 
+func (s *Streamdal) startAsyncWorkers() {
+	for i := 1; i <= s.config.ModeAsyncNumWorkers; i++ {
+		go s.runAsyncWorker(i)
+	}
+}
+
+func (s *Streamdal) runAsyncWorker(workerID int) {
+	s.config.Logger.Debugf("starting async worker '%d'", workerID)
+
+	for {
+		select {
+		case <-s.config.ShutdownCtx.Done():
+			s.config.Logger.Debugf("async worker '%d' shutting down", workerID)
+			return
+		case req := <-s.asyncCh:
+			s.config.Logger.Debugf("async worker '%d' processing request", workerID)
+			s.processSync(s.config.ShutdownCtx, req, workerID)
+		}
+	}
+}
+
+func (s *Streamdal) processSync(ctx context.Context, req *ProcessRequest, workerID int) *ProcessResponse {
 	resp := &ProcessResponse{
 		PipelineStatus: make([]*protos.PipelineStatus, 0),
 		Metadata:       make(map[string]string),
+		SdkMode:        protos.SDKMode(s.config.Mode),
+	}
+
+	if s.closed {
+		resp.Status = ExecStatusError
+		resp.StatusMessage = proto.String(ErrClosedClient.Error())
+		return resp
+	}
+
+	if !s.shouldProcess() {
+		resp.Data = req.Data
+		resp.Status = ExecStatusSkipped
+		resp.StatusMessage = proto.String("skipped processing due to sampling rate")
+
+		return resp
 	}
 
 	if err := validateProcessRequest(req); err != nil {
@@ -779,7 +861,7 @@ PIPELINE:
 
 			// Pipeline timeout either has not occurred OR it occurred and execution was not aborted
 
-			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr)
+			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr, workerID)
 			if err != nil {
 				stepTimeoutCxl()
 
@@ -826,7 +908,7 @@ PIPELINE:
 				// NOT aborting, update LOCAL step & pipeline status
 				s.updateStatus(nil, pipelineStatus, stepStatus)
 
-				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution)", pipeline.Name, step.Name)
+				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution): %s", pipeline.Name, step.Name, err.Error())
 
 				continue // Move on to the next step in the pipeline
 			}

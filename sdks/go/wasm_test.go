@@ -44,6 +44,8 @@ var _ = Describe("WASM Modules", func() {
 				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
+				wasmCacheMtx: &sync.RWMutex{},
+				wasmCache:    map[string][]byte{},
 			}
 
 			f, err = s.createFunction(req.Step)
@@ -113,6 +115,8 @@ var _ = Describe("WASM Modules", func() {
 				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
+				wasmCacheMtx: &sync.RWMutex{},
+				wasmCache:    map[string][]byte{},
 			}
 
 			f, err := s.createFunction(req.Step)
@@ -175,6 +179,8 @@ var _ = Describe("WASM Modules", func() {
 				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
+				wasmCacheMtx: &sync.RWMutex{},
+				wasmCache:    map[string][]byte{},
 			}
 
 			f, err = s.createFunction(req.Step)
@@ -266,6 +272,8 @@ var _ = Describe("WASM Modules", func() {
 				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
+				wasmCacheMtx: &sync.RWMutex{},
+				wasmCache:    map[string][]byte{},
 			}
 
 			req = &protos.WASMRequest{
@@ -500,6 +508,8 @@ var _ = Describe("WASM Modules", func() {
 				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
+				wasmCacheMtx: &sync.RWMutex{},
+				wasmCache:    map[string][]byte{},
 			}
 
 			f, err = s.createFunction(req.Step)
@@ -584,6 +594,8 @@ var _ = Describe("WASM Modules", func() {
 				pipelines:    map[string][]*protos.Pipeline{},
 				audiencesMtx: &sync.RWMutex{},
 				audiences:    map[string]struct{}{},
+				wasmCacheMtx: &sync.RWMutex{},
+				wasmCache:    map[string][]byte{},
 			}
 
 			f, err = s.createFunction(req.Step)
