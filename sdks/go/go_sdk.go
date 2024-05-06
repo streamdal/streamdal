@@ -904,7 +904,7 @@ PIPELINE:
 				// NOT aborting, update LOCAL step & pipeline status
 				s.updateStatus(nil, pipelineStatus, stepStatus)
 
-				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution)", pipeline.Name, step.Name)
+				s.config.Logger.Warnf("Step '%s:%s' failed (no abort condition defined - continuing step execution): %s", pipeline.Name, step.Name, err.Error())
 
 				continue // Move on to the next step in the pipeline
 			}
