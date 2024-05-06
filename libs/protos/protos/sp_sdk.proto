@@ -29,6 +29,7 @@ enum ExecStatus {
   EXEC_STATUS_SKIPPED = 4;
 }
 
+// protolint:disable:this ENUM_FIELD_NAMES_PREFIX
 enum SDKMode {
   SDK_MODE_UNSET = 0;
 

@@ -46,6 +46,8 @@ export var ExecStatus;
     ExecStatus[ExecStatus["SKIPPED"] = 4] = "SKIPPED";
 })(ExecStatus || (ExecStatus = {}));
 /**
+ * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+ *
  * @generated from protobuf enum protos.SDKMode
  */
 export var SDKMode;

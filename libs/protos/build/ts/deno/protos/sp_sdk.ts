@@ -162,6 +162,8 @@ export enum ExecStatus {
     SKIPPED = 4
 }
 /**
+ * protolint:disable:this ENUM_FIELD_NAMES_PREFIX
+ *
  * @generated from protobuf enum protos.SDKMode
  */
 export enum SDKMode {

@@ -169,6 +169,8 @@ class ExecStatus(betterproto.Enum):
 
 
 class SdkMode(betterproto.Enum):
+    """protolint:disable:this ENUM_FIELD_NAMES_PREFIX"""
+
     SDK_MODE_UNSET = 0
     SDK_MODE_SYNC = 1
     """

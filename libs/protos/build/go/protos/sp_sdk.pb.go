@@ -85,6 +85,7 @@ func (ExecStatus) EnumDescriptor() ([]byte, []int) {
 	return file_sp_sdk_proto_rawDescGZIP(), []int{0}
 }
 
+// protolint:disable:this ENUM_FIELD_NAMES_PREFIX
 type SDKMode int32
 
 const (
