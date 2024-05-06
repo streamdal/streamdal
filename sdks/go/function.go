@@ -78,16 +78,20 @@ func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
 	return resBytes, nil
 }
 
-func (s *Streamdal) setFunctionCache(wasmID string, f *function) {
+func (s *Streamdal) setFunctionCache(wasmID string, f *function, workerID int) {
 	s.functionsMtx.Lock()
 	defer s.functionsMtx.Unlock()
 
-	s.functions[wasmID] = f
+	if _, ok := s.functions[workerID]; !ok {
+		s.functions[workerID] = make(map[string]*function)
+	}
+
+	s.functions[workerID][wasmID] = f
 }
 
-func (s *Streamdal) getFunction(_ context.Context, step *protos.PipelineStep) (*function, error) {
+func (s *Streamdal) getFunction(_ context.Context, step *protos.PipelineStep, workerID int) (*function, error) {
 	// check cache
-	fc, ok := s.getFunctionFromCache(step.GetXWasmId())
+	fc, ok := s.getFunctionFromCache(step.GetXWasmId(), workerID)
 	if ok {
 		return fc, nil
 	}
@@ -98,16 +102,20 @@ func (s *Streamdal) getFunction(_ context.Context, step *protos.PipelineStep) (*
 	}
 
 	// Cache function
-	s.setFunctionCache(step.GetXWasmId(), fi)
+	s.setFunctionCache(step.GetXWasmId(), fi, workerID)
 
 	return fi, nil
 }
 
-func (s *Streamdal) getFunctionFromCache(wasmID string) (*function, bool) {
+func (s *Streamdal) getFunctionFromCache(wasmID string, workerID int) (*function, bool) {
 	s.functionsMtx.RLock()
 	defer s.functionsMtx.RUnlock()
 
-	f, ok := s.functions[wasmID]
+	if _, ok := s.functions[workerID]; !ok {
+		return nil, false
+	}
+
+	f, ok := s.functions[workerID][wasmID]
 	return f, ok
 }
 

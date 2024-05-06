@@ -132,7 +132,7 @@ type IStreamdal interface {
 // Streamdal is the main struct for this library
 type Streamdal struct {
 	config         *Config
-	functions      map[string]*function
+	functions      map[int]map[string]*function
 	functionsMtx   *sync.RWMutex
 	pipelines      map[string][]*protos.Pipeline // k: audienceStr
 	pipelinesMtx   *sync.RWMutex
@@ -296,7 +296,7 @@ func New(cfg *Config) (*Streamdal, error) {
 	}
 
 	s := &Streamdal{
-		functions:      make(map[string]*function),
+		functions:      make(map[int]map[string]*function),
 		functionsMtx:   &sync.RWMutex{},
 		serverClient:   serverClient,
 		pipelines:      make(map[string][]*protos.Pipeline),
@@ -560,11 +560,11 @@ func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 	s.config.Logger.Debug("heartbeat() exit")
 }
 
-func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult) (*protos.WASMResponse, error) {
+func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult, workerID int) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
-	f, err := s.getFunction(ctx, step)
+	f, err := s.getFunction(ctx, step, workerID)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get wasm data")
 	}
@@ -653,7 +653,8 @@ func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
 	switch s.config.Mode {
 	case ModeSync:
-		return s.processSync(ctx, req)
+		// workerID is "1" here since we only have one worker in sync mode
+		return s.processSync(ctx, req, 1)
 	case ModeAsync:
 		s.asyncCh <- req
 		return &ProcessResponse{
@@ -690,12 +691,12 @@ func (s *Streamdal) runAsyncWorker(workerID int) {
 			return
 		case req := <-s.asyncCh:
 			s.config.Logger.Debugf("async worker '%d' processing request", workerID)
-			s.processSync(s.config.ShutdownCtx, req)
+			s.processSync(s.config.ShutdownCtx, req, workerID)
 		}
 	}
 }
 
-func (s *Streamdal) processSync(ctx context.Context, req *ProcessRequest) *ProcessResponse {
+func (s *Streamdal) processSync(ctx context.Context, req *ProcessRequest, workerID int) *ProcessResponse {
 	if s.closed {
 		return &ProcessResponse{
 			Data:          req.Data,
@@ -857,7 +858,7 @@ PIPELINE:
 
 			// Pipeline timeout either has not occurred OR it occurred and execution was not aborted
 
-			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr)
+			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr, workerID)
 			if err != nil {
 				stepTimeoutCxl()
 

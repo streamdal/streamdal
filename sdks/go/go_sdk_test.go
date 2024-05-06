@@ -546,7 +546,7 @@ func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipelin
 	return &Streamdal{
 		serverClient: &serverfakes.FakeIServerClient{},
 		functionsMtx: &sync.RWMutex{},
-		functions:    map[string]*function{},
+		functions:    map[int]map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
 		config: &Config{
