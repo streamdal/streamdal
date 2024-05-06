@@ -549,6 +549,8 @@ func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipelin
 		functions:    map[int]map[string]*function{},
 		audiencesMtx: &sync.RWMutex{},
 		audiences:    map[string]struct{}{},
+		wasmCacheMtx: &sync.RWMutex{},
+		wasmCache:    map[string][]byte{},
 		config: &Config{
 			ServiceName:     serviceName,
 			Logger:          &logger.TinyLogger{},
@@ -586,6 +588,8 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 		audiences:    map[string]struct{}{},
 		kv:           kvClient,
 		hf:           hfClient,
+		wasmCacheMtx: &sync.RWMutex{},
+		wasmCache:    map[string][]byte{},
 	}, kvClient, nil
 }
 

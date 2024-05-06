@@ -150,6 +150,8 @@ type Streamdal struct {
 	schemas        map[string]*protos.Schema   // k: audienceStr
 	schemasMtx     *sync.RWMutex
 	cancelFunc     context.CancelFunc
+	wasmCache      map[string][]byte
+	wasmCacheMtx   *sync.RWMutex
 
 	// Sampling rate limiter, uses token bucket algo
 	limiter *rate.Limiter
@@ -315,6 +317,8 @@ func New(cfg *Config) (*Streamdal, error) {
 		schemasMtx:     &sync.RWMutex{},
 		schemas:        make(map[string]*protos.Schema),
 		cancelFunc:     cancelFunc,
+		wasmCache:      make(map[string][]byte),
+		wasmCacheMtx:   &sync.RWMutex{},
 	}
 
 	if cfg.DryRun {

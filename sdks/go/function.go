@@ -120,7 +120,7 @@ func (s *Streamdal) getFunctionFromCache(wasmID string, workerID int) (*function
 }
 
 func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error) {
-	inst, err := s.createWASMInstance(step.GetXWasmBytes())
+	inst, err := s.createWASMInstance(step)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to create WASM instance")
 	}
@@ -153,9 +153,37 @@ func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error)
 	}, nil
 }
 
-func (s *Streamdal) createWASMInstance(wasmBytes []byte) (api.Module, error) {
-	if len(wasmBytes) == 0 {
-		return nil, errors.New("wasm data is empty")
+func (s *Streamdal) getWasmBytesCache(funcID string) ([]byte, bool) {
+	s.wasmCacheMtx.RLock()
+	defer s.wasmCacheMtx.RUnlock()
+
+	wb, ok := s.wasmCache[funcID]
+	return wb, ok
+}
+
+func (s *Streamdal) setWasmBytesCache(funcID string, wb []byte) {
+	s.wasmCacheMtx.Lock()
+	defer s.wasmCacheMtx.Unlock()
+
+	s.wasmCache[funcID] = wb
+}
+
+func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, error) {
+	// We need to cache wasm bytes so that we can instantiate the module
+	// When running in async mode, createWASMInstance will be hit multiple times, but we need to wipe the wasmBytes
+	// from the pipeline step after the first run, so that we don't hold multiple MB of duplicate data in memory
+	wasmBytes, ok := s.getWasmBytesCache(step.GetXWasmId())
+	if !ok {
+		// Not cached yet, check if it's in the step
+		stepWasmBytes := step.GetXWasmBytes()
+		if len(stepWasmBytes) == 0 {
+			// WASM bytes are not in cache or step, error out
+			return nil, errors.New("wasm data is empty")
+		}
+
+		// Cache the bytes so we can wipe from the step
+		s.setWasmBytesCache(step.GetXWasmId(), stepWasmBytes)
+		wasmBytes = stepWasmBytes
 	}
 
 	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) uint64{
