@@ -38,7 +38,6 @@ export const oneArgTypes: (keyof typeof DetectiveType)[] = [
   "NUMERIC_MIN",
   "NUMERIC_MAX",
   "IS_TYPE",
-  "PII_KEYWORD",
 ];
 
 export const nArgTypes: (keyof typeof DetectiveType)[] = [
@@ -186,7 +185,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         path: z.string(),
         args: repeatable(z.array(z.string()).default([])),
         type: numeric(DetectiveTypeEnum),
-        piiKeywordMode: numeric(PIIKeywordModeEnum.default(DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET)).optional(),
+        piiKeywordMode: numeric(PIIKeywordModeEnum.default(DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET)),
         negate: z.boolean().default(false),
       })
       .superRefine((detective, ctx) => {

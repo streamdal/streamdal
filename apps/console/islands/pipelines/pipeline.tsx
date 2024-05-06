@@ -45,6 +45,8 @@ import { ActionModal } from "../modals/actionModal.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 import React from "react";
+import {RadioGroup} from "../../components/form/radioGroup.tsx";
+import { DetectiveTypePIIKeywordMode } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 
 export default function PipelineDetail({
   pipeline,
@@ -102,10 +104,14 @@ export default function PipelineDetail({
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
 
+    console.log("Form data: ", formData);
+
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
 
     if (errors) {
+      console.log("on submit errors: ", errors);
+
       e.preventDefault();
       return;
     }
@@ -310,6 +316,15 @@ export default function PipelineDetail({
                             errors={errors}
                             children={optionsFromEnum(DetectiveType)}
                           />
+                            <RadioGroup
+                                name={`steps.${i}.step.detective.piiKeywordMode`}
+                                data={data}
+                                errors={errors}
+                                options={{
+                                    [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Unset",
+                                    [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
+                                }}
+                            />
                           <div>
                             {argTypes.includes(
                               DetectiveType[

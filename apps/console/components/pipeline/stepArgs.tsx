@@ -83,18 +83,6 @@ export const StepArgs = (
           ))}
       />
     )
-    : type === "PII_KEYWORD"
-      ? (
-        <RadioGroup
-          name={`steps.0.step.detective.piiKeywordMode`}
-          data={data}
-          errors={errors}
-          options={{
-            [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Performance",
-            [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
-          }}
-        />
-      )
     : oneArgTypes.filter((a: string) =>
         !["STRING_CONTAINS_ANY", "STRING_CONTAINS_ALL"].includes(a)
       ).includes(type)
