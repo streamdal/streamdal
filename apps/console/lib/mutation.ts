@@ -58,8 +58,6 @@ export const updatePipelineNotifications = async (
 export const upsertPipeline = async (
   pipeline: Pipeline,
 ): Promise<PatchedPipelineResponse> => {
-  console.log("upserting pipeline", pipeline);
-
   if (pipeline.id) {
     const { response: updateResponse } = await client
       .updatePipeline(

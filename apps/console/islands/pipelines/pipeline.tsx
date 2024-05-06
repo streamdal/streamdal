@@ -104,13 +104,11 @@ export default function PipelineDetail({
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
 
-    console.log("Form data: ", formData);
-
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
 
     if (errors) {
-      console.log("on submit errors: ", errors);
+      console.error("onSubmit error(s): ", errors);
 
       e.preventDefault();
       return;
@@ -316,15 +314,18 @@ export default function PipelineDetail({
                             errors={errors}
                             children={optionsFromEnum(DetectiveType)}
                           />
-                            <RadioGroup
-                                name={`steps.${i}.step.detective.piiKeywordMode`}
-                                data={data}
-                                errors={errors}
-                                options={{
-                                    [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Unset",
-                                    [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
-                                }}
-                            />
+                            {/* There's a bug with type sometimes being passed as string and sometimes int... 🤷 */}
+                            {(data.steps[i].step.detective.type === "2036" || data.steps[i].step.detective.type === 2036) && (
+                                <RadioGroup
+                                    name={`steps.${i}.step.detective.piiKeywordMode`}
+                                    data={data}
+                                    errors={errors}
+                                    options={{
+                                        [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Unset",
+                                        [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
+                                    }}
+                                />
+                            )}
                           <div>
                             {argTypes.includes(
                               DetectiveType[

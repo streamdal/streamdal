@@ -10,6 +10,8 @@ import { FormTextArea } from "root/components/form/formTextArea.tsx";
 import { FormStringKV } from "root/components/form/formStringKV.tsx";
 import React from "react";
 import { RadioGroup } from "../../components/form/radioGroup.tsx";
+import {Tooltip} from "../../components/tooltip/tooltip.tsx";
+import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
 
 export type PipelineHTTPType = {
   stepNumber: number;

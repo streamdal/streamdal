@@ -185,7 +185,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         path: z.string(),
         args: repeatable(z.array(z.string()).default([])),
         type: numeric(DetectiveTypeEnum),
-        piiKeywordMode: numeric(PIIKeywordModeEnum.default(DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET)),
+        piiKeywordMode: numeric(PIIKeywordModeEnum),
         negate: z.boolean().default(false),
       })
       .superRefine((detective, ctx) => {

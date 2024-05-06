@@ -47,22 +47,13 @@ export const StepArg = (
 export const StepArgs = (
   { stepIndex, type, data, setData, errors }: StepArgsType,
 ) => {
-  console.log("Step args type:", type);
-  console.log("Step data:", data.steps[stepIndex]);
-  console.log("Step set data:", setData);
-
   //
   // Peek into step to see how many args there are so we
   // can tell the ui how many args to render initially
   const length = data?.steps[stepIndex]
     ?.step[data?.steps[stepIndex]?.step?.oneofKind]?.args?.length || 1;
 
-  console.log("Length: ", length);
-
   const [args, setArgs] = useState(Array.from({ length }, (v, k) => k));
-
-  console.log("Args: ", args);
-  console.log("setArgs: ", setArgs);
 
   return type === "IS_TYPE"
     ? (
