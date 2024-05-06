@@ -29,6 +29,21 @@ enum ExecStatus {
   EXEC_STATUS_SKIPPED = 4;
 }
 
+enum SDKMode {
+  SDK_MODE_UNSET = 0;
+
+  // Process() will handle the message inline.
+  // This method should be used when you need to modify the input data and pass
+  // the modified data back to your application
+  SDK_MODE_SYNC = 1;
+
+  // Process() will handle the message asynchronously in a worker.
+  // The SDKResponse will not contain any modified data. This mode should
+  // only be used when you don't need to modify and pass it back to your
+  // application, such as when discovering/monitoring PII only
+  SDK_MODE_ASYNC = 2;
+}
+
 // Common return response used by all SDKs
 message SDKResponse {
   // Contains (potentially) modified input data
@@ -56,13 +71,6 @@ message SDKResponse {
   // SDKMode is purely an informative field that tells the user the mode that the
   // SDK was running in when the response was generated.
   SDKMode sdk_mode = 6;
-}
-
-// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
-enum SDKMode {
-  SDK_MODE_UNSET = 0;
-  SDK_MODE_SYNC = 1;
-  SDK_MODE_ASYNC = 2;
 }
 
 message PipelineStatus {

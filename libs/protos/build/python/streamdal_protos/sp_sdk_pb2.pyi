@@ -8,8 +8,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 EXEC_STATUS_ERROR: ExecStatus
 EXEC_STATUS_FALSE: ExecStatus
+EXEC_STATUS_SKIPPED: ExecStatus
 EXEC_STATUS_TRUE: ExecStatus
 EXEC_STATUS_UNSET: ExecStatus
+SDK_MODE_ASYNC: SDKMode
+SDK_MODE_SYNC: SDKMode
+SDK_MODE_UNSET: SDKMode
 
 class PipelineStatus(_message.Message):
     __slots__ = ["id", "name", "step_status"]
@@ -22,7 +26,7 @@ class PipelineStatus(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., step_status: _Optional[_Iterable[_Union[StepStatus, _Mapping]]] = ...) -> None: ...
 
 class SDKResponse(_message.Message):
-    __slots__ = ["data", "metadata", "pipeline_status", "status", "status_message"]
+    __slots__ = ["data", "metadata", "pipeline_status", "sdk_mode", "status", "status_message"]
     class MetadataEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -33,14 +37,16 @@ class SDKResponse(_message.Message):
     DATA_FIELD_NUMBER: _ClassVar[int]
     METADATA_FIELD_NUMBER: _ClassVar[int]
     PIPELINE_STATUS_FIELD_NUMBER: _ClassVar[int]
+    SDK_MODE_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
     STATUS_MESSAGE_FIELD_NUMBER: _ClassVar[int]
     data: bytes
     metadata: _containers.ScalarMap[str, str]
     pipeline_status: _containers.RepeatedCompositeFieldContainer[PipelineStatus]
+    sdk_mode: SDKMode
     status: ExecStatus
     status_message: str
-    def __init__(self, data: _Optional[bytes] = ..., status: _Optional[_Union[ExecStatus, str]] = ..., status_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., metadata: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, data: _Optional[bytes] = ..., status: _Optional[_Union[ExecStatus, str]] = ..., status_message: _Optional[str] = ..., pipeline_status: _Optional[_Iterable[_Union[PipelineStatus, _Mapping]]] = ..., metadata: _Optional[_Mapping[str, str]] = ..., sdk_mode: _Optional[_Union[SDKMode, str]] = ...) -> None: ...
 
 class StepStatus(_message.Message):
     __slots__ = ["abort_condition", "name", "status", "status_message"]
@@ -55,4 +61,7 @@ class StepStatus(_message.Message):
     def __init__(self, name: _Optional[str] = ..., status: _Optional[_Union[ExecStatus, str]] = ..., status_message: _Optional[str] = ..., abort_condition: _Optional[_Union[_sp_pipeline_pb2.AbortCondition, str]] = ...) -> None: ...
 
 class ExecStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+
+class SDKMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

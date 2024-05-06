@@ -50,6 +50,13 @@ export interface SDKResponse {
     metadata: {
         [key: string]: string;
     };
+    /**
+     * SDKMode is purely an informative field that tells the user the mode that the
+     * SDK was running in when the response was generated.
+     *
+     * @generated from protobuf field: protos.SDKMode sdk_mode = 6;
+     */
+    sdkMode: SDKMode;
 }
 /**
  * @generated from protobuf message protos.PipelineStatus
@@ -137,7 +144,41 @@ export declare enum ExecStatus {
      *
      * @generated from protobuf enum value: EXEC_STATUS_ERROR = 3;
      */
-    ERROR = 3
+    ERROR = 3,
+    /**
+     * Indicates that the step was skipped; this status is set when the SDK is
+     * configured with sampling and a .Process() was called on a message that
+     * was sampled out.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_SKIPPED = 4;
+     */
+    SKIPPED = 4
+}
+/**
+ * @generated from protobuf enum protos.SDKMode
+ */
+export declare enum SDKMode {
+    /**
+     * @generated from protobuf enum value: SDK_MODE_UNSET = 0;
+     */
+    SDK_MODE_UNSET = 0,
+    /**
+     * Process() will handle the message inline.
+     * This method should be used when you need to modify the input data and pass
+     * the modified data back to your application
+     *
+     * @generated from protobuf enum value: SDK_MODE_SYNC = 1;
+     */
+    SDK_MODE_SYNC = 1,
+    /**
+     * Process() will handle the message asynchronously in a worker.
+     * The SDKResponse will not contain any modified data. This mode should
+     * only be used when you don't need to modify and pass it back to your
+     * application, such as when discovering/monitoring PII only
+     *
+     * @generated from protobuf enum value: SDK_MODE_ASYNC = 2;
+     */
+    SDK_MODE_ASYNC = 2
 }
 declare class SDKResponse$Type extends MessageType<SDKResponse> {
     constructor();

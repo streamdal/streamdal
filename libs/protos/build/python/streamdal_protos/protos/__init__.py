@@ -160,6 +160,31 @@ class ExecStatus(betterproto.Enum):
     Wasm function cannot alloc or dealloc memory, etc.
     """
 
+    EXEC_STATUS_SKIPPED = 4
+    """
+    Indicates that the step was skipped; this status is set when the SDK is
+    configured with sampling and a .Process() was called on a message that was
+    sampled out.
+    """
+
+
+class SdkMode(betterproto.Enum):
+    SDK_MODE_UNSET = 0
+    SDK_MODE_SYNC = 1
+    """
+    Process() will handle the message inline. This method should be used when
+    you need to modify the input data and pass the modified data back to your
+    application
+    """
+
+    SDK_MODE_ASYNC = 2
+    """
+    Process() will handle the message asynchronously in a worker. The
+    SDKResponse will not contain any modified data. This mode should only be
+    used when you don't need to modify and pass it back to your application,
+    such as when discovering/monitoring PII only
+    """
+
 
 class WasmExitCode(betterproto.Enum):
     """
@@ -1337,6 +1362,12 @@ class SdkResponse(betterproto.Message):
     response will be the value set by the last step in the pipeline. To learn
     more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error Behavior"
     section.
+    """
+
+    sdk_mode: "SdkMode" = betterproto.enum_field(6)
+    """
+    SDKMode is purely an informative field that tells the user the mode that
+    the SDK was running in when the response was generated.
     """
 
 

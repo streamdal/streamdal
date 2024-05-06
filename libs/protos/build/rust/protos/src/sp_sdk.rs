@@ -52,6 +52,10 @@ pub struct SDKResponse {
     ///  Behavior" section.
     // @@protoc_insertion_point(field:protos.SDKResponse.metadata)
     pub metadata: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+    ///  SDKMode is purely an informative field that tells the user the mode that the
+    ///  SDK was running in when the response was generated.
+    // @@protoc_insertion_point(field:protos.SDKResponse.sdk_mode)
+    pub sdk_mode: ::protobuf::EnumOrUnknown<SDKMode>,
     // special fields
     // @@protoc_insertion_point(special_field:protos.SDKResponse.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -69,7 +73,7 @@ impl SDKResponse {
     }
 
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
-        let mut fields = ::std::vec::Vec::with_capacity(5);
+        let mut fields = ::std::vec::Vec::with_capacity(6);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
         fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "data",
@@ -95,6 +99,11 @@ impl SDKResponse {
             "metadata",
             |m: &SDKResponse| { &m.metadata },
             |m: &mut SDKResponse| { &mut m.metadata },
+        ));
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
+            "sdk_mode",
+            |m: &SDKResponse| { &m.sdk_mode },
+            |m: &mut SDKResponse| { &mut m.sdk_mode },
         ));
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<SDKResponse>(
             "SDKResponse",
@@ -141,6 +150,9 @@ impl ::protobuf::Message for SDKResponse {
                     is.pop_limit(old_limit);
                     self.metadata.insert(key, value);
                 },
+                48 => {
+                    self.sdk_mode = is.read_enum_or_unknown()?;
+                },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
                 },
@@ -172,6 +184,9 @@ impl ::protobuf::Message for SDKResponse {
             entry_size += ::protobuf::rt::string_size(2, &v);
             my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(entry_size) + entry_size
         };
+        if self.sdk_mode != ::protobuf::EnumOrUnknown::new(SDKMode::SDK_MODE_UNSET) {
+            my_size += ::protobuf::rt::int32_size(6, self.sdk_mode.value());
+        }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
         my_size
@@ -199,6 +214,9 @@ impl ::protobuf::Message for SDKResponse {
             os.write_string(1, &k)?;
             os.write_string(2, &v)?;
         };
+        if self.sdk_mode != ::protobuf::EnumOrUnknown::new(SDKMode::SDK_MODE_UNSET) {
+            os.write_enum(6, ::protobuf::EnumOrUnknown::value(&self.sdk_mode))?;
+        }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
     }
@@ -221,6 +239,7 @@ impl ::protobuf::Message for SDKResponse {
         self.status_message = ::std::option::Option::None;
         self.pipeline_status.clear();
         self.metadata.clear();
+        self.sdk_mode = ::protobuf::EnumOrUnknown::new(SDKMode::SDK_MODE_UNSET);
         self.special_fields.clear();
     }
 
@@ -604,6 +623,8 @@ pub enum ExecStatus {
     EXEC_STATUS_FALSE = 2,
     // @@protoc_insertion_point(enum_value:protos.ExecStatus.EXEC_STATUS_ERROR)
     EXEC_STATUS_ERROR = 3,
+    // @@protoc_insertion_point(enum_value:protos.ExecStatus.EXEC_STATUS_SKIPPED)
+    EXEC_STATUS_SKIPPED = 4,
 }
 
 impl ::protobuf::Enum for ExecStatus {
@@ -619,6 +640,7 @@ impl ::protobuf::Enum for ExecStatus {
             1 => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_TRUE),
             2 => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_FALSE),
             3 => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_ERROR),
+            4 => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_SKIPPED),
             _ => ::std::option::Option::None
         }
     }
@@ -629,6 +651,7 @@ impl ::protobuf::Enum for ExecStatus {
             "EXEC_STATUS_TRUE" => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_TRUE),
             "EXEC_STATUS_FALSE" => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_FALSE),
             "EXEC_STATUS_ERROR" => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_ERROR),
+            "EXEC_STATUS_SKIPPED" => ::std::option::Option::Some(ExecStatus::EXEC_STATUS_SKIPPED),
             _ => ::std::option::Option::None
         }
     }
@@ -638,6 +661,7 @@ impl ::protobuf::Enum for ExecStatus {
         ExecStatus::EXEC_STATUS_TRUE,
         ExecStatus::EXEC_STATUS_FALSE,
         ExecStatus::EXEC_STATUS_ERROR,
+        ExecStatus::EXEC_STATUS_SKIPPED,
     ];
 }
 
@@ -665,111 +689,208 @@ impl ExecStatus {
     }
 }
 
+#[derive(Clone,Copy,PartialEq,Eq,Debug,Hash)]
+// @@protoc_insertion_point(enum:protos.SDKMode)
+pub enum SDKMode {
+    // @@protoc_insertion_point(enum_value:protos.SDKMode.SDK_MODE_UNSET)
+    SDK_MODE_UNSET = 0,
+    // @@protoc_insertion_point(enum_value:protos.SDKMode.SDK_MODE_SYNC)
+    SDK_MODE_SYNC = 1,
+    // @@protoc_insertion_point(enum_value:protos.SDKMode.SDK_MODE_ASYNC)
+    SDK_MODE_ASYNC = 2,
+}
+
+impl ::protobuf::Enum for SDKMode {
+    const NAME: &'static str = "SDKMode";
+
+    fn value(&self) -> i32 {
+        *self as i32
+    }
+
+    fn from_i32(value: i32) -> ::std::option::Option<SDKMode> {
+        match value {
+            0 => ::std::option::Option::Some(SDKMode::SDK_MODE_UNSET),
+            1 => ::std::option::Option::Some(SDKMode::SDK_MODE_SYNC),
+            2 => ::std::option::Option::Some(SDKMode::SDK_MODE_ASYNC),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    fn from_str(str: &str) -> ::std::option::Option<SDKMode> {
+        match str {
+            "SDK_MODE_UNSET" => ::std::option::Option::Some(SDKMode::SDK_MODE_UNSET),
+            "SDK_MODE_SYNC" => ::std::option::Option::Some(SDKMode::SDK_MODE_SYNC),
+            "SDK_MODE_ASYNC" => ::std::option::Option::Some(SDKMode::SDK_MODE_ASYNC),
+            _ => ::std::option::Option::None
+        }
+    }
+
+    const VALUES: &'static [SDKMode] = &[
+        SDKMode::SDK_MODE_UNSET,
+        SDKMode::SDK_MODE_SYNC,
+        SDKMode::SDK_MODE_ASYNC,
+    ];
+}
+
+impl ::protobuf::EnumFull for SDKMode {
+    fn enum_descriptor() -> ::protobuf::reflect::EnumDescriptor {
+        static descriptor: ::protobuf::rt::Lazy<::protobuf::reflect::EnumDescriptor> = ::protobuf::rt::Lazy::new();
+        descriptor.get(|| file_descriptor().enum_by_package_relative_name("SDKMode").unwrap()).clone()
+    }
+
+    fn descriptor(&self) -> ::protobuf::reflect::EnumValueDescriptor {
+        let index = *self as usize;
+        Self::enum_descriptor().value_by_index(index)
+    }
+}
+
+impl ::std::default::Default for SDKMode {
+    fn default() -> Self {
+        SDKMode::SDK_MODE_UNSET
+    }
+}
+
+impl SDKMode {
+    fn generated_enum_descriptor_data() -> ::protobuf::reflect::GeneratedEnumDescriptorData {
+        ::protobuf::reflect::GeneratedEnumDescriptorData::new::<SDKMode>("SDKMode")
+    }
+}
+
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0csp_sdk.proto\x12\x06protos\x1a\x11sp_pipeline.proto\"\xc9\x02\n\
+    \n\x0csp_sdk.proto\x12\x06protos\x1a\x11sp_pipeline.proto\"\xf5\x02\n\
     \x0bSDKResponse\x12\x12\n\x04data\x18\x01\x20\x01(\x0cR\x04data\x12*\n\
     \x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecStatusR\x06status\x12*\n\
     \x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatusMessage\x88\x01\x01\x12\
     ?\n\x0fpipeline_status\x18\x04\x20\x03(\x0b2\x16.protos.PipelineStatusR\
     \x0epipelineStatus\x12=\n\x08metadata\x18\x05\x20\x03(\x0b2!.protos.SDKR\
-    esponse.MetadataEntryR\x08metadata\x1a;\n\rMetadataEntry\x12\x10\n\x03ke\
-    y\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\x05v\
-    alue:\x028\x01B\x11\n\x0f_status_message\"i\n\x0ePipelineStatus\x12\x0e\
-    \n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\tR\
-    \x04name\x123\n\x0bstep_status\x18\x03\x20\x03(\x0b2\x12.protos.StepStat\
-    usR\nstepStatus\"\xcc\x01\n\nStepStatus\x12\x12\n\x04name\x18\x01\x20\
-    \x01(\tR\x04name\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.protos.ExecS\
-    tatusR\x06status\x12*\n\x0estatus_message\x18\x03\x20\x01(\tH\0R\rstatus\
-    Message\x88\x01\x01\x12?\n\x0fabort_condition\x18\x04\x20\x01(\x0e2\x16.\
-    protos.AbortConditionR\x0eabortConditionB\x11\n\x0f_status_message*g\n\n\
-    ExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\x10\0\x12\x14\n\x10EXEC_STATUS\
-    _TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FALSE\x10\x02\x12\x15\n\x11EXEC_S\
-    TATUS_ERROR\x10\x03BPZ:github.com/streamdal/streamdal/libs/protos/build/\
-    go/protos\xea\x02\x11Streamdal::ProtosJ\xa5\x14\n\x06\x12\x04\0\0N\x01\n\
-    \x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\
-    \x02\x03\0\x12\x03\x04\0\x1b\n\x08\n\x01\x08\x12\x03\x06\0Q\n\t\n\x02\
-    \x08\x0b\x12\x03\x06\0Q\n\x08\n\x01\x08\x12\x03\x07\0*\n\t\n\x02\x08-\
-    \x12\x03\x07\0*\n\n\n\x02\x05\0\x12\x04\t\0\x18\x01\n\n\n\x03\x05\0\x01\
-    \x12\x03\t\x05\x0f\n\x87\x01\n\x04\x05\0\x02\0\x12\x03\x0c\x02\x18\x1az\
-    \x20Unset\x20status.\x20This\x20should\x20never\x20be\x20returned\x20by\
-    \x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20is\n\x20probably\x20a\x20b\
-    ug\x20(and\x20you\x20should\x20file\x20an\x20issue)\n\n\x0c\n\x05\x05\0\
-    \x02\0\x01\x12\x03\x0c\x02\x13\n\x0c\n\x05\x05\0\x02\0\x02\x12\x03\x0c\
-    \x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0f\x02\x17\x1a7\x20Indicates\
-    \x20that\x20the\x20step\x20execution\x20evaluated\x20to\x20\"true\"\n\n\
-    \x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x12\n\x0c\n\x05\x05\0\x02\
-    \x01\x02\x12\x03\x0f\x15\x16\nE\n\x04\x05\0\x02\x02\x12\x03\x12\x02\x18\
-    \x1a8\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\x20t\
-    o\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\x03\x12\x02\x13\n\x0c\
-    \n\x05\x05\0\x02\x02\x02\x12\x03\x12\x16\x17\n\xd6\x01\n\x04\x05\0\x02\
-    \x03\x12\x03\x17\x02\x18\x1a\xc8\x01\x20Indicates\x20that\x20the\x20SDK\
-    \x20encountered\x20an\x20error\x20while\x20trying\x20to\x20process\x20th\
-    e\n\x20request.\x20Example\x20error\x20cases:\x20SDK\x20can't\x20find\
-    \x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\x20function\x20canno\
-    t\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\x0c\n\x05\x05\0\x02\
-    \x03\x01\x12\x03\x17\x02\x13\n\x0c\n\x05\x05\0\x02\x03\x02\x12\x03\x17\
-    \x16\x17\n5\n\x02\x04\0\x12\x04\x1b\01\x01\x1a)\x20Common\x20return\x20r\
-    esponse\x20used\x20by\x20all\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03\x1b\
-    \x08\x13\n9\n\x04\x04\0\x02\0\x12\x03\x1d\x02\x11\x1a,\x20Contains\x20(p\
-    otentially)\x20modified\x20input\x20data\n\n\x0c\n\x05\x04\0\x02\0\x05\
-    \x12\x03\x1d\x02\x07\n\x0c\n\x05\x04\0\x02\0\x01\x12\x03\x1d\x08\x0c\n\
-    \x0c\n\x05\x04\0\x02\0\x03\x12\x03\x1d\x0f\x10\n0\n\x04\x04\0\x02\x01\
-    \x12\x03\x20\x02\x18\x1a#\x20Execution\x20status\x20of\x20the\x20last\
-    \x20step\n\n\x0c\n\x05\x04\0\x02\x01\x06\x12\x03\x20\x02\x0c\n\x0c\n\x05\
-    \x04\0\x02\x01\x01\x12\x03\x20\r\x13\n\x0c\n\x05\x04\0\x02\x01\x03\x12\
-    \x03\x20\x16\x17\nN\n\x04\x04\0\x02\x02\x12\x03#\x02%\x1aA\x20Optional\
-    \x20message\x20accompanying\x20the\x20exec\x20status\x20for\x20the\x20la\
-    st\x20step\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03#\x02\n\n\x0c\n\x05\
-    \x04\0\x02\x02\x05\x12\x03#\x0b\x11\n\x0c\n\x05\x04\0\x02\x02\x01\x12\
-    \x03#\x12\x20\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03##$\nV\n\x04\x04\0\
-    \x02\x03\x12\x03&\x02.\x1aI\x20An\x20array\x20of\x20pipelines\x20that\
-    \x20the\x20SDK\x20executed\x20and\x20the\x20status\x20of\x20each\x20step\
-    \n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\x03&\x02\n\n\x0c\n\x05\x04\0\x02\
-    \x03\x06\x12\x03&\x0b\x19\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03&\x1a)\n\
-    \x0c\n\x05\x04\0\x02\x03\x03\x12\x03&,-\n\x92\x03\n\x04\x04\0\x02\x04\
-    \x12\x030\x02#\x1a\x84\x03\x20Includes\x20any\x20metadata\x20that\x20the\
-    \x20step(s)\x20may\x20want\x20to\x20pass\x20back\x20to\x20the\x20user.\n\
-    \n\x20NOTE:\x20Metadata\x20is\x20aggregated\x20across\x20all\x20steps\
-    \x20in\x20the\x20pipeline,\x20so\x20if\x20two\n\x20steps\x20both\x20set\
-    \x20a\x20key\x20\"foo\"\x20to\x20different\x20values,\x20the\x20value\
-    \x20of\x20\"foo\"\x20in\x20the\n\x20response\x20will\x20be\x20the\x20val\
-    ue\x20set\x20by\x20the\x20last\x20step\x20in\x20the\x20pipeline.\n\n\x20\
-    To\x20learn\x20more\x20about\x20\"metadata\",\x20see\x20SDK\x20Spec\x20V\
-    2\x20doc\x20\"Pipeline\x20Step\x20&\x20Error\n\x20Behavior\"\x20section.\
-    \n\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x030\x02\x15\n\x0c\n\x05\x04\0\x02\
-    \x04\x01\x12\x030\x16\x1e\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x030!\"\n\n\
-    \n\x02\x04\x01\x12\x043\0<\x01\n\n\n\x03\x04\x01\x01\x12\x033\x08\x16\n!\
-    \n\x04\x04\x01\x02\0\x12\x035\x02\x10\x1a\x14\x20ID\x20of\x20the\x20pipe\
-    line\n\n\x0c\n\x05\x04\x01\x02\0\x05\x12\x035\x02\x08\n\x0c\n\x05\x04\
-    \x01\x02\0\x01\x12\x035\t\x0b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x035\x0e\
-    \x0f\n'\n\x04\x04\x01\x02\x01\x12\x038\x02\x12\x1a\x1a\x20The\x20name\
-    \x20of\x20the\x20pipeline\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x038\x02\
-    \x08\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x038\t\r\n\x0c\n\x05\x04\x01\
-    \x02\x01\x03\x12\x038\x10\x11\n6\n\x04\x04\x01\x02\x02\x12\x03;\x02&\x1a\
-    )\x20The\x20status\x20of\x20each\x20step\x20in\x20the\x20pipeline\n\n\
-    \x0c\n\x05\x04\x01\x02\x02\x04\x12\x03;\x02\n\n\x0c\n\x05\x04\x01\x02\
-    \x02\x06\x12\x03;\x0b\x15\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03;\x16!\
-    \n\x0c\n\x05\x04\x01\x02\x02\x03\x12\x03;$%\n\n\n\x02\x04\x02\x12\x04>\0\
-    N\x01\n\n\n\x03\x04\x02\x01\x12\x03>\x08\x12\n#\n\x04\x04\x02\x02\0\x12\
-    \x03@\x02\x12\x1a\x16\x20The\x20name\x20of\x20the\x20step\n\n\x0c\n\x05\
-    \x04\x02\x02\0\x05\x12\x03@\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\
-    \x03@\t\r\n\x0c\n\x05\x04\x02\x02\0\x03\x12\x03@\x10\x11\n3\n\x04\x04\
-    \x02\x02\x01\x12\x03C\x02\x18\x1a&\x20Execution\x20outcome\x20status\x20\
-    of\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\x01\x06\x12\x03C\x02\x0c\n\
-    \x0c\n\x05\x04\x02\x02\x01\x01\x12\x03C\r\x13\n\x0c\n\x05\x04\x02\x02\
-    \x01\x03\x12\x03C\x16\x17\n<\n\x04\x04\x02\x02\x02\x12\x03F\x02%\x1a/\
-    \x20Optional\x20message\x20accompanying\x20the\x20exec\x20status\n\n\x0c\
-    \n\x05\x04\x02\x02\x02\x04\x12\x03F\x02\n\n\x0c\n\x05\x04\x02\x02\x02\
-    \x05\x12\x03F\x0b\x11\n\x0c\n\x05\x04\x02\x02\x02\x01\x12\x03F\x12\x20\n\
-    \x0c\n\x05\x04\x02\x02\x02\x03\x12\x03F#$\n\xf0\x01\n\x04\x04\x02\x02\
-    \x03\x12\x03M\x02%\x1a\xe2\x01\x20Indicates\x20if\x20current\x20or\x20al\
-    l\x20future\x20pipelines\x20were\x20aborted.\n\n\x20IMPORTANT:\x20The\
-    \x20SDK\x20running\x20into\x20an\x20error\x20does\x20not\x20automaticall\
-    y\x20abort\n\x20current\x20or\x20all\x20future\x20pipelines\x20-\x20the\
-    \x20user\x20must\x20define\x20the\x20abort\x20conditions\n\x20for\x20\"o\
-    n_error\".\n\n\x0c\n\x05\x04\x02\x02\x03\x06\x12\x03M\x02\x10\n\x0c\n\
-    \x05\x04\x02\x02\x03\x01\x12\x03M\x11\x20\n\x0c\n\x05\x04\x02\x02\x03\
-    \x03\x12\x03M#$b\x06proto3\
+    esponse.MetadataEntryR\x08metadata\x12*\n\x08sdk_mode\x18\x06\x20\x01(\
+    \x0e2\x0f.protos.SDKModeR\x07sdkMode\x1a;\n\rMetadataEntry\x12\x10\n\x03\
+    key\x18\x01\x20\x01(\tR\x03key\x12\x14\n\x05value\x18\x02\x20\x01(\tR\
+    \x05value:\x028\x01B\x11\n\x0f_status_message\"i\n\x0ePipelineStatus\x12\
+    \x0e\n\x02id\x18\x01\x20\x01(\tR\x02id\x12\x12\n\x04name\x18\x02\x20\x01\
+    (\tR\x04name\x123\n\x0bstep_status\x18\x03\x20\x03(\x0b2\x12.protos.Step\
+    StatusR\nstepStatus\"\xcc\x01\n\nStepStatus\x12\x12\n\x04name\x18\x01\
+    \x20\x01(\tR\x04name\x12*\n\x06status\x18\x02\x20\x01(\x0e2\x12.protos.E\
+    xecStatusR\x06status\x12*\n\x0estatus_message\x18\x03\x20\x01(\tH\0R\rst\
+    atusMessage\x88\x01\x01\x12?\n\x0fabort_condition\x18\x04\x20\x01(\x0e2\
+    \x16.protos.AbortConditionR\x0eabortConditionB\x11\n\x0f_status_message*\
+    \x80\x01\n\nExecStatus\x12\x15\n\x11EXEC_STATUS_UNSET\x10\0\x12\x14\n\
+    \x10EXEC_STATUS_TRUE\x10\x01\x12\x15\n\x11EXEC_STATUS_FALSE\x10\x02\x12\
+    \x15\n\x11EXEC_STATUS_ERROR\x10\x03\x12\x17\n\x13EXEC_STATUS_SKIPPED\x10\
+    \x04*D\n\x07SDKMode\x12\x12\n\x0eSDK_MODE_UNSET\x10\0\x12\x11\n\rSDK_MOD\
+    E_SYNC\x10\x01\x12\x12\n\x0eSDK_MODE_ASYNC\x10\x02BPZ:github.com/streamd\
+    al/streamdal/libs/protos/build/go/protos\xea\x02\x11Streamdal::ProtosJ\
+    \xf6\x1b\n\x06\x12\x04\0\0f\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\
+    \x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x1b\n\x08\n\x01\
+    \x08\x12\x03\x06\0Q\n\t\n\x02\x08\x0b\x12\x03\x06\0Q\n\x08\n\x01\x08\x12\
+    \x03\x07\0*\n\t\n\x02\x08-\x12\x03\x07\0*\n\n\n\x02\x05\0\x12\x04\t\0\
+    \x1d\x01\n\n\n\x03\x05\0\x01\x12\x03\t\x05\x0f\n\x87\x01\n\x04\x05\0\x02\
+    \0\x12\x03\x0c\x02\x18\x1az\x20Unset\x20status.\x20This\x20should\x20nev\
+    er\x20be\x20returned\x20by\x20the\x20SDK.\x20If\x20it\x20does,\x20it\x20\
+    is\n\x20probably\x20a\x20bug\x20(and\x20you\x20should\x20file\x20an\x20i\
+    ssue)\n\n\x0c\n\x05\x05\0\x02\0\x01\x12\x03\x0c\x02\x13\n\x0c\n\x05\x05\
+    \0\x02\0\x02\x12\x03\x0c\x16\x17\nD\n\x04\x05\0\x02\x01\x12\x03\x0f\x02\
+    \x17\x1a7\x20Indicates\x20that\x20the\x20step\x20execution\x20evaluated\
+    \x20to\x20\"true\"\n\n\x0c\n\x05\x05\0\x02\x01\x01\x12\x03\x0f\x02\x12\n\
+    \x0c\n\x05\x05\0\x02\x01\x02\x12\x03\x0f\x15\x16\nE\n\x04\x05\0\x02\x02\
+    \x12\x03\x12\x02\x18\x1a8\x20Indicates\x20that\x20the\x20step\x20executi\
+    on\x20evaluated\x20to\x20\"false\"\n\n\x0c\n\x05\x05\0\x02\x02\x01\x12\
+    \x03\x12\x02\x13\n\x0c\n\x05\x05\0\x02\x02\x02\x12\x03\x12\x16\x17\n\xd6\
+    \x01\n\x04\x05\0\x02\x03\x12\x03\x17\x02\x18\x1a\xc8\x01\x20Indicates\
+    \x20that\x20the\x20SDK\x20encountered\x20an\x20error\x20while\x20trying\
+    \x20to\x20process\x20the\n\x20request.\x20Example\x20error\x20cases:\x20\
+    SDK\x20can't\x20find\x20the\x20appropriate\x20Wasm\x20module,\n\x20Wasm\
+    \x20function\x20cannot\x20alloc\x20or\x20dealloc\x20memory,\x20etc.\n\n\
+    \x0c\n\x05\x05\0\x02\x03\x01\x12\x03\x17\x02\x13\n\x0c\n\x05\x05\0\x02\
+    \x03\x02\x12\x03\x17\x16\x17\n\xb1\x01\n\x04\x05\0\x02\x04\x12\x03\x1c\
+    \x02\x1a\x1a\xa3\x01\x20Indicates\x20that\x20the\x20step\x20was\x20skipp\
+    ed;\x20this\x20status\x20is\x20set\x20when\x20the\x20SDK\x20is\n\x20conf\
+    igured\x20with\x20sampling\x20and\x20a\x20.Process()\x20was\x20called\
+    \x20on\x20a\x20message\x20that\n\x20was\x20sampled\x20out.\n\n\x0c\n\x05\
+    \x05\0\x02\x04\x01\x12\x03\x1c\x02\x15\n\x0c\n\x05\x05\0\x02\x04\x02\x12\
+    \x03\x1c\x18\x19\n\n\n\x02\x05\x01\x12\x04\x1f\0,\x01\n\n\n\x03\x05\x01\
+    \x01\x12\x03\x1f\x05\x0c\n\x0b\n\x04\x05\x01\x02\0\x12\x03\x20\x02\x15\n\
+    \x0c\n\x05\x05\x01\x02\0\x01\x12\x03\x20\x02\x10\n\x0c\n\x05\x05\x01\x02\
+    \0\x02\x12\x03\x20\x13\x14\n\xb1\x01\n\x04\x05\x01\x02\x01\x12\x03%\x02\
+    \x14\x1a\xa3\x01\x20Process()\x20will\x20handle\x20the\x20message\x20inl\
+    ine.\n\x20This\x20method\x20should\x20be\x20used\x20when\x20you\x20need\
+    \x20to\x20modify\x20the\x20input\x20data\x20and\x20pass\n\x20the\x20modi\
+    fied\x20data\x20back\x20to\x20your\x20application\n\n\x0c\n\x05\x05\x01\
+    \x02\x01\x01\x12\x03%\x02\x0f\n\x0c\n\x05\x05\x01\x02\x01\x02\x12\x03%\
+    \x12\x13\n\x93\x02\n\x04\x05\x01\x02\x02\x12\x03+\x02\x15\x1a\x85\x02\
+    \x20Process()\x20will\x20handle\x20the\x20message\x20asynchronously\x20i\
+    n\x20a\x20worker.\n\x20The\x20SDKResponse\x20will\x20not\x20contain\x20a\
+    ny\x20modified\x20data.\x20This\x20mode\x20should\n\x20only\x20be\x20use\
+    d\x20when\x20you\x20don't\x20need\x20to\x20modify\x20and\x20pass\x20it\
+    \x20back\x20to\x20your\n\x20application,\x20such\x20as\x20when\x20discov\
+    ering/monitoring\x20PII\x20only\n\n\x0c\n\x05\x05\x01\x02\x02\x01\x12\
+    \x03+\x02\x10\n\x0c\n\x05\x05\x01\x02\x02\x02\x12\x03+\x13\x14\n5\n\x02\
+    \x04\0\x12\x04/\0I\x01\x1a)\x20Common\x20return\x20response\x20used\x20b\
+    y\x20all\x20SDKs\n\n\n\n\x03\x04\0\x01\x12\x03/\x08\x13\n9\n\x04\x04\0\
+    \x02\0\x12\x031\x02\x11\x1a,\x20Contains\x20(potentially)\x20modified\
+    \x20input\x20data\n\n\x0c\n\x05\x04\0\x02\0\x05\x12\x031\x02\x07\n\x0c\n\
+    \x05\x04\0\x02\0\x01\x12\x031\x08\x0c\n\x0c\n\x05\x04\0\x02\0\x03\x12\
+    \x031\x0f\x10\n0\n\x04\x04\0\x02\x01\x12\x034\x02\x18\x1a#\x20Execution\
+    \x20status\x20of\x20the\x20last\x20step\n\n\x0c\n\x05\x04\0\x02\x01\x06\
+    \x12\x034\x02\x0c\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x034\r\x13\n\x0c\n\
+    \x05\x04\0\x02\x01\x03\x12\x034\x16\x17\nN\n\x04\x04\0\x02\x02\x12\x037\
+    \x02%\x1aA\x20Optional\x20message\x20accompanying\x20the\x20exec\x20stat\
+    us\x20for\x20the\x20last\x20step\n\n\x0c\n\x05\x04\0\x02\x02\x04\x12\x03\
+    7\x02\n\n\x0c\n\x05\x04\0\x02\x02\x05\x12\x037\x0b\x11\n\x0c\n\x05\x04\0\
+    \x02\x02\x01\x12\x037\x12\x20\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x037#$\n\
+    V\n\x04\x04\0\x02\x03\x12\x03:\x02.\x1aI\x20An\x20array\x20of\x20pipelin\
+    es\x20that\x20the\x20SDK\x20executed\x20and\x20the\x20status\x20of\x20ea\
+    ch\x20step\n\n\x0c\n\x05\x04\0\x02\x03\x04\x12\x03:\x02\n\n\x0c\n\x05\
+    \x04\0\x02\x03\x06\x12\x03:\x0b\x19\n\x0c\n\x05\x04\0\x02\x03\x01\x12\
+    \x03:\x1a)\n\x0c\n\x05\x04\0\x02\x03\x03\x12\x03:,-\n\x92\x03\n\x04\x04\
+    \0\x02\x04\x12\x03D\x02#\x1a\x84\x03\x20Includes\x20any\x20metadata\x20t\
+    hat\x20the\x20step(s)\x20may\x20want\x20to\x20pass\x20back\x20to\x20the\
+    \x20user.\n\n\x20NOTE:\x20Metadata\x20is\x20aggregated\x20across\x20all\
+    \x20steps\x20in\x20the\x20pipeline,\x20so\x20if\x20two\n\x20steps\x20bot\
+    h\x20set\x20a\x20key\x20\"foo\"\x20to\x20different\x20values,\x20the\x20\
+    value\x20of\x20\"foo\"\x20in\x20the\n\x20response\x20will\x20be\x20the\
+    \x20value\x20set\x20by\x20the\x20last\x20step\x20in\x20the\x20pipeline.\
+    \n\n\x20To\x20learn\x20more\x20about\x20\"metadata\",\x20see\x20SDK\x20S\
+    pec\x20V2\x20doc\x20\"Pipeline\x20Step\x20&\x20Error\n\x20Behavior\"\x20\
+    section.\n\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03D\x02\x15\n\x0c\n\x05\
+    \x04\0\x02\x04\x01\x12\x03D\x16\x1e\n\x0c\n\x05\x04\0\x02\x04\x03\x12\
+    \x03D!\"\n\x91\x01\n\x04\x04\0\x02\x05\x12\x03H\x02\x17\x1a\x83\x01\x20S\
+    DKMode\x20is\x20purely\x20an\x20informative\x20field\x20that\x20tells\
+    \x20the\x20user\x20the\x20mode\x20that\x20the\n\x20SDK\x20was\x20running\
+    \x20in\x20when\x20the\x20response\x20was\x20generated.\n\n\x0c\n\x05\x04\
+    \0\x02\x05\x06\x12\x03H\x02\t\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03H\n\
+    \x12\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03H\x15\x16\n\n\n\x02\x04\x01\
+    \x12\x04K\0T\x01\n\n\n\x03\x04\x01\x01\x12\x03K\x08\x16\n!\n\x04\x04\x01\
+    \x02\0\x12\x03M\x02\x10\x1a\x14\x20ID\x20of\x20the\x20pipeline\n\n\x0c\n\
+    \x05\x04\x01\x02\0\x05\x12\x03M\x02\x08\n\x0c\n\x05\x04\x01\x02\0\x01\
+    \x12\x03M\t\x0b\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03M\x0e\x0f\n'\n\x04\
+    \x04\x01\x02\x01\x12\x03P\x02\x12\x1a\x1a\x20The\x20name\x20of\x20the\
+    \x20pipeline\n\n\x0c\n\x05\x04\x01\x02\x01\x05\x12\x03P\x02\x08\n\x0c\n\
+    \x05\x04\x01\x02\x01\x01\x12\x03P\t\r\n\x0c\n\x05\x04\x01\x02\x01\x03\
+    \x12\x03P\x10\x11\n6\n\x04\x04\x01\x02\x02\x12\x03S\x02&\x1a)\x20The\x20\
+    status\x20of\x20each\x20step\x20in\x20the\x20pipeline\n\n\x0c\n\x05\x04\
+    \x01\x02\x02\x04\x12\x03S\x02\n\n\x0c\n\x05\x04\x01\x02\x02\x06\x12\x03S\
+    \x0b\x15\n\x0c\n\x05\x04\x01\x02\x02\x01\x12\x03S\x16!\n\x0c\n\x05\x04\
+    \x01\x02\x02\x03\x12\x03S$%\n\n\n\x02\x04\x02\x12\x04V\0f\x01\n\n\n\x03\
+    \x04\x02\x01\x12\x03V\x08\x12\n#\n\x04\x04\x02\x02\0\x12\x03X\x02\x12\
+    \x1a\x16\x20The\x20name\x20of\x20the\x20step\n\n\x0c\n\x05\x04\x02\x02\0\
+    \x05\x12\x03X\x02\x08\n\x0c\n\x05\x04\x02\x02\0\x01\x12\x03X\t\r\n\x0c\n\
+    \x05\x04\x02\x02\0\x03\x12\x03X\x10\x11\n3\n\x04\x04\x02\x02\x01\x12\x03\
+    [\x02\x18\x1a&\x20Execution\x20outcome\x20status\x20of\x20the\x20step\n\
+    \n\x0c\n\x05\x04\x02\x02\x01\x06\x12\x03[\x02\x0c\n\x0c\n\x05\x04\x02\
+    \x02\x01\x01\x12\x03[\r\x13\n\x0c\n\x05\x04\x02\x02\x01\x03\x12\x03[\x16\
+    \x17\n<\n\x04\x04\x02\x02\x02\x12\x03^\x02%\x1a/\x20Optional\x20message\
+    \x20accompanying\x20the\x20exec\x20status\n\n\x0c\n\x05\x04\x02\x02\x02\
+    \x04\x12\x03^\x02\n\n\x0c\n\x05\x04\x02\x02\x02\x05\x12\x03^\x0b\x11\n\
+    \x0c\n\x05\x04\x02\x02\x02\x01\x12\x03^\x12\x20\n\x0c\n\x05\x04\x02\x02\
+    \x02\x03\x12\x03^#$\n\xf0\x01\n\x04\x04\x02\x02\x03\x12\x03e\x02%\x1a\
+    \xe2\x01\x20Indicates\x20if\x20current\x20or\x20all\x20future\x20pipelin\
+    es\x20were\x20aborted.\n\n\x20IMPORTANT:\x20The\x20SDK\x20running\x20int\
+    o\x20an\x20error\x20does\x20not\x20automatically\x20abort\n\x20current\
+    \x20or\x20all\x20future\x20pipelines\x20-\x20the\x20user\x20must\x20defi\
+    ne\x20the\x20abort\x20conditions\n\x20for\x20\"on_error\".\n\n\x0c\n\x05\
+    \x04\x02\x02\x03\x06\x12\x03e\x02\x10\n\x0c\n\x05\x04\x02\x02\x03\x01\
+    \x12\x03e\x11\x20\n\x0c\n\x05\x04\x02\x02\x03\x03\x12\x03e#$b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
@@ -792,8 +913,9 @@ pub fn file_descriptor() -> &'static ::protobuf::reflect::FileDescriptor {
             messages.push(SDKResponse::generated_message_descriptor_data());
             messages.push(PipelineStatus::generated_message_descriptor_data());
             messages.push(StepStatus::generated_message_descriptor_data());
-            let mut enums = ::std::vec::Vec::with_capacity(1);
+            let mut enums = ::std::vec::Vec::with_capacity(2);
             enums.push(ExecStatus::generated_enum_descriptor_data());
+            enums.push(SDKMode::generated_enum_descriptor_data());
             ::protobuf::reflect::GeneratedFileDescriptor::new_generated(
                 file_descriptor_proto(),
                 deps,
