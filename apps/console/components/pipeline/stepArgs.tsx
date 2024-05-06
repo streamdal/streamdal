@@ -8,6 +8,9 @@ import { Tooltip } from "../tooltip/tooltip.tsx";
 import { FormSelect } from "../form/formSelect.tsx";
 import { titleCase } from "../../lib/utils.ts";
 import { nArgTypes, oneArgTypes } from "root/components/pipeline/pipeline.ts";
+import { RadioGroup } from "../form/radioGroup.tsx";
+import React from "react";
+import { DetectiveTypePIIKeywordMode } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 
 export const argTypes = [...oneArgTypes, ...nArgTypes];
 
@@ -44,13 +47,22 @@ export const StepArg = (
 export const StepArgs = (
   { stepIndex, type, data, setData, errors }: StepArgsType,
 ) => {
+  console.log("Step args type:", type);
+  console.log("Step data:", data.steps[stepIndex]);
+  console.log("Step set data:", setData);
+
   //
   // Peek into step to see how many args there are so we
   // can tell the ui how many args to render initially
   const length = data?.steps[stepIndex]
     ?.step[data?.steps[stepIndex]?.step?.oneofKind]?.args?.length || 1;
 
+  console.log("Length: ", length);
+
   const [args, setArgs] = useState(Array.from({ length }, (v, k) => k));
+
+  console.log("Args: ", args);
+  console.log("setArgs: ", setArgs);
 
   return type === "IS_TYPE"
     ? (
@@ -71,6 +83,18 @@ export const StepArgs = (
           ))}
       />
     )
+    : type === "PII_KEYWORD"
+      ? (
+        <RadioGroup
+          name={`steps.0.step.detective.piiKeywordMode`}
+          data={data}
+          errors={errors}
+          options={{
+            [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Performance",
+            [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
+          }}
+        />
+      )
     : oneArgTypes.filter((a: string) =>
         !["STRING_CONTAINS_ANY", "STRING_CONTAINS_ALL"].includes(a)
       ).includes(type)

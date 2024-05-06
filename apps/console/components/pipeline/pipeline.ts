@@ -21,6 +21,7 @@ import { HttpRequestMethod } from "streamdal-protos/protos/steps/sp_steps_httpre
 import { numeric, repeatable, text } from "../form/validate.ts";
 import { isNumeric } from "../../lib/utils.ts";
 import { z } from "zod/mod.ts";
+import { DetectiveTypePIIKeywordMode } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 
 export const oneArgTypes: (keyof typeof DetectiveType)[] = [
   "STRING_EQUAL",
@@ -37,6 +38,7 @@ export const oneArgTypes: (keyof typeof DetectiveType)[] = [
   "NUMERIC_MIN",
   "NUMERIC_MAX",
   "IS_TYPE",
+  "PII_KEYWORD",
 ];
 
 export const nArgTypes: (keyof typeof DetectiveType)[] = [
@@ -92,6 +94,7 @@ const KVActionTypeEnum = z.nativeEnum(KVAction);
 const KVModeTypeEnum = z.nativeEnum(KVMode);
 const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
 const HTTPBodyModeEnum = z.nativeEnum(HttpRequestBodyMode);
+const PIIKeywordModeEnum = z.nativeEnum(DetectiveTypePIIKeywordMode);
 const NotificationPayloadTypeEnum = z.nativeEnum(
   PipelineStepNotification_PayloadType,
 );
@@ -183,6 +186,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         path: z.string(),
         args: repeatable(z.array(z.string()).default([])),
         type: numeric(DetectiveTypeEnum),
+        piiKeywordMode: numeric(PIIKeywordModeEnum.default(DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET)).optional(),
         negate: z.boolean().default(false),
       })
       .superRefine((detective, ctx) => {
