@@ -57,6 +57,13 @@ export interface SDKResponse {
     metadata: {
         [key: string]: string;
     };
+    /**
+     * SDKMode is purely an informative field that tells the user the mode that the
+     * SDK was running in when the response was generated.
+     *
+     * @generated from protobuf field: protos.SDKMode sdk_mode = 6;
+     */
+    sdkMode: SDKMode;
 }
 /**
  * @generated from protobuf message protos.PipelineStatus
@@ -144,7 +151,41 @@ export enum ExecStatus {
      *
      * @generated from protobuf enum value: EXEC_STATUS_ERROR = 3;
      */
-    ERROR = 3
+    ERROR = 3,
+    /**
+     * Indicates that the step was skipped; this status is set when the SDK is
+     * configured with sampling and a .Process() was called on a message that
+     * was sampled out.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_SKIPPED = 4;
+     */
+    SKIPPED = 4
+}
+/**
+ * @generated from protobuf enum protos.SDKMode
+ */
+export enum SDKMode {
+    /**
+     * @generated from protobuf enum value: SDK_MODE_UNSET = 0;
+     */
+    SDK_MODE_UNSET = 0,
+    /**
+     * Process() will handle the message inline.
+     * This method should be used when you need to modify the input data and pass
+     * the modified data back to your application
+     *
+     * @generated from protobuf enum value: SDK_MODE_SYNC = 1;
+     */
+    SDK_MODE_SYNC = 1,
+    /**
+     * Process() will handle the message asynchronously in a worker.
+     * The SDKResponse will not contain any modified data. This mode should
+     * only be used when you don't need to modify and pass it back to your
+     * application, such as when discovering/monitoring PII only
+     *
+     * @generated from protobuf enum value: SDK_MODE_ASYNC = 2;
+     */
+    SDK_MODE_ASYNC = 2
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class SDKResponse$Type extends MessageType<SDKResponse> {
@@ -154,11 +195,12 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
             { no: 2, name: "status", kind: "enum", T: () => ["protos.ExecStatus", ExecStatus, "EXEC_STATUS_"] },
             { no: 3, name: "status_message", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "pipeline_status", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStatus },
-            { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } }
+            { no: 5, name: "metadata", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 9 /*ScalarType.STRING*/ } },
+            { no: 6, name: "sdk_mode", kind: "enum", T: () => ["protos.SDKMode", SDKMode] }
         ]);
     }
     create(value?: PartialMessage<SDKResponse>): SDKResponse {
-        const message = { data: new Uint8Array(0), status: 0, pipelineStatus: [], metadata: {} };
+        const message = { data: new Uint8Array(0), status: 0, pipelineStatus: [], metadata: {}, sdkMode: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<SDKResponse>(this, message, value);
@@ -183,6 +225,9 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
                     break;
                 case /* map<string, string> metadata */ 5:
                     this.binaryReadMap5(message.metadata, reader, options);
+                    break;
+                case /* protos.SDKMode sdk_mode */ 6:
+                    message.sdkMode = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -227,6 +272,9 @@ class SDKResponse$Type extends MessageType<SDKResponse> {
         /* map<string, string> metadata = 5; */
         for (let k of Object.keys(message.metadata))
             writer.tag(5, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).string(message.metadata[k]).join();
+        /* protos.SDKMode sdk_mode = 6; */
+        if (message.sdkMode !== 0)
+            writer.tag(6, WireType.Varint).int32(message.sdkMode);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

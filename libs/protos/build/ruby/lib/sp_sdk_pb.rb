@@ -13,6 +13,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       proto3_optional :status_message, :string, 3
       repeated :pipeline_status, :message, 4, "protos.PipelineStatus"
       map :metadata, :string, :string, 5
+      optional :sdk_mode, :enum, 6, "protos.SDKMode"
     end
     add_message "protos.PipelineStatus" do
       optional :id, :string, 1
@@ -30,6 +31,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :EXEC_STATUS_TRUE, 1
       value :EXEC_STATUS_FALSE, 2
       value :EXEC_STATUS_ERROR, 3
+      value :EXEC_STATUS_SKIPPED, 4
+    end
+    add_enum "protos.SDKMode" do
+      value :SDK_MODE_UNSET, 0
+      value :SDK_MODE_SYNC, 1
+      value :SDK_MODE_ASYNC, 2
     end
   end
 end
@@ -40,5 +47,6 @@ module Streamdal
     PipelineStatus = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PipelineStatus").msgclass
     StepStatus = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.StepStatus").msgclass
     ExecStatus = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.ExecStatus").enummodule
+    SDKMode = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.SDKMode").enummodule
   end
 end
