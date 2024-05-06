@@ -22,6 +22,11 @@ enum ExecStatus {
   // request. Example error cases: SDK can't find the appropriate Wasm module,
   // Wasm function cannot alloc or dealloc memory, etc.
   EXEC_STATUS_ERROR = 3;
+
+  // Indicates that the step was skipped; this status is set when the SDK is
+  // configured with sampling and a .Process() was called on a message that
+  // was sampled out.
+  EXEC_STATUS_SKIPPED = 4;
 }
 
 // Common return response used by all SDKs
@@ -47,6 +52,17 @@ message SDKResponse {
   // To learn more about "metadata", see SDK Spec V2 doc "Pipeline Step & Error
   // Behavior" section.
   map<string, string> metadata = 5;
+
+  // SDKMode is purely an informative field that tells the user the mode that the
+  // SDK was running in when the response was generated.
+  SDKMode sdk_mode = 6;
+}
+
+// protolint:disable:next ENUM_FIELD_NAMES_PREFIX
+enum SDKMode {
+  SDK_MODE_UNSET = 0;
+  SDK_MODE_SYNC = 1;
+  SDK_MODE_ASYNC = 2;
 }
 
 message PipelineStatus {
