@@ -44,6 +44,11 @@ type OperationType int
 // ClientType is used to indicate if this library is being used by a shim or directly (as an SDK)
 type ClientType int
 
+// SDKMode is how Process() will handle messages
+// ModeSync = Process() will block until the pipeline is complete
+// ModeAsync = Process() will return immediately and the pipeline will run in the background
+type SDKMode int
+
 // ProcessResponse is the response struct from a Process() call
 type ProcessResponse protos.SDKResponse
 
@@ -62,6 +67,8 @@ const (
 	// if SamplingEnabled is set to true and SamplingIntervalSeconds is not specified in the config
 	DefaultSamplingIntervalSeconds = 1
 
+	DefaultModeAsyncWorkers = 3
+
 	// ReconnectSleep determines the length of time to wait between reconnect attempts to streamdal server©
 	ReconnectSleep = time.Second * 5
 
@@ -77,6 +84,9 @@ const (
 	// type of operation the Process() call is performing.
 	OperationTypeConsumer OperationType = 1
 	OperationTypeProducer OperationType = 2
+
+	ModeSync  SDKMode = SDKMode(protos.SDKMode_SDK_MODE_SYNC)
+	ModeAsync SDKMode = SDKMode(protos.SDKMode_SDK_MODE_ASYNC)
 
 	AbortAllStr     = "aborted all pipelines"
 	AbortCurrentStr = "aborted current pipeline"
@@ -143,6 +153,8 @@ type Streamdal struct {
 
 	// Sampling rate limiter, uses token bucket algo
 	limiter *rate.Limiter
+
+	asyncCh chan *ProcessRequest
 
 	// Set to true when .Close() is called; used to prevent calling .Process()
 	// when library instance is stopped.
@@ -219,6 +231,13 @@ type Config struct {
 
 	// SamplingIntervalSeconds is the interval at which sampling will be done
 	SamplingIntervalSeconds int
+
+	// SDKMode is how Process() will handle messages.
+	// ModeSync = Process() will block until the pipeline is complete
+	// ModeAsync = Process() will return immediately and the pipeline will run in the background via workers
+	Mode SDKMode
+
+	ModeAsyncNumWorkers int
 }
 
 // ProcessRequest is used to maintain a consistent API for the Process() call
@@ -331,6 +350,12 @@ func New(cfg *Config) (*Streamdal, error) {
 	case err := <-errCh:
 		return nil, errors.Wrap(err, "received error on startup")
 	case <-time.After(time.Second * 5):
+		// Start async workers if necessary
+		if cfg.Mode == ModeAsync {
+			s.asyncCh = make(chan *ProcessRequest, cfg.ModeAsyncNumWorkers*10)
+			s.startAsyncWorkers()
+		}
+
 		return s, nil
 	}
 }
@@ -419,6 +444,15 @@ func validateConfig(cfg *Config) error {
 		if cfg.SamplingIntervalSeconds == 0 {
 			cfg.SamplingIntervalSeconds = DefaultSamplingIntervalSeconds
 		}
+	}
+
+	// Default to sync mode if none is specified
+	if cfg.Mode == 0 {
+		cfg.Mode = ModeSync
+	}
+
+	if cfg.ModeAsyncNumWorkers == 0 {
+		cfg.ModeAsyncNumWorkers = DefaultModeAsyncWorkers
 	}
 
 	return nil
@@ -616,8 +650,52 @@ func newAudience(req *ProcessRequest, cfg *Config) *protos.Audience {
 		OperationName: req.OperationName,
 	}
 }
-
 func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessResponse {
+	switch s.config.Mode {
+	case ModeSync:
+		return s.processSync(ctx, req)
+	case ModeAsync:
+		s.asyncCh <- req
+		return &ProcessResponse{
+			Status:         ExecStatusTrue,
+			StatusMessage:  proto.String("queued message for async processing"),
+			Data:           req.Data,
+			PipelineStatus: make([]*protos.PipelineStatus, 0),
+			Metadata:       make(map[string]string),
+		}
+	default:
+		return &ProcessResponse{
+			Status:         ExecStatusError,
+			StatusMessage:  proto.String(fmt.Sprintf("unknown SDK mode '%d'", s.config.Mode)),
+			Data:           req.Data,
+			PipelineStatus: make([]*protos.PipelineStatus, 0),
+			Metadata:       make(map[string]string),
+		}
+	}
+}
+
+func (s *Streamdal) startAsyncWorkers() {
+	for i := 1; i <= s.config.ModeAsyncNumWorkers; i++ {
+		go s.runAsyncWorker(i)
+	}
+}
+
+func (s *Streamdal) runAsyncWorker(workerID int) {
+	s.config.Logger.Debugf("starting async worker '%d'", workerID)
+
+	for {
+		select {
+		case <-s.config.ShutdownCtx.Done():
+			s.config.Logger.Debugf("async worker '%d' shutting down", workerID)
+			return
+		case req := <-s.asyncCh:
+			s.config.Logger.Debugf("async worker '%d' processing request", workerID)
+			s.processSync(s.config.ShutdownCtx, req)
+		}
+	}
+}
+
+func (s *Streamdal) processSync(ctx context.Context, req *ProcessRequest) *ProcessResponse {
 	if s.closed {
 		return &ProcessResponse{
 			Data:          req.Data,

@@ -245,7 +245,7 @@ var _ = Describe("Streamdal", func() {
 
 	Context("Process", func() {
 		It("return error when process request is nil", func() {
-			s := &Streamdal{}
+			s := &Streamdal{config: &Config{Mode: ModeSync}}
 			resp := s.Process(context.Background(), nil)
 
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_ERROR))
@@ -310,7 +310,7 @@ var _ = Describe("Streamdal", func() {
 		It("fails to process when closed property is set", func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			s := &Streamdal{cancelFunc: cancel}
+			s := &Streamdal{cancelFunc: cancel, config: &Config{Mode: ModeSync}}
 			s.Close()
 
 			resp := s.Process(ctx, &ProcessRequest{
@@ -554,6 +554,7 @@ func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipelin
 			Logger:          &logger.TinyLogger{},
 			StepTimeout:     time.Millisecond * 10,
 			PipelineTimeout: time.Millisecond * 100,
+			Mode:            ModeSync,
 		},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		tails:        map[string]map[string]*Tail{},
