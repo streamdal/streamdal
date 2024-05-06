@@ -663,6 +663,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 			Data:           req.Data,
 			PipelineStatus: make([]*protos.PipelineStatus, 0),
 			Metadata:       make(map[string]string),
+			SdkMode:        protos.SDKMode(s.config.Mode),
 		}
 	default:
 		return &ProcessResponse{
@@ -671,6 +672,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 			Data:           req.Data,
 			PipelineStatus: make([]*protos.PipelineStatus, 0),
 			Metadata:       make(map[string]string),
+			SdkMode:        protos.SDKMode(s.config.Mode),
 		}
 	}
 }
@@ -697,27 +699,24 @@ func (s *Streamdal) runAsyncWorker(workerID int) {
 }
 
 func (s *Streamdal) processSync(ctx context.Context, req *ProcessRequest, workerID int) *ProcessResponse {
-	if s.closed {
-		return &ProcessResponse{
-			Data:          req.Data,
-			Status:        ExecStatusError,
-			StatusMessage: proto.String(ErrClosedClient.Error()),
-		}
-	}
-
-	if !s.shouldProcess() {
-		return &ProcessResponse{
-			Data:           req.Data,
-			Status:         ExecStatusSkipped,
-			StatusMessage:  proto.String("skipped processing due to sampling rate"),
-			PipelineStatus: make([]*protos.PipelineStatus, 0),
-			Metadata:       make(map[string]string),
-		}
-	}
-
 	resp := &ProcessResponse{
 		PipelineStatus: make([]*protos.PipelineStatus, 0),
 		Metadata:       make(map[string]string),
+		SdkMode:        protos.SDKMode(s.config.Mode),
+	}
+
+	if s.closed {
+		resp.Status = ExecStatusError
+		resp.StatusMessage = proto.String(ErrClosedClient.Error())
+		return resp
+	}
+
+	if !s.shouldProcess() {
+		resp.Data = req.Data
+		resp.Status = ExecStatusSkipped
+		resp.StatusMessage = proto.String("skipped processing due to sampling rate")
+
+		return resp
 	}
 
 	if err := validateProcessRequest(req); err != nil {
