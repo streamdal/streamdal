@@ -321,9 +321,14 @@ export default function PipelineDetail({
                                     data={data}
                                     errors={errors}
                                     options={{
-                                        [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Unset",
+                                        [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Performance",
                                         [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
                                     }}
+                                    tooltip={`PII Keyword Match Mode\n
+                                      'Performance' == fast hashmap lookup
+                                      'Accuracy' == thorough field analysis\n
+                                      
+                                      https://docs.streamdal.com/foo`}
                                 />
                             )}
                           <div>
