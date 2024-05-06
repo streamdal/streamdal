@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
@@ -20,6 +21,9 @@ import (
 func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length int32) uint64 {
 	request := &protos.WASMRequest{}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
 	if err := helper.ReadRequestFromMemory(module, request, ptr, length); err != nil {
 		return httpRequestResponse(module, http.StatusInternalServerError, "unable to read HTTP request params: "+err.Error(), nil)
 	}
@@ -31,10 +35,20 @@ func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length
 		return httpRequestResponse(module, http.StatusInternalServerError, err.Error(), nil)
 	}
 
-	httpReq, err := http.NewRequest(methodFromProto(req.Method), req.Url, reqBody)
+	httpReq, err := http.NewRequestWithContext(ctx, methodFromProto(req.Method), req.Url, reqBody)
 	if err != nil {
 		err = errors.Wrap(err, "unable to create http request")
 		return httpRequestResponse(module, http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	// Set headers
+	for k, v := range req.Headers {
+		httpReq.Header.Set(k, v)
+	}
+
+	// Default content-type to JSON if not set and body is probably JSON
+	if len(req.Body) > 0 && req.Body[0] == '{' && httpReq.Header.Get("Content-Type") == "" {
+		httpReq.Header.Set("Content-Type", "application/json")
 	}
 
 	resp, err := http.DefaultClient.Do(httpReq)
@@ -68,11 +82,6 @@ func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length
 func getRequestBodyForMode(request *protos.WASMRequest) (io.Reader, error) {
 	httpReq := request.Step.GetHttpRequest().Request
 
-	// If empty body, then we have nothing to do here
-	if len(httpReq.Body) == 0 {
-		return nil, nil
-	}
-
 	switch httpReq.BodyMode {
 	case steps.HttpRequestBodyMode_HTTP_REQUEST_BODY_MODE_STATIC:
 		return bytes.NewReader(httpReq.Body), nil
@@ -94,7 +103,7 @@ func getRequestBodyForMode(request *protos.WASMRequest) (io.Reader, error) {
 		m := jsonpb.Marshaler{
 			EnumsAsInts:  false,
 			EmitDefaults: true,
-			Indent:       "  ",
+			OrigName:     true,
 		}
 
 		data, err := m.MarshalToString(request.InterStepResult)
