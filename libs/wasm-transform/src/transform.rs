@@ -4,6 +4,9 @@ use serde_json::{Map, Value};
 use streamdal_gjson as gjson;
 use streamdal_gjson::Kind;
 
+const OBFUSCATED_INT: &str = "123123123";
+const OBFUSCATED_FLOAT: &str = "123123.123";
+
 #[derive(Debug)]
 pub enum TransformError {
     Generic(String),
@@ -404,9 +407,27 @@ pub fn obfuscate(req: &Request) -> Result<String, TransformError> {
         let value = gjson::get(data_as_str, dr.path.as_str());
 
         match value.kind() {
-            gjson::Kind::String => match _obfuscate(data_as_str, dr.path.as_str()) {
+            gjson::Kind::String => match _obfuscate_string(data_as_str, dr.path.as_str()) {
                 Ok(new_data) => data_as_string = new_data,
                 Err(e) => return Err(e),
+            },
+            gjson::Kind::Number => {
+                // Check if value is a float or integer
+                if value.to_string().contains('.') {
+                    match _obfuscate_number(data_as_str, dr.path.as_str(), OBFUSCATED_FLOAT) {
+                        Ok(new_data) => data_as_string = new_data,
+                        Err(e) => return Err(e),
+                    }
+                } else {
+                    // Replace with 123123123
+                    match _obfuscate_number(data_as_str, dr.path.as_str(), OBFUSCATED_INT) {
+                        Ok(new_data) => data_as_string = new_data,
+                        Err(e) => return Err(e),
+                    }
+                }
+            },
+            gjson::Kind::True | gjson::Kind::False | gjson::Kind::Null => {
+                // Do nothing for these values
             },
             _ => {
                 return Err(TransformError::Generic(format!(
@@ -420,13 +441,18 @@ pub fn obfuscate(req: &Request) -> Result<String, TransformError> {
     Ok(data_as_string)
 }
 
-fn _obfuscate(data: &str, path: &str) -> Result<String, TransformError> {
+fn _obfuscate_string(data: &str, path: &str) -> Result<String, TransformError> {
     let contents = gjson::get(data, path);
     let hashed = sha256::digest(contents.str().as_bytes());
 
     let obfuscated = format!("\"sha256:{}\"", hashed);
 
     gjson::set_overwrite(data, path, &obfuscated)
+        .map_err(|e| TransformError::Generic(format!("unable to obfuscate data: {}", e)))
+}
+
+fn _obfuscate_number(data: &str, path: &str, obfuscated: &str) -> Result<String, TransformError> {
+    gjson::set_overwrite(data, path, obfuscated)
         .map_err(|e| TransformError::Generic(format!("unable to obfuscate data: {}", e)))
 }
 
@@ -550,7 +576,9 @@ mod tests {
     "baz": {
         "qux": "quux"
     },
-    "bool": true
+    "bool": true,
+    "number_int": 30,
+    "number_float": 30.7128
 }"#;
 
     #[test]
@@ -602,7 +630,7 @@ mod tests {
     }
 
     #[test]
-    fn test_obfuscate() {
+    fn test_obfuscate_string() {
         let mut req = Request {
             data: TEST_DATA.as_bytes().to_vec(),
             paths: vec![DetectiveStepResultMatch {
@@ -633,14 +661,40 @@ mod tests {
             ..Default::default()
         }];
         assert!(obfuscate(&req).is_err());
+    }
 
-        // path not a string
-        req.paths = vec![DetectiveStepResultMatch {
-            path: "bool".to_string(),
-            value: "\"test\"".to_string().into_bytes(),
-            ..Default::default()
-        }];
-        assert!(obfuscate(&req).is_err());
+    #[test]
+    fn test_obfuscate_number() {
+        let req = Request {
+            data: TEST_DATA.as_bytes().to_vec(),
+            paths: vec![DetectiveStepResultMatch {
+                path: "number_float".to_string(),
+                ..Default::default()
+            },DetectiveStepResultMatch {
+                path: "number_int".to_string(),
+                ..Default::default()
+            }],
+            value: "*".to_string(),
+            truncate_options: None,
+            extract_options: None,
+        };
+
+        let result = obfuscate(&req).unwrap();
+
+        assert!(gjson::valid(TEST_DATA));
+        assert!(gjson::valid(&result));
+
+        let v = gjson::get(TEST_DATA, "number_float");
+        assert_eq!(v.str(), "30.7128");
+
+        let v = gjson::get(result.as_str(), "number_float");
+        assert_eq!(v.str(), OBFUSCATED_FLOAT);
+
+        let v = gjson::get(TEST_DATA, "number_int");
+        assert_eq!(v.str(), "30");
+
+        let v = gjson::get(result.as_str(), "number_int");
+        assert_eq!(v.str(), OBFUSCATED_INT);
     }
 
     #[test]
