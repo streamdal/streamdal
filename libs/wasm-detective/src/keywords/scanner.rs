@@ -194,6 +194,23 @@ impl FieldPII {
             return matches;
         }
 
+        // Don't strip underscores from key
+        // For example, "credit_card" will not match above because it will be looking for "creditcard"
+        let raw_key_name = f.key_name.to_lowercase();
+        if self.scalar_keywords.contains_key(&raw_key_name) {
+            let def = self.scalar_keywords.get(&raw_key_name).unwrap(); // safe unwrap
+
+            let m = KeywordMatch {
+                path: f.path(),
+                value: f.value.clone(),
+                confidence: def.score as f32,
+                entity: def.entity.clone(),
+            };
+
+            matches.push(m);
+            return matches;
+        }
+
         // Path keys get cleaned by path
         let cur_path_normalized = f.normalized_path();
 
