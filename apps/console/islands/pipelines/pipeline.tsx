@@ -45,7 +45,7 @@ import { ActionModal } from "../modals/actionModal.tsx";
 import IconTrash from "tabler-icons/tsx/trash.tsx";
 import IconX from "tabler-icons/tsx/x.tsx";
 import React from "react";
-import {RadioGroup} from "../../components/form/radioGroup.tsx";
+import { RadioGroup } from "../../components/form/radioGroup.tsx";
 import { DetectiveTypePIIKeywordMode } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 
 export default function PipelineDetail({
@@ -314,23 +314,30 @@ export default function PipelineDetail({
                             errors={errors}
                             children={optionsFromEnum(DetectiveType)}
                           />
-                            {/* There's a bug with type sometimes being passed as string and sometimes int... 🤷 */}
-                            {(data.steps[i].step.detective.type === "2036" || data.steps[i].step.detective.type === 2036) && (
-                                <RadioGroup
-                                    name={`steps.${i}.step.detective.piiKeywordMode`}
-                                    data={data}
-                                    errors={errors}
-                                    options={{
-                                        [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET]: "Performance",
-                                        [DetectiveTypePIIKeywordMode.DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY]: "Accuracy",
-                                    }}
-                                    tooltip={`PII Keyword Match Mode\n
+                          {/* There's a bug with type sometimes being passed as string and sometimes int... 🤷 */}
+                          {(data.steps[i].step.detective.type === "2036" ||
+                            data.steps[i].step.detective.type === 2036) && (
+                            <RadioGroup
+                              name={`steps.${i}.step.detective.piiKeywordMode`}
+                              data={data}
+                              errors={errors}
+                              options={{
+                                [
+                                  DetectiveTypePIIKeywordMode
+                                    .DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET
+                                ]: "Performance",
+                                [
+                                  DetectiveTypePIIKeywordMode
+                                    .DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY
+                                ]: "Accuracy",
+                              }}
+                              tooltip={`PII Keyword Match Mode\n
                                       'Performance' == fast hashmap lookup
                                       'Accuracy' == thorough field analysis\n
                                       
                                       https://docs.streamdal.com/foo`}
-                                />
-                            )}
+                            />
+                          )}
                           <div>
                             {argTypes.includes(
                               DetectiveType[
