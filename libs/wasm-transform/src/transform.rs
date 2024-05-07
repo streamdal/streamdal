@@ -476,14 +476,21 @@ pub fn mask(req: &Request) -> Result<String, TransformError> {
                 }
             }
             gjson::Kind::Number => {
-                let mut mask_char = req.value.chars().next().unwrap_or('0');
-                if !mask_char.is_ascii_digit() {
-                    mask_char = '0';
-                }
-
-                match _mask(data_as_str, dr.path.as_str(), mask_char, false) {
-                    Ok(new_data) => data_as_string = new_data,
-                    Err(e) => return Err(e),
+                // Re-using obfuscate here since we can't really "mask" a number
+                // We're just replacing it with a value which indicates that it
+                // was obviously something else previously
+                // Check if value is a float or integer
+                if value.to_string().contains('.') {
+                    match _obfuscate_number(data_as_str, dr.path.as_str(), OBFUSCATED_FLOAT) {
+                        Ok(new_data) => data_as_string = new_data,
+                        Err(e) => return Err(e),
+                    }
+                } else {
+                    // Replace with 123123123
+                    match _obfuscate_number(data_as_str, dr.path.as_str(), OBFUSCATED_INT) {
+                        Ok(new_data) => data_as_string = new_data,
+                        Err(e) => return Err(e),
+                    }
                 }
             }
             _ => {
