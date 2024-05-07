@@ -15,7 +15,7 @@ import { MessageType } from "@protobuf-ts/runtime";
  * @generated from protobuf message protos.steps.DetectiveStep
  */
 export interface DetectiveStep {
-    /**12
+    /**
      * @generated from protobuf field: optional string path = 1;
      */
     path?: string;
