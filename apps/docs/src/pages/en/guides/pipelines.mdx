@@ -15,32 +15,32 @@ import Changes from "@components/Misc/Changes.astro";
 
 <Changes />
 
-Between the service and the destination on the Data Graph, you will see your 
-producers and consumers (also known as readers or writers; what you assigned as 
-an operation type when configuring the [SDK](/en/core-components/sdk/)). These 
+Between the service and the destination on the Data Graph, you will see your
+producers and consumers (also known as readers or writers; what you assigned as
+an operation type when configuring the [SDK](/en/core-components/sdk/)). These
 are what you will be attaching pipelines to.
 
 ## What are Pipelines?
 
-Pipelines in Streamdal work similarly to pipelines in other products that 
-utilize step-based workflows. They are logical checks and rules data must 
-adhere to so it can continue to be processed by your applications, and 
-subsequently sent "downstream" (i.e. written to a database, or passed to 
-another application or service). 
+Pipelines in Streamdal work similarly to pipelines in other products that
+utilize step-based workflows. They are logical checks and rules data must
+adhere to so it can continue to be processed by your applications, and
+subsequently sent "downstream" (i.e. written to a database, or passed to
+another application or service).
 
-Pipelines are put together in the form of steps (which we refer to 
-interchangeably as rules), and each step has a type which determine the kinds 
+Pipelines are put together in the form of steps (which we refer to
+interchangeably as rules), and each step has a type which determine the kinds
 of actions to take on data.
 
 <RichImg src={pipelinesInfo} alt="Pipelines informative image" />
 
-You can also edit or create new pipelines by selecting an operation type (a <a href="/en/resources-support/glossary/#producer" class="pkeyword">producer</a> 
-or a <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumer</a>), 
-and clicking on Create New Pipeline or Edit Pipeline (circled on the right menu 
+You can also edit or create new pipelines by selecting an operation type (a <a href="/en/resources-support/glossary/#producer" class="pkeyword">producer</a>
+or a <a href="/en/resources-support/glossary/#consumer" class="pkeyword">consumer</a>),
+and clicking on Create New Pipeline or Edit Pipeline (circled on the right menu
 above.)
 
-On the high-level overview for [how Streamdal all works together with it's necessary components](/en/getting-started/how-streamdal-works/#how-it-all-works-together), 
-pipelines are the "transformation rules" that are sent to the server, which are 
+On the high-level overview for [how Streamdal all works together with it's necessary components](/en/getting-started/how-streamdal-works/#how-it-all-works-together),
+pipelines are the "transformation rules" that are sent to the server, which are
 then converted to <a href="/en/resources-support/glossary/#wasm" class="pkeyword">Wasm</a> modules that are pushed to the SDK.
 
 ## Step Types
@@ -55,8 +55,17 @@ then converted to <a href="/en/resources-support/glossary/#wasm" class="pkeyword
 
 ### Detective
 
-Detective is used to analyze a JSON payload. This step type accepts an 
-<span class='yhighlight'>optional</span> `path` to specifically search for, and when left empty detective will 
+Detective is used for performing various types of data analysis on `JSON`
+payloads, including but not limited to:
+
+* PII Detection
+* Data Validation
+* Key/Value Matching
+* Existence Validation
+* Data Format Checks
+
+This step type accepts an
+<span class='yhighlight'>optional</span> `path` to specifically search for, and when left empty detective will
 search the entire payload.
 
 #### Detective Types
@@ -83,10 +92,38 @@ search the entire payload.
 | PII_HEALTH | | | | |
 </div>
 
+#### PII_KEYWORD
+
+The `PII_KEYWORD` detective type will attempt to find sensitive info in JSON
+payloads by analyzing field names and their relative location in the payload.
+
+By default, this detective type will run in `Performance` mode - this mode
+normalizes field names and compares them against a PII keyword hashmap.
+The result is that "Performance" is _extremely_ fast and incurs a very small
+overhead penalty (`<0.08ms` per PII scan on a 10KB payload).
+
+The downside of "Performance" mode is that it relies on exact key and path-based
+lookups. Meaning, that if your payloads have fields like `foo_AWS_SECRET_KEY_bar`,
+"Performance" will _not_ pick up on it.
+
+**To address this, you can enable `PII_KEYWORD` to use `Accuracy` mode.**
+
+In this mode, Detective will perform hashmap based lookups, path comparison and
+lastly perform a "keyword-in-string" check. While this incurs a higher resource
+penalty cost (`~1.5ms` per PII scan on a 10KB payload), it results in _significantly_
+more accurate PII detection.
+<br/>
+<sub>NOTE: If you are concerned about the extra overhead that "Accuracy" mode
+    will incur, configure the Streamdal SDK to use `async` mode and enable `sampling`.</sub>
+
+
 <Notification type="tip">
   <img src={tip} alt="tip" width="30px" height="30px" />
   <div class="prose-md prose-p:my-2 prose-a:text-purple-dark prose-a:underline">
-    <p>Want to scan the entire payload dynamically for PII vs. specifying fields? <br /> <br /> Use `PII_ANY` for the detective step, leave the path empty, and your pipeline will detect PII anywhere in the payload!</p>
+      <p>Pro tip: There are two "catch-all" PII scanners: `PII_KEYWORD` and `PII_ANY`</p>
+
+      <p>`PII_KEYWORD` is used for scanning for PII in KEYS.</p>
+      <p>`PII_ANY` is used for scanning for PII in VALUES.</p>
   </div>
 </Notification>
 
@@ -132,12 +169,12 @@ Path is <span class='rhighlight'>required</span>.
 
 `TRUNCATE_VALUE`
 
-This transform type will truncate the object fields. Truncate length is 
+This transform type will truncate the object fields. Truncate length is
 determined by length or percentage
 
 Path is <span class='rhighlight'>required</span>.
 
-Value is <span class='rhighlight'>required</span>. 
+Value is <span class='rhighlight'>required</span>.
 
 ---
 
@@ -147,7 +184,7 @@ This transform type will extract the the object fields.
 
 Path is <span class='rhighlight'>required</span>.
 
-Extract will take only the selected paths, and drop all others. This type also 
+Extract will take only the selected paths, and drop all others. This type also
 allows you to flatten the resulting object.
 
 Example:
@@ -167,7 +204,7 @@ Example:
 }
 ```
 
-If you extract `customer.client.first_name` and `customer.address.city`, and 
+If you extract `customer.client.first_name` and `customer.address.city`, and
 select the flatten option, the resulting JSON will look like:
 
 ```json
@@ -179,21 +216,69 @@ select the flatten option, the resulting JSON will look like:
 
 ### Key/Value
 
-Key value currently operates similarly to the [Detective](#detective) type. You 
-can use this type to check against a payload for known keys. In the future, 
+Key value currently operates similarly to the [Detective](#detective) type. You
+can use this type to check against a payload for known keys. In the future,
 this type will support CRUD and DELETE_ALL operations.
 
 Key is <span class='rhighlight'>required</span>.
 
 ### Schema Validation
 
-Schema validation is self-explanatory. This type is used to validate schemas. 
-Schemas are accepted via pasting from the clipboard. We currently accept JSON 
+Schema validation is self-explanatory. This type is used to validate schemas.
+Schemas are accepted via pasting from the clipboard. We currently accept JSON
 schemas, but will accept protobuf and other binary schemas in the future.
 
 Schema is <span class='rhighlight'>required</span>.
 
 ### HTTP Request
+The `HTTP Request` step allows you to perform an outbound HTTP request if a condition is met.
+
+This step allows you to set a "Body Mode" to either `Static` or `Use Previous Step Result`.
+
+When using `Static`, the body will be sent as specified. When using `Use Previous Step Result` -
+the SDKs will construct a body that will look something like this:
+
+```json
+{
+   "detectiveResult": {
+      "matches": [
+         {
+            "type": "DETECTIVE_TYPE_PII_KEYWORD",
+            "path": "email",
+            "value": null,
+            "piiType": "Person"
+         },
+         {
+            "type": "DETECTIVE_TYPE_PII_KEYWORD",
+            "path": "password",
+            "value": null,
+            "piiType": "Credentials"
+         },
+         {
+            "type": "DETECTIVE_TYPE_PII_KEYWORD",
+            "path": "birthdate",
+            "value": null,
+            "piiType": "Person"
+         },
+         {
+            "type": "DETECTIVE_TYPE_PII_KEYWORD",
+            "path": "country",
+            "value": null,
+            "piiType": "Address"
+         }
+      ]
+   },
+   "audience": {
+      "serviceName": "signup-service",
+      "componentName": "postgresql",
+      "operationType": "OPERATION_TYPE_PRODUCER",
+      "operationName": "verifier"
+   }
+}
+```
+
+_NOTE: As of 05.2024, the only step type that can be used with `Use Previous Step Results` is `Detective`._
+
 <div style="text-align: center; width: fit-content; display: block; margin-left: auto; margin-right: auto;">
 | Allowed HTTP Methods |
 |-|
@@ -207,26 +292,26 @@ Schema is <span class='rhighlight'>required</span>.
 </div>
 URL is <span class='rhighlight'>required</span>.
 
-Request Body is <span class='rhighlight'>required</span>.
+Request Body is <span class='rhighlight'>required</span> _IF_ `PII_KEYWORD` mode is "Static".
 
-You are also able to pass key/value pairs that will be sent along as HTTP 
+You are also able to pass key/value pairs that will be sent along as HTTP
 request headers.
 
-Headers are <span class='yhighlight'>optional</span> _(but you'll probably want 
+Headers are <span class='yhighlight'>optional</span> _(but you'll probably want
 to include these in production environments)._
 
 ## Pipeline Flow control
 
-As pipelines execute, the resulting flow is determined via boolean or 
-`ERROR` results. When configuring pipelines, you can tailor each step to 
+As pipelines execute, the resulting flow is determined via boolean or
+`ERROR` results. When configuring pipelines, you can tailor each step to
 control the execution of pipelines or optimize the flow of data at every step:
 
 <img src={flowControl} alt="Pipeline Flow Control UI screenshot" />
 
-You can define how each pipeline should proceed by `Don't Abort`, 
-`Abort Current Pipeline`, `Abort All Pipelines`, adding `Metadata` (which 
-could be arbitrary keys and values that will be emitted to the calling code; 
-i.e. to enrich, categorize, or label data for downstream usage), or sending 
+You can define how each pipeline should proceed by `Don't Abort`,
+`Abort Current Pipeline`, `Abort All Pipelines`, adding `Metadata` (which
+could be arbitrary keys and values that will be emitted to the calling code;
+i.e. to enrich, categorize, or label data for downstream usage), or sending
 `Notifications`:
 
 <img src={flowControlOptions} alt="Pipeline Flow Control UI screenshot" />
@@ -240,7 +325,7 @@ i.e. to enrich, categorize, or label data for downstream usage), or sending
 
 ## Example Pipeline
 
-There are many workflows you might normally configure in a traditional data 
+There are many workflows you might normally configure in a traditional data
 pipeline. You might want to:
 
 - Ensure no PII or sensitive data is in logs
@@ -251,16 +336,16 @@ pipeline. You might want to:
 - Add automation
 - Scale services or data platform
 
-Below is an example of how you would set up a similar workflow as a Streamdal 
-pipeline in the [Console UI](/en/core-components/console-ui/). In this example, 
+Below is an example of how you would set up a similar workflow as a Streamdal
+pipeline in the [Console UI](/en/core-components/console-ui/). In this example,
 you'll see how you could use pipelines to truncate developer logs:
 
-<iframe 
-width="560" 
-height="315" 
-src="https://www.youtube.com/embed/5RQAvkPWONg?si=AQPvYOdBWK6v_DQi" 
-title="YouTube video player" 
-frameborder="0" 
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+<iframe
+width="560"
+height="315"
+src="https://www.youtube.com/embed/5RQAvkPWONg?si=AQPvYOdBWK6v_DQi"
+title="YouTube video player"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 allowfullscreen>
 </iframe>
