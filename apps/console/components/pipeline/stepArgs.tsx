@@ -8,6 +8,9 @@ import { Tooltip } from "../tooltip/tooltip.tsx";
 import { FormSelect } from "../form/formSelect.tsx";
 import { titleCase } from "../../lib/utils.ts";
 import { nArgTypes, oneArgTypes } from "root/components/pipeline/pipeline.ts";
+import { RadioGroup } from "../form/radioGroup.tsx";
+import React from "react";
+import { DetectiveTypePIIKeywordMode } from "streamdal-protos/protos/steps/sp_steps_detective.ts";
 
 export const argTypes = [...oneArgTypes, ...nArgTypes];
 

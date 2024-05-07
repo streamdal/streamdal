@@ -1,5 +1,7 @@
 import { ErrorType, resolveValue } from "./validate.ts";
 import { useState } from "preact/hooks";
+import IconInfoCircle from "tabler-icons/tsx/info-circle.tsx";
+import { Tooltip } from "../../components/tooltip/tooltip.tsx";
 
 export type RadioGroupProps = {
   name: string;
@@ -7,6 +9,7 @@ export type RadioGroupProps = {
   options: { [k: number]: string };
   errors: ErrorType;
   wrapperClass?: string;
+  tooltip?: string;
 };
 
 export const RadioGroup = ({
@@ -15,6 +18,7 @@ export const RadioGroup = ({
   options,
   errors,
   wrapperClass,
+  tooltip,
 }: RadioGroupProps) => {
   const [selected, setSelected] = useState(resolveValue(data, name) || 0);
 
@@ -40,6 +44,18 @@ export const RadioGroup = ({
             </div>
           );
         })}
+        {tooltip && (
+          <div>
+            <IconInfoCircle
+              class="w-4 h-4 ml-1"
+              data-tooltip-target={`radio-tooltip`}
+            />
+            <Tooltip
+              targetId={`radio-tooltip`}
+              message={tooltip}
+            />
+          </div>
+        )}
       </div>
       <div className="text-[12px] mt-1 font-semibold text-streamdalRed">
         {errors[name]}

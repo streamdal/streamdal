@@ -58,6 +58,11 @@ export const PipelineHTTP = (
           [HttpRequestBodyMode.UNSET]: "Static",
           [HttpRequestBodyMode.INTER_STEP_RESULT]: "Use Previous Step Result",
         }}
+        tooltip={`HTTP Body Construction\n
+            'Static' == use static body
+            'Use Previous' == body is automatically set to InterStepResult as JSON\n
+                                      
+             https://docs.streamdal.com/http-stuff`}
       />
 
       <FormTextArea
