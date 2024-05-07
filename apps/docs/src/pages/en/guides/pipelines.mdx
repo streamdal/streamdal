@@ -250,39 +250,39 @@ the SDKs will construct a body that will look something like this:
 
 ```json
 {
-   "detectiveResult": {
+   "detective_result": {
       "matches": [
          {
             "type": "DETECTIVE_TYPE_PII_KEYWORD",
             "path": "email",
             "value": null,
-            "piiType": "Person"
+            "pii_type": "Person"
          },
          {
             "type": "DETECTIVE_TYPE_PII_KEYWORD",
             "path": "password",
             "value": null,
-            "piiType": "Credentials"
+            "pii_type": "Credentials"
          },
          {
             "type": "DETECTIVE_TYPE_PII_KEYWORD",
             "path": "birthdate",
             "value": null,
-            "piiType": "Person"
+            "pii_type": "Person"
          },
          {
             "type": "DETECTIVE_TYPE_PII_KEYWORD",
             "path": "country",
             "value": null,
-            "piiType": "Address"
+            "pii_type": "Address"
          }
       ]
    },
    "audience": {
-      "serviceName": "signup-service",
-      "componentName": "postgresql",
-      "operationType": "OPERATION_TYPE_PRODUCER",
-      "operationName": "verifier"
+      "service_name": "signup-service",
+      "component_name": "postgresql",
+      "operation_type": "OPERATION_TYPE_PRODUCER",
+      "operation_name": "verifier"
    }
 }
 ```
