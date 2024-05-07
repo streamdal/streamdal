@@ -49,7 +49,7 @@ then converted to <a href="/en/resources-support/glossary/#wasm" class="pkeyword
 |-|-|
 | Detective | Used to analyze a payload |
 | Transform | Used to transform or extract data |
-| Key/Value | Used to analyze for specific key/values |
+| Key/Value | Operations against built-in distributed K/V store |
 | Schema Validation | Allows you to upload and version schemas to validate data against |
 | HTTP Request | Used for CRUD operations and multiplexing data via HTTP |
 
@@ -216,11 +216,21 @@ select the flatten option, the resulting JSON will look like:
 
 ### Key/Value
 
-Key value currently operates similarly to the [Detective](#detective) type. You
-can use this type to check against a payload for known keys. In the future,
-this type will support CRUD and DELETE_ALL operations.
+All Streamdal clients come pre-built with a "local, distributed key/value store".
 
-Key is <span class='rhighlight'>required</span>.
+"Local, distributed" is a strange term - here is what we mean:
+
+* Every Streamdal client that uses the same Streamdal cluster has a copy of the
+full key/value store that is accessible to every other Streamdal client.
+* The key/value store is stored entirely in memory.
+* Pipeline steps can modify the contents of the key/value store and these changes
+will be propagated to all other Streamdal clients.
+* Key/value does not incur ANY network hop penalty as it is stored entirely locally,
+in memory.
+
+This feature enables users to build complex pipelines that involve looking up
+dynamic data, such as "known user id's", to implement idempotency or implementing
+a dedupe strategy.
 
 ### Schema Validation
 
