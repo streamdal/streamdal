@@ -24,7 +24,7 @@ pub struct Field {
 
 impl Field {
     /// Returns the full path of a field in the JSON payload
-    pub fn path(&self) -> String {
+    pub fn normalized_path(&self) -> String {
         if self.parent_path.is_empty() {
             return self.key_name.clone().to_lowercase();
         }
@@ -33,6 +33,15 @@ impl Field {
         let cleaned: String = self.key_name.chars().filter(|&c| !c.is_numeric()).collect();
 
         format!("{}.{}", self.parent_path.join("."), cleaned.to_lowercase())
+    }
+
+    pub fn path(&self) -> String {
+        if self.parent_path.is_empty() {
+            return self.key_name.clone()
+        }
+
+        format!("{}.{}", self.parent_path.join("."), self.key_name)
+
     }
 }
 
@@ -132,6 +141,7 @@ impl FieldPII {
 
             f.pii_matches.extend(self.match_against_fields(&f, mode));
 
+
             let mut confidence_sum: f32 = 0.0;
             f.pii_matches.iter().for_each(|m| {
                 confidence_sum += m.confidence;
@@ -170,9 +180,10 @@ impl FieldPII {
         // Example key match: "token"
         //
         // O1 lookup
-        let key_name = clean_key(f.key_name.to_lowercase().as_str());
-        if self.scalar_keywords.contains_key(&key_name) {
-            let def = self.scalar_keywords.get(&key_name).unwrap(); // safe unwrap
+        let key_name_normalized = clean_key(f.key_name.to_lowercase().as_str());
+
+        if self.scalar_keywords.contains_key(&key_name_normalized) {
+            let def = self.scalar_keywords.get(&key_name_normalized).unwrap(); // safe unwrap
 
             let m = KeywordMatch {
                 path: f.path(),
@@ -186,7 +197,7 @@ impl FieldPII {
         }
 
         // Path keys get cleaned by path
-        let cur_path = f.path();
+        let cur_path_normalized = f.normalized_path();
 
         // Explicit path check here
         // We didn't match on a single key such as "cvv" or "ssn". So let's check
@@ -198,9 +209,9 @@ impl FieldPII {
         // O(1) lookup
         if self
             .path_keywords
-            .contains_key(cur_path.trim_start_matches('.'))
+            .contains_key(cur_path_normalized.trim_start_matches('.'))
         {
-            let def = self.path_keywords.get(cur_path.as_str()).unwrap(); // safe unwrap
+            let def = self.path_keywords.get(cur_path_normalized.as_str()).unwrap(); // safe unwrap
 
             let m = KeywordMatch {
                 path: f.path(),
@@ -233,9 +244,9 @@ impl FieldPII {
                 continue;
             }
 
-            if cur_path.contains(key_name.as_str()) {
+            if cur_path_normalized.contains(key_name.as_str()) {
                 let m = KeywordMatch {
-                    path: cur_path,
+                    path: f.path(),
                     value: f.value.clone(),
                     confidence: def.score as f32,
                     entity: def.entity.clone(),
@@ -256,9 +267,9 @@ impl FieldPII {
         //
         // O(n) lookup
         for (key_name, def) in &self.path_keywords {
-            if cur_path.ends_with(key_name.as_str()) {
+            if cur_path_normalized.ends_with(key_name.as_str()) {
                 let m = KeywordMatch {
-                    path: cur_path,
+                    path:  f.path(),
                     value: f.value.clone(),
                     confidence: def.score as f32,
                     entity: def.entity.clone(),

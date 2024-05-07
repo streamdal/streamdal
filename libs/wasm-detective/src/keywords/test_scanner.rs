@@ -51,6 +51,9 @@ fn run_payload(b: &mut Bencher, size: usize) {
                "state1": "OR"
            }
        ],
+       "Credit_Card": {
+            "card_number": "1234-5678-1234-5678",
+       }
        "customer_id": "abc123",
        "order_total": 100.00,
        "tax_total": 10.00,
@@ -83,6 +86,25 @@ fn run_payload(b: &mut Bencher, size: usize) {
     b.iter(|| {
         let _ = pii.scan(payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
     });
+}
+
+#[test]
+fn test_path_retention() {
+    let payload = r#"{
+       "Credit_Card": {
+            "card_number": "1234-5678-1234-5678",
+       }
+    }"#;
+
+    let keywords = get_keywords();
+    let mut pii = FieldPII::new(keywords.clone());
+
+    let results = pii.scan(payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
+
+    assert_eq!(results.len(), 1);
+    assert_eq!(results[0].path(), "Credit_Card".to_string());
+    assert_eq!(results[0].children[0].pii_matches[0].path, "Credit_Card.card_number".to_string());
+
 }
 
 #[bench]
