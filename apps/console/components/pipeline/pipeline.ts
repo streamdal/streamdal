@@ -185,7 +185,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         path: z.string(),
         args: repeatable(z.array(z.string()).default([])),
         type: numeric(DetectiveTypeEnum),
-        piiKeywordMode: numeric(PIIKeywordModeEnum),
+        piiKeywordMode: numeric(PIIKeywordModeEnum).optional(),
         negate: z.boolean().default(false),
       })
       .superRefine((detective, ctx) => {
@@ -206,9 +206,7 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
         }
 
         if (
-          oneArgTypes.includes(
-            DetectiveType[detective.type] as any,
-          ) &&
+          oneArgTypes.includes(DetectiveType[detective.type] as any) &&
           detective.args.filter((a: string) => a.trim() !== "")?.length === 0
         ) {
           ctx.addIssue({
@@ -272,8 +270,9 @@ const stepKindSchema = z.discriminatedUnion("oneofKind", [
     oneofKind: z.literal("schemaValidation"),
     schemaValidation: z.object({
       type: numeric(SchemaValidationTypeEnum),
-      condition: numeric(SchemaValidationConditionEnum)
-        .default(SchemaValidationCondition.MATCH),
+      condition: numeric(SchemaValidationConditionEnum).default(
+        SchemaValidationCondition.MATCH,
+      ),
       options: schemaValidationOptions,
     }),
   }),
@@ -330,28 +329,30 @@ const resultConditionSchema = z.object({
       z.string().min(1, { message: "Required" }),
     )
     .optional(),
-  notification: z.object({
-    notificationConfigIds: repeatable(z.array(z.string())),
-    payloadType: numeric(NotificationPayloadTypeEnum),
-    paths: repeatable(z.array(z.string())),
-  }).superRefine((notification, ctx) => {
-    if (
-      notification.payloadType ==
-        PipelineStepNotification_PayloadType.SELECT_PATHS &&
-      notification.paths.filter((a: string) => a.trim() !== "")?.length === 0
-    ) {
-      ctx.addIssue({
-        path: ["paths.0"],
-        code: z.ZodIssueCode.custom,
-        message: "Required",
-        fatal: true,
-      });
+  notification: z
+    .object({
+      notificationConfigIds: repeatable(z.array(z.string())),
+      payloadType: numeric(NotificationPayloadTypeEnum),
+      paths: repeatable(z.array(z.string())),
+    })
+    .superRefine((notification, ctx) => {
+      if (
+        notification.payloadType ==
+          PipelineStepNotification_PayloadType.SELECT_PATHS &&
+        notification.paths.filter((a: string) => a.trim() !== "")?.length === 0
+      ) {
+        ctx.addIssue({
+          path: ["paths.0"],
+          code: z.ZodIssueCode.custom,
+          message: "Required",
+          fatal: true,
+        });
 
-      return z.never;
-    }
-  }).optional().transform((v) =>
-    v?.notificationConfigIds?.length === 0 ? undefined : v
-  ),
+        return z.never;
+      }
+    })
+    .optional()
+    .transform((v) => (v?.notificationConfigIds?.length === 0 ? undefined : v)),
 });
 
 const stepSchema = z
