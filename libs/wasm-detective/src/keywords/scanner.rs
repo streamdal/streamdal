@@ -136,11 +136,9 @@ impl FieldPII {
 
                     // Field has a scalar value, set it on the match for reference
                     f.value = value.to_string();
+                    f.pii_matches.extend(self.match_against_fields(&f, mode));
                 }
             }
-
-            f.pii_matches.extend(self.match_against_fields(&f, mode));
-
 
             let mut confidence_sum: f32 = 0.0;
             f.pii_matches.iter().for_each(|m| {

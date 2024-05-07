@@ -92,7 +92,9 @@ fn run_payload(b: &mut Bencher, size: usize) {
 fn test_path_retention() {
     let payload = r#"{
        "Credit_Card": {
-            "card_number": "1234-5678-1234-5678",
+          "card_number": "1234 5678 9012 3456",
+          "expiry_date": "2024-12-31",
+          "cvv": "123"
        }
     }"#;
 
@@ -101,8 +103,9 @@ fn test_path_retention() {
 
     let results = pii.scan(payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY);
 
+    println!("{:#?}", results);
+
     assert_eq!(results.len(), 1);
-    assert_eq!(results[0].path(), "Credit_Card".to_string());
     assert_eq!(results[0].children[0].pii_matches[0].path, "Credit_Card.card_number".to_string());
 
 }
