@@ -25,6 +25,72 @@ Designed with efficiency in mind, the SDK handles metrics reporting, [pipeline](
 
 The SDK is designed to be integrated into your application as a library. Please see our [instrumentation guide](/en/guides/instrumentation/).
 
+## Synchronous Mode
+
+By default, all of the SDKs operate in **_synchronous_** mode.
+
+That is, when you perform a `.Process()` call, the call will block until
+`.Process()` completes.
+
+In most cases, this is the desired behavior as this allows you to use the
+contents of the `resp` object to potentially update your business logic,
+replace data that you're writing, inspect pipeline executions and so on.
+
+Depending on the number of configured pipelines and the complexity of the
+steps within a pipeline, the execution overhead added by pipeline execution is
+under `1ms`.
+
+## Asynchronous Mode
+
+Some SDKs (such as the Go SDK) can be configured to operate in an `async` mode.
+
+In this mode, calls to `.Process()` will **not** block and instead, the data
+provided in `*ProcessRequest` will be handled asynchronously by a pool of
+goroutines.
+
+You can enable this mode by setting
+[Config.Mode](https://github.com/streamdal/streamdal/blob/main/sdks/go/go_sdk.go#L240)
+to `ModeAsync`. The number of goroutines used for async execution can be
+adjusted by setting
+[Config.ModeAsyncNumWorkers](https://github.com/streamdal/streamdal/blob/main/sdks/go/go_sdk.go#L242)
+(default: 3).
+
+This mode is most useful if you are intending to use Streamdal to facilitate
+discovery and do not need to use the response from `.Process()` to influence
+your business logic.
+
+When in `ModeSync`, the `resp` object returned by `.Process()` calls contains
+all of the information necessary for determining the status of the execution -
+did it complete, did it run into errors, what steps were executed, metadata,
+etc. In `ModeAsync`, the only "usable" fields are `Status`, `StatusMessage`
+and `SDKMode`. All other fields will _not_ be filled out.
+
+Consider also configuring `Sampling` in the SDK to reduce the number of
+Streamdal operations that your service will perform on every payload.
+
+## Sampling
+
+The Go SDK supports sampling. Enabling sampling can prevent performance
+bottlenecks by reducing the resource load that your service would incur when
+making a `.Process()` call for every request. Sampling is ideal for high-traffic
+services where processing every request could be overly taxing.
+
+Some other situations where sampling might make sense:
+
+* You are not modifying data mid-flight
+* You are primarily interested in _discovery_
+* Your have a latency-sensitive service and cannot incur the penalty of
+performing `.Process()` calls for every request.
+
+Sampling can be configured in the Go SDK by setting the
+[Config.SamplingEnabled](https://github.com/streamdal/streamdal/blob/main/sdks/go/go_sdk.go#L229)
+bool. You can also adjust the sampling rate and the sampling interval by setting
+`Config.SamplingRate` and `Config.SamplingIntervalSeconds`.
+
+When sampling is enabled and a `.Process()` call gets sampled (ie. is a no-op),
+the returned `resp` object will have `.Status` set to `EXEC_STATUS_SKIPPED` -
+indicating that this particular request was skipped due to the sampling configuration.
+
 ## Multi-Language Support
 
 The SDK is currently available in the following languages:
