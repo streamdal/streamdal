@@ -389,8 +389,8 @@ const stepSchema = z
         path: [
           `step.transform.options.${step?.step?.transform?.options?.oneofKind}.${
             ["deleteFieldOptions", "extractOptions"].includes(
-              step?.step?.transform?.options?.oneofKind,
-            )
+                step?.step?.transform?.options?.oneofKind,
+              )
               ? "paths"
               : "path"
           }`,
