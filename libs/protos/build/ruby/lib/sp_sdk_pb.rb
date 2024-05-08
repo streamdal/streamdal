@@ -31,7 +31,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :EXEC_STATUS_TRUE, 1
       value :EXEC_STATUS_FALSE, 2
       value :EXEC_STATUS_ERROR, 3
-      value :EXEC_STATUS_SKIPPED, 4
+      value :EXEC_STATUS_ASYNC, 4
+      value :EXEC_STATUS_SAMPLING, 5
     end
     add_enum "protos.SDKMode" do
       value :SDK_MODE_UNSET, 0
