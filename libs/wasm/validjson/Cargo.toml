@@ -16,4 +16,4 @@ streamdal-gjson = "0.8.1-with-set-rename"
 
 [profile.release]
 lto = true
-
+opt-level = 'z'

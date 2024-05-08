@@ -18,3 +18,4 @@ protobuf = "3.3.0"
 
 [profile.release]
 lto = true
+opt-level = 'z'
