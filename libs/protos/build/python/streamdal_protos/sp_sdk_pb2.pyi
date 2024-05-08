@@ -6,9 +6,10 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+EXEC_STATUS_ASYNC: ExecStatus
 EXEC_STATUS_ERROR: ExecStatus
 EXEC_STATUS_FALSE: ExecStatus
-EXEC_STATUS_SKIPPED: ExecStatus
+EXEC_STATUS_SAMPLING: ExecStatus
 EXEC_STATUS_TRUE: ExecStatus
 EXEC_STATUS_UNSET: ExecStatus
 SDK_MODE_ASYNC: SDKMode
