@@ -94,10 +94,11 @@ const (
 
 	// ExecStatusTrue ExecStatusFalse ExecStatusError are used to indicate
 	// the execution status of the _last_ step in the _last_ pipeline.
-	ExecStatusTrue    = protos.ExecStatus_EXEC_STATUS_TRUE
-	ExecStatusFalse   = protos.ExecStatus_EXEC_STATUS_FALSE
-	ExecStatusError   = protos.ExecStatus_EXEC_STATUS_ERROR
-	ExecStatusSkipped = protos.ExecStatus_EXEC_STATUS_SKIPPED
+	ExecStatusTrue     = protos.ExecStatus_EXEC_STATUS_TRUE
+	ExecStatusFalse    = protos.ExecStatus_EXEC_STATUS_FALSE
+	ExecStatusError    = protos.ExecStatus_EXEC_STATUS_ERROR
+	ExecStatusAsync    = protos.ExecStatus_EXEC_STATUS_ASYNC
+	ExecStatusSampling = protos.ExecStatus_EXEC_STATUS_SAMPLING
 )
 
 var (
@@ -662,7 +663,7 @@ func (s *Streamdal) Process(ctx context.Context, req *ProcessRequest) *ProcessRe
 	case ModeAsync:
 		s.asyncCh <- req
 		return &ProcessResponse{
-			Status:         ExecStatusTrue,
+			Status:         ExecStatusAsync,
 			StatusMessage:  proto.String("queued message for async processing"),
 			Data:           req.Data,
 			PipelineStatus: make([]*protos.PipelineStatus, 0),
@@ -717,7 +718,7 @@ func (s *Streamdal) processSync(ctx context.Context, req *ProcessRequest, worker
 
 	if !s.shouldProcess() {
 		resp.Data = req.Data
-		resp.Status = ExecStatusSkipped
+		resp.Status = ExecStatusSampling
 		resp.StatusMessage = proto.String("skipped processing due to sampling rate")
 
 		return resp
