@@ -22,6 +22,7 @@ type Config struct {
 	MessageRate       []int    `kong:"help='Messages to send per second (can specify range as X,Y)',required,default='1'"`
 	DataSourceType    string   `kong:"help='Type of data source this client will use', enum='none,file',default='none'"`
 	DataSourceFile    *os.File `kong:"help='File that contains sample data - used only when DataSourceType=file'"`
+	DisplayExecTime   bool     `kong:"help='Display execution time for each message',default='false'"`
 
 	ServerAddress string `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
 	ServerToken   string `kong:"help='Streamdal server token',default='1234',required"`
