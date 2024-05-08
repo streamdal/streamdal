@@ -8,7 +8,7 @@ image:
   repository: streamdal/server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.50-ac6c708"
+  tag: "0.0.64-47495f5"
 nameOverride: "server"
 fullnameOverride: ""
 
