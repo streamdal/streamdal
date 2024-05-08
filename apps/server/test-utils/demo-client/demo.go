@@ -171,6 +171,15 @@ func (r *Demo) newClient() (*streamdal.Streamdal, error) {
 		cfg.Logger = r.log
 	}
 
+	if r.config.Async {
+		cfg.Mode = streamdal.ModeAsync
+	}
+
+	if r.config.SamplingRate > 0 {
+		cfg.SamplingEnabled = true
+		cfg.SamplingRate = r.config.SamplingRate
+	}
+
 	return streamdal.New(cfg)
 }
 
@@ -365,6 +374,10 @@ func translateStatus(status protos.ExecStatus) string {
 		return color.YellowString("FALSE")
 	case protos.ExecStatus_EXEC_STATUS_ERROR:
 		return color.RedString("ERROR")
+	case protos.ExecStatus_EXEC_STATUS_ASYNC:
+		return color.HiBlueString("ASYNC")
+	case protos.ExecStatus_EXEC_STATUS_SAMPLING:
+		return color.HiBlueString("SAMPLING")
 	default:
 		return color.HiRedString("%s", status)
 	}
