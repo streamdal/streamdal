@@ -110,12 +110,12 @@ run6:
 run7: description = PII Key word
 run7:
 	go run *.go -d \
-	--quiet \
 	--message-rate 1,10 \
 	--service-name "pii-keyword" \
 	--operation-type 2 \
 	--operation-name  "pii-service" \
 	--component-name "aws-ses" \
+	--display-exec-time \
 	--data-source-type file \
 	--data-source-file ./assets/pii-key-value.json
 

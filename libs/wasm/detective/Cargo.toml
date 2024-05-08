@@ -16,3 +16,4 @@ common = { path = "../common" }
 
 [profile.release]
 lto = true
+opt-level = 'z'

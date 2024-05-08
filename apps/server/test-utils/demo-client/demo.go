@@ -222,6 +222,8 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 			operationName = operationName + "-" + strconv.Itoa(workerID)
 		}
 
+		timeStart := time.Now()
+
 		resp := sc.Process(context.Background(), &streamdal.ProcessRequest{
 			ComponentName: r.config.ComponentName,
 			OperationType: streamdal.OperationType(r.config.OperationType),
@@ -229,11 +231,13 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 			Data:          input,
 		})
 
-		r.display(input, resp, err)
+		timeDiff := time.Now().Sub(timeStart)
+
+		r.display(input, resp, err, timeDiff)
 	}
 }
 
-func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
+func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error, timeDiff time.Duration) {
 	tw := gopretty.NewWriter()
 	tw.Style().Box = gopretty.StyleBoxDouble
 	now := time.Now().Format(time.RFC1123)
@@ -255,6 +259,10 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error) {
 	tw.AppendRow(gopretty.Row{bold("Date"), now})
 	tw.AppendRow(gopretty.Row{bold("Last Status"), status})
 	tw.AppendRow(gopretty.Row{bold("Last Status Message"), message})
+
+	if r.config.DisplayExecTime {
+		tw.AppendRow(gopretty.Row{bold("Execution Time"), timeDiff})
+	}
 
 	// If not quiet, display metadata and pipeline debug info
 	if !r.config.Quiet {
