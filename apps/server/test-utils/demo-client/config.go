@@ -23,6 +23,8 @@ type Config struct {
 	DataSourceType    string   `kong:"help='Type of data source this client will use', enum='none,file',default='none'"`
 	DataSourceFile    *os.File `kong:"help='File that contains sample data - used only when DataSourceType=file'"`
 	DisplayExecTime   bool     `kong:"help='Display execution time for each message',default='false'"`
+	Async             bool     `kong:"help='Use async mode in go-sdk',default='false'"`
+	SamplingRate      int      `kong:"help='Enable sampling and sample rate in go-sdk',default='0'"`
 
 	ServerAddress string `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
 	ServerToken   string `kong:"help='Streamdal server token',default='1234',required"`
