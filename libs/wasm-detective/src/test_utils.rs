@@ -133,12 +133,6 @@ pub const SAMPLE_JSON: &str = r#"{
     "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----",
     "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
     "bearer_token": "Authorization: Bearer testToken123"
-    "eMa_iL": "foo@bar.com",
-    "lICENSEplate": "abc123",
-    "123lic32ense_Plate1234": "def456",
-    "ipV4_address": "127.0.0.1",
-    "ip_address": "127.0.0.2",
-    "ipAddReSS": "127.0.0.3"
 }"#;
 
 pub const SAMPLE_JSON_K8S: &str = r#"{
@@ -587,7 +581,7 @@ pub const SAMPLE_JSON_PII_KEYWORD: &str = r#"{
     },
     "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----",
     "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-    "bearer_token": "Authorization: Bearer testToken123"
+    "bearer_token": "Authorization: Bearer testToken123",
     "eMa_iL": "foo@bar.com",
     "lICENSEplate": "abc123",
     "123lic32ense_Plate1234": "def456",
