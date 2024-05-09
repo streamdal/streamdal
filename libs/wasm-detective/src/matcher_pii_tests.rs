@@ -582,6 +582,11 @@ struct PIIKeywordResult {
 //
 // WARNING: If you update SAMPLE_JSON_PII_KEYWORD, you will need to update this test
 fn test_pii_keyword_accuracy() {
+
+    // This is pretty gross - we should replace this at a later time with something
+    // that generates a JSON blob with various permutations of the PII keywords
+    // listed in the keywords.toml.
+    //
     // NOTE: This does not test arrays (because of laziness)
     let expected = HashMap::from([
         (String::from("object.ipv4_address"), PIIKeywordResult {
