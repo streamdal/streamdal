@@ -46,9 +46,8 @@ run1:
 run2: description = Run signup-service
 run2:
 	go run *.go -d \
-	--quiet \
 	--display-exec-time \
-	--message-rate 10,20 \
+	--message-rate 1 \
 	--service-name "signup-service" \
 	--operation-type 2 \
 	--operation-name  "recorder" \
