@@ -15,6 +15,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "protos.steps.DetectiveStepResultMatch" do
       optional :type, :enum, 1, "protos.steps.DetectiveType"
       optional :path, :string, 2
+      optional :char_index_start, :int32, 3
+      optional :char_index_end, :int32, 4
       optional :value, :bytes, 5
       optional :pii_type, :string, 6
     end

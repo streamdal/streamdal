@@ -46,6 +46,17 @@ export interface DetectiveStepResultMatch {
      */
     path: string;
     /**
+     * For string payloads, the start and end characters of the match
+     * Placeholder for now, will implement in the future
+     *
+     * @generated from protobuf field: int32 char_index_start = 3;
+     */
+    charIndexStart: number;
+    /**
+     * @generated from protobuf field: int32 char_index_end = 4;
+     */
+    charIndexEnd: number;
+    /**
      * Value of the match
      *
      * @generated from protobuf field: bytes value = 5;

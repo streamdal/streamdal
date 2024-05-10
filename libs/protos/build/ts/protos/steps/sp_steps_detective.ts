@@ -52,11 +52,17 @@ export interface DetectiveStepResultMatch {
      * @generated from protobuf field: string path = 2;
      */
     path: string;
-    // For string payloads, the start and end characters of the match
-    // Placeholder for now, will implement in the future
-    // int32 char_index_start = 3;
-    // int32 char_index_end = 4;
-
+    /**
+     * For string payloads, the start and end characters of the match
+     * Placeholder for now, will implement in the future
+     *
+     * @generated from protobuf field: int32 char_index_start = 3;
+     */
+    charIndexStart: number;
+    /**
+     * @generated from protobuf field: int32 char_index_end = 4;
+     */
+    charIndexEnd: number;
     /**
      * Value of the match
      *
@@ -501,12 +507,14 @@ class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch
         super("protos.steps.DetectiveStepResultMatch", [
             { no: 1, name: "type", kind: "enum", T: () => ["protos.steps.DetectiveType", DetectiveType, "DETECTIVE_TYPE_"] },
             { no: 2, name: "path", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "char_index_start", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "char_index_end", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "value", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 6, name: "pii_type", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<DetectiveStepResultMatch>): DetectiveStepResultMatch {
-        const message = { type: 0, path: "", value: new Uint8Array(0), piiType: "" };
+        const message = { type: 0, path: "", charIndexStart: 0, charIndexEnd: 0, value: new Uint8Array(0), piiType: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<DetectiveStepResultMatch>(this, message, value);
@@ -522,6 +530,12 @@ class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch
                     break;
                 case /* string path */ 2:
                     message.path = reader.string();
+                    break;
+                case /* int32 char_index_start */ 3:
+                    message.charIndexStart = reader.int32();
+                    break;
+                case /* int32 char_index_end */ 4:
+                    message.charIndexEnd = reader.int32();
                     break;
                 case /* bytes value */ 5:
                     message.value = reader.bytes();
@@ -547,6 +561,12 @@ class DetectiveStepResultMatch$Type extends MessageType<DetectiveStepResultMatch
         /* string path = 2; */
         if (message.path !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.path);
+        /* int32 char_index_start = 3; */
+        if (message.charIndexStart !== 0)
+            writer.tag(3, WireType.Varint).int32(message.charIndexStart);
+        /* int32 char_index_end = 4; */
+        if (message.charIndexEnd !== 0)
+            writer.tag(4, WireType.Varint).int32(message.charIndexEnd);
         /* bytes value = 5; */
         if (message.value.length)
             writer.tag(5, WireType.LengthDelimited).bytes(message.value);
