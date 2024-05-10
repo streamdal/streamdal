@@ -1,7 +1,8 @@
 use crate::detective::Request;
 #[cfg(test)]
 use protos::sp_steps_detective::DetectiveType;
-use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
+use std::collections::HashMap;
 
 #[test]
 fn test_email() {
@@ -568,4 +569,239 @@ fn test_jwt() {
     ];
 
     crate::test_utils::run_tests(&test_cases);
+}
+
+struct PIIKeywordResult {
+    pii_type: String,
+    value: String,
+}
+
+#[test]
+// This test checks that PII keyword detection identifies expected PII and returns
+// expected data; this test ensures that we do not introduce a regression.
+//
+// WARNING: If you update SAMPLE_JSON_PII_KEYWORD, you will need to update this test
+fn test_pii_keyword_accuracy() {
+
+    // This is pretty gross - we should replace this at a later time with something
+    // that generates a JSON blob with various permutations of the PII keywords
+    // listed in the keywords.toml.
+    //
+    // NOTE: This does not test arrays (because of laziness)
+    let expected = HashMap::from([
+        (String::from("object.ipv4_address"), PIIKeywordResult {
+            pii_type: "IP_Information".to_string(),
+            value: "127.0.0.1".to_string(),
+        }),
+        (String::from("object.ipv6_address"), PIIKeywordResult {
+            pii_type: "IP_Information".to_string(),
+            value: "2001:0db8:85a3:0000:0000:8a2e:0370:7334".to_string(),
+        }),
+        (String::from("object.mac_address"), PIIKeywordResult {
+            pii_type: "Device".to_string(),
+            value: "00-B0-D0-63-C2-26".to_string(),
+        }),
+        (String::from("object.email_plain_valid"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "test@example.com".to_string(),
+        }),
+        (String::from("object.email_plain_invalid"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "test@example".to_string(),
+        }),
+        (String::from("object.email_unicode_domain_valid"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "test@日本.com".to_string(),
+        }),
+        (String::from("object.email_unicode_domain_invalid"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "test@日本".to_string(),
+        }),
+        (String::from("object.email_unicode_local_valid"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "日本@example.com".to_string(),
+        }),
+        (String::from("object.email_unicode_local_invalid"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "日本@example".to_string(),
+        }),
+        (String::from("object.credit_card.visa.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "4111-1111-1111-1111".to_string(),
+        }),
+        (String::from("object.credit_card.visa.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "4111111111111112".to_string(),
+        }),
+        (String::from("object.credit_card.mastercard.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "5555 5555 5555 4444".to_string(),
+        }),
+        (String::from("object.credit_card.mastercard.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "5555555555554445".to_string(),
+        }),
+        (String::from("object.credit_card.amex.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "378282246310005".to_string(),
+        }),
+        (String::from("object.credit_card.amex.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "378282246310006".to_string(),
+        }),
+        (String::from("object.credit_card.discover.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "6011111111111117".to_string(),
+        }),
+        (String::from("object.credit_card.discover.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "6011111111111118".to_string(),
+        }),
+        (String::from("object.credit_card.diners_club.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "30569309025904".to_string(),
+        }),
+        (String::from("object.credit_card.diners_club.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "30569309025905".to_string(),
+        }),
+        (String::from("object.credit_card.jcb.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "3530111333300000".to_string(),
+        }),
+        (String::from("object.credit_card.jcb.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "3530111333300001".to_string(),
+        }),
+        (String::from("object.credit_card.unionpay.valid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "6200000000000005".to_string(),
+        }),
+        (String::from("object.credit_card.unionpay.invalid"), PIIKeywordResult {
+            pii_type: "Billing".to_string(),
+            value: "6200000000000006".to_string(),
+        }),
+        (String::from("cloud.aws.mws_auth_token"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c".to_string(),
+        }),
+        (String::from("cloud.docker.swarm_join_token"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "SWMTKN-1-3pu6hszjas19xyp7ghgosyx9k8atbfcr8p2is99znpy26u2lkl-1awxwuwd3z9j1z3puu7rcgdbx".to_string(),
+        }),
+        (String::from("cloud.docker.swarm_unlock_token"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "SWMKEY-1-7c37Cc8654o6p38HnroywCi19pllOnGtbdZEgtKxZu8".to_string(),
+        }),
+        (String::from("cloud.paypal.braintree_access_token"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "access_token$sandbox$3g3w".to_string(),
+        }),
+        (String::from("cloud.sendgrid.api_key"), PIIKeywordResult {
+
+            pii_type: "Credentials".to_string(),
+            value: "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".to_string(),
+        }),
+        (String::from("payments.routing_number"), PIIKeywordResult {
+            pii_type: "Banking_and_Financial".to_string(),
+            value: "122105155".to_string(),
+        }),
+        (String::from("payments.iban"), PIIKeywordResult {
+            pii_type: "Banking_and_Financial".to_string(),
+            value: "GB82WEST12345698765432".to_string(),
+        }),
+        (String::from("payments.stripe.secret_key"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "sk_live_4eC39HqLyjWDarjtT1zdp7dc".to_string(),
+        }),
+        (String::from("address.postal_code.usa"), PIIKeywordResult {
+            pii_type: "Address".to_string(),
+            value: "12345".to_string(),
+        }),
+        (String::from("address.postal_code.canada"), PIIKeywordResult {
+            pii_type: "Address".to_string(),
+            value: "K1A 0B1".to_string(),
+        }),
+        (String::from("personal.religion"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "Buddhism".to_string(),
+        }),
+        (String::from("personal.phone"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "+13215781234".to_string(),
+        }),
+        (String::from("rsa_key"), PIIKeywordResult {
+            pii_type: "SSH".to_string(),
+            value: "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----".to_string(),
+        }),
+        (String::from("bearer_token"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "Authorization: Bearer testToken123".to_string(),
+        }),
+        (String::from("eMa_iL"), PIIKeywordResult {
+            pii_type: "Person".to_string(),
+            value: "foo@bar.com".to_string(),
+        }),
+        (String::from("lICENSEplate"), PIIKeywordResult {
+            pii_type: "Vehicle_Information".to_string(),
+            value: "abc123".to_string(),
+        }),
+        (String::from("123lic32ense_Plate1234"), PIIKeywordResult {
+            pii_type: "Vehicle_Information".to_string(),
+            value: "def456".to_string(),
+        }),
+        (String::from("ipV4_address"), PIIKeywordResult {
+            pii_type: "IP_Information".to_string(),
+            value: "127.0.0.1".to_string(),
+        }),
+        (String::from("ip_address"), PIIKeywordResult {
+            pii_type: "IP_Information".to_string(),
+            value: "127.0.0.2".to_string(),
+        }),
+        (String::from("ipAddReSS"), PIIKeywordResult {
+            pii_type: "IP_Information".to_string(),
+            value: "127.0.0.3".to_string(),
+        }),
+        (String::from("1234sEcREt23_k3Ey___"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c".to_string(),
+        }),
+        (String::from("aws_access_key"), PIIKeywordResult {
+            pii_type: "AWS".to_string(),
+            value: "AKIAIOSFODNN7EXAMPLE1".to_string(),
+        }),
+        (String::from("123awsAccessKey456"), PIIKeywordResult {
+            pii_type: "AWS".to_string(),
+            value: "AKIAIOSFODNN7EXAMPLE2".to_string(),
+        }),
+        (String::from("1234sEcREt_kEy___"), PIIKeywordResult {
+            pii_type: "Credentials".to_string(),
+            value: "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c".to_string(),
+        }),
+    ]);
+
+    let sample_json = &crate::test_utils::SAMPLE_JSON_PII_KEYWORD.as_bytes().to_vec();
+
+    let request = Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_KEYWORD,
+        data: sample_json,
+        path: "".to_string(), // scan whole payload
+        args: vec![],
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY,
+    };
+
+    let result = crate::detective::Detective::new().matches(&request);
+
+    assert_eq!(result.is_ok(), true);
+
+    for r in result.unwrap() {
+        println!("testing if result path {:?} exists in expected", &r.path);
+        println!("testing if result value {:?} exists in expected", String::from_utf8(r.value.clone()).unwrap());
+        println!("testing if result pii_type {:?} exists in expected", &r.pii_type);
+
+        assert!(expected.contains_key(&r.path));
+        assert_eq!(expected.get(&r.path).unwrap().pii_type, r.pii_type);
+        assert_eq!(expected.get(&r.path).unwrap().value, String::from_utf8(r.value).unwrap());
+    }
 }

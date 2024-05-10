@@ -462,6 +462,136 @@ pub const SAMPLE_JSON_K8S: &str = r#"{
   }
 }"#;
 
+pub const SAMPLE_JSON_PII_KEYWORD: &str = r#"{
+    "boolean_t": true,
+    "boolean_f": false,
+    "object": {
+        "ipv4_address": "127.0.0.1",
+        "ipv6_address": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+        "mac_address": "00-B0-D0-63-C2-26",
+        "uuid_dash": "550e8400-e29b-41d4-a716-446655440000",
+        "uuid_colon": "550e8400:e29b:41d4:a716:446655440000",
+        "uuid_stripped": "550e8400e29b41d4a716446655440000",
+        "number_as_string": "1234",
+        "field": "value",
+        "empty_string": "",
+        "null_field": null,
+        "empty_array": [],
+        "semver": "1.2.3",
+        "valid_hostname": "example.com",
+        "invalid_hostname": "-example.com.",
+        "email_plain_valid": "test@example.com",
+        "email_plain_invalid": "test@example",
+        "email_unicode_domain_valid": "test@日本.com",
+        "email_unicode_domain_invalid": "test@日本",
+        "email_unicode_local_valid": "日本@example.com",
+        "email_unicode_local_invalid": "日本@example",
+        "credit_card": {
+            "visa": {
+                "valid": "4111-1111-1111-1111",
+                "invalid": "4111111111111112"
+            },
+            "mastercard": {
+                "valid": "5555 5555 5555 4444",
+                "invalid": "5555555555554445"
+            },
+            "amex": {
+                "valid": "378282246310005",
+                "invalid": "378282246310006"
+            },
+            "discover": {
+                "valid": "6011111111111117",
+                "invalid": "6011111111111118"
+            },
+            "diners_club": {
+                "valid": "30569309025904",
+                "invalid": "30569309025905"
+            },
+            "jcb": {
+                "valid": "3530111333300000",
+                "invalid": "3530111333300001"
+            },
+            "unionpay": {
+                "valid": "6200000000000005",
+                "invalid": "6200000000000006"
+            }
+        },
+        "ssn_valid": "111-22-3456",
+        "ssn_invalid": "111-222-3456"
+    },
+    "array": [
+        "value1",
+        "value2"
+    ],
+    "number_int": 100,
+    "number_float": 100.1,
+    "timestamp_unix_str": "1614556800",
+    "timestamp_unix_num": 1614556800,
+    "timestamp_unix_nano_str": "1614556800000000000",
+    "timestamp_unix_nano_num": 1614556800000000000,
+    "timestamp_rfc3339": "2023-06-29T12:34:56Z",
+    "cloud": {
+        "aws": {
+            "key_id": "AKIAIOSFODNN7EXAMPLE",
+            "mws_auth_token": "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c"
+        },
+        "github": {
+            "pat": "ghp_qr7jU0ItnCxyvstfROjpYVngNWGidT0SOtwD",
+            "fine_grained": "github_pat_11ACDYWHY02q7NV2SZtkr0_CCUemYtLFNSDF0al1gSuLx0drIYZhzlxT2yfsKD6qR9M"
+        },
+        "docker": {
+            "swarm_join_token": "SWMTKN-1-3pu6hszjas19xyp7ghgosyx9k8atbfcr8p2is99znpy26u2lkl-1awxwuwd3z9j1z3puu7rcgdbx",
+            "swarm_unlock_token": "SWMKEY-1-7c37Cc8654o6p38HnroywCi19pllOnGtbdZEgtKxZu8"
+        },
+        "paypal": {
+            "braintree_access_token": "access_token$sandbox$3g3w"
+        },
+        "databricks": {
+            "pat": "dapi0a1b2c3d4e5f678901234567890123456a7b"
+        },
+        "sendgrid": {
+            "api_key": "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"
+        },
+        "azure": {
+            "sql_connection_string": "Server=tcp:myserver.database.windows.net,1433;Initial Catalog=mydb;Persist Security Info=False;User ID=mylogin;Password=mypassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+        }
+    },
+    "payments": {
+        "crypto": {
+            "eth": "0x1ABC7154748D1CE5144478CDEB574AE244B939B5"
+        },
+        "routing_number": "122105155",
+        "swift_bic": "AAAA-BB-CC-123",
+        "iban": "GB82WEST12345698765432",
+        "stripe": {
+            "secret_key": "sk_live_4eC39HqLyjWDarjtT1zdp7dc"
+        }
+    },
+    "slack": "xoxb-263594206564-FGqddMF8t08v8N7Oq4i57vs1",
+    "address": {
+        "postal_code": {
+            "usa": "12345",
+            "canada": "K1A 0B1"
+        }
+    },
+    "personal": {
+        "title": "Mr.",
+        "religion": "Buddhism",
+        "phone": "+13215781234"
+    },
+    "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----",
+    "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+    "bearer_token": "Authorization: Bearer testToken123",
+    "eMa_iL": "foo@bar.com",
+    "lICENSEplate": "abc123",
+    "123lic32ense_Plate1234": "def456",
+    "ipV4_address": "127.0.0.1",
+    "ip_address": "127.0.0.2",
+    "ipAddReSS": "127.0.0.3"
+    "aws_access_key": "AKIAIOSFODNN7EXAMPLE1",
+    "123awsAccessKey456": "AKIAIOSFODNN7EXAMPLE2",
+    "1234sEcREt_kEy___": "amzn.mws.4ea38b7b-f563-7709-4bae-87aea15c"
+}"#;
 
 lazy_static! {
     pub static ref SAMPLE_JSON_BYTES: Vec<u8> = SAMPLE_JSON.as_bytes().to_vec();
