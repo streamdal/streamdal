@@ -360,3 +360,80 @@ pub fn bearer_token(_request: &Request, field: Value) -> Result<bool, CustomErro
     let valid = field.starts_with("Bearer ") || field.starts_with("Authorization: Bearer");
     Ok(valid)
 }
+
+pub fn uk_national_insurance_number(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim();
+
+    // Check if the length is between 8 and 9 characters
+    if val.len() < 8 || val.len() > 9 {
+        return Ok(false);
+    }
+
+    // Check if the first two characters are letters
+    if !val[0..2].chars().all(|c| c.is_ascii_alphabetic()) {
+        return Ok(false);
+    }
+
+    // Check if the third character is a digit
+    if !val.chars().nth(2).unwrap().is_ascii_digit() {
+        return Ok(false);
+    }
+
+    // Check if the fourth character is a space
+    if val.chars().nth(3).unwrap() != ' ' {
+        return Ok(false);
+    }
+
+    // Check if the fifth and sixth characters are digits
+    if !val[4..6].chars().all(|c| c.is_ascii_digit()) {
+        return Ok(false);
+    }
+
+    // Check if the seventh and eighth characters are digits
+    if !val[6..8].chars().all(|c| c.is_ascii_digit()) {
+        return Ok(false);
+    }
+
+    // Check if the ninth character is a letter
+    if val.len() == 9 && !val.chars().nth(8).unwrap().is_ascii_alphabetic() {
+        return Ok(false);
+    }
+
+    Ok(true)
+}
+
+pub fn canada_ssn(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim();
+
+    // Check if the length is 9 characters
+    if val.len() != 9 {
+        return Ok(false);
+    }
+
+    // Check if the first character is a digit
+    if !val.chars().nth(0).unwrap().is_ascii_digit() {
+        return Ok(false);
+    }
+
+    // Check if the fourth character is a hyphen
+    if val.chars().nth(3).unwrap() != '-' {
+        return Ok(false);
+    }
+
+    // Check if the fifth character is a digit
+    if !val.chars().nth(4).unwrap().is_ascii_digit() {
+        return Ok(false);
+    }
+
+    // Check if the eighth character is a hyphen
+    if val.chars().nth(7).unwrap() != '-' {
+        return Ok(false);
+    }
+
+    // Check if the ninth character is a digit
+    if !val.chars().nth(8).unwrap().is_ascii_digit() {
+        return Ok(false);
+    }
+
+    Ok(true)
+}

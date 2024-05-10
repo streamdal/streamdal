@@ -9,8 +9,12 @@ use streamdal_gjson as gjson;
 
 use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType, DetectiveTypePIIKeywordMode};
 use std::str;
+use std::default::Default;
+use unicode_segmentation::UnicodeSegmentation;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
+use crate::matcher_pii::{canada_ssn, email, jwt, passport_id, ssn, uk_national_insurance_number, vin_number};
+use crate::matcher_pii_cloud::aws_key_id;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
@@ -74,7 +78,7 @@ impl Detective {
                     path: pii_match.path.clone(),
                     value: pii_match.value.into_bytes(),
                     pii_type: pii_match.entity.clone(),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 };
 
                 isr.push(result)
@@ -394,6 +398,74 @@ fn recurse_field(
             return res;
         }
         _ => {} // Don't care about nulls
+    }
+
+    res
+}
+
+pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch> {
+    let mut res = Vec::<DetectiveStepResultMatch>::new();
+    let sentences = input.split_sentence_bound_indices();
+
+    // These functions take a gjson value, but we can just mock that
+    // rather than changing around the entire library
+    // TODO: Add plaintext type to scanners
+    let scanners: Vec<MatcherFunc> = vec![
+        email,
+        aws_key_id,
+        jwt,
+        passport_id,
+        ssn,
+        uk_national_insurance_number,
+        vin_number,
+        canada_ssn,
+    ];
+
+    // TODO: this needs to find start and end chars
+    for (sentence_start, sentence) in sentences {
+        // Parse sentences into words
+        let words = sentence.split_word_bound_indices();
+
+        for (word_start, word) in words {
+            if word == " " {
+                continue;
+            }
+            // Get grapheme length and add to start
+            let end = word_start + word.chars().count();
+            let char_index_start = sentence_start + word_start;
+            let char_index_end = sentence_start + end;
+
+            for scanner in &scanners {
+                let tmp = format!("{{\"key\": \"{}\"}}", word);
+                let v = gjson::parse(tmp.as_str());
+
+                println!("tmp: {}", tmp);
+
+                match scanner(request, v) {
+                    Ok(found) => {
+                        if found {
+                            println!("found -----------------------");
+                            let result = DetectiveStepResultMatch {
+                                type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_ANY), // TODO: add plaintext type
+                                path: "".to_string(),
+                                value: word.to_owned().into_bytes(),
+                                pii_type: "plaintext".to_string(), // TODO: add plaintext type to scanner vec. Should change it to a hashmap
+                                char_index_start: char_index_start as i32,
+                                char_index_end: char_index_end as i32,
+                                ..Default::default()
+                            };
+
+                            res.push(result);
+                        } else {
+                            println!("DIDN'T FIND");
+                        }
+                    }
+                    Err(_e) => {
+                        // TODO: what am I doing with this?
+                    }
+                }
+            }
+        }
     }
 
     res

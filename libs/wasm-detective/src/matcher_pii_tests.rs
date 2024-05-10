@@ -1,7 +1,7 @@
-use crate::detective::Request;
+use crate::detective::{plaintext, Request};
 #[cfg(test)]
 use protos::sp_steps_detective::DetectiveType;
-use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
 use std::collections::HashMap;
 
 #[test]
@@ -804,4 +804,22 @@ fn test_pii_keyword_accuracy() {
         assert_eq!(expected.get(&r.path).unwrap().pii_type, r.pii_type);
         assert_eq!(expected.get(&r.path).unwrap().value, String::from_utf8(r.value).unwrap());
     }
+}
+
+#[test]
+fn test_plaintext() {
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 1HGCM82633A001234";
+
+    let req = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+        data: &Vec::new(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+    };
+
+    let results = plaintext(&req, sample_text);
+
+    assert_eq!(results.len(), 2);
 }
