@@ -1,8 +1,10 @@
 use crate::detective::{plaintext, Request};
 #[cfg(test)]
+extern crate test;
 use protos::sp_steps_detective::DetectiveType;
 use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
 use std::collections::HashMap;
+use test::Bencher;
 
 #[test]
 fn test_email() {
@@ -808,7 +810,7 @@ fn test_pii_keyword_accuracy() {
 
 #[test]
 fn test_plaintext() {
-    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 1HGCM82633A001234";
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have MQ938548A as my NHS number. My credit card is 4111111111111111";
 
     let req = &Request {
         match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
@@ -822,4 +824,22 @@ fn test_plaintext() {
     let results = plaintext(&req, sample_text);
 
     assert_eq!(results.len(), 2);
+}
+
+#[bench]
+fn bench_plaintext(b: &mut Bencher) {
+    b.iter(|| {
+        let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have MQ938548A as my NHS number. My credit card is 4111111111111111.";
+
+        let req = &Request {
+            match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+            data: &Vec::new(),
+            path: "".to_string(),
+            args: Vec::new(),
+            negate: false,
+            mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        };
+
+        let _ = plaintext(&req, sample_text);
+    });
 }

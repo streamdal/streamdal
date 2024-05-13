@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::error::CustomError;
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
@@ -15,6 +16,7 @@ use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
 use crate::matcher_pii::{canada_ssn, email, jwt, passport_id, ssn, uk_national_insurance_number, vin_number};
 use crate::matcher_pii_cloud::aws_key_id;
+use crate::matcher_pii_payments::credit_card;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
@@ -403,6 +405,13 @@ fn recurse_field(
     res
 }
 
+#[derive(Default, Clone,Debug)]
+pub struct Word {
+    start: usize,
+    end: usize,
+    word: String,
+}
+
 pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch> {
     let mut res = Vec::<DetectiveStepResultMatch>::new();
     let sentences = input.split_sentence_bound_indices();
@@ -419,50 +428,102 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         uk_national_insurance_number,
         vin_number,
         canada_ssn,
+        credit_card,
     ];
+
+    //Parse sentences into words
+    let mut accum: Vec<Word> = Vec::new();
+    let mut found: Vec<Word> = Vec::new();
 
     // TODO: this needs to find start and end chars
     for (sentence_start, sentence) in sentences {
         // Parse sentences into words
+       // let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
         let words = sentence.split_word_bound_indices();
 
+        let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
+
         for (word_start, word) in words {
-            if word == " " {
+            accum.push(Word {
+                start: sentence_start + word_start,
+                end: sentence_start + word_start + word.chars().count(),
+                word: word.to_string(),
+            });
+
+            if no_split.contains_key(&word.chars().next().unwrap()) {
                 continue;
             }
-            // Get grapheme length and add to start
-            let end = word_start + word.chars().count();
-            let char_index_start = sentence_start + word_start;
-            let char_index_end = sentence_start + end;
 
-            for scanner in &scanners {
-                let tmp = format!("{{\"key\": \"{}\"}}", word);
-                let v = gjson::parse(tmp.as_str());
+            // We've reached the end of a word, combine our accumulator into a single Word struct
+            if word == " " {
+                // Loop over accumulator and join the string value of each word
+                // and push it to the found vector
+                let mut combined = Word {
+                    ..Default::default()
+                };
 
-                println!("tmp: {}", tmp);
-
-                match scanner(request, v) {
-                    Ok(found) => {
-                        if found {
-                            println!("found -----------------------");
-                            let result = DetectiveStepResultMatch {
-                                type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_ANY), // TODO: add plaintext type
-                                path: "".to_string(),
-                                value: word.to_owned().into_bytes(),
-                                pii_type: "plaintext".to_string(), // TODO: add plaintext type to scanner vec. Should change it to a hashmap
-                                char_index_start: char_index_start as i32,
-                                char_index_end: char_index_end as i32,
-                                ..Default::default()
-                            };
-
-                            res.push(result);
-                        } else {
-                            println!("DIDN'T FIND");
-                        }
+                let i = 0;
+                for a in &accum {
+                    if i == 0 {
+                        combined.start = a.start;
                     }
-                    Err(_e) => {
-                        // TODO: what am I doing with this?
+                    if i == accum.len() - 1 {
+                        combined.end = a.end;
                     }
+
+                    combined.word.push_str(a.word.as_str());
+                }
+
+                found.push(combined);
+                accum.clear();
+            }
+        }
+
+        if !accum.is_empty() {
+            let mut combined = Word {
+                ..Default::default()
+            };
+
+            let i = 0;
+            for a in &accum {
+                if i == 0 {
+                    combined.start = a.start;
+                }
+                if i == accum.len() - 1 {
+                    combined.end = a.end;
+                }
+
+                combined.word.push_str(a.word.as_str());
+            }
+
+            found.push(combined);
+        }
+    }
+
+    for found_word in found {
+        for scanner in &scanners {
+
+            let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
+            match scanner(request, gjson::parse(&payload)) {
+                Ok(found) => {
+                    if found {
+                        println!("found ----------------------- {:#?}", found_word);
+
+                        // let result = DetectiveStepResultMatch {
+                        //     type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_ANY), // TODO: add plaintext type
+                        //     path: "".to_string(),
+                        //     value: word.to_owned().into_bytes(),
+                        //     pii_type: "plaintext".to_string(), // TODO: add plaintext type to scanner vec. Should change it to a hashmap
+                        //     char_index_start: char_index_start as i32,
+                        //     char_index_end: char_index_end as i32,
+                        //     ..Default::default()
+                        // };
+                        //
+                        // res.push(result);
+                    }
+                }
+                Err(_e) => {
+                    // TODO: what am I doing with this?
                 }
             }
         }
