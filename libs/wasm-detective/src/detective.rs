@@ -517,17 +517,14 @@ fn accumulate_parts(accum: &mut Vec<Word>) -> Word {
         ..Default::default()
     };
 
-    let i = 0;
-    let end = accum.len() - 1;
-    for a in accum {
-        if i == 0 {
-            combined.start = a.start;
-        }
-        if i == end {
-            combined.end = a.end;
+
+    for (idx, part) in accum.iter().enumerate() {
+        if idx == 0 {
+            combined.start = part.start;
         }
 
-        combined.word.push_str(a.word.as_str());
+        combined.end = part.end;
+        combined.word.push_str(part.word.as_str());
     }
 
     combined
