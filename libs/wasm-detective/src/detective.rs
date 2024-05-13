@@ -438,8 +438,8 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
     // TODO: this needs to find start and end chars
     for (sentence_start, sentence) in sentences {
         // Parse sentences into words
-       // let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
-        let words = sentence.split_word_bound_indices();
+        let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
+        let words = new_sentence.split_word_bound_indices();
 
         let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
 
