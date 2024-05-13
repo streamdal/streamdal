@@ -431,25 +431,32 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         credit_card,
     ];
 
-    //Parse sentences into words
-    let mut accum: Vec<Word> = Vec::new();
     let mut found: Vec<Word> = Vec::new();
 
-    // TODO: this needs to find start and end chars
     for (sentence_start, sentence) in sentences {
-        // Parse sentences into words
+        // Trim junk off the end. This won't affect offsets because
+        // it's at the end of a sentence
         let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
+        // Parse sentences into words
         let words = new_sentence.split_word_bound_indices();
 
+        // The splitter lib considers these word bounds, but we don't want to
+        // split on them since they might be inside an email, ipv6, macaddr, etc.
         let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
 
+        // This is our word-part accumulator and is used to
+        // combine "user", "@", "somedomain.com" words into a single word
+        let mut accum: Vec<Word> = Vec::new();
+
         for (word_start, word) in words {
+            // Push the word the splitter has seen to the accumulator
             accum.push(Word {
                 start: sentence_start + word_start,
                 end: sentence_start + word_start + word.chars().count(),
                 word: word.to_string(),
             });
 
+            // If the word is a character we don't want to split on, continue to the next word
             if no_split.contains_key(&word.chars().next().unwrap()) {
                 continue;
             }
@@ -458,45 +465,18 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
             if word == " " {
                 // Loop over accumulator and join the string value of each word
                 // and push it to the found vector
-                let mut combined = Word {
-                    ..Default::default()
-                };
-
-                let i = 0;
-                for a in &accum {
-                    if i == 0 {
-                        combined.start = a.start;
-                    }
-                    if i == accum.len() - 1 {
-                        combined.end = a.end;
-                    }
-
-                    combined.word.push_str(a.word.as_str());
-                }
-
+                let combined = accumulate_parts(&mut accum);
                 found.push(combined);
                 accum.clear();
             }
         }
 
+        // We might have hit the end of a sentence in the loop above but not triggered the
+        // summation of the accumulator. Check if it's empty and if not, combine it into a single word
         if !accum.is_empty() {
-            let mut combined = Word {
-                ..Default::default()
-            };
-
-            let i = 0;
-            for a in &accum {
-                if i == 0 {
-                    combined.start = a.start;
-                }
-                if i == accum.len() - 1 {
-                    combined.end = a.end;
-                }
-
-                combined.word.push_str(a.word.as_str());
-            }
-
+            let combined = accumulate_parts(&mut accum);
             found.push(combined);
+            accum.clear();
         }
     }
 
@@ -530,4 +510,25 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
     }
 
     res
+}
+
+fn accumulate_parts(accum: &mut Vec<Word>) -> Word {
+    let mut combined = Word {
+        ..Default::default()
+    };
+
+    let i = 0;
+    let end = accum.len() - 1;
+    for a in accum {
+        if i == 0 {
+            combined.start = a.start;
+        }
+        if i == end {
+            combined.end = a.end;
+        }
+
+        combined.word.push_str(a.word.as_str());
+    }
+
+    combined
 }
