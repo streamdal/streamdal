@@ -407,8 +407,8 @@ fn recurse_field(
 
 #[derive(Default, Clone,Debug)]
 pub struct Word {
-    start: usize,
-    end: usize,
+    char_index_start: usize,
+    char_index_end: usize,
     word: String,
 }
 
@@ -451,8 +451,8 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         for (word_start, word) in words {
             // Push the word the splitter has seen to the accumulator
             accum.push(Word {
-                start: sentence_start + word_start,
-                end: sentence_start + word_start + word.chars().count(),
+                char_index_start: sentence_start + word_start,
+                char_index_end: sentence_start + word_start + word.chars().count(),
                 word: word.to_string(),
             });
 
@@ -482,29 +482,24 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
 
     for found_word in found {
         for scanner in &scanners {
-
             let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
             match scanner(request, gjson::parse(&payload)) {
                 Ok(found) => {
                     if found {
-                        println!("found ----------------------- {:#?}", found_word);
+                        let result = DetectiveStepResultMatch {
+                            type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_ANY), // TODO: add plaintext type
+                            path: "".to_string(),
+                            value: found_word.word.clone().into_bytes(),
+                            pii_type: "plaintext".to_string(),
+                            char_index_start: found_word.char_index_start as i32,
+                            char_index_end: found_word.char_index_end as i32,
+                            ..Default::default()
+                        };
 
-                        // let result = DetectiveStepResultMatch {
-                        //     type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_ANY), // TODO: add plaintext type
-                        //     path: "".to_string(),
-                        //     value: word.to_owned().into_bytes(),
-                        //     pii_type: "plaintext".to_string(), // TODO: add plaintext type to scanner vec. Should change it to a hashmap
-                        //     char_index_start: char_index_start as i32,
-                        //     char_index_end: char_index_end as i32,
-                        //     ..Default::default()
-                        // };
-                        //
-                        // res.push(result);
+                        res.push(result);
                     }
                 }
-                Err(_e) => {
-                    // TODO: what am I doing with this?
-                }
+                _ => {} // Not doing anything with errors here
             }
         }
     }
@@ -520,10 +515,10 @@ fn accumulate_parts(accum: &mut Vec<Word>) -> Word {
 
     for (idx, part) in accum.iter().enumerate() {
         if idx == 0 {
-            combined.start = part.start;
+            combined.char_index_start = part.char_index_start;
         }
 
-        combined.end = part.end;
+        combined.char_index_end = part.char_index_end;
         combined.word.push_str(part.word.as_str());
     }
 
