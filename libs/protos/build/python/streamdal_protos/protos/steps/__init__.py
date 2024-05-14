@@ -139,7 +139,7 @@ class DetectiveType(betterproto.Enum):
     value
     """
 
-    DETECTIVE_TYPE_PII_PLAINTEXT = 2037
+    DETECTIVE_TYPE_PII_PLAINTEXT_ANY = 2037
     """Works on plaintext pipelines only"""
 
     DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038

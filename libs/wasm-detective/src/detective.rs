@@ -48,7 +48,7 @@ impl Detective {
     pub fn matches(&self, request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         validate_request(request)?;
 
-        if request.match_type == DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT {
+        if request.match_type == DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY {
             return self.matches_plaintext(request);
         }
 
@@ -304,7 +304,7 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN => pii::bearer_token,
             DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING => pii_cloud::azure_sql_connection_string,
             DetectiveType::DETECTIVE_TYPE_PII_KEYWORD => pii_keywords::keywords,
-            DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT => todo!(),
+            DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY => todo!(), // skipped on purpose
             DetectiveType::DETECTIVE_TYPE_UK_INSURANCE_NUMBER => pii::uk_nino,
             DetectiveType::DETECTIVE_TYPE_CANADA_SIN => pii::canada_sin,
             DetectiveType::DETECTIVE_TYPE_UNKNOWN => {
@@ -503,7 +503,7 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
                 Ok(found) => {
                     if found {
                         let result = DetectiveStepResultMatch {
-                            type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_ANY), // TODO: add plaintext type
+                            type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
                             path: "".to_string(),
                             value: found_word.word.clone().into_bytes(),
                             pii_type: "plaintext".to_string(),

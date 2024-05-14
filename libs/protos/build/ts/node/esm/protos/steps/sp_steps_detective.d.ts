@@ -365,9 +365,9 @@ export declare enum DetectiveType {
     /**
      * Works on plaintext pipelines only
      *
-     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_PLAINTEXT = 2037;
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_PLAINTEXT_ANY = 2037;
      */
-    PII_PLAINTEXT = 2037,
+    PII_PLAINTEXT_ANY = 2037,
     /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038;
      */

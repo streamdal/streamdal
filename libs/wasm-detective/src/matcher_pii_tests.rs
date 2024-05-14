@@ -920,7 +920,7 @@ fn test_plaintext() {
     let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111";
 
     let request = &Request {
-        match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT,
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
         data: &sample_text.as_bytes().to_vec(),
         path: "".to_string(),
         args: Vec::new(),
