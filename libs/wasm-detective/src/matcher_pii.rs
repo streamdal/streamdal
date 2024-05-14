@@ -402,7 +402,7 @@ pub fn uk_nino(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let val = field.str().trim();
 
     // Strip all spaces
-    let val = val.replace(" ", "");
+    let val = val.replace(' ', "");
 
     // Check if the length is between 8 and 9 characters
     if val.len() < 8 || val.len() > 9 {
@@ -436,7 +436,7 @@ pub fn canada_sin(_request: &Request, field: Value) -> Result<bool, CustomError>
     let val = field.str().trim();
 
     // Strip all dashes and spaces
-    let val = val.replace("-", "").replace(" ", "");
+    let val = val.replace(['-', ' '], "");
 
     // Check if the length is 9 characters
     if val.len() != 9 {

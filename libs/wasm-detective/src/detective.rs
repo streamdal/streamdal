@@ -15,7 +15,7 @@ use protos::sp_pipeline::PipelineDataFormat;
 use unicode_segmentation::UnicodeSegmentation;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
-use crate::matcher_pii::{canada_sin, email, jwt, passport_id, ssn, uk_nino, vin_number};
+use crate::matcher_pii::{canada_sin, email, jwt, ssn, uk_nino, vin_number};
 use crate::matcher_pii_cloud::aws_key_id;
 use crate::matcher_pii_payments::credit_card;
 
@@ -498,25 +498,22 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
     for found_word in found {
         for scanner in &scanners {
             let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
-            match scanner(request, gjson::parse(&payload).get("key")) {
-                Ok(found) => {
-                    if found {
-                        let result = DetectiveStepResultMatch {
-                            type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
-                            path: "".to_string(),
-                            value: found_word.word.clone().into_bytes(),
-                            // TODO: this should return a useful type, but there's no way to get the name of the scanner
-                            // TODO: Using `stringify!(scanner)` will just return "scanner"
-                            pii_type: "plaintext".to_string(),
-                            char_index_start: found_word.char_index_start as i32,
-                            char_index_end: found_word.char_index_end as i32,
-                            ..Default::default()
-                        };
+            if let Ok(found) = scanner(request, gjson::parse(&payload).get("key")) {
+                if found {
+                    let result = DetectiveStepResultMatch {
+                        type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
+                        path: "".to_string(),
+                        value: found_word.word.clone().into_bytes(),
+                        // TODO: this should return a useful type, but there's no way to get the name of the scanner
+                        // TODO: Using `stringify!(scanner)` will just return "scanner"
+                        pii_type: "plaintext".to_string(),
+                        char_index_start: found_word.char_index_start as i32,
+                        char_index_end: found_word.char_index_end as i32,
+                        ..Default::default()
+                    };
 
-                        res.push(result);
-                    }
+                    res.push(result);
                 }
-                _ => {} // Not doing anything with errors here
             }
         }
     }
@@ -524,7 +521,7 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
     res
 }
 
-fn accumulate_parts(accum: &mut Vec<Word>) -> Word {
+fn accumulate_parts(accum: &mut [Word]) -> Word {
     let mut combined = Word {
         ..Default::default()
     };
