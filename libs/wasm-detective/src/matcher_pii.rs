@@ -123,6 +123,8 @@ pub fn drivers_license(_request: &Request, _field: Value) -> Result<bool, Custom
 }
 
 pub fn passport_id(_request: &Request, _field: Value) -> Result<bool, CustomError> {
+    // The format of these IDs is not standardized and follows no reliable patter, so we can't really validate them.
+    // See: https://www.microfocus.com/documentation/idol/IDOL_23_4/EductionGrammars_23.4_Documentation/PII/Content/PII/PII_Examples_Passport.htm
     Err(CustomError::Error("not implemented".to_string()))
 }
 

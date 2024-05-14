@@ -438,7 +438,6 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         email,
         aws_key_id,
         jwt,
-        passport_id,
         ssn,
         uk_nino,
         vin_number,
