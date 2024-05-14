@@ -1,3 +1,4 @@
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 use protos::sp_steps_detective::DetectiveStepResultMatch;
 use protos::sp_steps_transform::TransformTruncateType::TRANSFORM_TRUNCATE_TYPE_PERCENTAGE;
 use protos::sp_steps_transform::TransformType;
@@ -129,6 +130,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             };
 
             transform::Request {
+                data_format: PIPELINE_DATA_FORMAT_JSON,
                 data: wasm_request.input_payload.clone(),
                 value: "".to_string(),
                 paths,
@@ -153,6 +155,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: PIPELINE_DATA_FORMAT_JSON,
                 data: wasm_request.input_payload.clone(),
                 value: "".to_string(),
                 paths: paths,
@@ -172,6 +175,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: PIPELINE_DATA_FORMAT_JSON,
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: opts.mask.clone(),
@@ -191,6 +195,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: PIPELINE_DATA_FORMAT_JSON,
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: "".to_string(),
@@ -210,6 +215,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: PIPELINE_DATA_FORMAT_JSON,
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: opts.value.clone(),
@@ -231,6 +237,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: PIPELINE_DATA_FORMAT_JSON,
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: "".to_string(),
