@@ -370,6 +370,20 @@ export enum DetectiveType {
      */
     PII_KEYWORD = 2036,
     /**
+     * Works on plaintext pipelines only
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_PLAINTEXT = 2037;
+     */
+    PII_PLAINTEXT = 2037,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038;
+     */
+    UK_INSURANCE_NUMBER = 2038,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_CANADA_SIN = 2039;
+     */
+    CANADA_SIN = 2039,
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     NUMERIC_EQUAL_TO = 3000,

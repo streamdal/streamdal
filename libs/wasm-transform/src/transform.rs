@@ -1,7 +1,7 @@
 use conv::prelude::*;
 use protos::sp_steps_detective::DetectiveStepResultMatch;
 use protos::sp_pipeline::PipelineDataFormat;
-use protos::sp_pipeline::PipelineDataFormat::{PIPELINE_DATA_FORMAT_JSON, PIPELINE_DATA_FORMAT_PLAINTEXT};
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_PLAINTEXT;
 use serde_json::{Map, Value};
 use streamdal_gjson as gjson;
 use streamdal_gjson::Kind;
@@ -84,7 +84,7 @@ fn extract_array(value: &streamdal_gjson::Value) -> Result<Value, TransformError
     Ok(array)
 }
 
-fn extract_number(json_str: &str) -> Result<serde_json::Value, TransformError> {
+fn extract_number(json_str: &str) -> Result<Value, TransformError> {
     // Parse the JSON string
     let parsed_value: Result<Value, _> = serde_json::from_str(json_str);
 
@@ -104,7 +104,7 @@ fn extract_number(json_str: &str) -> Result<serde_json::Value, TransformError> {
     }
 }
 
-fn extract_key(value: &streamdal_gjson::Value) -> Result<serde_json::Value, TransformError> {
+fn extract_key(value: &streamdal_gjson::Value) -> Result<Value, TransformError> {
     match value.kind() {
         Kind::String => Ok(Value::String(value.to_string())),
         Kind::Number => match extract_number(value.to_string().as_str()) {

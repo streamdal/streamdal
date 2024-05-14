@@ -287,6 +287,20 @@ export var DetectiveType;
      */
     DetectiveType[DetectiveType["PII_KEYWORD"] = 2036] = "PII_KEYWORD";
     /**
+     * Works on plaintext pipelines only
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_PLAINTEXT = 2037;
+     */
+    DetectiveType[DetectiveType["PII_PLAINTEXT"] = 2037] = "PII_PLAINTEXT";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038;
+     */
+    DetectiveType[DetectiveType["UK_INSURANCE_NUMBER"] = 2038] = "UK_INSURANCE_NUMBER";
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_CANADA_SIN = 2039;
+     */
+    DetectiveType[DetectiveType["CANADA_SIN"] = 2039] = "CANADA_SIN";
+    /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
     DetectiveType[DetectiveType["NUMERIC_EQUAL_TO"] = 3000] = "NUMERIC_EQUAL_TO";

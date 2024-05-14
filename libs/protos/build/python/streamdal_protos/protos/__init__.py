@@ -1452,6 +1452,11 @@ class WasmRequest(betterproto.Message):
     step to obfuscate them
     """
 
+    data_format: "PipelineDataFormat" = betterproto.enum_field(5)
+    """
+    Data format of the input payload. This is obtained from Pipeline.DataFormat
+    """
+
 
 @dataclass(eq=False, repr=False)
 class WasmResponse(betterproto.Message):

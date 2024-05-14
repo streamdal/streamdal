@@ -92,6 +92,13 @@ enum DetectiveType {
   // Uses field/path keyword matching to detect PII, rather than the field's value
   DETECTIVE_TYPE_PII_KEYWORD = 2036;
 
+  // Works on plaintext pipelines only
+  DETECTIVE_TYPE_PII_PLAINTEXT = 2037;
+
+  DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038;
+  DETECTIVE_TYPE_CANADA_SIN = 2039;
+
+
 
   // Numeric matchers (3000-3999)
 

@@ -9,6 +9,7 @@ const runtime_5 = require("@protobuf-ts/runtime");
 const sp_common_1 = require("./sp_common");
 const sp_steps_detective_1 = require("./steps/sp_steps_detective");
 const sp_pipeline_1 = require("./sp_pipeline");
+const sp_pipeline_2 = require("./sp_pipeline");
 /**
  * Included in Wasm response; the SDK should use the WASMExitCode to determine
  * what to do next - should it execute next step, should it notify or should it
@@ -51,14 +52,15 @@ var WASMExitCode;
 class WASMRequest$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.WASMRequest", [
-            { no: 1, name: "step", kind: "message", T: () => sp_pipeline_1.PipelineStep },
+            { no: 1, name: "step", kind: "message", T: () => sp_pipeline_2.PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
-            { no: 4, name: "inter_step_result", kind: "message", T: () => exports.InterStepResult }
+            { no: 4, name: "inter_step_result", kind: "message", T: () => exports.InterStepResult },
+            { no: 5, name: "data_format", kind: "enum", T: () => ["protos.PipelineDataFormat", sp_pipeline_1.PipelineDataFormat, "PIPELINE_DATA_FORMAT_"] }
         ]);
     }
     create(value) {
-        const message = { inputPayload: new Uint8Array(0) };
+        const message = { inputPayload: new Uint8Array(0), dataFormat: 0 };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -70,7 +72,7 @@ class WASMRequest$Type extends runtime_5.MessageType {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
                 case /* protos.PipelineStep step */ 1:
-                    message.step = sp_pipeline_1.PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
+                    message.step = sp_pipeline_2.PipelineStep.internalBinaryRead(reader, reader.uint32(), options, message.step);
                     break;
                 case /* bytes input_payload */ 2:
                     message.inputPayload = reader.bytes();
@@ -80,6 +82,9 @@ class WASMRequest$Type extends runtime_5.MessageType {
                     break;
                 case /* optional protos.InterStepResult inter_step_result */ 4:
                     message.interStepResult = exports.InterStepResult.internalBinaryRead(reader, reader.uint32(), options, message.interStepResult);
+                    break;
+                case /* protos.PipelineDataFormat data_format */ 5:
+                    message.dataFormat = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -95,7 +100,7 @@ class WASMRequest$Type extends runtime_5.MessageType {
     internalBinaryWrite(message, writer, options) {
         /* protos.PipelineStep step = 1; */
         if (message.step)
-            sp_pipeline_1.PipelineStep.internalBinaryWrite(message.step, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+            sp_pipeline_2.PipelineStep.internalBinaryWrite(message.step, writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         /* bytes input_payload = 2; */
         if (message.inputPayload.length)
             writer.tag(2, runtime_1.WireType.LengthDelimited).bytes(message.inputPayload);
@@ -105,6 +110,9 @@ class WASMRequest$Type extends runtime_5.MessageType {
         /* optional protos.InterStepResult inter_step_result = 4; */
         if (message.interStepResult)
             exports.InterStepResult.internalBinaryWrite(message.interStepResult, writer.tag(4, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineDataFormat data_format = 5; */
+        if (message.dataFormat !== 0)
+            writer.tag(5, runtime_1.WireType.Varint).int32(message.dataFormat);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
