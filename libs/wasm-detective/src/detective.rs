@@ -506,6 +506,8 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
                             type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
                             path: "".to_string(),
                             value: found_word.word.clone().into_bytes(),
+                            // TODO: this should return a useful type, but there's no way to get the name of the scanner
+                            // TODO: Using `stringify!(scanner)` will just return "scanner"
                             pii_type: "plaintext".to_string(),
                             char_index_start: found_word.char_index_start as i32,
                             char_index_end: found_word.char_index_end as i32,
