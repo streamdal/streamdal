@@ -50,6 +50,12 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
     URGENCY_HIGH = 2
 
 
+class PipelineDataFormat(betterproto.Enum):
+    PIPELINE_DATA_FORMAT_UNSET = 0
+    PIPELINE_DATA_FORMAT_JSON = 1
+    PIPELINE_DATA_FORMAT_PLAINTEXT = 2
+
+
 class AbortCondition(betterproto.Enum):
     """Defines the ways in which a pipeline can be aborted"""
 
@@ -303,6 +309,7 @@ class Pipeline(betterproto.Message):
     responses This is deprecated and the data has moved to PipelineStep
     """
 
+    data_format: "PipelineDataFormat" = betterproto.enum_field(5)
     paused: Optional[bool] = betterproto.bool_field(
         1000, optional=True, group="X_paused"
     )

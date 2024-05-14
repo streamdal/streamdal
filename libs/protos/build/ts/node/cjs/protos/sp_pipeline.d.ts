@@ -51,6 +51,10 @@ export interface Pipeline {
      */
     NotificationConfigs: NotificationConfig[];
     /**
+     * @generated from protobuf field: protos.PipelineDataFormat data_format = 5;
+     */
+    dataFormat: PipelineDataFormat;
+    /**
      * Indicates whether the pipeline is paused or not. Used internally by server.
      *
      * @generated from protobuf field: optional bool _paused = 1000;
@@ -341,6 +345,23 @@ export interface PipelineConfig {
      * @generated from protobuf field: int64 created_at_unix_ts_utc = 3;
      */
     createdAtUnixTsUtc: string;
+}
+/**
+ * @generated from protobuf enum protos.PipelineDataFormat
+ */
+export declare enum PipelineDataFormat {
+    /**
+     * @generated from protobuf enum value: PIPELINE_DATA_FORMAT_UNSET = 0;
+     */
+    UNSET = 0,
+    /**
+     * @generated from protobuf enum value: PIPELINE_DATA_FORMAT_JSON = 1;
+     */
+    JSON = 1,
+    /**
+     * @generated from protobuf enum value: PIPELINE_DATA_FORMAT_PLAINTEXT = 2;
+     */
+    PLAINTEXT = 2
 }
 /**
  * Defines the ways in which a pipeline can be aborted

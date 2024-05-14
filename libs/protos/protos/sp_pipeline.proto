@@ -17,6 +17,12 @@ import "steps/sp_steps_valid_json.proto";
 option go_package = "github.com/streamdal/streamdal/libs/protos/build/go/protos";
 option ruby_package = "Streamdal::Protos";
 
+enum PipelineDataFormat {
+  PIPELINE_DATA_FORMAT_UNSET = 0;
+  PIPELINE_DATA_FORMAT_JSON = 1;
+  PIPELINE_DATA_FORMAT_PLAINTEXT = 2;
+}
+
 // Pipeline is a structure that holds one or more pipeline steps. This structure
 // is intended to be immutable; clients are expected to generate WASMRequest's
 // that contain a pipeline step.
@@ -31,9 +37,13 @@ message Pipeline {
   // One or more steps to execute
   repeated PipelineStep steps = 3;
 
+
+
   // Notification configs for this pipeline. Only filled out in external API responses
   // This is deprecated and the data has moved to PipelineStep
   repeated protos.NotificationConfig _notification_configs = 4 [deprecated=true]; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  PipelineDataFormat data_format = 5;
 
   // Indicates whether the pipeline is paused or not. Used internally by server.
   optional bool _paused = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
