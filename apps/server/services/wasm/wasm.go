@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
@@ -189,8 +190,9 @@ func (w *Wasm) PopulateWASMFields(ctx context.Context, pipeline *protos.Pipeline
 
 func (w *Wasm) GenerateSchemaInferencePipeline(ctx context.Context) (*protos.Pipeline, error) {
 	pipeline := &protos.Pipeline{
-		Id:   util.GenerateUUID(),
-		Name: "Schema Inference (auto-generated pipeline)",
+		Id:         util.GenerateUUID(),
+		Name:       "Schema Inference (auto-generated pipeline)",
+		DataFormat: protos.PipelineDataFormat_PIPELINE_DATA_FORMAT_JSON,
 		Steps: []*protos.PipelineStep{
 			{
 				Name: "Infer Schema (auto-generated step)",
