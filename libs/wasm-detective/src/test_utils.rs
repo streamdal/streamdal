@@ -1,5 +1,6 @@
 use crate::detective::Request;
 use lazy_static::lazy_static;
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 use protos::sp_steps_detective::DetectiveType;
 use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
 
@@ -132,7 +133,16 @@ pub const SAMPLE_JSON: &str = r#"{
     },
     "rsa_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34GkxFhD9\n-----END RSA PRIVATE KEY-----",
     "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-    "bearer_token": "Authorization: Bearer testToken123"
+    "bearer_token": "Authorization: Bearer testToken123",
+    "vehicle": {
+        "vin": "4T1G11AKXRU906563"
+    },
+    "uk": {
+        "insurance_number": "AA000000B"
+    },
+    "ca": {
+        "social_insurance_number": "046 454 286"
+    }
 }"#;
 
 pub const SAMPLE_JSON_K8S: &str = r#"{
@@ -633,6 +643,7 @@ pub fn generate_request_for_bench(
         path: path.to_string(),
         args,
         negate: false,
-        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+        data_format: PIPELINE_DATA_FORMAT_JSON,
     }
 }

@@ -46,6 +46,24 @@ export var PipelineStepNotification_PayloadType;
     PipelineStepNotification_PayloadType[PipelineStepNotification_PayloadType["SELECT_PATHS"] = 3] = "SELECT_PATHS";
 })(PipelineStepNotification_PayloadType || (PipelineStepNotification_PayloadType = {}));
 /**
+ * @generated from protobuf enum protos.PipelineDataFormat
+ */
+export var PipelineDataFormat;
+(function (PipelineDataFormat) {
+    /**
+     * @generated from protobuf enum value: PIPELINE_DATA_FORMAT_UNSET = 0;
+     */
+    PipelineDataFormat[PipelineDataFormat["UNSET"] = 0] = "UNSET";
+    /**
+     * @generated from protobuf enum value: PIPELINE_DATA_FORMAT_JSON = 1;
+     */
+    PipelineDataFormat[PipelineDataFormat["JSON"] = 1] = "JSON";
+    /**
+     * @generated from protobuf enum value: PIPELINE_DATA_FORMAT_PLAINTEXT = 2;
+     */
+    PipelineDataFormat[PipelineDataFormat["PLAINTEXT"] = 2] = "PLAINTEXT";
+})(PipelineDataFormat || (PipelineDataFormat = {}));
+/**
  * Defines the ways in which a pipeline can be aborted
  *
  * @generated from protobuf enum protos.AbortCondition
@@ -73,6 +91,7 @@ class Pipeline$Type extends MessageType {
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "steps", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PipelineStep },
             { no: 4, name: "_notification_configs", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => NotificationConfig },
+            { no: 5, name: "data_format", kind: "enum", T: () => ["protos.PipelineDataFormat", PipelineDataFormat, "PIPELINE_DATA_FORMAT_"] },
             { no: 1000, name: "_paused", kind: "scalar", opt: true, T: 8 /*ScalarType.BOOL*/ },
             { no: 1001, name: "_description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 1002, name: "_version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
@@ -83,7 +102,7 @@ class Pipeline$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: "", name: "", steps: [], NotificationConfigs: [] };
+        const message = { id: "", name: "", steps: [], NotificationConfigs: [], dataFormat: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -105,6 +124,9 @@ class Pipeline$Type extends MessageType {
                     break;
                 case /* repeated protos.NotificationConfig _notification_configs = 4 [deprecated = true];*/ 4:
                     message.NotificationConfigs.push(NotificationConfig.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* protos.PipelineDataFormat data_format */ 5:
+                    message.dataFormat = reader.int32();
                     break;
                 case /* optional bool _paused */ 1000:
                     message.Paused = reader.bool();
@@ -151,6 +173,9 @@ class Pipeline$Type extends MessageType {
         /* repeated protos.NotificationConfig _notification_configs = 4 [deprecated = true]; */
         for (let i = 0; i < message.NotificationConfigs.length; i++)
             NotificationConfig.internalBinaryWrite(message.NotificationConfigs[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineDataFormat data_format = 5; */
+        if (message.dataFormat !== 0)
+            writer.tag(5, WireType.Varint).int32(message.dataFormat);
         /* optional bool _paused = 1000; */
         if (message.Paused !== undefined)
             writer.tag(1000, WireType.Varint).bool(message.Paused);

@@ -22,6 +22,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :name, :string, 2
       repeated :steps, :message, 3, "protos.PipelineStep"
       repeated :_notification_configs, :message, 4, "protos.NotificationConfig"
+      optional :data_format, :enum, 5, "protos.PipelineDataFormat"
       proto3_optional :_paused, :bool, 1000
       proto3_optional :_description, :string, 1001
       proto3_optional :_version, :string, 1002
@@ -79,6 +80,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :paused, :bool, 2
       optional :created_at_unix_ts_utc, :int64, 3
     end
+    add_enum "protos.PipelineDataFormat" do
+      value :PIPELINE_DATA_FORMAT_UNSET, 0
+      value :PIPELINE_DATA_FORMAT_JSON, 1
+      value :PIPELINE_DATA_FORMAT_PLAINTEXT, 2
+    end
     add_enum "protos.AbortCondition" do
       value :ABORT_CONDITION_UNSET, 0
       value :ABORT_CONDITION_ABORT_CURRENT, 1
@@ -96,6 +102,7 @@ module Streamdal
     PipelineStep = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PipelineStep").msgclass
     PipelineConfigs = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PipelineConfigs").msgclass
     PipelineConfig = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PipelineConfig").msgclass
+    PipelineDataFormat = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.PipelineDataFormat").enummodule
     AbortCondition = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.AbortCondition").enummodule
   end
 end

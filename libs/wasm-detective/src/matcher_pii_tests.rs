@@ -1,8 +1,11 @@
-use crate::detective::Request;
+use crate::detective::{plaintext, Request};
 #[cfg(test)]
+extern crate test;
 use protos::sp_steps_detective::DetectiveType;
-use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
 use std::collections::HashMap;
+use test::Bencher;
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 
 #[test]
 fn test_email() {
@@ -18,6 +21,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal email_plain_valid".to_string(),
@@ -31,6 +35,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal email_plain_invalid".to_string(),
@@ -44,6 +49,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal email_unicode_domain_valid".to_string(),
@@ -57,6 +63,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal email_unicode_domain_invalid".to_string(),
@@ -70,6 +77,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal email_unicode_local_valid".to_string(),
@@ -83,6 +91,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal email_unicode_local_invalid".to_string(),
@@ -96,6 +105,7 @@ fn test_email() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "handles objects inside arrays".to_string(),
@@ -120,6 +130,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal credit_card.visa.valid".to_string(),
@@ -133,6 +144,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal credit_card.visa.invalid".to_string(),
@@ -147,6 +159,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal credit_card.mastercard.valid".to_string(),
@@ -160,6 +173,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal credit_card.mastercard.invalid".to_string(),
@@ -174,6 +188,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal credit_card.discover.valid".to_string(),
@@ -187,6 +202,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal credit_card.discover.invalid".to_string(),
@@ -201,6 +217,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal credit_card.amex.valid".to_string(),
@@ -214,6 +231,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal credit_card.amex.invalid".to_string(),
@@ -228,6 +246,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal credit_card.diners_club.valid".to_string(),
@@ -241,6 +260,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal credit_card.diners_club.invalid".to_string(),
@@ -255,6 +275,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal credit_card.jcb.valid".to_string(),
@@ -268,6 +289,7 @@ fn test_credit_card() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal credit_card.jcb.invalid".to_string(),
@@ -292,6 +314,7 @@ fn test_ssn() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal ssn_valid".to_string(),
@@ -305,9 +328,58 @@ fn test_ssn() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "equal ssn_invalid".to_string(),
+            should_error: false,
+        },
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn test_uk_insurance_number() {
+    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_UK_INSURANCE_NUMBER,
+                data: sample_json,
+                path: "uk.insurance_number".to_string(),
+                args: vec![],
+                negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
+            },
+            expected_matches: 1,
+            text: "equal uk.insurance_number".to_string(),
+            should_error: false,
+        },
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn test_canada_sin() {
+    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_CANADA_SIN,
+                data: sample_json,
+                path: "ca.social_insurance_number".to_string(),
+                args: vec![],
+                negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
+            },
+            expected_matches: 1,
+            text: "equal ca.social_insurance_number".to_string(),
             should_error: false,
         },
     ];
@@ -342,6 +414,7 @@ fn test_payload_search() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "e".to_string(),
@@ -355,6 +428,7 @@ fn test_payload_search() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "".to_string(),
@@ -392,6 +466,7 @@ fn test_any() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "find PII in payload".to_string(),
@@ -405,6 +480,7 @@ fn test_any() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 0,
             text: "don't find PII in payload".to_string(),
@@ -430,6 +506,7 @@ fn test_phone() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal personal.phone".to_string(),
@@ -454,6 +531,7 @@ fn test_religion() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal personal.religion".to_string(),
@@ -478,6 +556,7 @@ fn test_title() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal personal.title".to_string(),
@@ -486,6 +565,31 @@ fn test_title() {
     ];
 
     crate::test_utils::run_tests(&test_cases);
+}
+
+#[test]
+fn test_vin() {
+    let sample_json = &crate::test_utils::SAMPLE_JSON.as_bytes().to_vec();
+
+    let test_cases = vec![
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_VIN_NUMBER,
+                data: sample_json,
+                path: "vehicle.vin".to_string(),
+                args: vec![],
+                negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
+            },
+            expected_matches: 1,
+            text: "equal vehicle.vin".to_string(),
+            should_error: false,
+        }
+    ];
+
+    crate::test_utils::run_tests(&test_cases);
+
 }
 
 #[test]
@@ -501,6 +605,7 @@ fn test_rsa_key() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal rsa_key".to_string(),
@@ -525,6 +630,7 @@ fn test_postal_code() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal address.postal_code.usa".to_string(),
@@ -538,6 +644,7 @@ fn test_postal_code() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal address.postal_code.canada".to_string(),
@@ -561,6 +668,7 @@ fn test_jwt() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal jwt".to_string(),
@@ -789,6 +897,7 @@ fn test_pii_keyword_accuracy() {
         args: vec![],
         negate: false,
         mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY,
+        data_format: PIPELINE_DATA_FORMAT_JSON,
     };
 
     let result = crate::detective::Detective::new().matches(&request);
@@ -804,4 +913,48 @@ fn test_pii_keyword_accuracy() {
         assert_eq!(expected.get(&r.path).unwrap().pii_type, r.pii_type);
         assert_eq!(expected.get(&r.path).unwrap().value, String::from_utf8(r.value).unwrap());
     }
+}
+
+#[test]
+fn test_plaintext() {
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111";
+
+    let request = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
+        data: &sample_text.as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_JSON,
+    };
+
+    let results = crate::detective::Detective::new().matches(&request).unwrap();
+
+    // This should match 4 PII types: email, vin, nhs number, and credit card
+    assert_eq!(results.len(), 4);
+
+    // assert_eq!(&results[0].pii_type, "Person");
+    // assert_eq!(&results[1].pii_type, "Vehicle_Information");
+    // assert_eq!(&results[2].pii_type, "Health");
+    // assert_eq!(&results[3].pii_type, "Billing");
+}
+
+#[bench]
+fn bench_plaintext(b: &mut Bencher) {
+    b.iter(|| {
+        let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111.";
+
+        let req = &Request {
+            match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+            data: &&sample_text.as_bytes().to_vec(),
+            path: "".to_string(),
+            args: Vec::new(),
+            negate: false,
+            mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+            data_format: PIPELINE_DATA_FORMAT_JSON,
+        };
+
+        let _ = plaintext(&req, sample_text);
+    });
 }

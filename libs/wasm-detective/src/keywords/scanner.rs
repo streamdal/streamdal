@@ -82,7 +82,7 @@ impl FieldPII {
                 match_against.insert(key_name.clone(), def.clone());
 
                 // Also insert a copy of the key with underscores removed
-                match_against.insert(key_name.clone().replace("_", ""), def.clone());
+                match_against.insert(key_name.clone().replace('_', ""), def.clone());
             }
         }
 

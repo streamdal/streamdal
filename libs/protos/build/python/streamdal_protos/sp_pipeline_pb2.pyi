@@ -19,9 +19,13 @@ ABORT_CONDITION_ABORT_ALL: AbortCondition
 ABORT_CONDITION_ABORT_CURRENT: AbortCondition
 ABORT_CONDITION_UNSET: AbortCondition
 DESCRIPTOR: _descriptor.FileDescriptor
+PIPELINE_DATA_FORMAT_JSON: PipelineDataFormat
+PIPELINE_DATA_FORMAT_PLAINTEXT: PipelineDataFormat
+PIPELINE_DATA_FORMAT_UNSET: PipelineDataFormat
 
 class Pipeline(_message.Message):
-    __slots__ = ["_created_at_unix_ts_utc", "_created_by", "_description", "_notification_configs", "_paused", "_updated_at_unix_ts_utc", "_url", "_version", "id", "name", "steps"]
+    __slots__ = ["_created_at_unix_ts_utc", "_created_by", "_description", "_notification_configs", "_paused", "_updated_at_unix_ts_utc", "_url", "_version", "data_format", "id", "name", "steps"]
+    DATA_FORMAT_FIELD_NUMBER: _ClassVar[int]
     ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STEPS_FIELD_NUMBER: _ClassVar[int]
@@ -41,10 +45,11 @@ class Pipeline(_message.Message):
     _updated_at_unix_ts_utc: int
     _url: str
     _version: str
+    data_format: PipelineDataFormat
     id: str
     name: str
     steps: _containers.RepeatedCompositeFieldContainer[PipelineStep]
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., _paused: bool = ..., _description: _Optional[str] = ..., _version: _Optional[str] = ..., _url: _Optional[str] = ..., _created_at_unix_ts_utc: _Optional[int] = ..., _updated_at_unix_ts_utc: _Optional[int] = ..., _created_by: _Optional[str] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., steps: _Optional[_Iterable[_Union[PipelineStep, _Mapping]]] = ..., _notification_configs: _Optional[_Iterable[_Union[_sp_notify_pb2.NotificationConfig, _Mapping]]] = ..., data_format: _Optional[_Union[PipelineDataFormat, str]] = ..., _paused: bool = ..., _description: _Optional[str] = ..., _version: _Optional[str] = ..., _url: _Optional[str] = ..., _created_at_unix_ts_utc: _Optional[int] = ..., _updated_at_unix_ts_utc: _Optional[int] = ..., _created_by: _Optional[str] = ...) -> None: ...
 
 class PipelineConfig(_message.Message):
     __slots__ = ["created_at_unix_ts_utc", "id", "paused"]
@@ -140,6 +145,9 @@ class PipelineStepNotification(_message.Message):
     paths: _containers.RepeatedScalarFieldContainer[str]
     payload_type: PipelineStepNotification.PayloadType
     def __init__(self, notification_config_ids: _Optional[_Iterable[str]] = ..., payload_type: _Optional[_Union[PipelineStepNotification.PayloadType, str]] = ..., paths: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class PipelineDataFormat(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
 
 class AbortCondition(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []

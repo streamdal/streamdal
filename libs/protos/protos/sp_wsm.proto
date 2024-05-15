@@ -49,6 +49,9 @@ message WASMRequest {
   // For example, when trying to find email addresses in a payload and
   // then passing on the results to a transform step to obfuscate them
   optional InterStepResult inter_step_result = 4;
+
+  // Data format of the input payload. This is obtained from Pipeline.DataFormat
+  PipelineDataFormat data_format = 5;
 }
 
 // Returned by all WASM functions

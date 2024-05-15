@@ -123,11 +123,46 @@ pub fn drivers_license(_request: &Request, _field: Value) -> Result<bool, Custom
 }
 
 pub fn passport_id(_request: &Request, _field: Value) -> Result<bool, CustomError> {
+    // The format of these IDs is not standardized and follows no reliable patter, so we can't really validate them.
+    // See: https://www.microfocus.com/documentation/idol/IDOL_23_4/EductionGrammars_23.4_Documentation/PII/Content/PII/PII_Examples_Passport.htm
     Err(CustomError::Error("not implemented".to_string()))
 }
 
 pub fn vin_number(_request: &Request, _field: Value) -> Result<bool, CustomError> {
-    Err(CustomError::Error("not implemented".to_string()))
+    let vin = _field.str().trim().to_lowercase();
+
+    // Check if VIN has 17 characters
+    if vin.len() != 17 {
+        return Ok(false);
+    }
+
+    let weights: [u32; 17] = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
+
+    let transliterations: std::collections::HashMap<char, u32> = [
+        ('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('h', 8),
+        ('j', 1), ('k', 2), ('l', 3), ('m', 4), ('n', 5), ('p', 7), ('r', 9), ('s', 2),
+        ('t', 3), ('u', 4), ('v', 5), ('w', 6), ('x', 7), ('y', 8), ('z', 9)
+    ].iter().cloned().collect();
+
+    let mut sum = 0;
+
+    for (i, c) in vin.chars().enumerate() {
+        if c.is_numeric() {
+            sum += c.to_digit(10).unwrap() * weights[i];
+        } else {
+            sum += *transliterations.get(&c).unwrap() * weights[i];
+        }
+    }
+
+    let checkdigit = sum % 11;
+
+    let found_char = char::from_u32(checkdigit + '0' as u32).unwrap();
+
+    let checkdigit = if checkdigit == 10 { 'x' } else { found_char };
+
+    let res = checkdigit == vin.chars().nth(8).unwrap();
+
+    Ok(res)
 }
 
 #[derive(Validator)]
@@ -359,4 +394,76 @@ pub fn bearer_token(_request: &Request, field: Value) -> Result<bool, CustomErro
 
     let valid = field.starts_with("Bearer ") || field.starts_with("Authorization: Bearer");
     Ok(valid)
+}
+
+const INVALID_NINO_PREFIXES: [&str; 7] = ["BG", "GB", "NK", "KN", "TN", "NT", "ZZ"];
+
+pub fn uk_nino(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim();
+
+    // Strip all spaces
+    let val = val.replace(' ', "");
+
+    // Check if the length is between 8 and 9 characters
+    if val.len() < 8 || val.len() > 9 {
+        return Ok(false);
+    }
+
+    // Check if the first two characters are letters
+    if !val.chars().take(2).all(|c| c.is_ascii_alphabetic()) {
+        return Ok(false);
+    }
+
+    // Check if the first two characters are not in the invalid prefixes
+    if INVALID_NINO_PREFIXES.contains(&val.chars().take(2).collect::<String>().as_str()) {
+        return Ok(false);
+    }
+
+    // Check if the next six characters are digits
+    if !val.chars().skip(2).take(6).all(|c| c.is_ascii_digit()) {
+        return Ok(false);
+    }
+
+    // Check if the last character is a letter
+    if !val.chars().last().unwrap().is_ascii_alphabetic() {
+        return Ok(false);
+    }
+
+    Ok(true)
+}
+
+pub fn canada_sin(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim();
+
+    // Strip all dashes and spaces
+    let val = val.replace(['-', ' '], "");
+
+    // Check if the length is 9 characters
+    if val.len() != 9 {
+        return Ok(false);
+    }
+
+    // Check if all characters are digits
+    if !val.chars().all(char::is_numeric) {
+        return Ok(false);
+    }
+
+    // Validate with Luhn algorithm
+    let mut sum = 0;
+    for (mut i, c) in val.chars().enumerate() {
+        i += 1;
+        let mut digit = c.to_digit(10).unwrap();
+
+
+        if i % 2 == 0 {
+            digit *= 2;
+            if digit > 9 {
+                digit -= 9;
+            }
+        }
+
+        sum += digit;
+    }
+
+    Ok(sum % 10 == 0)
 }
