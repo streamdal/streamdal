@@ -565,7 +565,8 @@ func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 	s.config.Logger.Debug("heartbeat() exit")
 }
 
-func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult, workerID int) (*protos.WASMResponse, error) {
+// TODO: refactor this signature
+func (s *Streamdal) runStep(ctx context.Context, df protos.PipelineDataFormat, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult, workerID int) (*protos.WASMResponse, error) {
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
@@ -584,6 +585,7 @@ func (s *Streamdal) runStep(ctx context.Context, aud *protos.Audience, step *pro
 		InputPayload:    data,
 		Step:            step,
 		InterStepResult: isr,
+		DataFormat:      df,
 	}
 
 	reqBytes, err := proto.Marshal(req)
@@ -862,7 +864,7 @@ PIPELINE:
 
 			// Pipeline timeout either has not occurred OR it occurred and execution was not aborted
 
-			wasmResp, err := s.runStep(stepTimeoutCtx, aud, step, resp.Data, isr, workerID)
+			wasmResp, err := s.runStep(stepTimeoutCtx, pipeline.DataFormat, aud, step, resp.Data, isr, workerID)
 			if err != nil {
 				stepTimeoutCxl()
 
