@@ -1,0 +1,5 @@
+2024-04-29T15:59:41.289946276Z stdout Hello World!
+2024-04-29T15:59:41.60221245Z stdout F  - using code:    gin.SetMode(gin.ReleaseMode)
+2024-04-29T15:59:41.60221514Z stdout Found user with email test@streamdal.com
+2024-04-29T15:59:41.60221515Z stdout Exporting data {"user": {"ccnum": "4111111111111111"}} to billing service
+2024-04-29T15:59:41.60221516Z stdout Run Completed

@@ -166,6 +166,18 @@ run/async-sampling:
 	--data-source-type file \
 	--data-source-file ./assets/sample.json
 
+.PHONY: run/plaintext
+run/plaintext: description = Plaintext Logs
+run/plaintext:
+	go run *.go -d \
+	--message-rate 1,10 \
+	--service-name "plaintext-logs" \
+	--operation-type 2 \
+	--operation-name  "logs" \
+	--component-name "plaintext-logger" \
+	--display-exec-time \
+	--data-source-type file \
+	--data-source-file ./assets/plaintext-logs.txt
 
 ### Build
 

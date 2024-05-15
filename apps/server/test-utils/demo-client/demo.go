@@ -15,6 +15,7 @@ import (
 	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	streamdal "github.com/streamdal/streamdal/sdks/go"
@@ -295,6 +296,16 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error, t
 }
 
 func generateDataDiff(tw gopretty.Writer, pre []byte, post *streamdal.ProcessResponse) {
+	// Plaintext
+	// TODO: can we add syntax highlighting to changed val?
+	if pre[0] != '{' {
+		tw.AppendSeparator()
+		tw.AppendRow(gopretty.Row{bold("Before"), bold("After")})
+		tw.AppendSeparator()
+		tw.AppendRow(gopretty.Row{string(pre), string(post.Data)})
+		return
+	}
+
 	// Format pre data
 	preFormatted, err := prettyjson.Format(pre)
 	if err != nil {
