@@ -299,7 +299,7 @@ dependencies = [
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.56"
+version = "0.1.57"
 dependencies = [
  "protobuf",
 ]

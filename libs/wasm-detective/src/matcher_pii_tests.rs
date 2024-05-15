@@ -940,6 +940,26 @@ fn test_plaintext() {
     // assert_eq!(&results[3].pii_type, "Billing");
 }
 
+#[test]
+fn test_plaintext_mixed() {
+    let sample_text = "2024-04-29T15:59:41.60221515Z stdout Exporting data {\"user\": {\"ccnum\": \"4111111111111111\"}} to billing service";
+
+    let request = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
+        data: &sample_text.as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_JSON,
+    };
+
+    let results = crate::detective::Detective::new().matches(&request).unwrap();
+
+    assert_eq!(results.len(), 1);
+
+}
+
 #[bench]
 fn bench_plaintext(b: &mut Bencher) {
     b.iter(|| {
