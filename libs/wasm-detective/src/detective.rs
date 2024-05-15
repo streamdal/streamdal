@@ -458,11 +458,18 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         // split on them since they might be inside an email, ipv6, macaddr, etc.
         let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
 
+        // Ignore these characters so that we can properly find PII inside JSON that is inside a plaintext string
+        let ignore_chars = HashMap::from([('"', 0), ('{', 0), ('}', 0), ('\'', 0)]);
+
         // This is our word-part accumulator and is used to
         // combine "user", "@", "somedomain.com" words into a single word
         let mut accum: Vec<Word> = Vec::new();
 
         for (word_start, word) in words {
+            if word.len() == 1 && ignore_chars.contains_key(&word.chars().next().unwrap()) {
+                continue;
+            }
+
             // We've reached the end of a word, combine our accumulator into a single Word struct
             if word == " " {
                 // Loop over accumulator and join the string value of each word
