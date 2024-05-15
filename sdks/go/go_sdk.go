@@ -567,6 +567,18 @@ func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 
 // TODO: refactor this signature
 func (s *Streamdal) runStep(ctx context.Context, df protos.PipelineDataFormat, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult, workerID int) (*protos.WASMResponse, error) {
+	// TODO: temp fix to ignore schemas for plaintext pipelines
+	// TODO: this should ideally be done by the server
+	if df == protos.PipelineDataFormat_PIPELINE_DATA_FORMAT_PLAINTEXT && step.GetInferSchema() != nil {
+		return &protos.WASMResponse{
+			OutputPayload:   data,
+			ExitCode:        protos.WASMExitCode_WASM_EXIT_CODE_TRUE,
+			ExitMsg:         "Plaintext, skipping infer schema step",
+			OutputStep:      []byte(``),
+			InterStepResult: nil,
+		}, nil
+	}
+
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
