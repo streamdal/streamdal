@@ -346,7 +346,6 @@ func truncp(s *string) string {
 }
 
 func trunc(s string) string {
-	return s
 	if len(s) > 80 {
 		return s[:80] + "..."
 	}
