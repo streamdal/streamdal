@@ -269,12 +269,14 @@ var _ = Describe("WASM Modules", func() {
 
 		BeforeEach(func() {
 			s = &Streamdal{
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string][]*protos.Pipeline{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				wasmCacheMtx: &sync.RWMutex{},
-				wasmCache:    map[string][]byte{},
+				pipelinesMtx:  &sync.RWMutex{},
+				pipelines:     map[string][]*protos.Pipeline{},
+				audiencesMtx:  &sync.RWMutex{},
+				audiences:     map[string]struct{}{},
+				wasmCacheMtx:  &sync.RWMutex{},
+				wasmCache:     map[string][]byte{},
+				funcCreate:    make(map[string]*sync.Mutex),
+				funcCreateMtx: &sync.Mutex{},
 			}
 
 			req = &protos.WASMRequest{
