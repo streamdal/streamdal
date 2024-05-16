@@ -148,19 +148,38 @@ pub fn vin_number(_request: &Request, _field: Value) -> Result<bool, CustomError
 
     for (i, c) in vin.chars().enumerate() {
         if c.is_numeric() {
-            sum += c.to_digit(10).unwrap() * weights[i];
+            if let Some(got_digit) = c.to_digit(10) {
+                sum += got_digit * weights[i];
+            } else {
+                return Ok(false);
+            }
         } else {
-            sum += *transliterations.get(&c).unwrap() * weights[i];
+            if let Some(got_translit) = transliterations.get(&c) {
+                sum += got_translit * weights[i];
+            } else {
+                return Ok(false);
+            }
         }
     }
 
     let checkdigit = sum % 11;
 
-    let found_char = char::from_u32(checkdigit + '0' as u32).unwrap();
+    let checkdigit = if checkdigit == 10 {
+        'x'
+    } else {
+        let found_char = char::from_u32(checkdigit + '0' as u32);
+        if found_char.is_none() {
+            return Ok(false);
+        }
+        found_char.unwrap()
+    };
 
-    let checkdigit = if checkdigit == 10 { 'x' } else { found_char };
+    let eighth_char = vin.chars().nth(8);
+    if eighth_char.is_none() {
+        return Ok(false);
+    }
 
-    let res = checkdigit == vin.chars().nth(8).unwrap();
+    let res = checkdigit == eighth_char.unwrap();
 
     Ok(res)
 }
@@ -425,7 +444,7 @@ pub fn uk_nino(_request: &Request, field: Value) -> Result<bool, CustomError> {
     }
 
     // Check if the last character is a letter
-    if !val.chars().last().unwrap().is_ascii_alphabetic() {
+    if !val.chars().last().unwrap_or('0').is_ascii_alphabetic() {
         return Ok(false);
     }
 
@@ -452,8 +471,12 @@ pub fn canada_sin(_request: &Request, field: Value) -> Result<bool, CustomError>
     let mut sum = 0;
     for (mut i, c) in val.chars().enumerate() {
         i += 1;
-        let mut digit = c.to_digit(10).unwrap();
+        let digit = c.to_digit(10);
+        if digit.is_none() {
+            return Ok(false);
+        }
 
+        let mut digit = digit.unwrap();
 
         if i % 2 == 0 {
             digit *= 2;
