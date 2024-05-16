@@ -113,6 +113,8 @@ github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/streamdal/streamdal/apps/server v0.0.43 h1:v5XR/WNOkr11CE0QyxWoBoaMqwbzeBxfrXa4jESru/s=
 github.com/streamdal/streamdal/apps/server v0.0.43/go.mod h1:vxW/tPBTn9+JJvYAJWm2K9JZAk+kmzyZFvALq44z5S8=
+github.com/streamdal/streamdal/apps/server v0.0.68 h1:dY2EfXpE80WBR7XAJO0/ieJCUa8899iQ/N6iNOFXY6U=
+github.com/streamdal/streamdal/apps/server v0.0.68/go.mod h1:4vE9V772B6TXGDDLq1i5UvOgnEIVC7hXAUheUrujGcI=
 github.com/streamdal/streamdal/libs/protos v0.1.39 h1:nO7zIzXtEQLGPweZ90XJ+EMJGNzPIX4vQPg8sQvhHl8=
 github.com/streamdal/streamdal/libs/protos v0.1.39/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/streamdal/streamdal/libs/protos v0.1.40 h1:4U8W/8Y8u+68oGe4R7p55LHS4c7tRy0wwJu71IXLsnY=
@@ -121,6 +123,8 @@ github.com/streamdal/streamdal/libs/protos v0.1.41 h1:OxU8ACMgiFiMt2P7FzV9uXzScr
 github.com/streamdal/streamdal/libs/protos v0.1.41/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/streamdal/streamdal/libs/protos v0.1.44 h1:DNn+zMbu/jaglZTVy/nL4iRrapqJ+tZYI+8P2RhPHdo=
 github.com/streamdal/streamdal/libs/protos v0.1.44/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
+github.com/streamdal/streamdal/libs/protos v0.1.57 h1:WcdPA6d/jSBbr4BF07q5bgnoA7NaadL1rccQbvLXer8=
+github.com/streamdal/streamdal/libs/protos v0.1.57/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=
