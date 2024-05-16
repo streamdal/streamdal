@@ -153,12 +153,10 @@ pub fn vin_number(_request: &Request, _field: Value) -> Result<bool, CustomError
             } else {
                 return Ok(false);
             }
+        } else if let Some(got_translit) = transliterations.get(&c) {
+            sum += got_translit * weights[i];
         } else {
-            if let Some(got_translit) = transliterations.get(&c) {
-                sum += got_translit * weights[i];
-            } else {
-                return Ok(false);
-            }
+            return Ok(false);
         }
     }
 
