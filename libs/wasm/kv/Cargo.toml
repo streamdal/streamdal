@@ -13,3 +13,7 @@ protobuf = "3.4.0"
 streamdal-protos = { path="../../protos/build/rust/protos" }
 common = { path = "../common" }
 streamdal-wasm-detective = { path = "../../wasm-detective" }
+
+[profile.release]
+lto = true
+opt-level = 'z'
