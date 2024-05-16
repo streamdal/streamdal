@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/tetratelabs/wazero/internal/engine/wazevo/wazevoapi"
 )
 
 // BasicBlock represents the Basic Block of an SSA function.
@@ -53,6 +55,9 @@ type BasicBlock interface {
 	// Valid is true if this block is still valid even after optimizations.
 	Valid() bool
 
+	// Sealed is true if this block has been sealed.
+	Sealed() bool
+
 	// BeginPredIterator returns the first predecessor of this block.
 	BeginPredIterator() BasicBlock
 
@@ -92,7 +97,7 @@ type (
 		// lastDefinitions maps Variable to its last definition in this block.
 		lastDefinitions map[Variable]Value
 		// unknownsValues are used in builder.findValue. The usage is well-described in the paper.
-		unknownValues map[Variable]Value
+		unknownValues []unknownValue
 		// invalid is true if this block is made invalid during optimizations.
 		invalid bool
 		// sealed is true if this is sealed (all the predecessors are known).
@@ -130,6 +135,13 @@ type (
 		value Value
 		// typ is the type of the parameter.
 		typ Type
+	}
+
+	unknownValue struct {
+		// variable is the variable that this unknownValue represents.
+		variable Variable
+		// value is the value that this unknownValue represents.
+		value Value
 	}
 )
 
@@ -201,6 +213,11 @@ func (bb *basicBlock) Param(i int) Value {
 // Valid implements BasicBlock.Valid.
 func (bb *basicBlock) Valid() bool {
 	return !bb.invalid
+}
+
+// Sealed implements BasicBlock.Sealed.
+func (bb *basicBlock) Sealed() bool {
+	return bb.sealed
 }
 
 // InsertInstruction implements BasicBlock.InsertInstruction.
@@ -285,8 +302,8 @@ func resetBasicBlock(bb *basicBlock) {
 	bb.success = bb.success[:0]
 	bb.invalid, bb.sealed = false, false
 	bb.singlePred = nil
-	bb.unknownValues = make(map[Variable]Value)
-	bb.lastDefinitions = make(map[Variable]Value)
+	bb.unknownValues = bb.unknownValues[:0]
+	bb.lastDefinitions = wazevoapi.ResetMap(bb.lastDefinitions)
 	bb.reversePostOrder = -1
 	bb.loopNestingForestChildren = bb.loopNestingForestChildren[:0]
 	bb.loopHeader = false
@@ -362,11 +379,11 @@ func (bb *basicBlock) validate(b *builder) {
 				exp = len(bb.params)
 			}
 
-			if len(pred.branch.vs) != exp {
+			if len(pred.branch.vs.View()) != exp {
 				panic(fmt.Sprintf(
 					"BUG: len(argument at %s) != len(params at %s): %d != %d: %s",
 					pred.blk.Name(), bb.Name(),
-					len(pred.branch.vs), len(bb.params), pred.branch.Format(b),
+					len(pred.branch.vs.View()), len(bb.params), pred.branch.Format(b),
 				))
 			}
 

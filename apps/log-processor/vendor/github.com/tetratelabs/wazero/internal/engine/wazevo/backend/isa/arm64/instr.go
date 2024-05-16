@@ -3,8 +3,8 @@ package arm64
 import (
 	"fmt"
 	"math"
-	"strings"
 
+	"github.com/tetratelabs/wazero/internal/engine/wazevo/backend"
 	"github.com/tetratelabs/wazero/internal/engine/wazevo/backend/regalloc"
 	"github.com/tetratelabs/wazero/internal/engine/wazevo/ssa"
 )
@@ -21,20 +21,30 @@ type (
 	//
 	// TODO: optimize the layout later once the impl settles.
 	instruction struct {
-		kind                instructionKind
 		prev, next          *instruction
 		u1, u2, u3          uint64
 		rd, rm, rn, ra      operand
 		amode               addressMode
-		abi                 *abiImpl
-		targets             []uint32
+		kind                instructionKind
 		addedBeforeRegAlloc bool
 	}
 
 	// instructionKind represents the kind of instruction.
 	// This controls how the instruction struct is interpreted.
-	instructionKind int
+	instructionKind byte
 )
+
+func asNop0(i *instruction) {
+	i.kind = nop0
+}
+
+func setNext(i, next *instruction) {
+	i.next = next
+}
+
+func setPrev(i, prev *instruction) {
+	i.prev = prev
+}
 
 // IsCall implements regalloc.Instr IsCall.
 func (i *instruction) IsCall() bool {
@@ -49,6 +59,21 @@ func (i *instruction) IsIndirectCall() bool {
 // IsReturn implements regalloc.Instr IsReturn.
 func (i *instruction) IsReturn() bool {
 	return i.kind == ret
+}
+
+// Next implements regalloc.Instr Next.
+func (i *instruction) Next() regalloc.Instr {
+	return i.next
+}
+
+// Prev implements regalloc.Instr Prev.
+func (i *instruction) Prev() regalloc.Instr {
+	return i.prev
+}
+
+// AddedBeforeRegAlloc implements regalloc.Instr AddedBeforeRegAlloc.
+func (i *instruction) AddedBeforeRegAlloc() bool {
+	return i.addedBeforeRegAlloc
 }
 
 type defKind byte
@@ -134,6 +159,12 @@ var defKinds = [numInstructionKinds]defKind{
 	movToFPSR:            defKindNone,
 	movFromFPSR:          defKindRD,
 	emitSourceOffsetInfo: defKindNone,
+	atomicRmw:            defKindRD,
+	atomicCas:            defKindNone,
+	atomicLoad:           defKindRD,
+	atomicStore:          defKindNone,
+	dmb:                  defKindNone,
+	loadConstBlockArg:    defKindRD,
 }
 
 // Defs returns the list of regalloc.VReg that are defined by the instruction.
@@ -145,7 +176,13 @@ func (i *instruction) Defs(regs *[]regalloc.VReg) []regalloc.VReg {
 	case defKindRD:
 		*regs = append(*regs, i.rd.nr())
 	case defKindCall:
-		*regs = append(*regs, i.abi.retRealRegs...)
+		_, _, retIntRealRegs, retFloatRealRegs, _ := backend.ABIInfoFromUint64(i.u2)
+		for i := byte(0); i < retIntRealRegs; i++ {
+			*regs = append(*regs, regInfo.RealRegToVReg[intParamResultRegs[i]])
+		}
+		for i := byte(0); i < retFloatRealRegs; i++ {
+			*regs = append(*regs, regInfo.RealRegToVReg[floatParamResultRegs[i]])
+		}
 	default:
 		panic(fmt.Sprintf("defKind for %v not defined", i))
 	}
@@ -173,13 +210,16 @@ const (
 	useKindRNRM
 	useKindRNRMRA
 	useKindRNRN1RM
-	useKindRet
 	useKindCall
 	useKindCallInd
 	useKindAMode
 	useKindRNAMode
 	useKindCond
-	useKindVecRRRRewrite
+	// useKindRDRewrite indicates an instruction where RD is used both as a source and destination.
+	// A temporary register for RD must be allocated explicitly with the source copied to this
+	// register before the instruction and the value copied from this register to the instruction
+	// return register.
+	useKindRDRewrite
 )
 
 var useKinds = [numInstructionKinds]useKind{
@@ -204,7 +244,7 @@ var useKinds = [numInstructionKinds]useKind{
 	nop0:                 useKindNone,
 	call:                 useKindCall,
 	callInd:              useKindCallInd,
-	ret:                  useKindRet,
+	ret:                  useKindNone,
 	store8:               useKindRNAMode,
 	store16:              useKindRNAMode,
 	store32:              useKindRNAMode,
@@ -249,7 +289,7 @@ var useKinds = [numInstructionKinds]useKind{
 	vecTbl:               useKindRNRM,
 	vecTbl2:              useKindRNRN1RM,
 	vecRRR:               useKindRNRM,
-	vecRRRRewrite:        useKindVecRRRRewrite,
+	vecRRRRewrite:        useKindRDRewrite,
 	vecPermute:           useKindRNRM,
 	fpuToInt:             useKindRN,
 	intToFpu:             useKindRN,
@@ -257,6 +297,12 @@ var useKinds = [numInstructionKinds]useKind{
 	movFromFPSR:          useKindNone,
 	adr:                  useKindNone,
 	emitSourceOffsetInfo: useKindNone,
+	atomicRmw:            useKindRNRM,
+	atomicCas:            useKindRDRewrite,
+	atomicLoad:           useKindRN,
+	atomicStore:          useKindRNRM,
+	loadConstBlockArg:    useKindNone,
+	dmb:                  useKindNone,
 }
 
 // Uses returns the list of regalloc.VReg that are used by the instruction.
@@ -294,8 +340,6 @@ func (i *instruction) Uses(regs *[]regalloc.VReg) []regalloc.VReg {
 		if rm := i.rm.reg(); rm.Valid() {
 			*regs = append(*regs, rm)
 		}
-	case useKindRet:
-		*regs = append(*regs, i.abi.retRealRegs...)
 	case useKindAMode:
 		if amodeRN := i.amode.rn; amodeRN.Valid() {
 			*regs = append(*regs, amodeRN)
@@ -316,12 +360,18 @@ func (i *instruction) Uses(regs *[]regalloc.VReg) []regalloc.VReg {
 		if cnd.kind() != condKindCondFlagSet {
 			*regs = append(*regs, cnd.register())
 		}
-	case useKindCall:
-		*regs = append(*regs, i.abi.argRealRegs...)
 	case useKindCallInd:
 		*regs = append(*regs, i.rn.nr())
-		*regs = append(*regs, i.abi.argRealRegs...)
-	case useKindVecRRRRewrite:
+		fallthrough
+	case useKindCall:
+		argIntRealRegs, argFloatRealRegs, _, _, _ := backend.ABIInfoFromUint64(i.u2)
+		for i := byte(0); i < argIntRealRegs; i++ {
+			*regs = append(*regs, regInfo.RealRegToVReg[intParamResultRegs[i]])
+		}
+		for i := byte(0); i < argFloatRealRegs; i++ {
+			*regs = append(*regs, regInfo.RealRegToVReg[floatParamResultRegs[i]])
+		}
+	case useKindRDRewrite:
 		*regs = append(*regs, i.rn.reg())
 		*regs = append(*regs, i.rm.reg())
 		*regs = append(*regs, i.rd.reg())
@@ -348,7 +398,7 @@ func (i *instruction) AssignUse(index int, reg regalloc.VReg) {
 				i.rm = i.rm.assignReg(reg)
 			}
 		}
-	case useKindVecRRRRewrite:
+	case useKindRDRewrite:
 		if index == 0 {
 			if rn := i.rn.reg(); rn.Valid() {
 				i.rn = i.rn.assignReg(reg)
@@ -389,8 +439,6 @@ func (i *instruction) AssignUse(index int, reg regalloc.VReg) {
 				i.ra = i.ra.assignReg(reg)
 			}
 		}
-	case useKindRet:
-		panic("BUG: ret instructions shouldn't be assigned")
 	case useKindAMode:
 		if index == 0 {
 			if amodeRN := i.amode.rn; amodeRN.Valid() {
@@ -434,16 +482,20 @@ func (i *instruction) AssignUse(index int, reg regalloc.VReg) {
 	}
 }
 
-func (i *instruction) asCall(ref ssa.FuncRef, abi *abiImpl) {
+func (i *instruction) asCall(ref ssa.FuncRef, abi *backend.FunctionABI) {
 	i.kind = call
 	i.u1 = uint64(ref)
-	i.abi = abi
+	if abi != nil {
+		i.u2 = abi.ABIInfoAsUint64()
+	}
 }
 
-func (i *instruction) asCallIndirect(ptr regalloc.VReg, abi *abiImpl) {
+func (i *instruction) asCallIndirect(ptr regalloc.VReg, abi *backend.FunctionABI) {
 	i.kind = callInd
 	i.rn = operandNR(ptr)
-	i.abi = abi
+	if abi != nil {
+		i.u2 = abi.ABIInfoAsUint64()
+	}
 }
 
 func (i *instruction) callFuncRef() ssa.FuncRef {
@@ -497,9 +549,8 @@ func (i *instruction) nop0Label() label {
 	return label(i.u1)
 }
 
-func (i *instruction) asRet(abi *abiImpl) {
+func (i *instruction) asRet() {
 	i.kind = ret
-	i.abi = abi
 }
 
 func (i *instruction) asStorePair64(src1, src2 regalloc.VReg, amode addressMode) {
@@ -625,17 +676,18 @@ func (i *instruction) asFpuCSel(rd, rn, rm operand, c condFlag, _64bit bool) {
 }
 
 func (i *instruction) asBr(target label) {
-	if target == returnLabel {
+	if target == labelReturn {
 		panic("BUG: call site should special case for returnLabel")
 	}
 	i.kind = br
 	i.u1 = uint64(target)
 }
 
-func (i *instruction) asBrTableSequence(indexReg regalloc.VReg, targets []uint32) {
+func (i *instruction) asBrTableSequence(indexReg regalloc.VReg, targetIndex, targetCounts int) {
 	i.kind = brTableSequence
 	i.rn = operandNR(indexReg)
-	i.targets = targets
+	i.u1 = uint64(targetIndex)
+	i.u2 = uint64(targetCounts)
 }
 
 func (i *instruction) brTableSequenceOffsetsResolved() {
@@ -921,11 +973,12 @@ func (i *instruction) asVecLanes(op vecOp, rd, rn operand, arr vecArrangement) {
 	i.u2 = uint64(arr)
 }
 
-func (i *instruction) asVecShiftImm(op vecOp, rd, rn, rm operand, arr vecArrangement) {
+func (i *instruction) asVecShiftImm(op vecOp, rd, rn, rm operand, arr vecArrangement) *instruction {
 	i.kind = vecShiftImm
 	i.u1 = uint64(op)
 	i.rn, i.rm, i.rd = rn, rm, rd
 	i.u2 = uint64(arr)
+	return i
 }
 
 func (i *instruction) asVecTbl(nregs byte, rd, rn, rm operand, arr vecArrangement) {
@@ -954,11 +1007,12 @@ func (i *instruction) asVecPermute(op vecOp, rd, rn, rm operand, arr vecArrangem
 	i.u2 = uint64(arr)
 }
 
-func (i *instruction) asVecRRR(op vecOp, rd, rn, rm operand, arr vecArrangement) {
+func (i *instruction) asVecRRR(op vecOp, rd, rn, rm operand, arr vecArrangement) *instruction {
 	i.kind = vecRRR
 	i.u1 = uint64(op)
 	i.rn, i.rd, i.rm = rn, rd, rm
 	i.u2 = uint64(arr)
+	return i
 }
 
 // asVecRRRRewrite encodes a vector instruction that rewrites the destination register.
@@ -1361,11 +1415,7 @@ func (i *instruction) String() (str string) {
 	case movFromFPSR:
 		str = fmt.Sprintf("mrs %s fpsr", formatVRegSized(i.rd.nr(), 64))
 	case call:
-		if i.u2 > 0 {
-			str = fmt.Sprintf("bl #%#x", i.u2)
-		} else {
-			str = fmt.Sprintf("bl %s", ssa.FuncRef(i.u1))
-		}
+		str = fmt.Sprintf("bl %s", ssa.FuncRef(i.u1))
 	case callInd:
 		str = fmt.Sprintf("bl %s", formatVRegSized(i.rn.nr(), 64))
 	case ret:
@@ -1396,7 +1446,7 @@ func (i *instruction) String() (str string) {
 			}
 		case condKindCondFlagSet:
 			if offset := i.condBrOffset(); offset != 0 {
-				if target == invalidLabel {
+				if target == labelInvalid {
 					str = fmt.Sprintf("b.%s #%#x", c.flag(), offset)
 				} else {
 					str = fmt.Sprintf("b.%s #%#x, (%s)", c.flag(), offset, target.String())
@@ -1408,36 +1458,68 @@ func (i *instruction) String() (str string) {
 	case adr:
 		str = fmt.Sprintf("adr %s, #%#x", formatVRegSized(i.rd.nr(), 64), int64(i.u1))
 	case brTableSequence:
-		if i.u3 == 0 { // The offsets haven't been resolved yet.
-			labels := make([]string, len(i.targets))
-			for index, l := range i.targets {
-				labels[index] = label(l).String()
-			}
-			str = fmt.Sprintf("br_table_sequence %s, [%s]",
-				formatVRegSized(i.rn.nr(), 64),
-				strings.Join(labels, ", "),
-			)
-		} else {
-			// See encodeBrTableSequence for the encoding.
-			offsets := make([]string, len(i.targets))
-			for index, offset := range i.targets {
-				offsets[index] = fmt.Sprintf("%#x", int32(offset))
-			}
-			str = fmt.Sprintf(
-				`adr %[2]s, #16; ldrsw %[1]s, [%[2]s, %[1]s, UXTW 2]; add %[2]s, %[2]s, %[1]s; br %[2]s; %s`,
-				formatVRegSized(i.rn.nr(), 64),
-				formatVRegSized(tmpRegVReg, 64),
-				offsets,
-			)
-		}
+		targetIndex := i.u1
+		str = fmt.Sprintf("br_table_sequence %s, table_index=%d", formatVRegSized(i.rn.nr(), 64), targetIndex)
 	case exitSequence:
 		str = fmt.Sprintf("exit_sequence %s", formatVRegSized(i.rn.nr(), 64))
+	case atomicRmw:
+		m := atomicRmwOp(i.u1).String()
+		size := byte(32)
+		switch i.u2 {
+		case 8:
+			size = 64
+		case 2:
+			m = m + "h"
+		case 1:
+			m = m + "b"
+		}
+		str = fmt.Sprintf("%s %s, %s, %s", m, formatVRegSized(i.rm.nr(), size), formatVRegSized(i.rd.nr(), size), formatVRegSized(i.rn.nr(), 64))
+	case atomicCas:
+		m := "casal"
+		size := byte(32)
+		switch i.u2 {
+		case 8:
+			size = 64
+		case 2:
+			m = m + "h"
+		case 1:
+			m = m + "b"
+		}
+		str = fmt.Sprintf("%s %s, %s, %s", m, formatVRegSized(i.rd.nr(), size), formatVRegSized(i.rm.nr(), size), formatVRegSized(i.rn.nr(), 64))
+	case atomicLoad:
+		m := "ldar"
+		size := byte(32)
+		switch i.u2 {
+		case 8:
+			size = 64
+		case 2:
+			m = m + "h"
+		case 1:
+			m = m + "b"
+		}
+		str = fmt.Sprintf("%s %s, %s", m, formatVRegSized(i.rd.nr(), size), formatVRegSized(i.rn.nr(), 64))
+	case atomicStore:
+		m := "stlr"
+		size := byte(32)
+		switch i.u2 {
+		case 8:
+			size = 64
+		case 2:
+			m = m + "h"
+		case 1:
+			m = m + "b"
+		}
+		str = fmt.Sprintf("%s %s, %s", m, formatVRegSized(i.rm.nr(), size), formatVRegSized(i.rn.nr(), 64))
+	case dmb:
+		str = "dmb"
 	case udf:
 		str = "udf"
 	case emitSourceOffsetInfo:
 		str = fmt.Sprintf("source_offset_info %d", ssa.SourceOffset(i.u1))
 	case vecLoad1R:
 		str = fmt.Sprintf("ld1r {%s}, [%s]", formatVRegVec(i.rd.nr(), vecArrangement(i.u1), vecIndexNone), formatVRegSized(i.rn.nr(), 64))
+	case loadConstBlockArg:
+		str = fmt.Sprintf("load_const_block_arg %s, %#x", formatVRegSized(i.rd.nr(), 64), i.u1)
 	default:
 		panic(i.kind)
 	}
@@ -1448,6 +1530,35 @@ func (i *instruction) asAdr(rd regalloc.VReg, offset int64) {
 	i.kind = adr
 	i.rd = operandNR(rd)
 	i.u1 = uint64(offset)
+}
+
+func (i *instruction) asAtomicRmw(op atomicRmwOp, rn, rs, rt operand, size uint64) {
+	i.kind = atomicRmw
+	i.rd, i.rn, i.rm = rt, rn, rs
+	i.u1 = uint64(op)
+	i.u2 = size
+}
+
+func (i *instruction) asAtomicCas(rn, rs, rt operand, size uint64) {
+	i.kind = atomicCas
+	i.rm, i.rn, i.rd = rt, rn, rs
+	i.u2 = size
+}
+
+func (i *instruction) asAtomicLoad(rn, rt operand, size uint64) {
+	i.kind = atomicLoad
+	i.rn, i.rd = rn, rt
+	i.u2 = size
+}
+
+func (i *instruction) asAtomicStore(rn, rt operand, size uint64) {
+	i.kind = atomicStore
+	i.rn, i.rm = rn, rt
+	i.u2 = size
+}
+
+func (i *instruction) asDMB() {
+	i.kind = dmb
 }
 
 // TODO: delete unnecessary things.
@@ -1616,8 +1727,21 @@ const (
 	// exitSequence consists of multiple instructions, and exits the execution immediately.
 	// See encodeExitSequence.
 	exitSequence
+	// atomicRmw represents an atomic read-modify-write operation with two register sources and a register destination.
+	atomicRmw
+	// atomicCas represents an atomic compare-and-swap operation with three register sources. The value is loaded to
+	// the source register containing the comparison value.
+	atomicCas
+	// atomicLoad represents an atomic load with one source register and a register destination.
+	atomicLoad
+	// atomicStore represents an atomic store with two source registers and no destination.
+	atomicStore
+	// dmb represents the data memory barrier instruction in inner-shareable (ish) mode.
+	dmb
 	// UDF is the undefined instruction. For debugging only.
 	udf
+	// loadConstBlockArg represents a load of a constant block argument.
+	loadConstBlockArg
 
 	// emitSourceOffsetInfo is a dummy instruction to emit source offset info.
 	// The existence of this instruction does not affect the execution.
@@ -1626,6 +1750,18 @@ const (
 	// ------------------- do not define below this line -------------------
 	numInstructionKinds
 )
+
+func (i *instruction) asLoadConstBlockArg(v uint64, typ ssa.Type, dst regalloc.VReg) *instruction {
+	i.kind = loadConstBlockArg
+	i.u1 = v
+	i.u2 = uint64(typ)
+	i.rd = operandNR(dst)
+	return i
+}
+
+func (i *instruction) loadConstBlockArgData() (v uint64, typ ssa.Type, dst regalloc.VReg) {
+	return i.u1, ssa.Type(i.u2), i.rd.nr()
+}
 
 func (i *instruction) asEmitSourceOffsetInfo(l ssa.SourceOffset) *instruction {
 	i.kind = emitSourceOffsetInfo
@@ -1691,8 +1827,12 @@ func (a aluOp) String() string {
 		return "sub"
 	case aluOpOrr:
 		return "orr"
+	case aluOpOrn:
+		return "orn"
 	case aluOpAnd:
 		return "and"
+	case aluOpAnds:
+		return "ands"
 	case aluOpBic:
 		return "bic"
 	case aluOpEor:
@@ -1732,8 +1872,12 @@ const (
 	aluOpSub
 	// 32/64-bit Bitwise OR.
 	aluOpOrr
+	// 32/64-bit Bitwise OR NOT.
+	aluOpOrn
 	// 32/64-bit Bitwise AND.
 	aluOpAnd
+	// 32/64-bit Bitwise ANDS.
+	aluOpAnds
 	// 32/64-bit Bitwise AND NOT.
 	aluOpBic
 	// 32/64-bit Bitwise XOR (Exclusive OR).
@@ -1901,6 +2045,10 @@ func (b vecOp) String() string {
 		return "fmin"
 	case vecOpFmax:
 		return "fmax"
+	case vecOpSmull:
+		return "smull"
+	case vecOpSmull2:
+		return "smull2"
 	}
 	panic(int(b))
 }
@@ -1975,6 +2123,8 @@ const (
 	vecOpUshll
 	vecOpSshr
 	vecOpZip1
+	vecOpSmull
+	vecOpSmull2
 )
 
 // bitOp determines the type of bitwise operation. Instructions whose kind is one of
@@ -2233,7 +2383,7 @@ func (i *instruction) size() int64 {
 	switch i.kind {
 	case exitSequence:
 		return exitSequenceSize // 5 instructions as in encodeExitSequence.
-	case nop0:
+	case nop0, loadConstBlockArg:
 		return 0
 	case emitSourceOffsetInfo:
 		return 0
@@ -2253,7 +2403,7 @@ func (i *instruction) size() int64 {
 		}
 		return 4 + 4 + 16
 	case brTableSequence:
-		return 4*4 + int64(len(i.targets))*4
+		return 4*4 + int64(i.u2)*4
 	default:
 		return 4
 	}
@@ -2359,4 +2509,37 @@ func ssaLaneToArrangement(lane ssa.VecLane) vecArrangement {
 	default:
 		panic(lane)
 	}
+}
+
+// atomicRmwOp is the type of atomic read-modify-write operation.
+type atomicRmwOp byte
+
+const (
+	// atomicRmwOpAdd is an atomic add operation.
+	atomicRmwOpAdd atomicRmwOp = iota
+	// atomicRmwOpClr is an atomic clear operation, i.e. AND NOT.
+	atomicRmwOpClr
+	// atomicRmwOpSet is an atomic set operation, i.e. OR.
+	atomicRmwOpSet
+	// atomicRmwOpEor is an atomic exclusive OR operation.
+	atomicRmwOpEor
+	// atomicRmwOpSwp is an atomic swap operation.
+	atomicRmwOpSwp
+)
+
+// String implements fmt.Stringer
+func (a atomicRmwOp) String() string {
+	switch a {
+	case atomicRmwOpAdd:
+		return "ldaddal"
+	case atomicRmwOpClr:
+		return "ldclral"
+	case atomicRmwOpSet:
+		return "ldsetal"
+	case atomicRmwOpEor:
+		return "ldeoral"
+	case atomicRmwOpSwp:
+		return "swpal"
+	}
+	panic(fmt.Sprintf("unknown atomicRmwOp: %d", a))
 }

@@ -96,6 +96,14 @@ func (s *Streamdal) getFunction(_ context.Context, step *protos.PipelineStep, wo
 		return fc, nil
 	}
 
+	// Function is not in cache - let's create it but make sure that the creation
+	// is locked for this specific wasm ID - that way another .Process() call
+	// will wait for the create to finish.
+	wasmIDMtx := s.getLockForWasmID(step.GetXWasmId())
+
+	wasmIDMtx.Lock()
+	defer wasmIDMtx.Unlock()
+
 	fi, err := s.createFunction(step)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create function")
@@ -107,7 +115,33 @@ func (s *Streamdal) getFunction(_ context.Context, step *protos.PipelineStep, wo
 	return fi, nil
 }
 
+func (s *Streamdal) getLockForWasmID(wasmID string) *sync.Mutex {
+	s.funcCreateMtx.Lock()
+	defer s.funcCreateMtx.Unlock()
+
+	if mtx, ok := s.funcCreate[wasmID]; ok {
+		return mtx
+	}
+
+	// No existing lock found for wasm ID - create it
+	s.funcCreate[wasmID] = &sync.Mutex{}
+
+	return s.funcCreate[wasmID]
+}
+
 func (s *Streamdal) getFunctionFromCache(wasmID string, workerID int) (*function, bool) {
+	// We need to do this here because there is a possibility that .Process()
+	// was called for the first time in parallel and the function has not been
+	// created yet. We need a mechanism to wait for the function creation to
+	// complete before we perform a cache lookup.
+	wasmIDMtx := s.getLockForWasmID(wasmID)
+
+	// If this blocks, it is because createFunction() is in the process of
+	// creating a function. Once it complete, the lock will be released and
+	// our cache lookup will succeed.
+	wasmIDMtx.Lock()
+	wasmIDMtx.Unlock()
+
 	s.functionsMtx.RLock()
 	defer s.functionsMtx.RUnlock()
 

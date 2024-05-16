@@ -17,6 +17,7 @@ import (
 
 // LowerSingleBranch implements backend.Machine.
 func (m *machine) LowerSingleBranch(br *ssa.Instruction) {
+	ectx := m.executableContext
 	switch br.Opcode() {
 	case ssa.OpcodeJump:
 		_, _, targetBlk := br.BranchData()
@@ -24,9 +25,9 @@ func (m *machine) LowerSingleBranch(br *ssa.Instruction) {
 			return
 		}
 		b := m.allocateInstr()
-		target := m.getOrAllocateSSABlockLabel(targetBlk)
-		if target == returnLabel {
-			b.asRet(m.currentABI)
+		target := ectx.GetOrAllocateSSABlockLabel(targetBlk)
+		if target == labelReturn {
+			b.asRet()
 		} else {
 			b.asBr(target)
 		}
@@ -60,28 +61,24 @@ func (m *machine) lowerBrTable(i *ssa.Instruction) {
 
 	brSequence := m.allocateInstr()
 
-	// TODO: reuse the slice!
-	labels := make([]uint32, len(targets))
-	for j, target := range targets {
-		labels[j] = uint32(m.getOrAllocateSSABlockLabel(target))
-	}
-
-	brSequence.asBrTableSequence(adjustedIndex, labels)
+	tableIndex := m.addJmpTableTarget(targets)
+	brSequence.asBrTableSequence(adjustedIndex, tableIndex, len(targets))
 	m.insert(brSequence)
 }
 
 // LowerConditionalBranch implements backend.Machine.
 func (m *machine) LowerConditionalBranch(b *ssa.Instruction) {
+	exctx := m.executableContext
 	cval, args, targetBlk := b.BranchData()
 	if len(args) > 0 {
 		panic(fmt.Sprintf(
 			"conditional branch shouldn't have args; likely a bug in critical edge splitting: from %s to %s",
-			m.currentSSABlk,
+			exctx.CurrentSSABlk,
 			targetBlk,
 		))
 	}
 
-	target := m.getOrAllocateSSABlockLabel(targetBlk)
+	target := exctx.GetOrAllocateSSABlockLabel(targetBlk)
 	cvalDef := m.compiler.ValueDefinition(cval)
 
 	switch {
@@ -93,7 +90,9 @@ func (m *machine) LowerConditionalBranch(b *ssa.Instruction) {
 			cc = cc.invert()
 		}
 
-		m.lowerIcmpToFlag(x, y, signed)
+		if !m.tryLowerBandToFlag(x, y) {
+			m.lowerIcmpToFlag(x, y, signed)
+		}
 		cbr := m.allocateInstr()
 		cbr.asCondBr(cc.asCond(), target, false /* ignored */)
 		m.insert(cbr)
@@ -122,6 +121,31 @@ func (m *machine) LowerConditionalBranch(b *ssa.Instruction) {
 		cbr.asCondBr(c, target, false)
 		m.insert(cbr)
 	}
+}
+
+func (m *machine) tryLowerBandToFlag(x, y ssa.Value) (ok bool) {
+	xx := m.compiler.ValueDefinition(x)
+	yy := m.compiler.ValueDefinition(y)
+	if xx.IsFromInstr() && xx.Instr.Constant() && xx.Instr.ConstantVal() == 0 {
+		if m.compiler.MatchInstr(yy, ssa.OpcodeBand) {
+			bandInstr := yy.Instr
+			m.lowerBitwiseAluOp(bandInstr, aluOpAnds, true)
+			ok = true
+			bandInstr.MarkLowered()
+			return
+		}
+	}
+
+	if yy.IsFromInstr() && yy.Instr.Constant() && yy.Instr.ConstantVal() == 0 {
+		if m.compiler.MatchInstr(xx, ssa.OpcodeBand) {
+			bandInstr := xx.Instr
+			m.lowerBitwiseAluOp(bandInstr, aluOpAnds, true)
+			ok = true
+			bandInstr.MarkLowered()
+			return
+		}
+	}
+	return
 }
 
 // LowerInstr implements backend.Machine.
@@ -182,11 +206,11 @@ func (m *machine) LowerInstr(instr *ssa.Instruction) {
 	case ssa.OpcodeVMinPseudo:
 		m.lowerVMinMaxPseudo(instr, false)
 	case ssa.OpcodeBand:
-		m.lowerBitwiseAluOp(instr, aluOpAnd)
+		m.lowerBitwiseAluOp(instr, aluOpAnd, false)
 	case ssa.OpcodeBor:
-		m.lowerBitwiseAluOp(instr, aluOpOrr)
+		m.lowerBitwiseAluOp(instr, aluOpOrr, false)
 	case ssa.OpcodeBxor:
-		m.lowerBitwiseAluOp(instr, aluOpEor)
+		m.lowerBitwiseAluOp(instr, aluOpEor, false)
 	case ssa.OpcodeIshl:
 		m.lowerShifts(instr, extModeNone, aluOpLsl)
 	case ssa.OpcodeSshr:
@@ -393,10 +417,37 @@ func (m *machine) LowerInstr(instr *ssa.Instruction) {
 		x, y, lane := instr.Arg2WithLane()
 		arr := ssaLaneToArrangement(lane)
 		m.lowerVecRRR(vecOpAdd, x, y, instr.Return(), arr)
-	case ssa.OpcodeIaddPairwise:
-		x, y, lane := instr.Arg2WithLane()
-		arr := ssaLaneToArrangement(lane)
-		m.lowerVecRRR(vecOpAddp, x, y, instr.Return(), arr)
+	case ssa.OpcodeExtIaddPairwise:
+		v, lane, signed := instr.ExtIaddPairwiseData()
+		vv := m.getOperand_NR(m.compiler.ValueDefinition(v), extModeNone)
+
+		tmpLo, tmpHi := operandNR(m.compiler.AllocateVReg(ssa.TypeV128)), operandNR(m.compiler.AllocateVReg(ssa.TypeV128))
+		var widen vecOp
+		if signed {
+			widen = vecOpSshll
+		} else {
+			widen = vecOpUshll
+		}
+
+		var loArr, hiArr, dstArr vecArrangement
+		switch lane {
+		case ssa.VecLaneI8x16:
+			loArr, hiArr, dstArr = vecArrangement8B, vecArrangement16B, vecArrangement8H
+		case ssa.VecLaneI16x8:
+			loArr, hiArr, dstArr = vecArrangement4H, vecArrangement8H, vecArrangement4S
+		case ssa.VecLaneI32x4:
+			loArr, hiArr, dstArr = vecArrangement2S, vecArrangement4S, vecArrangement2D
+		default:
+			panic("unsupported lane " + lane.String())
+		}
+
+		widenLo := m.allocateInstr().asVecShiftImm(widen, tmpLo, vv, operandShiftImm(0), loArr)
+		widenHi := m.allocateInstr().asVecShiftImm(widen, tmpHi, vv, operandShiftImm(0), hiArr)
+		addp := m.allocateInstr().asVecRRR(vecOpAddp, operandNR(m.compiler.VRegOf(instr.Return())), tmpLo, tmpHi, dstArr)
+		m.insert(widenLo)
+		m.insert(widenHi)
+		m.insert(addp)
+
 	case ssa.OpcodeVSaddSat:
 		x, y, lane := instr.Arg2WithLane()
 		arr := ssaLaneToArrangement(lane)
@@ -704,13 +755,43 @@ func (m *machine) LowerInstr(instr *ssa.Instruction) {
 		}
 		m.insert(dup)
 
+	case ssa.OpcodeWideningPairwiseDotProductS:
+		x, y := instr.Arg2()
+		xx, yy := m.getOperand_NR(m.compiler.ValueDefinition(x), extModeNone),
+			m.getOperand_NR(m.compiler.ValueDefinition(y), extModeNone)
+		tmp, tmp2 := operandNR(m.compiler.AllocateVReg(ssa.TypeV128)), operandNR(m.compiler.AllocateVReg(ssa.TypeV128))
+		m.insert(m.allocateInstr().asVecRRR(vecOpSmull, tmp, xx, yy, vecArrangement8H))
+		m.insert(m.allocateInstr().asVecRRR(vecOpSmull2, tmp2, xx, yy, vecArrangement8H))
+		m.insert(m.allocateInstr().asVecRRR(vecOpAddp, tmp, tmp, tmp2, vecArrangement4S))
+
+		rd := operandNR(m.compiler.VRegOf(instr.Return()))
+		m.insert(m.allocateInstr().asFpuMov128(rd.nr(), tmp.nr()))
+
 	case ssa.OpcodeLoadSplat:
 		ptr, offset, lane := instr.LoadSplatData()
 		m.lowerLoadSplat(ptr, offset, lane, instr.Return())
+
+	case ssa.OpcodeAtomicRmw:
+		m.lowerAtomicRmw(instr)
+
+	case ssa.OpcodeAtomicCas:
+		m.lowerAtomicCas(instr)
+
+	case ssa.OpcodeAtomicLoad:
+		m.lowerAtomicLoad(instr)
+
+	case ssa.OpcodeAtomicStore:
+		m.lowerAtomicStore(instr)
+
+	case ssa.OpcodeFence:
+		instr := m.allocateInstr()
+		instr.asDMB()
+		m.insert(instr)
+
 	default:
 		panic("TODO: lowering " + op.String())
 	}
-	m.FlushPendingInstructions()
+	m.executableContext.FlushPendingInstructions()
 }
 
 func (m *machine) lowerShuffle(rd, rn, rm operand, lane1, lane2 uint64) {
@@ -1591,12 +1672,18 @@ func (m *machine) lowerShifts(si *ssa.Instruction, ext extMode, aluOp aluOp) {
 	m.insert(alu)
 }
 
-func (m *machine) lowerBitwiseAluOp(si *ssa.Instruction, op aluOp) {
+func (m *machine) lowerBitwiseAluOp(si *ssa.Instruction, op aluOp, ignoreResult bool) {
 	x, y := si.Arg2()
 
 	xDef, yDef := m.compiler.ValueDefinition(x), m.compiler.ValueDefinition(y)
 	rn := m.getOperand_NR(xDef, extModeNone)
-	rd := operandNR(m.compiler.VRegOf(si.Return()))
+
+	var rd operand
+	if ignoreResult {
+		rd = operandNR(xzrVReg)
+	} else {
+		rd = operandNR(m.compiler.VRegOf(si.Return()))
+	}
 
 	_64 := x.Type().Bits() == 64
 	alu := m.allocateInstr()
@@ -1880,8 +1967,13 @@ func (m *machine) lowerExitIfTrueWithCode(execCtxVReg regalloc.VReg, cond ssa.Va
 	cvalInstr := condDef.Instr
 	x, y, c := cvalInstr.IcmpData()
 	signed := c.Signed()
-	m.lowerIcmpToFlag(x, y, signed)
 
+	if !m.tryLowerBandToFlag(x, y) {
+		m.lowerIcmpToFlag(x, y, signed)
+	}
+
+	// We need to copy the execution context to a temp register, because if it's spilled,
+	// it might end up being reloaded inside the exiting branch.
 	execCtxTmp := m.copyToTmp(execCtxVReg)
 
 	// We have to skip the entire exit sequence if the condition is false.
@@ -1977,6 +2069,140 @@ func (m *machine) lowerSelectVec(rc, rn, rm, rd operand) {
 	mov2 := m.allocateInstr()
 	mov2.asFpuMov128(rd.nr(), tmp2.nr())
 	m.insert(mov2)
+}
+
+func (m *machine) lowerAtomicRmw(si *ssa.Instruction) {
+	ssaOp, size := si.AtomicRmwData()
+
+	var op atomicRmwOp
+	var negateArg bool
+	var flipArg bool
+	switch ssaOp {
+	case ssa.AtomicRmwOpAdd:
+		op = atomicRmwOpAdd
+	case ssa.AtomicRmwOpSub:
+		op = atomicRmwOpAdd
+		negateArg = true
+	case ssa.AtomicRmwOpAnd:
+		op = atomicRmwOpClr
+		flipArg = true
+	case ssa.AtomicRmwOpOr:
+		op = atomicRmwOpSet
+	case ssa.AtomicRmwOpXor:
+		op = atomicRmwOpEor
+	case ssa.AtomicRmwOpXchg:
+		op = atomicRmwOpSwp
+	default:
+		panic(fmt.Sprintf("unknown ssa atomic rmw op: %s", ssaOp))
+	}
+
+	addr, val := si.Arg2()
+	addrDef, valDef := m.compiler.ValueDefinition(addr), m.compiler.ValueDefinition(val)
+	rn := m.getOperand_NR(addrDef, extModeNone)
+	rt := operandNR(m.compiler.VRegOf(si.Return()))
+	rs := m.getOperand_NR(valDef, extModeNone)
+
+	_64 := si.Return().Type().Bits() == 64
+	var tmp operand
+	if _64 {
+		tmp = operandNR(m.compiler.AllocateVReg(ssa.TypeI64))
+	} else {
+		tmp = operandNR(m.compiler.AllocateVReg(ssa.TypeI32))
+	}
+	m.lowerAtomicRmwImpl(op, rn, rs, rt, tmp, size, negateArg, flipArg, _64)
+}
+
+func (m *machine) lowerAtomicRmwImpl(op atomicRmwOp, rn, rs, rt, tmp operand, size uint64, negateArg, flipArg, dst64bit bool) {
+	switch {
+	case negateArg:
+		neg := m.allocateInstr()
+		neg.asALU(aluOpSub, tmp, operandNR(xzrVReg), rs, dst64bit)
+		m.insert(neg)
+	case flipArg:
+		flip := m.allocateInstr()
+		flip.asALU(aluOpOrn, tmp, operandNR(xzrVReg), rs, dst64bit)
+		m.insert(flip)
+	default:
+		tmp = rs
+	}
+
+	rmw := m.allocateInstr()
+	rmw.asAtomicRmw(op, rn, tmp, rt, size)
+	m.insert(rmw)
+}
+
+func (m *machine) lowerAtomicCas(si *ssa.Instruction) {
+	addr, exp, repl := si.Arg3()
+	size := si.AtomicTargetSize()
+
+	addrDef, expDef, replDef := m.compiler.ValueDefinition(addr), m.compiler.ValueDefinition(exp), m.compiler.ValueDefinition(repl)
+	rn := m.getOperand_NR(addrDef, extModeNone)
+	rt := m.getOperand_NR(replDef, extModeNone)
+	rs := m.getOperand_NR(expDef, extModeNone)
+	tmp := operandNR(m.compiler.AllocateVReg(si.Return().Type()))
+
+	_64 := si.Return().Type().Bits() == 64
+	// rs is overwritten by CAS, so we need to move it to the result register before the instruction
+	// in case when it is used somewhere else.
+	mov := m.allocateInstr()
+	if _64 {
+		mov.asMove64(tmp.nr(), rs.nr())
+	} else {
+		mov.asMove32(tmp.nr(), rs.nr())
+	}
+	m.insert(mov)
+
+	m.lowerAtomicCasImpl(rn, tmp, rt, size)
+
+	mov2 := m.allocateInstr()
+	rd := m.compiler.VRegOf(si.Return())
+	if _64 {
+		mov2.asMove64(rd, tmp.nr())
+	} else {
+		mov2.asMove32(rd, tmp.nr())
+	}
+	m.insert(mov2)
+}
+
+func (m *machine) lowerAtomicCasImpl(rn, rs, rt operand, size uint64) {
+	cas := m.allocateInstr()
+	cas.asAtomicCas(rn, rs, rt, size)
+	m.insert(cas)
+}
+
+func (m *machine) lowerAtomicLoad(si *ssa.Instruction) {
+	addr := si.Arg()
+	size := si.AtomicTargetSize()
+
+	addrDef := m.compiler.ValueDefinition(addr)
+	rn := m.getOperand_NR(addrDef, extModeNone)
+	rt := operandNR(m.compiler.VRegOf(si.Return()))
+
+	m.lowerAtomicLoadImpl(rn, rt, size)
+}
+
+func (m *machine) lowerAtomicLoadImpl(rn, rt operand, size uint64) {
+	ld := m.allocateInstr()
+	ld.asAtomicLoad(rn, rt, size)
+	m.insert(ld)
+}
+
+func (m *machine) lowerAtomicStore(si *ssa.Instruction) {
+	addr, val := si.Arg2()
+	size := si.AtomicTargetSize()
+
+	addrDef := m.compiler.ValueDefinition(addr)
+	valDef := m.compiler.ValueDefinition(val)
+	rn := m.getOperand_NR(addrDef, extModeNone)
+	rt := m.getOperand_NR(valDef, extModeNone)
+
+	m.lowerAtomicStoreImpl(rn, rt, size)
+}
+
+func (m *machine) lowerAtomicStoreImpl(rn, rt operand, size uint64) {
+	ld := m.allocateInstr()
+	ld.asAtomicStore(rn, rt, size)
+	m.insert(ld)
 }
 
 // copyToTmp copies the given regalloc.VReg to a temporary register. This is called before cbr to avoid the regalloc issue

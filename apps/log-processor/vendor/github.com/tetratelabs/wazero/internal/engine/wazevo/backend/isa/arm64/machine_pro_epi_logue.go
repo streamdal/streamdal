@@ -7,9 +7,17 @@ import (
 	"github.com/tetratelabs/wazero/internal/engine/wazevo/wazevoapi"
 )
 
-// SetupPrologue implements backend.Machine.
-func (m *machine) SetupPrologue() {
-	cur := m.rootInstr
+// PostRegAlloc implements backend.Machine.
+func (m *machine) PostRegAlloc() {
+	m.setupPrologue()
+	m.postRegAlloc()
+}
+
+// setupPrologue initializes the prologue of the function.
+func (m *machine) setupPrologue() {
+	ectx := m.executableContext
+
+	cur := ectx.RootInstr
 	prevInitInst := cur.next
 
 	//
@@ -145,7 +153,7 @@ func (m *machine) SetupPrologue() {
 func (m *machine) createReturnAddrAndSizeOfArgRetSlot(cur *instruction) *instruction {
 	// First we decrement the stack pointer to point the arg0 slot.
 	var sizeOfArgRetReg regalloc.VReg
-	s := m.currentABI.alignedArgResultStackSlotSize()
+	s := int64(m.currentABI.AlignedArgResultStackSlotSize())
 	if s > 0 {
 		cur = m.lowerConstantI64AndInsert(cur, tmpRegVReg, s)
 		sizeOfArgRetReg = tmpRegVReg
@@ -184,22 +192,34 @@ func (m *machine) createFrameSizeSlot(cur *instruction, s int64) *instruction {
 	return cur
 }
 
-// SetupEpilogue implements backend.Machine.
-func (m *machine) SetupEpilogue() {
-	for cur := m.rootInstr; cur != nil; cur = cur.next {
-		if cur.kind == ret {
+// postRegAlloc does multiple things while walking through the instructions:
+// 1. Removes the redundant copy instruction.
+// 2. Inserts the epilogue.
+func (m *machine) postRegAlloc() {
+	ectx := m.executableContext
+	for cur := ectx.RootInstr; cur != nil; cur = cur.next {
+		switch cur.kind {
+		case ret:
 			m.setupEpilogueAfter(cur.prev)
-			continue
-		}
-
-		// Removes the redundant copy instruction.
-		// TODO: doing this in `SetupEpilogue` seems weird. Find a better home.
-		if cur.IsCopy() && cur.rn.realReg() == cur.rd.realReg() {
-			prev, next := cur.prev, cur.next
-			// Remove the copy instruction.
-			prev.next = next
-			if next != nil {
-				next.prev = prev
+		case loadConstBlockArg:
+			lc := cur
+			next := lc.next
+			m.executableContext.PendingInstructions = m.executableContext.PendingInstructions[:0]
+			m.lowerLoadConstantBlockArgAfterRegAlloc(lc)
+			for _, instr := range m.executableContext.PendingInstructions {
+				cur = linkInstr(cur, instr)
+			}
+			linkInstr(cur, next)
+			m.executableContext.PendingInstructions = m.executableContext.PendingInstructions[:0]
+		default:
+			// Removes the redundant copy instruction.
+			if cur.IsCopy() && cur.rn.realReg() == cur.rd.realReg() {
+				prev, next := cur.prev, cur.next
+				// Remove the copy instruction.
+				prev.next = next
+				if next != nil {
+					next.prev = prev
+				}
 			}
 		}
 	}
@@ -256,8 +276,8 @@ func (m *machine) setupEpilogueAfter(cur *instruction) {
 		//          |   ReturnAddress |                      |   ReturnAddress |
 		//          +-----------------+      ========>       +-----------------+ <---- SP
 		//          |   clobbered M   |
-		//          |   clobbered 1   |
 		//          |   ...........   |
+		//          |   clobbered 1   |
 		//          |   clobbered 0   |
 		//   SP---> +-----------------+
 		//             (low address)
@@ -301,7 +321,7 @@ func (m *machine) setupEpilogueAfter(cur *instruction) {
 		addressModePreOrPostIndex(spVReg, 16 /* stack pointer must be 16-byte aligned. */, false /* increment after loads */), 64)
 	cur = linkInstr(cur, ldr)
 
-	if s := m.currentABI.alignedArgResultStackSlotSize(); s > 0 {
+	if s := int64(m.currentABI.AlignedArgResultStackSlotSize()); s > 0 {
 		cur = m.addsAddOrSubStackPointer(cur, spVReg, s, true)
 	}
 
@@ -342,7 +362,7 @@ func (m *machine) insertStackBoundsCheck(requiredStackSize int64, cur *instructi
 		cur = linkInstr(cur, sub)
 	}
 
-	tmp2 := x11VReg // Callee save, so it is safe to use it here in the prologue.
+	tmp2 := x11VReg // Caller save, so it is safe to use it here in the prologue.
 
 	// ldr tmp2, [executionContext #StackBottomPtr]
 	ldr := m.allocateInstr()
@@ -360,7 +380,7 @@ func (m *machine) insertStackBoundsCheck(requiredStackSize int64, cur *instructi
 
 	// b.ge #imm
 	cbr := m.allocateInstr()
-	cbr.asCondBr(ge.asCond(), invalidLabel, false /* ignored */)
+	cbr.asCondBr(ge.asCond(), labelInvalid, false /* ignored */)
 	cur = linkInstr(cur, cbr)
 
 	// Set the required stack size and set it to the exec context.
@@ -407,9 +427,11 @@ func (m *machine) insertStackBoundsCheck(requiredStackSize int64, cur *instructi
 
 // CompileStackGrowCallSequence implements backend.Machine.
 func (m *machine) CompileStackGrowCallSequence() []byte {
+	ectx := m.executableContext
+
 	cur := m.allocateInstr()
 	cur.asNop0()
-	m.rootInstr = cur
+	ectx.RootInstr = cur
 
 	// Save the callee saved and argument registers.
 	cur = m.saveRegistersInExecutionContext(cur, saveRequiredRegs)
@@ -428,17 +450,19 @@ func (m *machine) CompileStackGrowCallSequence() []byte {
 
 	// Then goes back the original address of this stack grow call.
 	ret := m.allocateInstr()
-	ret.asRet(nil)
+	ret.asRet()
 	linkInstr(cur, ret)
 
-	m.encode(m.rootInstr)
+	m.encode(ectx.RootInstr)
 	return m.compiler.Buf()
 }
 
 func (m *machine) addsAddOrSubStackPointer(cur *instruction, rd regalloc.VReg, diff int64, add bool) *instruction {
-	m.pendingInstructions = m.pendingInstructions[:0]
+	ectx := m.executableContext
+
+	ectx.PendingInstructions = ectx.PendingInstructions[:0]
 	m.insertAddOrSubStackPointer(rd, diff, add)
-	for _, inserted := range m.pendingInstructions {
+	for _, inserted := range ectx.PendingInstructions {
 		cur = linkInstr(cur, inserted)
 	}
 	return cur

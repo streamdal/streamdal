@@ -1,6 +1,7 @@
 package arm64
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/tetratelabs/wazero/internal/engine/wazevo/backend"
@@ -9,19 +10,25 @@ import (
 )
 
 // Encode implements backend.Machine Encode.
-func (m *machine) Encode() {
-	m.encode(m.rootInstr)
+func (m *machine) Encode(ctx context.Context) error {
+	m.resolveRelativeAddresses(ctx)
+	m.encode(m.executableContext.RootInstr)
+	if l := len(m.compiler.Buf()); l > maxFunctionExecutableSize {
+		return fmt.Errorf("function size exceeds the limit: %d > %d", l, maxFunctionExecutableSize)
+	}
+	return nil
 }
 
 func (m *machine) encode(root *instruction) {
 	for cur := root; cur != nil; cur = cur.next {
-		cur.encode(m.compiler)
+		cur.encode(m)
 	}
 }
 
-func (i *instruction) encode(c backend.Compiler) {
+func (i *instruction) encode(m *machine) {
+	c := m.compiler
 	switch kind := i.kind; kind {
-	case nop0, emitSourceOffsetInfo:
+	case nop0, emitSourceOffsetInfo, loadConstBlockArg:
 	case exitSequence:
 		encodeExitSequence(c, i.rn.reg())
 	case ret:
@@ -31,15 +38,9 @@ func (i *instruction) encode(c backend.Compiler) {
 		imm := i.brOffset()
 		c.Emit4Bytes(encodeUnconditionalBranch(false, imm))
 	case call:
-		if i.u2 > 0 {
-			// This is a special case for EmitGoEntryPreamble which doesn't need reloc info,
-			// but instead the imm is already resolved.
-			c.Emit4Bytes(encodeUnconditionalBranch(true, int64(i.u2)))
-		} else {
-			// We still don't know the exact address of the function to call, so we emit a placeholder.
-			c.AddRelocationInfo(i.callFuncRef())
-			c.Emit4Bytes(encodeUnconditionalBranch(true, 0)) // 0 = placeholder
-		}
+		// We still don't know the exact address of the function to call, so we emit a placeholder.
+		c.AddRelocationInfo(i.callFuncRef())
+		c.Emit4Bytes(encodeUnconditionalBranch(true, 0)) // 0 = placeholder
 	case callInd:
 		c.Emit4Bytes(encodeUnconditionalBranchReg(regNumberInEncoding[i.rn.realReg()], true))
 	case store8, store16, store32, store64, fpuStore32, fpuStore64, fpuStore128:
@@ -345,7 +346,8 @@ func (i *instruction) encode(c backend.Compiler) {
 			vecArrangement(i.u2)),
 		)
 	case brTableSequence:
-		encodeBrTableSequence(c, i.rn.reg(), i.targets)
+		targets := m.jmpTableTargets[i.u1]
+		encodeBrTableSequence(c, i.rn.reg(), targets)
 	case fpuToInt, intToFpu:
 		c.Emit4Bytes(encodeCnvBetweenFloatInt(i))
 	case fpuRR:
@@ -384,6 +386,37 @@ func (i *instruction) encode(c backend.Compiler) {
 	case movToFPSR:
 		rt := regNumberInEncoding[i.rn.realReg()]
 		c.Emit4Bytes(encodeSystemRegisterMove(rt, false))
+	case atomicRmw:
+		c.Emit4Bytes(encodeAtomicRmw(
+			atomicRmwOp(i.u1),
+			regNumberInEncoding[i.rm.realReg()],
+			regNumberInEncoding[i.rd.realReg()],
+			regNumberInEncoding[i.rn.realReg()],
+			uint32(i.u2),
+		))
+	case atomicCas:
+		c.Emit4Bytes(encodeAtomicCas(
+			regNumberInEncoding[i.rd.realReg()],
+			regNumberInEncoding[i.rm.realReg()],
+			regNumberInEncoding[i.rn.realReg()],
+			uint32(i.u2),
+		))
+	case atomicLoad:
+		c.Emit4Bytes(encodeAtomicLoadStore(
+			regNumberInEncoding[i.rn.realReg()],
+			regNumberInEncoding[i.rd.realReg()],
+			uint32(i.u2),
+			1,
+		))
+	case atomicStore:
+		c.Emit4Bytes(encodeAtomicLoadStore(
+			regNumberInEncoding[i.rn.realReg()],
+			regNumberInEncoding[i.rm.realReg()],
+			uint32(i.u2),
+			0,
+		))
+	case dmb:
+		c.Emit4Bytes(encodeDMB())
 	default:
 		panic(i.String())
 	}
@@ -663,6 +696,20 @@ func encodeVecRRR(op vecOp, rd, rn, rm uint32, arr vecArrangement) uint32 {
 		}
 		size, q := arrToSizeQEncoded(arr)
 		return encodeAdvancedSIMDThreeSame(rd, rn, rm, 0b01000, size, 0b1, q)
+
+	case vecOpSmull:
+		if arr > vecArrangement4S {
+			panic("unsupported arrangement: " + arr.String())
+		}
+		size, _ := arrToSizeQEncoded(arr)
+		return encodeAdvancedSIMDThreeDifferent(rd, rn, rm, 0b1100, size, 0b0, 0b0)
+
+	case vecOpSmull2:
+		if arr > vecArrangement4S {
+			panic("unsupported arrangement: " + arr.String())
+		}
+		size, _ := arrToSizeQEncoded(arr)
+		return encodeAdvancedSIMDThreeDifferent(rd, rn, rm, 0b1100, size, 0b0, 0b1)
 
 	default:
 		panic("TODO: " + op.String())
@@ -1333,6 +1380,8 @@ func encodeAluBitmaskImmediate(op aluOp, rd, rn uint32, imm uint64, _64bit bool)
 		_31to23 = 0b01_100100
 	case aluOpEor:
 		_31to23 = 0b10_100100
+	case aluOpAnds:
+		_31to23 = 0b11_100100
 	default:
 		panic("BUG")
 	}
@@ -1496,7 +1545,7 @@ func encodeAluRRRShift(op aluOp, rd, rn, rm, amount uint32, shiftOp shiftOp, _64
 		_31to24 = 0b01001011
 	case aluOpSubS:
 		_31to24 = 0b01101011
-	case aluOpAnd, aluOpOrr, aluOpEor:
+	case aluOpAnd, aluOpOrr, aluOpEor, aluOpAnds:
 		// "Logical (shifted register)".
 		switch op {
 		case aluOpAnd:
@@ -1505,6 +1554,8 @@ func encodeAluRRRShift(op aluOp, rd, rn, rm, amount uint32, shiftOp shiftOp, _64
 			opc = 0b01
 		case aluOpEor:
 			opc = 0b10
+		case aluOpAnds:
+			opc = 0b11
 		}
 		_31to24 = 0b000_01010
 	default:
@@ -1606,7 +1657,7 @@ func encodeAluRRR(op aluOp, rd, rn, rm uint32, _64bit, isRnSp bool) uint32 {
 		}
 		// "Shifted register" with shift = 0
 		_31to21 = 0b01101011_000
-	case aluOpAnd, aluOpOrr, aluOpEor:
+	case aluOpAnd, aluOpOrr, aluOpOrn, aluOpEor, aluOpAnds:
 		// "Logical (shifted register)".
 		var opc, n uint32
 		switch op {
@@ -1614,8 +1665,13 @@ func encodeAluRRR(op aluOp, rd, rn, rm uint32, _64bit, isRnSp bool) uint32 {
 			// all zeros
 		case aluOpOrr:
 			opc = 0b01
+		case aluOpOrn:
+			opc = 0b01
+			n = 1
 		case aluOpEor:
 			opc = 0b10
+		case aluOpAnds:
+			opc = 0b11
 		}
 		_31to21 = 0b000_01010_000 | opc<<8 | n
 	case aluOpLsl, aluOpAsr, aluOpLsr, aluOpRotR:
@@ -2150,7 +2206,7 @@ func encodeBrTableSequence(c backend.Compiler, index regalloc.VReg, targets []ui
 	}
 }
 
-// encodeExitSequence matches the implementation detail of abiImpl.emitGoEntryPreamble.
+// encodeExitSequence matches the implementation detail of functionABI.emitGoEntryPreamble.
 func encodeExitSequence(c backend.Compiler, ctxReg regalloc.VReg) {
 	// Restore the FP, SP and LR, and return to the Go code:
 	// 		ldr lr,  [ctxReg, #GoReturnAddress]
@@ -2215,4 +2271,81 @@ func encodeExitSequence(c backend.Compiler, ctxReg regalloc.VReg) {
 func encodeRet() uint32 {
 	// https://developer.arm.com/documentation/ddi0596/2020-12/Base-Instructions/RET--Return-from-subroutine-?lang=en
 	return 0b1101011001011111<<16 | regNumberInEncoding[lr]<<5
+}
+
+func encodeAtomicRmw(op atomicRmwOp, rs, rt, rn uint32, size uint32) uint32 {
+	var _31to21, _15to10, sz uint32
+
+	switch size {
+	case 8:
+		sz = 0b11
+	case 4:
+		sz = 0b10
+	case 2:
+		sz = 0b01
+	case 1:
+		sz = 0b00
+	}
+
+	_31to21 = 0b00111000_111 | sz<<9
+
+	switch op {
+	case atomicRmwOpAdd:
+		_15to10 = 0b000000
+	case atomicRmwOpClr:
+		_15to10 = 0b000100
+	case atomicRmwOpSet:
+		_15to10 = 0b001100
+	case atomicRmwOpEor:
+		_15to10 = 0b001000
+	case atomicRmwOpSwp:
+		_15to10 = 0b100000
+	}
+
+	return _31to21<<21 | rs<<16 | _15to10<<10 | rn<<5 | rt
+}
+
+func encodeAtomicCas(rs, rt, rn uint32, size uint32) uint32 {
+	var _31to21, _15to10, sz uint32
+
+	switch size {
+	case 8:
+		sz = 0b11
+	case 4:
+		sz = 0b10
+	case 2:
+		sz = 0b01
+	case 1:
+		sz = 0b00
+	}
+
+	_31to21 = 0b00001000_111 | sz<<9
+	_15to10 = 0b111111
+
+	return _31to21<<21 | rs<<16 | _15to10<<10 | rn<<5 | rt
+}
+
+func encodeAtomicLoadStore(rn, rt, size, l uint32) uint32 {
+	var _31to21, _20to16, _15to10, sz uint32
+
+	switch size {
+	case 8:
+		sz = 0b11
+	case 4:
+		sz = 0b10
+	case 2:
+		sz = 0b01
+	case 1:
+		sz = 0b00
+	}
+
+	_31to21 = 0b00001000_100 | sz<<9 | l<<1
+	_20to16 = 0b11111
+	_15to10 = 0b111111
+
+	return _31to21<<21 | _20to16<<16 | _15to10<<10 | rn<<5 | rt
+}
+
+func encodeDMB() uint32 {
+	return 0b11010101000000110011101110111111
 }
