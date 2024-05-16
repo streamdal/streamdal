@@ -79,12 +79,12 @@ github.com/relistan/go-director
 # github.com/rivo/uniseg v0.4.7
 ## explicit; go 1.18
 github.com/rivo/uniseg
-# github.com/streamdal/streamdal/libs/protos v0.1.45
+# github.com/streamdal/streamdal/libs/protos v0.1.57
 ## explicit; go 1.20
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
 github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
-# github.com/streamdal/streamdal/sdks/go v0.1.20
+# github.com/streamdal/streamdal/sdks/go v0.1.28
 ## explicit; go 1.19
 github.com/streamdal/streamdal/sdks/go
 github.com/streamdal/streamdal/sdks/go/helper
