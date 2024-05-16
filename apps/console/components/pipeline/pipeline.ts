@@ -86,7 +86,7 @@ export const newPipeline: Pipeline = {
   name: "",
   steps: [newStep as PipelineStep],
   NotificationConfigs: [],
-  dataFormat: 0, // defualt to JSON
+  dataFormat: 1, // defualt to JSON
 };
 
 const AbortConditionEnum = z.nativeEnum(AbortCondition);
