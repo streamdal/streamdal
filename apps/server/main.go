@@ -26,11 +26,16 @@ var (
 func main() {
 	cfg := config.New(version)
 
-	if cfg.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
-	} else {
-		logrus.SetLevel(logrus.InfoLevel)
+	logLevel, err := logrus.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logrus.Fatalf("Failed to parse log level: %v", err)
 	}
+
+	if cfg.Debug {
+		logLevel = logrus.DebugLevel
+	}
+
+	logrus.SetLevel(logLevel)
 
 	// Start DataDog tracer
 	if os.Getenv("DD_ENV") != "" {

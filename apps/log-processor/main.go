@@ -23,9 +23,16 @@ func main() {
 		log.Fatalf("Failed to validate configuration: %v", err)
 	}
 
-	if cfg.Debug {
-		log.SetLevel(log.DebugLevel)
+	logLevel, err := log.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		log.Fatalf("Failed to parse log level: %v", err)
 	}
+
+	if cfg.Debug {
+		logLevel = log.DebugLevel
+	}
+
+	log.SetLevel(logLevel)
 
 	// Context everyone uses for shutdown
 	ctx, cancel := context.WithCancel(context.Background())
