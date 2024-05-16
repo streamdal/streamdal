@@ -5,9 +5,9 @@ import (
 	"context"
 	"sync"
 
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/sdks/go/server"
 	"github.com/streamdal/streamdal/sdks/go/types"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 type FakeIServerClient struct {

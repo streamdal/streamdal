@@ -143,6 +143,7 @@ func applyDefaults(cfg *Config) {
 		cfg.ReaperTTL = defaultReaperTTL
 	}
 
+	// Cannot have a worker pool size of 0
 	if cfg.WorkerPoolSize == 0 {
 		cfg.WorkerPoolSize = defaultWorkerPoolSize
 	}

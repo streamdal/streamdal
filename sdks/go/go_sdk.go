@@ -53,23 +53,37 @@ type SDKMode int
 type ProcessResponse protos.SDKResponse
 
 const (
-	// DefaultPipelineTimeoutDurationStr is the default timeout for a pipeline execution
+	// DefaultPipelineTimeoutDurationStr is the default timeout for a pipeline execution.
 	DefaultPipelineTimeoutDurationStr = "100ms"
 
 	// DefaultStepTimeoutDurationStr is the default timeout for a single step.
 	DefaultStepTimeoutDurationStr = "10ms"
 
-	// DefaultSamplingRate is the default number at which messages will be sampled per SamplingIntervalSeconds
-	// if SamplingEnabled is set to true and SampleRate is not specified in the config
-
+	// DefaultSamplingRate is the default number at which messages will be sampled
+	// per SamplingIntervalSeconds if SamplingEnabled is set to true and SampleRate
+	// is not specified in the config.
 	DefaultSamplingRate = 1
+
 	// DefaultSamplingIntervalSeconds is the default interval at which sampling will be done
-	// if SamplingEnabled is set to true and SamplingIntervalSeconds is not specified in the config
+	// if SamplingEnabled is set to true and SamplingIntervalSeconds is not specified in the config.
 	DefaultSamplingIntervalSeconds = 1
 
-	DefaultModeAsyncWorkers = 3
+	// DefaultModeAsyncWorkers is the default number of workers that will be spawned
+	// by the SDK when config.Mode is set to ModeAsync.
+	//
+	// Higher amount == improved .Process() speeds but heavier resource usage.
+	DefaultModeAsyncWorkers = 2
 
-	// ReconnectSleep determines the length of time to wait between reconnect attempts to streamdal server©
+	// DefaultMetricsNumWorkers is the default number of workers that the SDK will
+	// spawn for collecting and sending metrics to the configured Streamdal server.
+	//
+	// NOTE: Metrics are NOT optional. The server uses metrics sent by the SDK
+	// clients to determine if clients are alive, display usage stats and many
+	// other features.
+	DefaultMetricsNumWorkers = 10
+
+	// ReconnectSleep determines the length of time the SDK will wait between
+	// reconnect attempts to streamdal server after the streamdal server goes away.
 	ReconnectSleep = time.Second * 5
 
 	// MaxWASMPayloadSize is the maximum size of data that can be sent to the WASM module
@@ -167,24 +181,32 @@ type Streamdal struct {
 }
 
 type Config struct {
-	// ServerURL the hostname and port for the gRPC API of Streamdal Server
-	// If this value is left empty, the library will not attempt to connect to the server
-	// and New() will return nil
+	// ServerURL the hostname and port for the gRPC API of Streamdal Server.
+	// If this value is left empty, the library will not attempt to connect to
+	// the server and New() will return nil.
+	//
+	// REQUIRED
 	ServerURL string
 
 	// ServerToken is the authentication token for the gRPC API of the Streamdal server
 	// If this value is left empty, the library will not attempt to connect to the server
-	// and New() will return nil
+	// and New() will return nil.
+	//
+	// REQUIRED
 	ServerToken string
 
-	// ServiceName is the name that this library will identify as in the UI. Required
+	// ServiceName is the name that this library will identify as in the UI.
+	//
+	// REQUIRED
 	ServiceName string
 
-	// PipelineTimeout defines how long this library will allow a pipeline to
-	// run. Optional; default: 100ms
+	// PipelineTimeout defines how long this library will allow a pipeline to run.
+	//
+	// Optional; default: 100ms
 	PipelineTimeout time.Duration
 
 	// StepTimeout defines how long this library will allow a single step to run.
+	//
 	// Optional; default: 10ms
 	StepTimeout time.Duration
 
@@ -193,32 +215,47 @@ type Config struct {
 	// will cause New() to return an error. If true, the library will block and
 	// continue trying to initialize. You may want to adjust this if you want
 	// your application to behave a certain way on startup when the server
-	// is unavailable. Optional; default: false
+	// is unavailable.
+	//
+	// Optional; default: false
 	IgnoreStartupError bool
 
 	// If specified, library will connect to the server but won't apply any
-	// pipelines. Optional; default: false
+	// pipelines.
+	//
+	// Optional; default: false
 	DryRun bool
 
 	// ShutdownCtx is a context that the library will listen to for cancellation
 	// notices. Upon cancelling this context, SDK will stop all active goroutines
-	// and free up all used resources. Optional; default: nil
+	// and free up all used resources.
+	//
+	// Optional; default: nil
 	ShutdownCtx context.Context
 
 	// Logger is a logger you can inject (such as logrus) to allow this library
-	// to log output. Optional; default: nil
+	// to log output.
+	//
+	// Optional; default: nil
 	Logger logger.Logger
 
 	// Audiences is a list of audiences you can specify at registration time.
 	// This is useful if you know your audiences in advance and want to populate
 	// service groups in the Streamdal UI _before_ your code executes any .Process()
-	// calls. Optional; default: nil
+	// calls.
+	//
+	// NOTE: If you do not specify audiences here, they will only show up in
+	// the UI _after_ the first call to .Process() completes!
+	//
+	// Optional; default: nil
 	Audiences []*Audience
 
 	// ClientType specifies whether this of the SDK is used in a shim library or
 	// as a standalone SDK. This information is used for both debug info and to
 	// help the library determine whether ServerURL and ServerToken should be
-	// optional or required. Optional; default: ClientTypeSDK
+	// optional or required.
+	//
+	// Optional; default: ClientTypeSDK
 	ClientType ClientType
 
 	// EnableStdout enables ability for wasm modules to write to stdout
@@ -227,22 +264,39 @@ type Config struct {
 	// EnableStderr enables ability for wasm modules to write to stderr
 	EnableStderr bool
 
-	// SamplingEnabled enables sampling of data
-	// This will cause Process() to ignore some messages if the rate exceeds the SamplingRate per SamplingIntervalSeconds
+	// SamplingEnabled enables sampling of data. This will cause Process() to
+	// ignore some messages if the rate exceeds the SamplingRate per SamplingIntervalSeconds.
+	// This is useful for high-throughput systems where you cannot .Process()
+	// every message.
 	SamplingEnabled bool
 
 	// SamplingRate is the rate at which messages will be sampled per SamplingIntervalSeconds
+	//
+	// Default: 1
 	SamplingRate int
 
-	// SamplingIntervalSeconds is the interval at which sampling will be done
+	// SamplingIntervalSeconds is the interval at which sampling will be done.
+	//
+	// Default: 1
 	SamplingIntervalSeconds int
 
 	// SDKMode is how Process() will handle messages.
 	// ModeSync = Process() will block until the pipeline is complete
 	// ModeAsync = Process() will return immediately and the pipeline will run in the background via workers
+	//
+	// Default: ModeSync
 	Mode SDKMode
 
+	// ModeAsyncNumWorkers is the number of workers SDK will spawn when Mode is
+	// set to ModeAsync.
+	//
+	// Default: 4
 	ModeAsyncNumWorkers int
+
+	// Number of workers that the SDK will run for collecting and sending metrics
+	//
+	// Default: 1
+	MetricsNumWorkers int
 }
 
 // ProcessRequest is used to maintain a consistent API for the Process() call
@@ -277,9 +331,10 @@ func New(cfg *Config) (*Streamdal, error) {
 	}
 
 	m, err := metrics.New(&metrics.Config{
-		ServerClient: serverClient,
-		ShutdownCtx:  cfg.ShutdownCtx,
-		Log:          cfg.Logger,
+		ServerClient:   serverClient,
+		WorkerPoolSize: cfg.MetricsNumWorkers,
+		ShutdownCtx:    cfg.ShutdownCtx,
+		Log:            cfg.Logger,
 	})
 	if err != nil {
 		cancelFunc()
@@ -464,6 +519,10 @@ func validateConfig(cfg *Config) error {
 
 	if cfg.ModeAsyncNumWorkers == 0 {
 		cfg.ModeAsyncNumWorkers = DefaultModeAsyncWorkers
+	}
+
+	if cfg.MetricsNumWorkers == 0 {
+		cfg.MetricsNumWorkers = DefaultMetricsNumWorkers
 	}
 
 	return nil
