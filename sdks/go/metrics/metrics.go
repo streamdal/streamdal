@@ -35,10 +35,6 @@ const (
 	// A stale counter is one with zero value and last updated time > ReaperTTL
 	defaultReaperTTL = 10 * time.Second
 
-	// defaultWorkerPoolSize is how many counter workers will be spun up.
-	// These workers are responsible for processing the counterIncrCh and counterPublishCh channels
-	defaultWorkerPoolSize = 10
-
 	// serverFlushTimeout is the maximum amount of time to wait before flushing metrics to the server
 	serverFlushTimeout = time.Second * 2
 
@@ -125,6 +121,10 @@ func validateConfig(cfg *Config) error {
 		return ErrMissingShutdownCtx
 	}
 
+	if cfg.WorkerPoolSize < 1 || cfg.WorkerPoolSize > 100 {
+		return errors.New("metrics WorkerPoolSize must be between 1 and 100")
+	}
+
 	applyDefaults(cfg)
 
 	return nil
@@ -141,11 +141,6 @@ func applyDefaults(cfg *Config) {
 
 	if cfg.ReaperTTL == 0 {
 		cfg.ReaperTTL = defaultReaperTTL
-	}
-
-	// Cannot have a worker pool size of 0
-	if cfg.WorkerPoolSize == 0 {
-		cfg.WorkerPoolSize = defaultWorkerPoolSize
 	}
 
 	if cfg.Log == nil {

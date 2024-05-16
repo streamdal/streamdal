@@ -80,7 +80,7 @@ const (
 	// NOTE: Metrics are NOT optional. The server uses metrics sent by the SDK
 	// clients to determine if clients are alive, display usage stats and many
 	// other features.
-	DefaultMetricsNumWorkers = 10
+	DefaultMetricsNumWorkers = 1
 
 	// ReconnectSleep determines the length of time the SDK will wait between
 	// reconnect attempts to streamdal server after the streamdal server goes away.
