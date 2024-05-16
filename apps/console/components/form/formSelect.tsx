@@ -50,9 +50,7 @@ export const FormSelect = ({
         } ${inputClass}`}
         value={value}
         onChange={(e: ChangeEvent<HTMLSelectElement>) => {
-          const selectedValue = e.currentTarget.value;
-          const newValue = selectedValue === "0" ? "JSON" : selectedValue;
-          updateData(data, setData, parsePath(name), newValue);
+          updateData(data, setData, parsePath(name), e.currentTarget.value);
         }}
         placeholder={placeHolder}
       >

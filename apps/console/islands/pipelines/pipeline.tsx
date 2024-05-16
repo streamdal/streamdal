@@ -152,7 +152,9 @@ export default function PipelineDetail({
       });
     }
 
-    return detectiveKeywordOptions;
+    return detectiveKeywordOptions.filter((option) => {
+      return option.props.label !== "PII_PLAINTEXT_ANY";
+    });
   };
 
   return (
