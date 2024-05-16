@@ -4,7 +4,7 @@ images:
   logProcessor:
     repository: streamdal/log-processor
     pullPolicy: Always
-    tag: "567d0ce"
+    tag: "e932b88"
   logstash:
     repository: logstash
     tag: "7.17.20"
