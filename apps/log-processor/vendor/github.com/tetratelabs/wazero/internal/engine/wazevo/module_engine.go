@@ -74,6 +74,18 @@ type (
 	moduleContextOpaque []byte
 )
 
+func newAlignedOpaque(size int) moduleContextOpaque {
+	// Check if the size is a multiple of 16.
+	if size%16 != 0 {
+		panic("size must be a multiple of 16")
+	}
+	buf := make([]byte, size+16)
+	// Align the buffer to 16 bytes.
+	rem := uintptr(unsafe.Pointer(&buf[0])) % 16
+	buf = buf[16-rem:]
+	return buf
+}
+
 func putLocalMemory(opaque []byte, offset wazevoapi.Offset, mem *wasm.MemoryInstance) {
 	s := uint64(len(mem.Buffer))
 	var b uint64
@@ -183,6 +195,9 @@ func (m *moduleEngine) NewFunction(index wasm.Index) api.Function {
 	ce.execCtx.checkModuleExitCodeTrampolineAddress = &m.parent.sharedFunctions.checkModuleExitCode[0]
 	ce.execCtx.tableGrowTrampolineAddress = &m.parent.sharedFunctions.tableGrowExecutable[0]
 	ce.execCtx.refFuncTrampolineAddress = &m.parent.sharedFunctions.refFuncExecutable[0]
+	ce.execCtx.memoryWait32TrampolineAddress = &m.parent.sharedFunctions.memoryWait32Executable[0]
+	ce.execCtx.memoryWait64TrampolineAddress = &m.parent.sharedFunctions.memoryWait64Executable[0]
+	ce.execCtx.memoryNotifyTrampolineAddress = &m.parent.sharedFunctions.memoryNotifyExecutable[0]
 	ce.execCtx.memmoveAddress = memmovPtr
 	ce.init()
 	return ce
@@ -196,6 +211,17 @@ func (m *moduleEngine) GetGlobalValue(i wasm.Index) (lo, hi uint64) {
 		panic("GetGlobalValue should not be called for imported globals")
 	}
 	return binary.LittleEndian.Uint64(buf), binary.LittleEndian.Uint64(buf[8:])
+}
+
+// SetGlobalValue implements the same method as documented on wasm.ModuleEngine.
+func (m *moduleEngine) SetGlobalValue(i wasm.Index, lo, hi uint64) {
+	offset := m.parent.offsets.GlobalInstanceOffset(i)
+	buf := m.opaque[offset:]
+	if i < m.module.Source.ImportGlobalCount {
+		panic("GetGlobalValue should not be called for imported globals")
+	}
+	binary.LittleEndian.PutUint64(buf, lo)
+	binary.LittleEndian.PutUint64(buf[8:], hi)
 }
 
 // OwnsGlobals implements the same method as documented on wasm.ModuleEngine.
@@ -306,23 +332,11 @@ func (m *moduleEngine) LookupFunction(t *wasm.TableInstance, typeId wasm.Functio
 		panic(wasmruntime.ErrRuntimeInvalidTableAccess)
 	}
 
-	tf := functionFromUintptr(rawPtr)
+	tf := wazevoapi.PtrFromUintptr[functionInstance](rawPtr)
 	if tf.typeID != typeId {
 		panic(wasmruntime.ErrRuntimeIndirectCallTypeMismatch)
 	}
 	return moduleInstanceFromOpaquePtr(tf.moduleContextOpaquePtr), tf.indexInModule
-}
-
-// functionFromUintptr resurrects the original *function from the given uintptr
-// which comes from either funcref table or OpcodeRefFunc instruction.
-func functionFromUintptr(ptr uintptr) *functionInstance {
-	// Wraps ptrs as the double pointer in order to avoid the unsafe access as detected by race detector.
-	//
-	// For example, if we have (*function)(unsafe.Pointer(ptr)) instead, then the race detector's "checkptr"
-	// subroutine wanrs as "checkptr: pointer arithmetic result points to invalid allocation"
-	// https://github.com/golang/go/blob/1ce7fcf139417d618c2730010ede2afb41664211/src/runtime/checkptr.go#L69
-	var wrapped *uintptr = &ptr
-	return *(**functionInstance)(unsafe.Pointer(wrapped))
 }
 
 func moduleInstanceFromOpaquePtr(ptr *byte) *wasm.ModuleInstance {
