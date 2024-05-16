@@ -153,6 +153,8 @@ type Streamdal struct {
 	cancelFunc     context.CancelFunc
 	wasmCache      map[string][]byte
 	wasmCacheMtx   *sync.RWMutex
+	funcCreateMtx  *sync.Mutex
+	funcCreate     map[string]*sync.Mutex
 
 	// Sampling rate limiter, uses token bucket algo
 	limiter *rate.Limiter
@@ -320,6 +322,10 @@ func New(cfg *Config) (*Streamdal, error) {
 		cancelFunc:     cancelFunc,
 		wasmCache:      make(map[string][]byte),
 		wasmCacheMtx:   &sync.RWMutex{},
+
+		// Used for blocking getFunctionFromCache() calls when a function is being created
+		funcCreate:    make(map[string]*sync.Mutex),
+		funcCreateMtx: &sync.Mutex{},
 	}
 
 	if cfg.DryRun {
