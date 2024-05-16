@@ -16,16 +16,21 @@ spec:
     spec:
       containers:
       - name: logrotate
-        image: {{ .Values.logrotate.image }}
+        image: skymatic/logrotate:latest
         env:
-        - name: LOGS_DIRECTORIES
-          value: "{{ .Values.logrotate.env.LOGS_DIRECTORIES }}"
-        - name: LOGROTATE_SIZE
-          value: "{{ .Values.logrotate.env.LOGROTATE_SIZE }}"
+        - name: CRON_SCHEDULE
+          value: "5 * * * *"
         volumeMounts:
           - name: logs
-            mountPath: /var/log/pods
+            mountPath: /logs
+          - name: logrotate-config
+            mountPath: /etc/logrotate.conf
+            subPath: logrotate.conf
+            readOnly: true
       volumes:
         - name: logs
           persistentVolumeClaim:
             claimName: {{ .Release.Name }}-logs-pvc
+        - name: logrotate-config
+          configMap:
+            name: logrotate-config
