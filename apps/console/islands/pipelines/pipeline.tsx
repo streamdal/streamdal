@@ -28,6 +28,7 @@ import {
   validate,
 } from "../../components/form/validate.ts";
 import {
+  dataFormats,
   kinds,
   newStep,
   PipelineSchema,
@@ -103,7 +104,6 @@ export default function PipelineDetail({
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
-
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
 
@@ -175,6 +175,22 @@ export default function PipelineDetail({
         </div>
 
         <div class="flex flex-col px-6 pt-6">
+          <FormSelect
+            name={`dataFormat`}
+            data={data}
+            setData={setData}
+            label="Data Format"
+            errors={errors}
+            inputClass="w-64"
+            children={dataFormats.map((kind, i) => (
+              <option
+                key={`data-format-${i}`}
+                value={kind.value}
+                label={kind.label}
+                disabled={kind.value === "custom"}
+              />
+            ))}
+          />
           <div class="mb-6 flex flex-row items-center justify-between">
             <div class="flex flex-row items-center">
               <div class="mr-2 text-[16px] font-semibold">Steps</div>
@@ -334,7 +350,7 @@ export default function PipelineDetail({
                               tooltip={`PII Keyword Match Mode\n
                                       'Performance' == fast hashmap lookup
                                       'Accuracy' == thorough field analysis\n
-                                      
+
                                       https://docs.streamdal.com/foo`}
                             />
                           )}

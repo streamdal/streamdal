@@ -1,6 +1,7 @@
 import {
   AbortCondition,
   Pipeline,
+  PipelineDataFormat,
   PipelineStep,
   PipelineStepNotification_PayloadType,
 } from "streamdal-protos/protos/sp_pipeline.ts";
@@ -45,6 +46,11 @@ export const nArgTypes: (keyof typeof DetectiveType)[] = [
   "NUMERIC_RANGE",
 ];
 
+export const dataFormatArgTypes: (keyof typeof PipelineDataFormat)[] = [
+  "JSON",
+  "PLAINTEXT",
+];
+
 const detective = {
   type: DetectiveType.IS_EMPTY,
   path: "",
@@ -80,6 +86,7 @@ export const newPipeline: Pipeline = {
   name: "",
   steps: [newStep as PipelineStep],
   NotificationConfigs: [],
+  dataFormat: 0, // defualt to JSON
 };
 
 const AbortConditionEnum = z.nativeEnum(AbortCondition);
@@ -94,6 +101,7 @@ const KVModeTypeEnum = z.nativeEnum(KVMode);
 const HTTPMethodEnum = z.nativeEnum(HttpRequestMethod);
 const HTTPBodyModeEnum = z.nativeEnum(HttpRequestBodyMode);
 const PIIKeywordModeEnum = z.nativeEnum(DetectiveTypePIIKeywordMode);
+const DataFormatEnum = z.nativeEnum(PipelineDataFormat);
 const NotificationPayloadTypeEnum = z.nativeEnum(
   PipelineStepNotification_PayloadType,
 );
@@ -105,6 +113,11 @@ export const kinds = [
   { label: "Schema Validation", value: "schemaValidation" },
   { label: "HTTP Request", value: "httpRequest" },
   { label: "Custom Wasm", value: "custom" },
+];
+
+export const dataFormats = [
+  { label: "JSON", value: 1 },
+  { label: "PLAINTEXT", value: 2 },
 ];
 
 const transformOptions = z.discriminatedUnion("oneofKind", [
@@ -410,4 +423,5 @@ export const PipelineSchema = z.object({
   steps: z.array(stepSchema).min(1, {
     message: "At least one step is required",
   }),
+  dataFormat: numeric(DataFormatEnum),
 });

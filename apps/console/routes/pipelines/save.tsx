@@ -9,7 +9,6 @@ import { SuccessType } from "../_middleware.ts";
 export const handler: Handlers<SuccessType> = {
   async POST(req, ctx) {
     const formData = await req.formData();
-
     const {
       data: pipeline,
       errors,
