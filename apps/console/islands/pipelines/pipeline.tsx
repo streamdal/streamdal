@@ -144,6 +144,16 @@ export default function PipelineDetail({
     });
     setDragId(null);
   };
+  const detectiveKeywordList = (data: any) => {
+    const detectiveKeywordOptions = optionsFromEnum(DetectiveType);
+    if (data.dataFormat === "2" || data.dataFormat === 2) {
+      return detectiveKeywordOptions.filter((option) => {
+        return option.props.label === "PII_PLAINTEXT_ANY";
+      });
+    }
+
+    return detectiveKeywordOptions;
+  };
 
   return (
     //
@@ -328,7 +338,7 @@ export default function PipelineDetail({
                             data={data}
                             setData={setData}
                             errors={errors}
-                            children={optionsFromEnum(DetectiveType)}
+                            children={detectiveKeywordList(data)}
                           />
                           {/* There's a bug with type sometimes being passed as string and sometimes int... 🤷 */}
                           {(data.steps[i].step.detective.type === "2036" ||
