@@ -54,11 +54,15 @@ github.com/streamdal/streamdal/libs/protos v0.1.57 h1:WcdPA6d/jSBbr4BF07q5bgnoA7
 github.com/streamdal/streamdal/libs/protos v0.1.57/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/streamdal/streamdal/sdks/go v0.1.28 h1:iTGyAIO9l9NLgQNWubfdxlf/lPPT0djyI0S2zzOCPkI=
 github.com/streamdal/streamdal/sdks/go v0.1.28/go.mod h1:Rf7Jc8I7Qtsy/wF7mvOR0a3btvdaNaJ2R/nIgMM0BRQ=
+github.com/streamdal/streamdal/sdks/go v0.1.29 h1:aoijqCoeLsEvQnfZnl0Ti6xUI89dxdgzlGt/LGtexkc=
+github.com/streamdal/streamdal/sdks/go v0.1.29/go.mod h1:xXLO9ilfy2QJd9D8WgqQu7umVqYOg+iqBueLRzrK6Tg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/tetratelabs/wazero v1.7.0 h1:jg5qPydno59wqjpGrHph81lbtHzTrWzwwtD4cD88+hQ=
 github.com/tetratelabs/wazero v1.7.0/go.mod h1:ytl6Zuh20R/eROuyDaGPkp82O9C/DJfXAwJfQ3X6/7Y=
+github.com/tetratelabs/wazero v1.7.2 h1:1+z5nXJNwMLPAWaTePFi49SSTL0IMx/i3Fg8Yc25GDc=
+github.com/tetratelabs/wazero v1.7.2/go.mod h1:ytl6Zuh20R/eROuyDaGPkp82O9C/DJfXAwJfQ3X6/7Y=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/net v0.0.0-20190311183353-d8887717615a/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/net v0.24.0 h1:1PcaxkF854Fu3+lvBIx5SYn9wRlBzzcnHZSiaFFAb0w=
