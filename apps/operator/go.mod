@@ -8,8 +8,8 @@ require (
 	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0
 	github.com/pkg/errors v0.9.1
-	github.com/streamdal/streamdal/apps/server v0.0.43
-	github.com/streamdal/streamdal/libs/protos v0.1.44
+	github.com/streamdal/streamdal/apps/server v0.0.68
+	github.com/streamdal/streamdal/libs/protos v0.1.57
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
