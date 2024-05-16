@@ -183,7 +183,7 @@ run/plaintext:
 run/plaintext2: description = Plaintext Logs
 run/plaintext2:
 	go run *.go -d \
-	--message-rate 1 \
+	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
 	--operation-name  "logs" \
