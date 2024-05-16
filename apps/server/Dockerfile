@@ -49,4 +49,4 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 8081
 EXPOSE 8082
 
-CMD ["/streamdal-server", "--debug"]
+CMD ["/streamdal-server"]
