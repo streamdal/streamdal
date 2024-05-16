@@ -49,8 +49,9 @@ export const FormSelect = ({
           errors[name] ? "border-streamdalRed" : "border-twilight"
         } ${inputClass}`}
         value={value}
-        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-          updateData(data, setData, parsePath(name), e.currentTarget.value)}
+        onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+          updateData(data, setData, parsePath(name), e.currentTarget.value);
+        }}
         placeholder={placeHolder}
       >
         {children}

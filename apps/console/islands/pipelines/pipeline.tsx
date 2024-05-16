@@ -28,6 +28,7 @@ import {
   validate,
 } from "../../components/form/validate.ts";
 import {
+  dataFormats,
   kinds,
   newStep,
   PipelineSchema,
@@ -103,7 +104,6 @@ export default function PipelineDetail({
 
   const onSubmit = async (e: any) => {
     const formData = new FormData(e.target);
-
     const { errors } = validate(PipelineSchema as any, formData);
     setErrors(errors || {});
 
@@ -145,6 +145,19 @@ export default function PipelineDetail({
     setDragId(null);
   };
 
+  const detectiveKeywordList = (data: any) => {
+    const detectiveKeywordOptions = optionsFromEnum(DetectiveType);
+    if (data.dataFormat === "2" || data.dataFormat === 2) {
+      return detectiveKeywordOptions.filter((option) => {
+        return option.props.label === "PII_PLAINTEXT_ANY";
+      });
+    }
+
+    return detectiveKeywordOptions.filter((option) => {
+      return option.props.label !== "PII_PLAINTEXT_ANY";
+    });
+  };
+
   return (
     //
     // Disabling partial nav here as downstream redirects don't work with fresh.
@@ -175,6 +188,21 @@ export default function PipelineDetail({
         </div>
 
         <div class="flex flex-col px-6 pt-6">
+          <FormSelect
+            name={`dataFormat`}
+            data={data}
+            setData={setData}
+            label="Data Format"
+            errors={errors}
+            inputClass="w-64"
+            children={dataFormats.map((kind, i) => (
+              <option
+                key={`data-format-${i}`}
+                value={kind.value}
+                label={kind.label}
+              />
+            ))}
+          />
           <div class="mb-6 flex flex-row items-center justify-between">
             <div class="flex flex-row items-center">
               <div class="mr-2 text-[16px] font-semibold">Steps</div>
@@ -312,7 +340,7 @@ export default function PipelineDetail({
                             data={data}
                             setData={setData}
                             errors={errors}
-                            children={optionsFromEnum(DetectiveType)}
+                            children={detectiveKeywordList(data)}
                           />
                           {/* There's a bug with type sometimes being passed as string and sometimes int... 🤷 */}
                           {(data.steps[i].step.detective.type === "2036" ||
@@ -334,7 +362,7 @@ export default function PipelineDetail({
                               tooltip={`PII Keyword Match Mode\n
                                       'Performance' == fast hashmap lookup
                                       'Accuracy' == thorough field analysis\n
-                                      
+
                                       https://docs.streamdal.com/foo`}
                             />
                           )}
