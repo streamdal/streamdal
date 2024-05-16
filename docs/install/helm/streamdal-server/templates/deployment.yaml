@@ -43,6 +43,8 @@ spec:
                 secretKeyRef:
                   name: streamdal-server-aes-key
                   key: STREAMDAL_SERVER_AES_KEY
+            - name: STREAMDAL_SERVER_LOG_LEVEL
+              value: "{{ .Values.env.STREAMDAL_SERVER_LOG_LEVEL }}"
             {{- range $name, $value := .Values.env }}
             - name: {{ $name }}
               value: {{ $value | quote }}

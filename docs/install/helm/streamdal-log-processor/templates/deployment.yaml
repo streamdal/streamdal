@@ -26,6 +26,9 @@ spec:
             value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR }}"
           - name: STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN
             value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN }}"
+          - name: STREAMDAL_LOG_PROCESSOR_LOG_LEVEL
+            value: "{{ .Values.config.STREAMDAL_LOG_PROCESSOR_LOG_LEVEL }}"
+
         ports:
           - containerPort: {{ .Values.service.logProcessorPort }}
         volumeMounts:

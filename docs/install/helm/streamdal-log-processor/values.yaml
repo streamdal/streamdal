@@ -4,7 +4,7 @@ images:
   logProcessor:
     repository: streamdal/log-processor
     pullPolicy: Always
-    tag: "3291009f6"
+    tag: "567d0ce"
   logstash:
     repository: logstash
     tag: "7.17.20"
@@ -26,6 +26,7 @@ config:
   STREAMDAL_LOG_PROCESSOR_LISTEN_ADDR: "0.0.0.0:6000"
   STREAMDAL_LOG_PROCESSOR_LOGSTASH_ADDR: "127.0.0.1:6001"
   STREAMDAL_LOG_PROCESSOR_STREAMDAL_TOKEN: "1234"
+  STREAMDAL_LOG_PROCESSOR_LOG_LEVEL: "error"
 
 logrotate:
   name: logrotate-deployment
