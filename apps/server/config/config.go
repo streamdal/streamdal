@@ -31,6 +31,7 @@ type Config struct {
 	DemoMode             bool             `help:"Run server in demo mode. This disables modifications" default:"false"`
 	TelemetryDisable     bool             `help:"Disable sending usage analytics to Streamdal" default:"false"`
 	TelemetryAddress     string           `help:"Address to send telemetry to" default:"telemetry.streamdal.com:8125" hidden:"true"`
+	LogLevel             string           `kong:"default='INFO',help='Log level to use.',enum='DEBUG,INFO,WARN,ERROR,FATAL,PANIC,TRACE'"`
 
 	NodeID    string `kong:"-"`
 	InstallID string `kong:"-"`

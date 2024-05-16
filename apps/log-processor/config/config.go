@@ -29,6 +29,7 @@ type Config struct {
 	ProcessBufferSize         int              `kong:"default='100',help='Size of the process buffer.'"`
 	SendBufferSize            int              `kong:"default='100',help='Size of the send buffer.'"`
 	Debug                     bool             `kong:"default='false',help='Enable debug logging.'"`
+	LogLevel                  string           `kong:"default='INFO',help='Log level to use.',enum='DEBUG,INFO,WARN,ERROR,FATAL,PANIC,TRACE'"`
 
 	KongContext *kong.Context `kong:"-"`
 }
