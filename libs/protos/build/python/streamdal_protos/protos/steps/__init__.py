@@ -139,6 +139,11 @@ class DetectiveType(betterproto.Enum):
     value
     """
 
+    DETECTIVE_TYPE_PII_PLAINTEXT_ANY = 2037
+    """Works on plaintext pipelines only"""
+
+    DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038
+    DETECTIVE_TYPE_CANADA_SIN = 2039
     DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000
     DETECTIVE_TYPE_NUMERIC_GREATER_THAN = 3001
     DETECTIVE_TYPE_NUMERIC_GREATER_EQUAL = 3002
@@ -284,6 +289,13 @@ class DetectiveStepResultMatch(betterproto.Message):
     path: str = betterproto.string_field(2)
     """For JSON payloads, the path to the match"""
 
+    char_index_start: int = betterproto.int32_field(3)
+    """
+    For string payloads, the start and end characters of the match Placeholder
+    for now, will implement in the future
+    """
+
+    char_index_end: int = betterproto.int32_field(4)
     value: bytes = betterproto.bytes_field(5)
     """Value of the match"""
 

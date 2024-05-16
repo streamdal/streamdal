@@ -50,6 +50,12 @@ class NotificationPagerDutyUrgency(betterproto.Enum):
     URGENCY_HIGH = 2
 
 
+class PipelineDataFormat(betterproto.Enum):
+    PIPELINE_DATA_FORMAT_UNSET = 0
+    PIPELINE_DATA_FORMAT_JSON = 1
+    PIPELINE_DATA_FORMAT_PLAINTEXT = 2
+
+
 class AbortCondition(betterproto.Enum):
     """Defines the ways in which a pipeline can be aborted"""
 
@@ -160,11 +166,20 @@ class ExecStatus(betterproto.Enum):
     Wasm function cannot alloc or dealloc memory, etc.
     """
 
-    EXEC_STATUS_SKIPPED = 4
+    EXEC_STATUS_ASYNC = 4
     """
-    Indicates that the step was skipped; this status is set when the SDK is
-    configured with sampling and a .Process() was called on a message that was
-    sampled out.
+    Indicates that the SDK was configured to operate in async mode. Step
+    execution will occur asynchronously in a background worker-group.
+    """
+
+    EXEC_STATUS_SAMPLING = 5
+    """
+    Indicates that the SDK was configured to operate in sampling mode. Step
+    execution was skipped for this request due to configured sampling rate. If
+    this status is set, you can safely ignore the rest of the response as the
+    execution for this request was skipped due to being sampled out. Non-
+    sampled messages will have TRUE/FALSE/ERROR status set as any other non-
+    sampled message.
     """
 
 
@@ -294,6 +309,7 @@ class Pipeline(betterproto.Message):
     responses This is deprecated and the data has moved to PipelineStep
     """
 
+    data_format: "PipelineDataFormat" = betterproto.enum_field(5)
     paused: Optional[bool] = betterproto.bool_field(
         1000, optional=True, group="X_paused"
     )
@@ -1434,6 +1450,11 @@ class WasmRequest(betterproto.Message):
     for communicating data between steps. For example, when trying to find
     email addresses in a payload and then passing on the results to a transform
     step to obfuscate them
+    """
+
+    data_format: "PipelineDataFormat" = betterproto.enum_field(5)
+    """
+    Data format of the input payload. This is obtained from Pipeline.DataFormat
     """
 
 

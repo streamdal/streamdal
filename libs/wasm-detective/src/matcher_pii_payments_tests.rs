@@ -1,3 +1,4 @@
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 use crate::detective::Request;
 #[cfg(test)]
 use protos::sp_steps_detective::DetectiveType;
@@ -16,6 +17,7 @@ pub fn test_stripe_secret() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal payments.stripe.secret_key".to_string(),
@@ -39,6 +41,7 @@ fn test_iban() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal payments.iban".to_string(),
@@ -62,6 +65,7 @@ fn test_routing_number() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal payments.routing_number".to_string(),
@@ -85,6 +89,7 @@ fn test_swift_bic() {
                 args: vec![],
                 negate: false,
                 mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
             },
             expected_matches: 1,
             text: "equal payments.swift_bic".to_string(),

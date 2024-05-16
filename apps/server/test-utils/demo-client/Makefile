@@ -30,6 +30,7 @@ run/all:
 run1: description = Run signup-service
 run1:
 	go run *.go -d \
+	--display-exec-time \
 	--message-rate 1 \
 	--service-name "signup-service" \
 	--operation-type 2 \
@@ -45,8 +46,8 @@ run1:
 run2: description = Run signup-service
 run2:
 	go run *.go -d \
-	--quiet \
-	--message-rate 10,20 \
+	--display-exec-time \
+	--message-rate 1 \
 	--service-name "signup-service" \
 	--operation-type 2 \
 	--operation-name  "recorder" \
@@ -118,6 +119,65 @@ run7:
 	--display-exec-time \
 	--data-source-type file \
 	--data-source-file ./assets/pii-key-value.json
+
+.PHONY: run/async
+run/async: description = Run signup-service-async service configured with async
+run/async:
+	go run *.go -d \
+	--quiet \
+	--async \
+	--display-exec-time \
+	--message-rate 10,20 \
+	--service-name "signup-service-async" \
+	--operation-type 2 \
+	--operation-name  "recorder" \
+	--component-name "kafka" \
+	--data-source-type file \
+	--data-source-file ./assets/sample.json
+
+.PHONY: run/sampling
+run/sampling: description = Run signup-service-async service configured with sampling rate of 1 message/sec
+run/sampling:
+	go run *.go -d \
+	--quiet \
+	--sampling-rate 1 \
+	--display-exec-time \
+	--message-rate 10,100 \
+	--service-name "signup-service-sampling" \
+	--operation-type 2 \
+	--operation-name  "verifier" \
+	--component-name "mysql" \
+	--data-source-type file \
+	--data-source-file ./assets/sample.json
+
+.PHONY: run/async-sampling
+run/async-sampling: description = Run signup-service-async service configured with async and sampling
+run/async-sampling:
+	go run *.go -d \
+	--quiet \
+	--async \
+	--sampling-rate 1 \
+	--display-exec-time \
+	--message-rate 10,100 \
+	--service-name "signup-service-async-sampling" \
+	--operation-type 2 \
+	--operation-name  "worker" \
+	--component-name "postgresql" \
+	--data-source-type file \
+	--data-source-file ./assets/sample.json
+
+.PHONY: run/plaintext
+run/plaintext: description = Plaintext Logs
+run/plaintext:
+	go run *.go -d \
+	--message-rate 1,10 \
+	--service-name "plaintext-logs" \
+	--operation-type 2 \
+	--operation-name  "logs" \
+	--component-name "plaintext-logger" \
+	--display-exec-time \
+	--data-source-type file \
+	--data-source-file ./assets/plaintext-logs.txt
 
 ### Build
 

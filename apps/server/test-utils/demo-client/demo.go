@@ -15,6 +15,7 @@ import (
 	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	streamdal "github.com/streamdal/streamdal/sdks/go"
@@ -171,6 +172,15 @@ func (r *Demo) newClient() (*streamdal.Streamdal, error) {
 		cfg.Logger = r.log
 	}
 
+	if r.config.Async {
+		cfg.Mode = streamdal.ModeAsync
+	}
+
+	if r.config.SamplingRate > 0 {
+		cfg.SamplingEnabled = true
+		cfg.SamplingRate = r.config.SamplingRate
+	}
+
 	return streamdal.New(cfg)
 }
 
@@ -286,6 +296,16 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error, t
 }
 
 func generateDataDiff(tw gopretty.Writer, pre []byte, post *streamdal.ProcessResponse) {
+	// Plaintext
+	// TODO: can we add syntax highlighting to changed val?
+	if pre[0] != '{' {
+		tw.AppendSeparator()
+		tw.AppendRow(gopretty.Row{bold("Before"), bold("After")})
+		tw.AppendSeparator()
+		tw.AppendRow(gopretty.Row{string(pre), string(post.Data)})
+		return
+	}
+
 	// Format pre data
 	preFormatted, err := prettyjson.Format(pre)
 	if err != nil {
@@ -365,6 +385,10 @@ func translateStatus(status protos.ExecStatus) string {
 		return color.YellowString("FALSE")
 	case protos.ExecStatus_EXEC_STATUS_ERROR:
 		return color.RedString("ERROR")
+	case protos.ExecStatus_EXEC_STATUS_ASYNC:
+		return color.HiBlueString("ASYNC")
+	case protos.ExecStatus_EXEC_STATUS_SAMPLING:
+		return color.HiBlueString("SAMPLING")
 	default:
 		return color.HiRedString("%s", status)
 	}

@@ -174,13 +174,21 @@ This repo is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that has the f
 # └── README.md
 ```
 
+### Tested Versions
+
+The Streamdal platform is made up of several components that must all be at specific versions to function properly together.
+
+When running in production, verify versions of the components against this list:
+
+| Date       | Server | Console | Protos | Wasm   | Helm   |
+|------------|--------|---------|--------|--------|--------|
+| 05.08.2024 | 0.0.38 | 0.0.69  | 0.1.56 | 0.1.38 | 0.1.61 |
+
 # Community
 
 We're building Streamdal in the open and we'd love for you to join us!
 
 Join our [Discord](https://discord.gg/streamdal)!
-
-# Resources
 
 ### Getting Help
 
@@ -189,11 +197,6 @@ Stuck? Something not working right? Have questions?
 * First and _easiest_ way to get help is to join our [Discord](https://discord.gg/streamdal)
 * If you're not in the mood to chat - there's [docs](https://docs.streamdal.com)
 * If all else fails, [open an issue](https://github.com/streamdal/streamdal/issues/new)!
-
-### Manifesto
-
-To get a better understanding of what we're trying to do, our ethos, principles,
-and really, our state of mind - check out our [manifesto](https://streamdal.com/manifesto).
 
 ### Roadmap
 

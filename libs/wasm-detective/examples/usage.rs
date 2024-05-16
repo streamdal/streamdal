@@ -1,3 +1,4 @@
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 use protos::sp_steps_detective::DetectiveType;
 use streamdal_wasm_detective::detective;
 use streamdal_wasm_detective::detective::Request;
@@ -19,7 +20,8 @@ fn main() {
         path: "field1".to_string(),
         args: vec!["1".to_string()],
         negate: false,
-        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+        data_format: PIPELINE_DATA_FORMAT_JSON,
     };
 
     match det.matches(&request) {

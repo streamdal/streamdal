@@ -107,7 +107,6 @@ fn test_path_retention() {
 
     assert_eq!(results.len(), 1);
     assert_eq!(results[0].children[0].pii_matches[0].path, "Credit_Card.card_number".to_string());
-
 }
 
 #[bench]
@@ -170,7 +169,6 @@ fn bench_standard_pii_medium_performance(b: &mut Bencher) {
         let _ = pii.scan(str_payload, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE);
     });
 }
-
 
 #[bench]
 fn bench_standard_pii_large_performance(b: &mut Bencher) {

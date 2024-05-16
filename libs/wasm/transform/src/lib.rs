@@ -129,6 +129,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             };
 
             transform::Request {
+                data_format: wasm_request.data_format.clone().unwrap(),
                 data: wasm_request.input_payload.clone(),
                 value: "".to_string(),
                 paths,
@@ -153,6 +154,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: wasm_request.data_format.clone().unwrap(),
                 data: wasm_request.input_payload.clone(),
                 value: "".to_string(),
                 paths: paths,
@@ -172,6 +174,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: wasm_request.data_format.clone().unwrap(),
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: opts.mask.clone(),
@@ -191,6 +194,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: wasm_request.data_format.clone().unwrap(),
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: "".to_string(),
@@ -210,6 +214,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: wasm_request.data_format.clone().unwrap(),
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: opts.value.clone(),
@@ -231,6 +236,7 @@ fn generate_transform_request(wasm_request: &WASMRequest) -> Result<transform::R
             }
 
             transform::Request {
+                data_format: wasm_request.data_format.clone().unwrap(),
                 data: wasm_request.input_payload.clone(),
                 paths: paths,
                 value: "".to_string(),

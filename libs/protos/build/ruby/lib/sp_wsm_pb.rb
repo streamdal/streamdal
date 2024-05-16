@@ -14,6 +14,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :input_payload, :bytes, 2
       proto3_optional :input_step, :bytes, 3
       proto3_optional :inter_step_result, :message, 4, "protos.InterStepResult"
+      optional :data_format, :enum, 5, "protos.PipelineDataFormat"
     end
     add_message "protos.WASMResponse" do
       optional :output_payload, :bytes, 1

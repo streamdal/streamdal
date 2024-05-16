@@ -62,7 +62,7 @@ checksum = "bc51bbdb843478589c7bb3229b680fbd406daae398c4edd44ba5662688f5eb2c"
 
 [[package]]
 name = "streamdal-protos"
-version = "0.1.55"
+version = "0.1.57"
 dependencies = [
  "protobuf",
 ]

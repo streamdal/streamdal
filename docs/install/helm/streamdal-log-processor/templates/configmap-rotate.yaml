@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logrotate-config
+  namespace: vector
+data:
+  logrotate.conf: |
+    /logs/*/*/*.log {
+        daily
+        size 250M
+        dateext
+        dateformat -%Y-%m-%d-%H-%M
+        rotate 3
+        maxage 5
+        missingok
+        notifempty
+        compress
+        delaycompress
+        sharedscripts
+    }

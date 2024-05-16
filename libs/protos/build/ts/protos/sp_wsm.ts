@@ -13,6 +13,7 @@ import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Audience } from "./sp_common.js";
 import { DetectiveStepResult } from "./steps/sp_steps_detective.js";
+import { PipelineDataFormat } from "./sp_pipeline.js";
 import { PipelineStep } from "./sp_pipeline.js";
 /**
  * SDK generates a WASM request and passes this to the WASM func
@@ -49,6 +50,12 @@ export interface WASMRequest {
      * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 4;
      */
     interStepResult?: InterStepResult;
+    /**
+     * Data format of the input payload. This is obtained from Pipeline.DataFormat
+     *
+     * @generated from protobuf field: protos.PipelineDataFormat data_format = 5;
+     */
+    dataFormat: PipelineDataFormat;
 }
 /**
  * Returned by all WASM functions
@@ -162,11 +169,12 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
             { no: 1, name: "step", kind: "message", T: () => PipelineStep },
             { no: 2, name: "input_payload", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 3, name: "input_step", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
-            { no: 4, name: "inter_step_result", kind: "message", T: () => InterStepResult }
+            { no: 4, name: "inter_step_result", kind: "message", T: () => InterStepResult },
+            { no: 5, name: "data_format", kind: "enum", T: () => ["protos.PipelineDataFormat", PipelineDataFormat, "PIPELINE_DATA_FORMAT_"] }
         ]);
     }
     create(value?: PartialMessage<WASMRequest>): WASMRequest {
-        const message = { inputPayload: new Uint8Array(0) };
+        const message = { inputPayload: new Uint8Array(0), dataFormat: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<WASMRequest>(this, message, value);
@@ -188,6 +196,9 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
                     break;
                 case /* optional protos.InterStepResult inter_step_result */ 4:
                     message.interStepResult = InterStepResult.internalBinaryRead(reader, reader.uint32(), options, message.interStepResult);
+                    break;
+                case /* protos.PipelineDataFormat data_format */ 5:
+                    message.dataFormat = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -213,6 +224,9 @@ class WASMRequest$Type extends MessageType<WASMRequest> {
         /* optional protos.InterStepResult inter_step_result = 4; */
         if (message.interStepResult)
             InterStepResult.internalBinaryWrite(message.interStepResult, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* protos.PipelineDataFormat data_format = 5; */
+        if (message.dataFormat !== 0)
+            writer.tag(5, WireType.Varint).int32(message.dataFormat);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

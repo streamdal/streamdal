@@ -3,6 +3,7 @@ package streamdal
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -128,7 +129,7 @@ var _ = Describe("WASM Modules", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			res, err := f.Exec(context.Background(), data)
-			Expect(err).ToNot(HaveOccurred())
+			Expect(err).ToNot(HaveOccurred(), fmt.Sprintf("error executing function: %s", err))
 
 			wasmResp := &protos.WASMResponse{}
 
@@ -268,12 +269,14 @@ var _ = Describe("WASM Modules", func() {
 
 		BeforeEach(func() {
 			s = &Streamdal{
-				pipelinesMtx: &sync.RWMutex{},
-				pipelines:    map[string][]*protos.Pipeline{},
-				audiencesMtx: &sync.RWMutex{},
-				audiences:    map[string]struct{}{},
-				wasmCacheMtx: &sync.RWMutex{},
-				wasmCache:    map[string][]byte{},
+				pipelinesMtx:  &sync.RWMutex{},
+				pipelines:     map[string][]*protos.Pipeline{},
+				audiencesMtx:  &sync.RWMutex{},
+				audiences:     map[string]struct{}{},
+				wasmCacheMtx:  &sync.RWMutex{},
+				wasmCache:     map[string][]byte{},
+				funcCreate:    make(map[string]*sync.Mutex),
+				funcCreateMtx: &sync.Mutex{},
 			}
 
 			req = &protos.WASMRequest{

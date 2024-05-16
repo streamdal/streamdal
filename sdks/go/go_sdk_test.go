@@ -515,9 +515,10 @@ var _ = Describe("Streamdal", func() {
 			wg := &sync.WaitGroup{}
 			for i := 0; i < 100; i++ {
 				wg.Add(1)
-				go func() {
+				go func(id int) {
 					defer GinkgoRecover()
 					defer wg.Done()
+
 					resp := s.Process(context.Background(), &ProcessRequest{
 						ComponentName: aud.ComponentName,
 						OperationType: OperationType(aud.OperationType),
@@ -534,13 +535,31 @@ var _ = Describe("Streamdal", func() {
 					Expect(resp.PipelineStatus[0].StepStatus[0].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 					Expect(resp.PipelineStatus[0].StepStatus[1].AbortCondition).To(Equal(protos.AbortCondition_ABORT_CONDITION_UNSET))
 					Expect(string(resp.Data)).To(Equal(`{"object":{"payload":"stre***************"}}`))
-				}()
+				}(i)
 			}
 
-			wg.Wait()
+			// Wait for all requests to complete with timeout
+			wgWaitErr := timeout(func() { wg.Wait() }, time.Minute*5)
+
+			Expect(wgWaitErr).ToNot(HaveOccurred())
 		})
 	})
 })
+
+func timeout(f func(), timeout time.Duration) error {
+	done := make(chan struct{})
+	go func() {
+		f()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		return nil
+	case <-time.After(timeout):
+		return errors.New("timeout")
+	}
+}
 
 func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipeline *protos.Pipeline) *Streamdal {
 	return &Streamdal{
@@ -567,6 +586,8 @@ func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipelin
 				pipeline,
 			},
 		},
+		funcCreate:    make(map[string]*sync.Mutex),
+		funcCreateMtx: &sync.Mutex{},
 	}
 }
 
@@ -582,14 +603,16 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 	}
 
 	return &Streamdal{
-		pipelinesMtx: &sync.RWMutex{},
-		pipelines:    map[string][]*protos.Pipeline{},
-		audiencesMtx: &sync.RWMutex{},
-		audiences:    map[string]struct{}{},
-		kv:           kvClient,
-		hf:           hfClient,
-		wasmCacheMtx: &sync.RWMutex{},
-		wasmCache:    map[string][]byte{},
+		pipelinesMtx:  &sync.RWMutex{},
+		pipelines:     map[string][]*protos.Pipeline{},
+		audiencesMtx:  &sync.RWMutex{},
+		audiences:     map[string]struct{}{},
+		kv:            kvClient,
+		hf:            hfClient,
+		wasmCacheMtx:  &sync.RWMutex{},
+		wasmCache:     map[string][]byte{},
+		funcCreate:    make(map[string]*sync.Mutex),
+		funcCreateMtx: &sync.Mutex{},
 	}, kvClient, nil
 }
 

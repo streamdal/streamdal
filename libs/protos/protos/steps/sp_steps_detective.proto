@@ -92,6 +92,13 @@ enum DetectiveType {
   // Uses field/path keyword matching to detect PII, rather than the field's value
   DETECTIVE_TYPE_PII_KEYWORD = 2036;
 
+  // Works on plaintext pipelines only
+  DETECTIVE_TYPE_PII_PLAINTEXT_ANY = 2037;
+
+  DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038;
+  DETECTIVE_TYPE_CANADA_SIN = 2039;
+
+
 
   // Numeric matchers (3000-3999)
 
@@ -133,8 +140,8 @@ message DetectiveStepResultMatch {
 
   // For string payloads, the start and end characters of the match
   // Placeholder for now, will implement in the future
-  //int32 char_index_start = 3;
-  //int32 char_index_end = 4;
+  int32 char_index_start = 3;
+  int32 char_index_end = 4;
 
   // Value of the match
   bytes value = 5;

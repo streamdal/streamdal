@@ -1,3 +1,4 @@
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 use protos::sp_steps_detective::DetectiveStepResultMatch;
 use streamdal_wasm_transform::transform;
 use streamdal_wasm_transform::transform::{TruncateOptions, TruncateType};
@@ -26,6 +27,7 @@ fn overwrite() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
+        data_format: PIPELINE_DATA_FORMAT_JSON,
         data: sample_json.into(),
         value: r#""baz""#.to_string(),
         paths: vec![DetectiveStepResultMatch {
@@ -48,6 +50,7 @@ fn mask_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
+        data_format: PIPELINE_DATA_FORMAT_JSON,
         data: sample_json.into(),
         value: "*".to_string(),
         paths: vec![DetectiveStepResultMatch {
@@ -70,6 +73,7 @@ fn mask_number() {
     let sample_json = r#"{"hello": 329328102938}"#;
 
     let req = transform::Request {
+        data_format: PIPELINE_DATA_FORMAT_JSON,
         data: sample_json.into(),
         value: "0".to_string(),
         paths: vec![DetectiveStepResultMatch {
@@ -92,6 +96,7 @@ fn obfuscate_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
+        data_format: PIPELINE_DATA_FORMAT_JSON,
         data: sample_json.into(),
         value: "".to_string(),
         paths: vec![DetectiveStepResultMatch {
@@ -114,6 +119,7 @@ fn truncate_string() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
+        data_format: PIPELINE_DATA_FORMAT_JSON,
         data: sample_json.into(),
         value: "".to_string(),
         paths: vec![DetectiveStepResultMatch {
@@ -139,6 +145,7 @@ fn delete_field() {
     let sample_json = r#"{"hello": "world"}"#;
 
     let req = transform::Request {
+        data_format: PIPELINE_DATA_FORMAT_JSON,
         data: sample_json.into(),
         value: "".to_string(),
         paths: vec![DetectiveStepResultMatch {

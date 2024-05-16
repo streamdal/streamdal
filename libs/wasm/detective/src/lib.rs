@@ -80,6 +80,7 @@ fn generate_detective_request(wasm_request: &WASMRequest) -> Request {
         .unwrap_or_else(|| "".to_string());
 
     Request {
+        data_format: wasm_request.data_format.clone().unwrap(),
         match_type: wasm_request.step.detective().type_.clone().unwrap(),
         data: &wasm_request.input_payload,
         path: path,

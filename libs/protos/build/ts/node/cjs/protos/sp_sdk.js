@@ -40,13 +40,25 @@ var ExecStatus;
      */
     ExecStatus[ExecStatus["ERROR"] = 3] = "ERROR";
     /**
-     * Indicates that the step was skipped; this status is set when the SDK is
-     * configured with sampling and a .Process() was called on a message that
-     * was sampled out.
+     * Indicates that the SDK was configured to operate in async mode.
+     * Step execution will occur asynchronously in a background worker-group.
      *
-     * @generated from protobuf enum value: EXEC_STATUS_SKIPPED = 4;
+     * @generated from protobuf enum value: EXEC_STATUS_ASYNC = 4;
      */
-    ExecStatus[ExecStatus["SKIPPED"] = 4] = "SKIPPED";
+    ExecStatus[ExecStatus["ASYNC"] = 4] = "ASYNC";
+    /**
+     * Indicates that the SDK was configured to operate in sampling mode.
+     * Step execution was skipped for this request due to configured sampling rate.
+     *
+     * If this status is set, you can safely ignore the rest of the response as
+     * the execution for this request was skipped due to being sampled out.
+     *
+     * Non-sampled messages will have TRUE/FALSE/ERROR status set as any other
+     * non-sampled message.
+     *
+     * @generated from protobuf enum value: EXEC_STATUS_SAMPLING = 5;
+     */
+    ExecStatus[ExecStatus["SAMPLING"] = 5] = "SAMPLING";
 })(ExecStatus || (exports.ExecStatus = ExecStatus = {}));
 /**
  * @generated from protobuf enum protos.SDKMode

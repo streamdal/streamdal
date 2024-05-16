@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::error::CustomError;
 use crate::matcher_core as core;
 use crate::matcher_numeric as numeric;
@@ -9,8 +10,14 @@ use streamdal_gjson as gjson;
 
 use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType, DetectiveTypePIIKeywordMode};
 use std::str;
+use std::default::Default;
+use protos::sp_pipeline::PipelineDataFormat;
+use unicode_segmentation::UnicodeSegmentation;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
+use crate::matcher_pii::{canada_sin, email, jwt, ssn, uk_nino, vin_number};
+use crate::matcher_pii_cloud::aws_key_id;
+use crate::matcher_pii_payments::credit_card;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
@@ -24,6 +31,7 @@ pub struct Request<'a> {
     pub args: Vec<String>,
     pub negate: bool,
     pub mode: DetectiveTypePIIKeywordMode,
+    pub data_format: PipelineDataFormat,
 }
 
 impl Default for Detective {
@@ -40,6 +48,10 @@ impl Detective {
     pub fn matches(&self, request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
         validate_request(request)?;
 
+        if request.match_type == DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY {
+            return self.matches_plaintext(request);
+        }
+
         if !request.path.is_empty() {
             // Matching on path value
             self.matches_path(request)
@@ -47,6 +59,13 @@ impl Detective {
             // Matching on any field in the payload
             self.matches_payload(request)
         }
+    }
+
+    pub fn matches_plaintext(&self, request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
+        let data_as_str = str::from_utf8(request.data)
+            .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
+
+        Ok(plaintext(request, data_as_str))
     }
 
     pub fn matches_keyword(request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
@@ -74,7 +93,7 @@ impl Detective {
                     path: pii_match.path.clone(),
                     value: pii_match.value.into_bytes(),
                     pii_type: pii_match.entity.clone(),
-                    special_fields: Default::default(),
+                    ..Default::default()
                 };
 
                 isr.push(result)
@@ -285,6 +304,9 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_BEARER_TOKEN => pii::bearer_token,
             DetectiveType::DETECTIVE_TYPE_PII_AZURE_SQL_CONN_STRING => pii_cloud::azure_sql_connection_string,
             DetectiveType::DETECTIVE_TYPE_PII_KEYWORD => pii_keywords::keywords,
+            DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY => todo!(), // skipped on purpose
+            DetectiveType::DETECTIVE_TYPE_UK_INSURANCE_NUMBER => pii::uk_nino,
+            DetectiveType::DETECTIVE_TYPE_CANADA_SIN => pii::canada_sin,
             DetectiveType::DETECTIVE_TYPE_UNKNOWN => {
                 return Err(CustomError::Error(
                     "match type cannot be unknown".to_string(),
@@ -397,4 +419,129 @@ fn recurse_field(
     }
 
     res
+}
+
+#[derive(Default, Clone,Debug)]
+pub struct Word {
+    char_index_start: usize,
+    char_index_end: usize,
+    word: String,
+}
+
+pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch> {
+    let mut res = Vec::<DetectiveStepResultMatch>::new();
+    let sentences = input.split_sentence_bound_indices();
+
+    // These functions take a gjson value, but we can just mock that
+    // rather than changing around the entire library for now
+    let scanners: Vec<MatcherFunc> = vec![
+        email,
+        aws_key_id,
+        jwt,
+        ssn,
+        uk_nino,
+        vin_number,
+        canada_sin,
+        credit_card,
+    ];
+
+    let mut found: Vec<Word> = Vec::new();
+
+    for (sentence_start, sentence) in sentences {
+        // Trim junk off the end. This won't affect offsets because
+        // it's at the end of a sentence
+        let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
+        // Parse sentences into words
+        let words = new_sentence.split_word_bound_indices();
+
+        // The splitter lib considers these word bounds, but we don't want to
+        // split on them since they might be inside an email, ipv6, macaddr, etc.
+        let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
+
+        // Ignore these characters so that we can properly find PII inside JSON that is inside a plaintext string
+        let ignore_chars = HashMap::from([('"', 0), ('{', 0), ('}', 0), ('\'', 0)]);
+
+        // This is our word-part accumulator and is used to
+        // combine "user", "@", "somedomain.com" words into a single word
+        let mut accum: Vec<Word> = Vec::new();
+
+        for (word_start, word) in words {
+            if word.len() == 1 && ignore_chars.contains_key(&word.chars().next().unwrap()) {
+                continue;
+            }
+
+            // We've reached the end of a word, combine our accumulator into a single Word struct
+            if word == " " {
+                // Loop over accumulator and join the string value of each word
+                // and push it to the found vector
+                let combined = accumulate_parts(&mut accum);
+                found.push(combined);
+                accum.clear();
+                continue
+            }
+
+            // Push the word the splitter has seen to the accumulator
+            accum.push(Word {
+                char_index_start: sentence_start + word_start,
+                char_index_end: sentence_start + word_start + word.chars().count(),
+                word: word.to_string(),
+            });
+
+            // If the word is a character we don't want to split on, continue to the next word
+            if no_split.contains_key(&word.chars().next().unwrap()) {
+                continue;
+            }
+        }
+
+        // We might have hit the end of a sentence in the loop above but not triggered the
+        // summation of the accumulator. Check if it's empty and if not, combine it into a single word
+        if !accum.is_empty() {
+            let combined = accumulate_parts(&mut accum);
+            found.push(combined);
+            accum.clear();
+        }
+    }
+
+    for found_word in found {
+        for scanner in &scanners {
+            let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
+            if let Ok(found) = scanner(request, gjson::parse(&payload).get("key")) {
+                if found {
+                    let result = DetectiveStepResultMatch {
+                        type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
+                        path: "".to_string(),
+                        value: found_word.word.clone().into_bytes(),
+                        // TODO: this should return a useful type, but there's no way to get the name of the scanner
+                        // TODO: Using `stringify!(scanner)` will just return "scanner"
+                        pii_type: "plaintext".to_string(),
+                        char_index_start: found_word.char_index_start as i32,
+                        char_index_end: found_word.char_index_end as i32,
+                        ..Default::default()
+                    };
+
+                    res.push(result);
+                }
+            }
+        }
+    }
+
+    res
+}
+
+fn accumulate_parts(accum: &mut [Word]) -> Word {
+    let mut combined = Word {
+        ..Default::default()
+    };
+
+
+    for (idx, part) in accum.iter().enumerate() {
+        if idx == 0 {
+            combined.char_index_start = part.char_index_start;
+        }
+
+        combined.char_index_end = part.char_index_end;
+        combined.word.push_str(part.word.as_str());
+    }
+
+    combined
 }

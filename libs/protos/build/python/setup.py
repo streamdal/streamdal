@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='streamdal-protos',
-    version='0.1.55',
+    version='0.1.57',
     description='Protobuf python package for Streamdal.com server and SDKs',
     long_description=long_description,
     long_description_content_type="text/markdown",

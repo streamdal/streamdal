@@ -6,6 +6,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Audience } from "./sp_common.js";
 import { DetectiveStepResult } from "./steps/sp_steps_detective.js";
+import { PipelineDataFormat } from "./sp_pipeline.js";
 import { PipelineStep } from "./sp_pipeline.js";
 /**
  * SDK generates a WASM request and passes this to the WASM func
@@ -42,6 +43,12 @@ export interface WASMRequest {
      * @generated from protobuf field: optional protos.InterStepResult inter_step_result = 4;
      */
     interStepResult?: InterStepResult;
+    /**
+     * Data format of the input payload. This is obtained from Pipeline.DataFormat
+     *
+     * @generated from protobuf field: protos.PipelineDataFormat data_format = 5;
+     */
+    dataFormat: PipelineDataFormat;
 }
 /**
  * Returned by all WASM functions

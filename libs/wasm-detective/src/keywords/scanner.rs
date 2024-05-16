@@ -75,9 +75,14 @@ impl FieldPII {
         let mut match_against = HashMap::new();
         for (key_name, def) in keywords {
             if key_name.contains('.') {
+                // This is a path-based keyword - insert it into path keywords hashmap
                 match_against_path.insert(key_name.clone(), def.clone());
             } else {
+                // Insert key as is into scalar keywords hashmap
                 match_against.insert(key_name.clone(), def.clone());
+
+                // Also insert a copy of the key with underscores removed
+                match_against.insert(key_name.clone().replace('_', ""), def.clone());
             }
         }
 

@@ -46,6 +46,17 @@ export interface DetectiveStepResultMatch {
      */
     path: string;
     /**
+     * For string payloads, the start and end characters of the match
+     * Placeholder for now, will implement in the future
+     *
+     * @generated from protobuf field: int32 char_index_start = 3;
+     */
+    charIndexStart: number;
+    /**
+     * @generated from protobuf field: int32 char_index_end = 4;
+     */
+    charIndexEnd: number;
+    /**
      * Value of the match
      *
      * @generated from protobuf field: bytes value = 5;
@@ -351,6 +362,20 @@ export declare enum DetectiveType {
      * @generated from protobuf enum value: DETECTIVE_TYPE_PII_KEYWORD = 2036;
      */
     PII_KEYWORD = 2036,
+    /**
+     * Works on plaintext pipelines only
+     *
+     * @generated from protobuf enum value: DETECTIVE_TYPE_PII_PLAINTEXT_ANY = 2037;
+     */
+    PII_PLAINTEXT_ANY = 2037,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_UK_INSURANCE_NUMBER = 2038;
+     */
+    UK_INSURANCE_NUMBER = 2038,
+    /**
+     * @generated from protobuf enum value: DETECTIVE_TYPE_CANADA_SIN = 2039;
+     */
+    CANADA_SIN = 2039,
     /**
      * @generated from protobuf enum value: DETECTIVE_TYPE_NUMERIC_EQUAL_TO = 3000;
      */
