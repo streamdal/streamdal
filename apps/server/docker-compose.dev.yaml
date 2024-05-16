@@ -1,7 +1,7 @@
 version: "3"
 services:
   streamdal-server:
-    image: streamdal/server:0.0.68-a95c7b6
+    image: streamdal/server:latest
     depends_on:
       - redis
     environment:
