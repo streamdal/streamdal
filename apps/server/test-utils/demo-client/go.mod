@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/streamdal/streamdal/libs/protos v0.1.57
-	github.com/streamdal/streamdal/sdks/go v0.1.28
+	github.com/streamdal/streamdal/sdks/go v0.1.29
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	github.com/tetratelabs/wazero v1.7.0 // indirect
+	github.com/tetratelabs/wazero v1.7.2 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect

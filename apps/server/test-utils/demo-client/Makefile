@@ -170,7 +170,7 @@ run/async-sampling:
 run/plaintext: description = Plaintext Logs
 run/plaintext:
 	go run *.go -d \
-	--message-rate 1,10 \
+	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
 	--operation-name  "logs" \
@@ -178,6 +178,19 @@ run/plaintext:
 	--display-exec-time \
 	--data-source-type file \
 	--data-source-file ./assets/plaintext-logs.txt
+
+.PHONY: run/plaintext2
+run/plaintext2: description = Plaintext Logs
+run/plaintext2:
+	go run *.go -d \
+	--message-rate 1 \
+	--service-name "plaintext-logs" \
+	--operation-type 2 \
+	--operation-name  "logs" \
+	--component-name "plaintext-logger" \
+	--display-exec-time \
+	--data-source-type file \
+	--data-source-file ./assets/plaintext-logs.real.txt
 
 ### Build
 
