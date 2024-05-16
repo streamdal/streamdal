@@ -144,6 +144,7 @@ export default function PipelineDetail({
     });
     setDragId(null);
   };
+
   const detectiveKeywordList = (data: any) => {
     const detectiveKeywordOptions = optionsFromEnum(DetectiveType);
     if (data.dataFormat === "2" || data.dataFormat === 2) {
@@ -199,7 +200,6 @@ export default function PipelineDetail({
                 key={`data-format-${i}`}
                 value={kind.value}
                 label={kind.label}
-                disabled={kind.value === "custom"}
               />
             ))}
           />
