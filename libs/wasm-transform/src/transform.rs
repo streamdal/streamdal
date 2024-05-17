@@ -553,12 +553,16 @@ pub fn mask(req: &Request) -> Result<String, TransformError> {
 
     for dr in &req.paths {
         if req.data_format == PIPELINE_DATA_FORMAT_PLAINTEXT {
-            return _mask_plaintext(
+            match _mask_plaintext(
                 data_as_string.as_str(),
                 dr.char_index_start,
                 dr.char_index_end,
                 req.value.chars().next().unwrap_or('*'),
-            );
+            ) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            }
+            continue;
         }
 
         let data_as_str = data_as_string.as_str();

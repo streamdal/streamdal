@@ -5,7 +5,7 @@ use protos::sp_steps_detective::DetectiveType;
 use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
 use std::collections::HashMap;
 use test::Bencher;
-use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
+use protos::sp_pipeline::PipelineDataFormat::{PIPELINE_DATA_FORMAT_JSON, PIPELINE_DATA_FORMAT_PLAINTEXT};
 
 #[test]
 fn test_email() {
@@ -926,7 +926,7 @@ fn test_plaintext() {
         args: Vec::new(),
         negate: false,
         mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
-        data_format: PIPELINE_DATA_FORMAT_JSON,
+        data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
     };
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
