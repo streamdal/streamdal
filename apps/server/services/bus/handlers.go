@@ -2,7 +2,6 @@ package bus
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -420,31 +419,33 @@ func (b *Bus) handleNewAudienceRequest(ctx context.Context, req *protos.NewAudie
 		return errors.Wrap(err, "error getting config by audience")
 	}
 
-	// If this is NOT a brand new audience, nothing to do
+	// If this is an existing audience with a pipeline config - nothing to do
 	if len(existingPipelines.Configs) > 0 {
 		llog.Debugf("audience '%s' already has pipeline configuration - nothing to do", util.AudienceToStr(req.Audience))
 		return nil
 	}
 
-	// Get all session IDs on this node
-	sessionIDs, err := b.options.Store.GetSessionIDsByAudience(ctx, req.Audience, b.options.NodeName)
+	// No point in doing anything about this session id if it's not on our node
+
+	// Ensure that this session id is on this node
+	exists, err := b.options.Store.SessionIDExistsOnNode(ctx, req.SessionId, b.options.NodeName)
 	if err != nil {
-		llog.Errorf("error getting session ids by audience '%s' from store: %v", req.Audience, err)
-		return errors.Wrapf(err, "error getting session ids by audience '%s' from store", req.Audience)
+		llog.Errorf("error checking if session id '%s' exists on node '%s': %v", req.SessionId, b.options.NodeName, err)
+		return errors.Wrapf(err, "error checking if session id '%s' exists on node '%s'", req.SessionId, b.options.NodeName)
 	}
 
-	if len(sessionIDs) == 0 {
-		llog.Debugf("no active sessions found for audience '%s' on node '%s' - skipping", req.Audience, b.options.NodeName)
+	if !exists {
+		llog.Debugf("session id '%s' not found on node '%s' - nothing to do in handleNewAudienceRequest()", req.SessionId, b.options.NodeName)
 		return nil
 	}
 
-	// Send SetPipelines command to each session ID
-	if _, err := b.sendSetPipelinesCommand(ctx, req.Audience, make([]*protos.Pipeline, 0), sessionIDs...); err != nil {
+	// Session ID is on node - send SetPipelines command
+	if _, err := b.sendSetPipelinesCommand(ctx, req.Audience, make([]*protos.Pipeline, 0), req.SessionId); err != nil {
 		llog.Errorf("unable to send SetPipelines command: %v", err)
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
 
-	llog.Debugf("sent SetPipelineCommands for '%d' sessions", len(sessionIDs))
+	llog.Debugf("sent SetPipelineCommands for session id '%s'", req.SessionId)
 
 	return nil
 }
@@ -471,12 +472,6 @@ func (b *Bus) sendSetPipelinesCommand(
 
 	var sent int
 
-	requestID := util.GenerateUUID()
-	llog.Debugf(">>> sending set pipelines to '%d' session ID's: %+v (request id: '%s')", len(sessionIDs), sessionIDs, requestID)
-
-	// TODO: Need to investigate and determine if this could panic as a
-	// result an SDK disconnecting and having the channel get closed. If so,
-	// need to implement a more reliable way to push the command.
 	cmd := &protos.Command{
 		Audience: aud,
 		Command: &protos.Command_SetPipelines{
@@ -497,12 +492,9 @@ func (b *Bus) sendSetPipelinesCommand(
 
 		llog.Debugf("sending SetPipelines command to session id '%s' on node '%s'", sessionID, b.options.NodeName)
 
-		fmt.Printf(">>> sendSetPipelinesCommand: sending '%d' wasm modules\n", len(cmd.GetSetPipelines().WasmModules))
-
-		for id, wm := range cmd.GetSetPipelines().WasmModules {
-			fmt.Printf(">>> sendSetPipelinesCommand: wasm module '%s' -> function '%s', bytes '%d'\n", id, wm.Function, len(wm.Bytes))
-		}
-
+		// TODO: Need to investigate and determine if this could panic as a
+		// result an SDK disconnecting and having the channel get closed. If so,
+		// need to implement a more reliable way to push the command.
 		ch <- cmd
 
 		sent += 1
