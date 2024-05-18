@@ -107,7 +107,7 @@ func (r *Demo) displayTabular(result *Result) {
 	tw.AppendRow(gopretty.Row{bold("Last Status Message"), message})
 
 	if r.config.DisplayExecTime {
-		tw.AppendRow(gopretty.Row{bold("Execution Time"), result.ExecTime})
+		tw.AppendRow(gopretty.Row{bold("Exec Time"), result.ExecTime})
 	}
 
 	// Display metadata if output level is high
@@ -143,10 +143,10 @@ func (r *Demo) displayPlaintext(result *Result) {
 		panic("displayPlaintext(): result cannot be nil")
 	}
 
-	fmt.Printf("Date:           %s\n", result.Date.Format(time.RFC1123))
-	fmt.Printf("Status:         %s\n", r.translateStatus(result.ProcessStatus))
-	fmt.Printf("Status Message: %s\n", result.ProcessStatusMessage)
-	fmt.Printf("Execution Time: %s\n", result.ExecTime)
+	fmt.Printf("Date:               %s\n", result.Date.Format(time.RFC1123))
+	fmt.Printf("Status:             %s\n", r.translateStatus(result.ProcessStatus))
+	fmt.Printf("Status Message:     %s\n", result.ProcessStatusMessage)
+	fmt.Printf("Exec Time:          %s\n", result.ExecTime)
 
 	// Display metadata if output level is high
 	if r.config.OutputLevel >= OutputLevelMed {
@@ -160,7 +160,11 @@ func (r *Demo) displayPlaintext(result *Result) {
 			metadata = strings.TrimSuffix(metadata, ", ")
 		}
 
-		fmt.Printf("Metadata (%d):   %s\n", len(result.Metadata), metadata)
+		if metadata == "" {
+			metadata = "N/A"
+		}
+
+		fmt.Printf("Metadata:           %s\n", metadata)
 	}
 
 	// Display pipeline debug if output level is high
@@ -183,10 +187,27 @@ func (r *Demo) displayDataDiffPlaintext(result *Result) {
 
 	// Do not try to format non-JSON data
 	if result.Input[0] != '{' {
-		fmt.Println("Before:")
-		fmt.Println(string(result.Input))
-		fmt.Println("After:")
-		fmt.Println(string(result.Output))
+		beforeLine := fmt.Sprintf("Before:             %s", string(result.Input))
+		// Add newline if there is none
+		if beforeLine[len(beforeLine)-1] != '\n' {
+			beforeLine += "\n"
+		}
+
+		fmt.Print(beforeLine)
+
+		afterText := "After (unchanged):  %s"
+
+		if string(result.Input) != string(result.Output) {
+			afterText = "After (changed):    %s"
+		}
+
+		afterLine := fmt.Sprintf(afterText, string(result.Output))
+		// Add newline if there is none
+		if afterLine[len(afterLine)-1] != '\n' {
+			afterLine += "\n"
+		}
+
+		fmt.Print(afterLine)
 		return
 	}
 
@@ -221,13 +242,13 @@ func (r *Demo) displayDataDiffPlaintext(result *Result) {
 	}
 
 	// Determine title
-	postTitle := "Data After (unchanged)"
+	postTitle := "After (unchanged)"
 
 	if string(result.Input) != string(result.Output) {
-		postTitle = "Data After " + underline("(changed)")
+		postTitle = "After " + underline("(changed)")
 	}
 
-	fmt.Printf("Data Before:\n%s\n", preFormatted)
+	fmt.Printf("Before:\n%s\n", preFormatted)
 	fmt.Printf("%s:\n%s\n", postTitle, postFormatted)
 }
 
@@ -307,22 +328,18 @@ func (r *Demo) displayPipelineDebugPlaintext(result *Result) {
 		panic("generatePipelineDebugPlaintext(): result cannot be nil")
 	}
 
-	// If there are no pipelines, don't bother
-	if len(result.ProcessPipelineStatus) == 0 {
-		return
-	}
+	fmt.Println("Num Pipelines:      " + strconv.Itoa(len(result.ProcessPipelineStatus)))
 
-	fmt.Println("Num Pipelines:  " + strconv.Itoa(len(result.ProcessPipelineStatus)))
-
-	for pIndex, pd := range result.ProcessPipelineStatus {
-		fmt.Printf("(%d) Pipeline ID / Name\n", pIndex+1)
+	for _, pd := range result.ProcessPipelineStatus {
+		fmt.Printf("Pipeline ID:        %s\n", pd.Id)
+		fmt.Printf("Pipeline Name:      %s\n", pd.Name)
 
 		for _, s := range pd.StepStatus {
 			status := r.translateStatus(s.Status)
 
-			fmt.Printf("  Step Name:    %s\n", s.Name)
-			fmt.Printf("  Step Status:  %s\n", status)
-			fmt.Printf("  Step Message: %s\n", truncStrPtr(s.StatusMessage))
+			fmt.Printf(" | Step Name:       %s\n", s.Name)
+			fmt.Printf(" | Step Status:     %s\n", status)
+			fmt.Printf(" | Step Message:    %s\n", truncStrPtr(s.StatusMessage))
 		}
 	}
 }
