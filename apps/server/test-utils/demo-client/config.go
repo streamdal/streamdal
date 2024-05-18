@@ -12,26 +12,27 @@ const (
 )
 
 type Config struct {
-	ServerAddress     string   `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
-	ServerToken       string   `kong:"help='Streamdal server token',default='1234',required"`
-	ServiceName       string   `kong:"help='Service name',required,default='demo-client'"`
-	OperationType     int64    `kong:"help='Audience component name (1 = Consumer, 2 = Producer)',enum='1,2',default='1',required"`
-	OperationName     string   `kong:"help='Audience operation name',required,default='demo-operation'"`
-	ComponentName     string   `kong:"help='Audience component name',required,default='demo-component'"`
-	NumInstances      int      `kong:"help='Number of instances of SDK to register',required,default='1'"`
-	ReconnectRandom   bool     `kong:"help='Randomly disconnects and reconnects to server (useful for testing concurrency in server)',default='false'"`
-	ReconnectInterval int      `kong:"help='Seconds between reconnects (rand(0..ReconnectInterval) if ReconnectRandom is true)',default='0'"`
-	MessageRate       []int    `kong:"help='Messages to send per second (can specify range as X,Y)',required,default='1'"`
-	DataSourceType    string   `kong:"help='Type of data source this client will use', enum='none,file',default='none'"`
-	DataSourceFile    *os.File `kong:"help='File that contains sample data - used only when DataSourceType=file'"`
-	DisplayExecTime   bool     `kong:"help='Display execution time for each message',default='false'"`
-	Async             bool     `kong:"help='Use async mode in go-sdk',default='false'"`
-	SamplingRate      int      `kong:"help='Enable sampling and sample rate in go-sdk',default='0'"`
-	OutputLevel       int      `kong:"help='Amount of output displayed by demo client',enum='0,1,2,3',default='2'"`
-	OutputType        string   `kong:"help='Type of output to display',enum='plaintext,tabular,json',default='tabular'"`
-	DisableColor      bool     `kong:"help='Disable color output',default='false'"`
-	InjectLogger      bool     `kong:"help='Inject logger into SDK',default='false'"`
-	Debug             bool     `kong:"help='Enable debug log output',short='d'"`
+	ServerAddress       string   `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
+	ServerToken         string   `kong:"help='Streamdal server token',default='1234',required"`
+	ServiceName         string   `kong:"help='Service name',required,default='demo-client'"`
+	OperationType       int64    `kong:"help='Audience component name (1 = Consumer, 2 = Producer)',enum='1,2',default='1',required"`
+	OperationName       string   `kong:"help='Audience operation name',required,default='demo-operation'"`
+	ComponentName       string   `kong:"help='Audience component name',required,default='demo-component'"`
+	NumInstances        int      `kong:"help='Number of instances of SDK to register',required,default='1'"`
+	ReconnectRandom     bool     `kong:"help='Randomly disconnects and reconnects to server (useful for testing concurrency in server)',default='false'"`
+	ReconnectInterval   int      `kong:"help='Seconds between reconnects (rand(0..ReconnectInterval) if ReconnectRandom is true)',default='0'"`
+	MessageRate         []int    `kong:"help='Messages to send per second (can specify range as X,Y)',required,default='1'"`
+	DataSourceType      string   `kong:"help='Type of data source this client will use', enum='none,file',default='none'"`
+	DataSourceFile      *os.File `kong:"help='File that contains sample data - used only when DataSourceType=file'"`
+	DisplayExecTime     bool     `kong:"help='Display execution time for each message',default='false'"`
+	Async               bool     `kong:"help='Use async mode in go-sdk',default='false'"`
+	SamplingRate        int      `kong:"help='Enable sampling and sample rate in go-sdk',default='0'"`
+	OutputLevel         int      `kong:"help='Amount of output displayed by demo client',enum='0,1,2,3',default='2'"`
+	OutputType          string   `kong:"help='Type of output to display',enum='plaintext,tabular,json',default='tabular'"`
+	DisableColor        bool     `kong:"help='Disable color output',default='false'"`
+	InjectLogger        bool     `kong:"help='Inject logger into SDK',default='false'"`
+	UniqueOperationName bool     `kong:"help='Use unique operation name for each instance (adds -$i suffix)',default='false'"`
+	Debug               bool     `kong:"help='Enable debug log output',short='d'"`
 
 	// Internal bits
 	Ctx *kong.Context `kong:"-"`

@@ -233,7 +233,7 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 		operationName := r.config.OperationName
 
 		// Give each instance a unique operation name
-		if r.config.NumInstances > 1 {
+		if r.config.UniqueOperationName {
 			operationName = operationName + "-" + strconv.Itoa(workerID)
 		}
 
