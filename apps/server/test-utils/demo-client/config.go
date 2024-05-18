@@ -12,6 +12,8 @@ const (
 )
 
 type Config struct {
+	ServerAddress     string   `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
+	ServerToken       string   `kong:"help='Streamdal server token',default='1234',required"`
 	ServiceName       string   `kong:"help='Service name',required,default='demo-client'"`
 	OperationType     int64    `kong:"help='Audience component name (1 = Consumer, 2 = Producer)',enum='1,2',default='1',required"`
 	OperationName     string   `kong:"help='Audience operation name',required,default='demo-operation'"`
@@ -25,12 +27,11 @@ type Config struct {
 	DisplayExecTime   bool     `kong:"help='Display execution time for each message',default='false'"`
 	Async             bool     `kong:"help='Use async mode in go-sdk',default='false'"`
 	SamplingRate      int      `kong:"help='Enable sampling and sample rate in go-sdk',default='0'"`
-
-	ServerAddress string `kong:"help='Streamdal gRPC server address',default='localhost:8082',required"`
-	ServerToken   string `kong:"help='Streamdal server token',default='1234',required"`
-	Debug         bool   `kong:"help='Enable debug output',short='d'"`
-	Quiet         bool   `kong:"help='Disable showing pre/post output',short='q'"`
-	InjectLogger  bool   `kong:"help='Inject logger into SDK',default='false'"`
+	OutputLevel       int      `kong:"help='Amount of output displayed by demo client',enum='0,1,2,3',default='2'"`
+	OutputType        string   `kong:"help='Type of output to display',enum='plaintext,tabular,json',default='tabular'"`
+	DisableColor      bool     `kong:"help='Disable color output',default='false'"`
+	InjectLogger      bool     `kong:"help='Inject logger into SDK',default='false'"`
+	Debug             bool     `kong:"help='Enable debug log output',short='d'"`
 
 	// Internal bits
 	Ctx *kong.Context `kong:"-"`

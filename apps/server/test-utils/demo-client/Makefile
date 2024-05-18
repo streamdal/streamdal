@@ -192,6 +192,23 @@ run/plaintext2:
 	--data-source-type file \
 	--data-source-file ./assets/plaintext-logs.real.txt
 
+.PHONY: run/wasm-dedupe-debug
+run/wasm-dedupe-debug: description = Used for troubleshooting wasm dedupe issues
+run/wasm-dedupe-debug:
+	go run *.go -d \
+	--message-rate 1 \
+	--num-instances 1 \
+	--inject-logger \
+	--service-name "dedupe-svc" \
+	--operation-type 2 \
+	--operation-name  "processor" \
+	--component-name "logs" \
+	--display-exec-time \
+	--data-source-type file \
+	--output-level 3 \
+	--output-type json \
+	--data-source-file ./assets/plaintext-logs.real.txt
+
 ### Build
 
 .PHONY: build
