@@ -2,10 +2,10 @@ package bus
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
@@ -471,6 +471,23 @@ func (b *Bus) sendSetPipelinesCommand(
 
 	var sent int
 
+	requestID := util.GenerateUUID()
+	llog.Debugf(">>> sending set pipelines to '%d' session ID's: %+v (request id: '%s')", len(sessionIDs), sessionIDs, requestID)
+
+	// TODO: Need to investigate and determine if this could panic as a
+	// result an SDK disconnecting and having the channel get closed. If so,
+	// need to implement a more reliable way to push the command.
+	cmd := &protos.Command{
+		Audience: aud,
+		Command: &protos.Command_SetPipelines{
+			SetPipelines: &protos.SetPipelinesCommand{
+				Pipelines: updatedPipelines,
+			},
+		},
+	}
+
+	cmd.GetSetPipelines().WasmModules = util.GenerateWasmMapping(cmd)
+
 	for _, sessionID := range sessionIDs {
 		ch := b.options.Cmd.GetChannel(sessionID)
 		if ch == nil {
@@ -480,19 +497,11 @@ func (b *Bus) sendSetPipelinesCommand(
 
 		llog.Debugf("sending SetPipelines command to session id '%s' on node '%s'", sessionID, b.options.NodeName)
 
-		// TODO: Need to investigate and determine if this could panic as a
-		// result an SDK disconnecting and having the channel get closed. If so,
-		// need to implement a more reliable way to push the command.
-		cmd := &protos.Command{
-			Audience: aud,
-			Command: &protos.Command_SetPipelines{
-				SetPipelines: &protos.SetPipelinesCommand{
-					Pipelines: updatedPipelines,
-				},
-			},
-		}
+		fmt.Printf(">>> sendSetPipelinesCommand: sending '%d' wasm modules\n", len(cmd.GetSetPipelines().WasmModules))
 
-		cmd.GetSetPipelines().WasmModules = util.GenerateWasmMapping(cmd)
+		for id, wm := range cmd.GetSetPipelines().WasmModules {
+			fmt.Printf(">>> sendSetPipelinesCommand: wasm module '%s' -> function '%s', bytes '%d'\n", id, wm.Function, len(wm.Bytes))
+		}
 
 		ch <- cmd
 

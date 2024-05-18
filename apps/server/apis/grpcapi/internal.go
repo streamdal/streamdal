@@ -214,6 +214,16 @@ MAIN:
 				continue
 			}
 
+			if cmd.GetSetPipelines() != nil {
+				myUuid := request.SessionId
+
+				fmt.Printf(">>> Register() '%s': received GetSetPipelines command; inspecting wasm modules\n", myUuid)
+
+				for id, wm := range cmd.GetSetPipelines().WasmModules {
+					fmt.Printf(">>> Register() '%s': wasm module id '%s' -> func '%s', bytes '%d'\n", myUuid, id, wm.Function, len(wm.Bytes))
+				}
+			}
+
 			llog.Debugf("received cmd on cmd channel; sending cmd to client session id '%s'", request.SessionId)
 
 			// Send cmd to connected client
