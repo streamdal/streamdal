@@ -59,7 +59,8 @@ run2:
 run3: description = Run billing-service
 run3:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
+	--output-type plaintext \
 	--message-rate 1,4 \
 	--service-name "billing-service" \
 	--operation-type 1 \
@@ -72,7 +73,8 @@ run3:
 run4: description = Run billing-service
 run4:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
+	--output-type plaintext \
 	--message-rate 3,5 \
 	--service-name "billing-service" \
 	--operation-type 2 \
@@ -85,7 +87,7 @@ run4:
 run5: description = Run welcome-service
 run5:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
 	--message-rate 1,5 \
 	--service-name "welcome-service" \
 	--operation-type 1 \
@@ -98,7 +100,7 @@ run5:
 run6: description = Run welcome-service
 run6:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
 	--message-rate 1,3 \
 	--service-name "welcome-service" \
 	--operation-type 2 \
@@ -124,7 +126,7 @@ run7:
 run/async: description = Run signup-service-async service configured with async
 run/async:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
 	--async \
 	--display-exec-time \
 	--message-rate 10,20 \
@@ -139,7 +141,7 @@ run/async:
 run/sampling: description = Run signup-service-async service configured with sampling rate of 1 message/sec
 run/sampling:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
 	--sampling-rate 1 \
 	--display-exec-time \
 	--message-rate 10,100 \
@@ -154,7 +156,7 @@ run/sampling:
 run/async-sampling: description = Run signup-service-async service configured with async and sampling
 run/async-sampling:
 	go run *.go -d \
-	--quiet \
+	--output-level 1 \
 	--async \
 	--sampling-rate 1 \
 	--display-exec-time \
@@ -191,6 +193,23 @@ run/plaintext2:
 	--display-exec-time \
 	--data-source-type file \
 	--data-source-file ./assets/plaintext-logs.real.txt
+
+.PHONY: run/wasm-dedupe-debug
+run/wasm-dedupe-debug: description = Used for troubleshooting wasm dedupe issues
+run/wasm-dedupe-debug:
+	go run *.go -d \
+	--message-rate 1 \
+	--num-instances 10 \
+	--inject-logger \
+	--service-name "dedupe-svc" \
+	--operation-type 2 \
+	--operation-name  "processor" \
+	--component-name "logs" \
+	--display-exec-time \
+	--data-source-type file \
+	--output-level 3 \
+	--output-type plaintext \
+	--data-source-file ./assets/plaintext-logs.txt
 
 ### Build
 

@@ -3,22 +3,27 @@ package main
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"math/rand"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/hokaccha/go-prettyjson"
-	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
-
 	streamdal "github.com/streamdal/streamdal/sdks/go"
+)
+
+const (
+	OutputLevelNone = 0
+	OutputLevelLow  = 1
+	OutputLevelMed  = 2
+	OutputLevelHigh = 3
+
+	OutputTypePlaintext = "plaintext"
+	OutputTypeTabular   = "tabular"
+	OutputTypeJSON      = "json"
 )
 
 type Demo struct {
@@ -228,7 +233,7 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 		operationName := r.config.OperationName
 
 		// Give each instance a unique operation name
-		if r.config.NumInstances > 1 {
+		if r.config.UniqueOperationName {
 			operationName = operationName + "-" + strconv.Itoa(workerID)
 		}
 
@@ -243,153 +248,6 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 
 		timeDiff := time.Now().Sub(timeStart)
 
-		r.display(input, resp, err, timeDiff)
-	}
-}
-
-func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, err error, timeDiff time.Duration) {
-	tw := gopretty.NewWriter()
-	tw.Style().Box = gopretty.StyleBoxDouble
-	now := time.Now().Format(time.RFC1123)
-
-	var (
-		status  string
-		message string
-	)
-
-	message = "no status message"
-
-	if post.StatusMessage != nil {
-		message = *post.StatusMessage
-	}
-
-	message = trunc(message)
-	status = translateStatus(post.Status)
-
-	tw.AppendRow(gopretty.Row{bold("Date"), now})
-	tw.AppendRow(gopretty.Row{bold("Last Status"), status})
-	tw.AppendRow(gopretty.Row{bold("Last Status Message"), message})
-
-	if r.config.DisplayExecTime {
-		tw.AppendRow(gopretty.Row{bold("Execution Time"), timeDiff})
-	}
-
-	// If not quiet, display metadata and pipeline debug info
-	if !r.config.Quiet {
-		var metadata string
-
-		if len(post.Metadata) > 0 {
-			for k, v := range post.Metadata {
-				metadata += fmt.Sprintf("%s => %s, ", k, v)
-			}
-
-			metadata = strings.TrimSuffix(metadata, ", ")
-		}
-
-		tw.AppendRow(gopretty.Row{bold(fmt.Sprintf("Metadata (%d)", len(post.Metadata))), metadata})
-
-		generatePipelineDebug(tw, post)
-		generateDataDiff(tw, pre, post)
-	}
-
-	fmt.Print(tw.Render() + "\n")
-}
-
-func generateDataDiff(tw gopretty.Writer, pre []byte, post *streamdal.ProcessResponse) {
-	// Plaintext
-	// TODO: can we add syntax highlighting to changed val?
-	if pre[0] != '{' {
-		tw.AppendSeparator()
-		tw.AppendRow(gopretty.Row{bold("Before"), bold("After")})
-		tw.AppendSeparator()
-		tw.AppendRow(gopretty.Row{string(pre), string(post.Data)})
-		return
-	}
-
-	// Format pre data
-	preFormatted, err := prettyjson.Format(pre)
-	if err != nil {
-		logrus.Debugf("failed to format data: %s (pre: %s)", err, pre)
-
-		// Format failed, just print raw data
-		preFormatted = pre
-	}
-
-	// Format post data
-	postFormatted, err := prettyjson.Format(post.Data)
-	if err != nil {
-		logrus.Debugf("failed to format data: %s (post: %s)", err, post.Data)
-
-		// Format failed, just print raw data
-		postFormatted = post.Data
-	}
-
-	// Determine post-title
-	postTitle := "After (unchanged)"
-
-	if string(pre) != string(post.Data) {
-		postTitle = "After " + underline("(changed)")
-	}
-
-	tw.AppendSeparator()
-	tw.AppendRow(gopretty.Row{bold("Before"), bold(postTitle)})
-	tw.AppendSeparator()
-	tw.AppendRow(gopretty.Row{string(preFormatted), string(postFormatted)})
-}
-
-func truncp(s *string) string {
-	if s == nil {
-		return "N/A"
-	}
-
-	return trunc(*s)
-}
-
-func trunc(s string) string {
-	if len(s) > 80 {
-		return s[:80] + "..."
-	}
-
-	return s
-}
-
-func generatePipelineDebug(tw gopretty.Writer, post *streamdal.ProcessResponse) {
-	// If there are no pipelines, don't bother
-	if len(post.PipelineStatus) == 0 {
-		tw.AppendRow(gopretty.Row{bold("Num Pipelines"), "None"})
-		return
-	}
-
-	tw.AppendSeparator()
-
-	tw.AppendRow(gopretty.Row{bold("Num Pipelines"), len(post.PipelineStatus)})
-
-	for pIndex, pd := range post.PipelineStatus {
-		tw.AppendRow(gopretty.Row{bold(fmt.Sprintf("(%d) Pipeline ID / Name", pIndex+1)), pd.Id + " / " + pd.Name})
-
-		for _, s := range pd.StepStatus {
-			status := translateStatus(s.Status)
-
-			tw.AppendRow(gopretty.Row{bold("  ┌── Step Name"), s.Name})
-			tw.AppendRow(gopretty.Row{bold("  ├── Step Status"), status})
-			tw.AppendRow(gopretty.Row{bold("  └── Step Message"), truncp(s.StatusMessage)})
-		}
-	}
-}
-
-func translateStatus(status protos.ExecStatus) string {
-	switch status {
-	case protos.ExecStatus_EXEC_STATUS_TRUE:
-		return color.GreenString("TRUE")
-	case protos.ExecStatus_EXEC_STATUS_FALSE:
-		return color.YellowString("FALSE")
-	case protos.ExecStatus_EXEC_STATUS_ERROR:
-		return color.RedString("ERROR")
-	case protos.ExecStatus_EXEC_STATUS_ASYNC:
-		return color.HiBlueString("ASYNC")
-	case protos.ExecStatus_EXEC_STATUS_SAMPLING:
-		return color.HiBlueString("SAMPLING")
-	default:
-		return color.HiRedString("%s", status)
+		r.display(input, resp, timeDiff)
 	}
 }

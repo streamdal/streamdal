@@ -182,6 +182,10 @@ type IStore interface {
 
 	// GetPipelinesByWasmID returns a slice of pipelines that use a given Wasm ID
 	GetPipelinesByWasmID(ctx context.Context, wasmID string) ([]*protos.Pipeline, error)
+
+	// SessionIDExistsOnNode checks given session ID and node name against live
+	// entries in Redis and returns true if found. This is used by
+	SessionIDExistsOnNode(ctx context.Context, sessionID, node string) (bool, error)
 }
 
 // Option contains settings that can influence read, write or delete operations.
@@ -397,7 +401,33 @@ func (s *Store) GetAudiencesByPipelineID(ctx context.Context, pipelineID string)
 	return audiences, nil
 }
 
-// TODO: Needs tests
+func (s *Store) SessionIDExistsOnNode(ctx context.Context, sessionID, node string) (bool, error) {
+	llog := s.log.WithField("method", "GetSessionIDsByAudience")
+	llog.Debug("received request to get session IDs by audience")
+
+	if sessionID == "" {
+		return false, errors.New("session ID is required")
+	}
+
+	if node == "" {
+		return false, errors.New("node name is required")
+	}
+
+	liveEntries, err := s.GetLive(ctx)
+	if err != nil {
+		llog.Errorf("unable to fetch live entries: %s", err)
+		return false, errors.Wrap(err, "error fetching live entries")
+	}
+
+	for _, l := range liveEntries {
+		if l.SessionID == sessionID && l.NodeName == node {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 func (s *Store) GetSessionIDsByAudience(ctx context.Context, aud *protos.Audience, nodeName ...string) ([]string, error) {
 	llog := s.log.WithField("method", "GetSessionIDsByAudience")
 	llog.Debug("received request to get session IDs by audience")
