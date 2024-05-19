@@ -209,7 +209,7 @@ run/wasm-dedupe-debug:
 	--data-source-type file \
 	--output-level 3 \
 	--output-type plaintext \
-	--data-source-file ./assets/plaintext-logs.real.txt
+	--data-source-file ./assets/plaintext-logs.txt
 
 ### Build
 
