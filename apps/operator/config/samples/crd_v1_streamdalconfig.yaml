@@ -59,7 +59,6 @@ spec:
                             "onFalse": {
                                 "abort": "ABORT_CONDITION_ABORT_CURRENT"
                             },
-                            "onError": {},
                             "detective": {
                                 "path": "",
                                 "negate": false,
