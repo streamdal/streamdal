@@ -73,7 +73,7 @@ pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> u64 
 /// This function is unsafe because it operates with raw memory so the compiler
 /// is unable to provide memory safety guarantees.
 pub unsafe extern "C" fn alloc(size: i32) -> *mut u8 {
-    let mut buffer = Vec::with_capacity(size as usize);
+    let mut buffer = Vec::with_capacity(size as usize * 3);
 
     let pointer = buffer.as_mut_ptr();
 
@@ -92,7 +92,7 @@ pub unsafe extern "C" fn alloc(size: i32) -> *mut u8 {
 /// This function is unsafe because it operates with raw memory so the compiler
 /// is unable to provide memory safety guarantees.
 pub unsafe extern "C" fn dealloc(pointer: *mut u8, size: i32) {
-    drop(Vec::from_raw_parts(pointer, size as usize, size as usize))
+    drop(Vec::from_raw_parts(pointer, size as usize * 3, size as usize * 3))
 }
 
 /// Helper for reading data from memory when length is known ahead of time
