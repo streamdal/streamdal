@@ -10,6 +10,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
+
 	streamdal "github.com/streamdal/streamdal/sdks/go"
 
 	"github.com/streamdal/streamdal/apps/log-processor/config"
@@ -60,7 +61,7 @@ type LogstashMessage struct {
 	Version   string `json:"@version"`
 	Path      string `json:"path"`
 	Timestamp string `json:"@timestamp"`
-	Message   string `json:"message"`
+	Message   []byte `json:"message"`
 	Host      string `json:"host"`
 	Type      string `json:"type,omitempty"`
 }
@@ -228,15 +229,15 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: operationName,
 		ComponentName: componentName,
-		Data:          []byte(logstashMessage.Message),
+		Data:          logstashMessage.Message,
 	})
 
 	if resp.Metadata["log_drop"] == "true" {
-		llog.Debugf("Log message was skipped due to 'log_drop' metadata (message: %s)", logstashMessage.Message)
+		llog.Debugf("Log message was skipped due to 'log_drop' metadata (message: %s)", string(logstashMessage.Message))
 		return nil
 	}
 
-	logstashMessage.Message = string(resp.Data)
+	logstashMessage.Message = resp.Data
 
 	p.sendCh <- logstashMessage
 
