@@ -73,9 +73,7 @@ pub fn write_error_response(wasm_exit_code: WASMExitCode, error: String) -> u64 
 /// This function is unsafe because it operates with raw memory so the compiler
 /// is unable to provide memory safety guarantees.
 pub unsafe extern "C" fn alloc(size: i32) -> *mut u8 {
-    // We multiply size by 3 here to allow for both request and response to fit into
-    // Memory + a buffer to allow for transform to mutate data into a bigger size
-    let mut buffer = Vec::with_capacity(size as usize * 3);
+    let mut buffer = Vec::with_capacity(size as usize);
 
     let pointer = buffer.as_mut_ptr();
 
