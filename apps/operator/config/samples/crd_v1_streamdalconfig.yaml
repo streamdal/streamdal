@@ -4,26 +4,330 @@ metadata:
   labels:
     app.kubernetes.io/name: operator
     app.kubernetes.io/managed-by: kustomize
-  name: sample-config
+  name: demo.streamdal.com
 spec:
   serverAddress: ":8082"
   serverAuth: "1234"
   configs:
-    - name: "config with audiences"
+    - name: "config for demo.streamdal.com"
       config: >
         {
             "audiences": [
                 {
-                    "serviceName": "service5",
+                    "serviceName": "docs-svc",
+                    "componentName": "aws-s3",
                     "operationType": "OPERATION_TYPE_CONSUMER",
-                    "operationName": "operationName5",
-                    "componentName": "componentName5"
+                    "operationName": "reader",
+                    "CreatedBy": "streamdal-operator"
                 },
                 {
-                    "serviceName": "service6",
+                    "serviceName": "docs-svc",
+                    "componentName": "aws-s3",
+                    "operationType": "OPERATION_TYPE_PRODUCER",
+                    "operationName": "filtered-writer",
+                    "CreatedBy": "streamdal-operator"
+                },
+                {
+                    "serviceName": "log-processor",
+                    "componentName": "kubernetes",
                     "operationType": "OPERATION_TYPE_CONSUMER",
-                    "operationName": "operationName6",
-                    "componentName": "componentName6"
+                    "operationName": "reader",
+                    "CreatedBy": "streamdal-operator"
+                },
+                {
+                    "serviceName": "log-processor",
+                    "componentName": "logstash",
+                    "operationType": "OPERATION_TYPE_PRODUCER",
+                    "operationName": "writer",
+                    "CreatedBy": "streamdal-operator"
+                },
+                {
+                    "serviceName": "ai-chatbot",
+                    "componentName": "openai",
+                    "operationType": "OPERATION_TYPE_PRODUCER",
+                    "operationName": "query",
+                    "CreatedBy": "streamdal-operator"
+                }
+            ],
+            "pipelines": [
+                {
+                    "id": "880b46ac-afc4-4c24-a983-33560b3dd5ab",
+                    "name": "PII: Detect \u0026 Mask in Plaintext",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onFalse": {
+                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+                            },
+                            "onError": {},
+                            "detective": {
+                                "path": "",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_PII_PLAINTEXT_ANY"
+                            }
+                        },
+                        {
+                            "name": "Step #2",
+                            "dynamic": true,
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_MASK_VALUE"
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_PLAINTEXT"
+                },
+                {
+                    "id": "b414d483-7b84-45b7-abfd-545915c97745",
+                    "name": "Conditional: Inject Metadata if Field Empty",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onTrue": {
+                                "metadata": {
+                                    "fieldIsEmpty": "true"
+                                }
+                            },
+                            "detective": {
+                                "path": "emptyField",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_IS_EMPTY"
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "29992c6a-90eb-4198-af7e-7bdb177ff654",
+                    "name": "Conditional: Mask Value if Fields exist",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onFalse": {
+                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+                            },
+                            "detective": {
+                                "path": "object.path",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_HAS_FIELD"
+                            }
+                        },
+                        {
+                            "name": "Step #2",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_MASK_VALUE",
+                                "maskOptions": {
+                                    "path": "object.path"
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "baa3869a-0579-4e4d-b2f7-04747469dc2d",
+                    "name": "Basic: Find \u0026 Replace",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_REPLACE_VALUE",
+                                "replaceValueOptions": {
+                                    "path": "product.id",
+                                    "value": "\"---REPLACED---\""
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "44df4060-562f-4451-bee0-4df663df0f6b",
+                    "name": "Basic: Extract Field",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_EXTRACT",
+                                "extractOptions": {
+                                    "paths": [
+                                        "person.id"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "4e8971f6-9be8-4989-9fc5-bbc2ddcd650f",
+                    "name": "Conditional: Replace Value if Contains String",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onFalse": {
+                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+                            },
+                            "detective": {
+                                "path": "object.replaceString",
+                                "args": [
+                                    "foo"
+                                ],
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_STRING_CONTAINS_ANY"
+                            }
+                        },
+                        {
+                            "name": "Step #2",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_REPLACE_VALUE",
+                                "replaceValueOptions": {
+                                    "path": "object.replaceString",
+                                    "value": "\"REPLACED-IF-STRING-CONTAINS\""
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "91fce4a0-0045-43af-9da3-7a9879f7f3c4",
+                    "name": "PII: Detect in JSON and Inject Metadata",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onTrue": {
+                                "metadata": {
+                                    "found_pii": "true"
+                                }
+                            },
+                            "detective": {
+                                "path": "",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_PII_KEYWORD",
+                                "piiKeywordMode": "DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET"
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "6e886878-7368-4769-8e74-81008104e952",
+                    "name": "Basic: Mask Field Value",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_MASK_VALUE",
+                                "maskOptions": {
+                                    "path": "object"
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "fbf62af9-69d7-45e6-9362-eaa7637ba570",
+                    "name": "Basic: Truncate Large Field",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_TRUNCATE_VALUE",
+                                "truncateOptions": {
+                                    "type": "TRANSFORM_TRUNCATE_TYPE_LENGTH",
+                                    "path": "largeField",
+                                    "value": 40
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "e69e886a-0666-41a6-9156-f5564be4e475",
+                    "name": "Basic: Obfuscate Field Value",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_OBFUSCATE_VALUE",
+                                "obfuscateOptions": {
+                                    "path": "obfuscatedField"
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "32847f22-46b5-49d2-834b-5fc799d157e1",
+                    "name": "test",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onFalse": {
+                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+                            },
+                            "detective": {
+                                "path": "",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_PII_PLAINTEXT_ANY"
+                            }
+                        },
+                        {
+                            "name": "Step #2",
+                            "dynamic": true,
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_MASK_VALUE"
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_PLAINTEXT"
+                },
+                {
+                    "id": "16dc37c0-6841-4c09-af6f-65015eee4826",
+                    "name": "PII: Detect \u0026 Mask in JSON",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "onFalse": {
+                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
+                            },
+                            "detective": {
+                                "path": "",
+                                "negate": false,
+                                "type": "DETECTIVE_TYPE_PII_KEYWORD",
+                                "piiKeywordMode": "DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY"
+                            }
+                        },
+                        {
+                            "name": "Step #2",
+                            "dynamic": true,
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_MASK_VALUE"
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
+                },
+                {
+                    "id": "cccafbe7-2cb8-49d7-a683-c3025cc9497a",
+                    "name": "Basic: Delete Field",
+                    "steps": [
+                        {
+                            "name": "Step #1",
+                            "transform": {
+                                "type": "TRANSFORM_TYPE_DELETE_FIELD",
+                                "deleteFieldOptions": {
+                                    "paths": [
+                                        "product_name"
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "dataFormat": "PIPELINE_DATA_FORMAT_JSON"
                 }
             ],
             "notifications": [
@@ -34,46 +338,8 @@ spec:
                     "slack": {
                         "botToken": "test-token",
                         "channel": "test-channel"
-                    }
+                    },
+                    "CreatedBy": "streamdal-operator"
                 }
-            ],
-            "pipelines": [
-                {
-                    "id": "a027f81c-fd90-45f6-9f38-962426c768eb",
-                    "name": "mypipeline-foo3",
-                    "steps": [
-                        {
-                            "name": "Step #1",
-                            "onFalse": {
-                                "abort": "ABORT_CONDITION_ABORT_CURRENT"
-                            },
-                            "detective": {
-                                "path": "object.field",
-                                "negate": false,
-                                "type": "DETECTIVE_TYPE_HAS_FIELD"
-                            },
-                            "WasmId": "06f21173-1008-c99b-2bb5-452ffa84b3d5"
-                        },
-                        {
-                            "name": "Step #2",
-                            "transform": {
-                                "type": "TRANSFORM_TYPE_MASK_VALUE",
-                                "maskOptions": {
-                                    "path": "object.field"
-                                }
-                            },
-                            "WasmId": "50adafdc-d17f-9caa-3d9d-f951ddc42819"
-                        }
-                    ]
-                }
-            ],
-            "audienceMappings": {
-                "service5:operation_type_consumer:operationname5:componentname5": {
-                    "configs": [
-                        {
-                            "id": "a027f81c-fd90-45f6-9f38-962426c768eb"
-                        }
-                    ]
-                }
-            }
+            ]
         }

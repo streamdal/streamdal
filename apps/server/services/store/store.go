@@ -994,7 +994,7 @@ func (s *Store) GetAudienceMappings(ctx context.Context) (map[*protos.Audience]*
 		}
 
 		if len(pipelineConfigs.Configs) == 0 {
-			s.log.Debugf("empty config for audience '%s' - nothing to do", audStrFull)
+			// s.log.Debugf("empty config for audience '%s' - nothing to do", audStrFull)
 			continue
 		}
 

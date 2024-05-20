@@ -38,7 +38,7 @@ func (r *StreamdalConfigReconciler) handlePipelines(
 	jobs := r.generatePipelineJobs(rr.Action, wantedCfg.Pipelines, serverCfg.Pipelines)
 
 	if len(jobs) != 0 {
-		llog.Info("Generated pipeline jobs", "numGenerated", len(jobs))
+		llog.V(1).Info("Generated pipeline jobs", "numGenerated", len(jobs))
 	}
 
 	var err error
@@ -132,7 +132,10 @@ func (r *StreamdalConfigReconciler) generatePipelineJobs(
 
 				// Server config was crated by this operator but we need to check
 				// if the contents of the config are the same as the wanted config.
-				if equal, _ := util.ComparePipeline(wc, sc); !equal {
+				if equal, diff := util.ComparePipeline(wc, sc); !equal {
+					llog.V(1).Info("Server pipeline different from wanted pipeline")
+					fmt.Println(diff)
+
 					jobs = append(jobs, &PipelineJob{
 						ServerAction: ReconcileActionUpdate,
 						Pipeline:     wc,
