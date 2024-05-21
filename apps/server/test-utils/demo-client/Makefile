@@ -29,7 +29,7 @@ run/all:
 .PHONY: run1
 run1: description = Run signup-service
 run1:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--display-exec-time \
 	--message-rate 1 \
 	--service-name "signup-service" \
@@ -45,7 +45,7 @@ run1:
 .PHONY: run2
 run2: description = Run signup-service
 run2:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--display-exec-time \
 	--message-rate 1 \
 	--service-name "signup-service" \
@@ -58,7 +58,7 @@ run2:
 .PHONY: run3
 run3: description = Run billing-service
 run3:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--output-type plaintext \
 	--message-rate 1,4 \
@@ -72,7 +72,7 @@ run3:
 .PHONY: run4
 run4: description = Run billing-service
 run4:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--output-type plaintext \
 	--message-rate 3,5 \
@@ -86,7 +86,7 @@ run4:
 .PHONY: run5
 run5: description = Run welcome-service
 run5:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--message-rate 1,5 \
 	--service-name "welcome-service" \
@@ -99,7 +99,7 @@ run5:
 .PHONY: run6
 run6: description = Run welcome-service
 run6:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--message-rate 1,3 \
 	--service-name "welcome-service" \
@@ -112,7 +112,7 @@ run6:
 .PHONY: run7
 run7: description = PII Key word
 run7:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--message-rate 1,10 \
 	--service-name "pii-keyword" \
 	--operation-type 2 \
@@ -125,7 +125,7 @@ run7:
 .PHONY: run/async
 run/async: description = Run signup-service-async service configured with async
 run/async:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--async \
 	--display-exec-time \
@@ -140,7 +140,7 @@ run/async:
 .PHONY: run/sampling
 run/sampling: description = Run signup-service-async service configured with sampling rate of 1 message/sec
 run/sampling:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--sampling-rate 1 \
 	--display-exec-time \
@@ -155,7 +155,7 @@ run/sampling:
 .PHONY: run/async-sampling
 run/async-sampling: description = Run signup-service-async service configured with async and sampling
 run/async-sampling:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--output-level 1 \
 	--async \
 	--sampling-rate 1 \
@@ -171,7 +171,7 @@ run/async-sampling:
 .PHONY: run/plaintext
 run/plaintext: description = Plaintext Logs
 run/plaintext:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
@@ -184,7 +184,7 @@ run/plaintext:
 .PHONY: run/plaintext2
 run/plaintext2: description = Plaintext Logs
 run/plaintext2:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
@@ -197,7 +197,7 @@ run/plaintext2:
 .PHONY: run/wasm-dedupe-debug
 run/wasm-dedupe-debug: description = Used for troubleshooting wasm dedupe issues
 run/wasm-dedupe-debug:
-	go run *.go -d \
+	rm -f ./demo-client; go build ./... && ./demo-client \
 	--message-rate 1 \
 	--num-instances 10 \
 	--inject-logger \
@@ -207,9 +207,25 @@ run/wasm-dedupe-debug:
 	--component-name "logs" \
 	--display-exec-time \
 	--data-source-type file \
-	--output-level 3 \
+	--output-level 2 \
 	--output-type plaintext \
 	--data-source-file ./assets/plaintext-logs.txt
+
+.PHONY: run/wasm-memory-debug
+run/wasm-memory-debug: description = Used for troubleshooting wasm memory issues
+run/wasm-memory-debug:
+	rm -f ./demo-client; go build ./... && ./demo-client \
+	--message-rate 1000 \
+	--num-instances 4 \
+	--service-name "memory-svc" \
+	--operation-type 2 \
+	--operation-name  "processor" \
+	--component-name "logs" \
+	--display-exec-time \
+	--data-source-type file \
+	--output-level 1 \
+	--output-type plaintext \
+	--data-source-file ./assets/transform.log
 
 ### Build
 

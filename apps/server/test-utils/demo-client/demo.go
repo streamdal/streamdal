@@ -16,10 +16,11 @@ import (
 )
 
 const (
-	OutputLevelNone = 0
-	OutputLevelLow  = 1
-	OutputLevelMed  = 2
-	OutputLevelHigh = 3
+	OutputLevelNone    = -1
+	OutputLevelMinimal = 0
+	OutputLevelLow     = 1
+	OutputLevelMedium  = 2
+	OutputLevelHigh    = 3
 
 	OutputTypePlaintext = "plaintext"
 	OutputTypeTabular   = "tabular"
@@ -197,7 +198,10 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 		return errors.Wrap(err, "failed to create initial streamdal client")
 	}
 
-	var reconnectTime time.Time
+	var (
+		reconnectTime time.Time
+		count         int
+	)
 
 	for {
 		if !reconnectTime.IsZero() && reconnectTime.After(time.Now()) {
@@ -247,7 +251,8 @@ func (r *Demo) runClient(workerID int, readCh chan []byte) error {
 		})
 
 		timeDiff := time.Now().Sub(timeStart)
+		count += 1
 
-		r.display(input, resp, timeDiff)
+		r.display(input, resp, timeDiff, count)
 	}
 }
