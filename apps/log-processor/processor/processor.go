@@ -217,8 +217,6 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return errors.Wrap(err, "failed to unmarshal data")
 	}
 
-	logstashMessage.Message = []byte(`{"email": "user@streamdal.com"}`)
-
 	// If .Message does not contain valid JSON, do not process it via Streamdal,
 	// ship back to logstash.
 	if _, err := json.Marshal(logstashMessage.Message); err != nil {
@@ -239,7 +237,7 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return nil
 	}
 
-	logstashMessage.Message = resp.Data
+	logstashMessage.Message = string(resp.Data)
 
 	p.sendCh <- logstashMessage
 
