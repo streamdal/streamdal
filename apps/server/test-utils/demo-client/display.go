@@ -11,6 +11,7 @@ import (
 	"github.com/hokaccha/go-prettyjson"
 	gopretty "github.com/jedib0t/go-pretty/v6/table"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	streamdal "github.com/streamdal/streamdal/sdks/go"
 )
@@ -306,12 +307,13 @@ func generateDataDiffTabular(tw gopretty.Writer, result *Result) {
 	tw.AppendRow(gopretty.Row{string(preFormatted), string(postFormatted)})
 }
 
-func truncStrPtr(s *string) string {
+// Let's not truncate this, it obfuscates issues ~MG 2024-05-21
+func strFromPtr(s *string) string {
 	if s == nil {
 		return "N/A"
 	}
 
-	return trunc(*s)
+	return *s
 }
 
 func trunc(s string) string {
@@ -339,7 +341,7 @@ func (r *Demo) displayPipelineDebugPlaintext(result *Result) {
 
 			fmt.Printf(" | Step Name:       %s\n", s.Name)
 			fmt.Printf(" | Step Status:     %s\n", status)
-			fmt.Printf(" | Step Message:    %s\n", truncStrPtr(s.StatusMessage))
+			fmt.Printf(" | Step Message:    %s\n", strFromPtr(s.StatusMessage))
 		}
 	}
 }
@@ -367,7 +369,7 @@ func (r *Demo) generatePipelineDebugTabular(tw gopretty.Writer, result *Result) 
 
 			tw.AppendRow(gopretty.Row{bold("  ┌── Step Name"), s.Name})
 			tw.AppendRow(gopretty.Row{bold("  ├── Step Status"), status})
-			tw.AppendRow(gopretty.Row{bold("  └── Step Message"), truncStrPtr(s.StatusMessage)})
+			tw.AppendRow(gopretty.Row{bold("  └── Step Message"), strFromPtr(s.StatusMessage)})
 		}
 	}
 }
