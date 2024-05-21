@@ -61,7 +61,7 @@ type LogstashMessage struct {
 	Version   string `json:"@version"`
 	Path      string `json:"path"`
 	Timestamp string `json:"@timestamp"`
-	Message   []byte `json:"message"`
+	Message   string `json:"message"`
 	Host      string `json:"host"`
 	Type      string `json:"type,omitempty"`
 }
