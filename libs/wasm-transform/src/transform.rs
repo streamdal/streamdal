@@ -278,24 +278,27 @@ pub fn extract_and_flatten(data: &str, paths: &Vec<DetectiveStepResultMatch>) ->
 pub fn overwrite(req: &Request) -> Result<String, TransformError> {
     validate_request(req, true)?;
 
-    // TODO: why is this different from the other functions which just use data_as_string? ~MG 2024-05-13
-    let mut data = req.data.clone();
 
-    let data_as_string = String::from_utf8(req.data.clone()).map_err(|e| {
+    let mut data_as_string = String::from_utf8(req.data.clone()).map_err(|e| {
         TransformError::Generic(format!("unable to convert bytes to string: {}", e))
     })?;
 
     for dr in &req.paths {
         if req.data_format == PIPELINE_DATA_FORMAT_PLAINTEXT {
-            return _overwrite_plaintext(
+            match _overwrite_plaintext(
                 data_as_string.as_str(),
                 dr.char_index_start,
                 dr.char_index_end,
                 req.value.clone(),
-            );
+            ) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            }
+            continue
         }
 
-        let value = gjson::get(convert_bytes_to_string(&data)?, dr.path.as_str());
+        let data_as_str = data_as_string.as_str();
+        let value = gjson::get(data_as_str, dr.path.as_str());
         if !value.exists() {
             continue;
         }
@@ -303,11 +306,11 @@ pub fn overwrite(req: &Request) -> Result<String, TransformError> {
         let overwrite_with = req.value.clone();
 
         match gjson::set_overwrite(
-            convert_bytes_to_string(&data)?,
+            data_as_str,
             dr.path.as_str(),
             overwrite_with.as_str(),
         ) {
-            Ok(d) => data = d.into_bytes(),
+            Ok(new_data) => data_as_string = new_data,
             Err(e) => {
                 return Err(TransformError::Generic(format!(
                     "unable to overwrite data: {}",
@@ -317,10 +320,14 @@ pub fn overwrite(req: &Request) -> Result<String, TransformError> {
         }
     }
 
-    String::from_utf8(data).map_err(|e| TransformError::Generic(e.to_string()))
+    Ok(data_as_string)
 }
 
 pub fn _overwrite_plaintext(data: &str, start: i32, end: i32, value: String) -> Result<String, TransformError> {
+    if end <= start {
+        return Err(TransformError::Generic("end index must be greater than start index".to_string()));
+    }
+
     let mut new_data = data.to_string();
     new_data.replace_range(start as usize..end as usize, value.as_str());
 
@@ -345,12 +352,16 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
 
     for dr in &req.paths {
         if req.data_format == PIPELINE_DATA_FORMAT_PLAINTEXT {
-            return _truncate_plaintext(
+            match _truncate_plaintext(
                 data_as_string.as_str(),
                 dr.char_index_start,
                 dr.char_index_end,
                 truncate_options,
-            );
+            ) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            }
+            continue
         }
 
         let data_as_str = data_as_string.as_str();
@@ -623,6 +634,10 @@ fn _mask_json(data: &str, path: &str, mask_char: char, quote: bool) -> Result<St
 }
 
 fn _mask_plaintext(data: &str, start: i32, end: i32, mask_char: char) -> Result<String, TransformError> {
+    if end <= start {
+        return Err(TransformError::Generic("end index must be greater than start index".to_string()));
+    }
+
     let mut masked = data.to_string();
     let num_chars_to_mask = (0.8 * (end - start) as f64).round() as usize;
     let end = start as usize + num_chars_to_mask;
@@ -915,14 +930,20 @@ mod tests {
 
     #[test]
     fn test_mask_plaintext() {
-        let my_str = "My credit card number is 4111111111111111 and expires on 01/24";
+        let my_str = "My email is user@streamdal.com, and my credit card number is 4111111111111111 and expires on 01/24";
         let req = Request {
             data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
             data: my_str.as_bytes().to_vec(),
             paths: vec![DetectiveStepResultMatch {
                 path: "".to_string(),
-                char_index_start: 25,
-                char_index_end: 41,
+                char_index_start: 12,
+                char_index_end: 30,
+                ..Default::default()
+            },
+                        DetectiveStepResultMatch {
+                path: "".to_string(),
+                char_index_start: 61,
+                char_index_end: 77,
                 ..Default::default()
             }],
             value: "#".to_string(),
@@ -932,7 +953,7 @@ mod tests {
 
         let result = mask(&req).unwrap();
 
-        assert_eq!(result, "My credit card number is #############111 and expires on 01/24");
+        assert_eq!(result, "My email is ##############.com, and my credit card number is #############111 and expires on 01/24");
     }
 
     #[test]
