@@ -467,6 +467,7 @@ pub fn delete(req: &Request) -> Result<String, TransformError> {
                 Ok(new_data) => data_as_string = new_data,
                 Err(e) => return Err(e),
             }
+            continue
         }
 
         let data_as_str = data_as_string.as_str();
