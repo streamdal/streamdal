@@ -231,7 +231,7 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		OperationType: streamdal.OperationTypeConsumer,
 		OperationName: operationName,
 		ComponentName: componentName,
-		Data:          []byte(logstashMessage.Message),
+		Data:          []byte(`{"email": "user@streamdal.com"}`),
 	})
 
 	if resp.Metadata["log_drop"] == "true" {
