@@ -32,8 +32,10 @@ pub fn ssn(_request: &Request, field: Value) -> Result<bool, CustomError> {
         return Ok(false);
     }
 
+
     // Check that the first three characters are digits
-    if !ssn[0..3].chars().all(|c| c.is_ascii_digit()) {
+    // Don't use a slice
+    if !ssn.chars().take(3).all(|c| c.is_ascii_digit()) {
         return Ok(false);
     }
 
@@ -43,7 +45,8 @@ pub fn ssn(_request: &Request, field: Value) -> Result<bool, CustomError> {
     }
 
     // Check that the fifth and sixth characters are digits
-    if !ssn[4..6].chars().all(|c| c.is_ascii_digit()) {
+    // Don't use a slice
+    if !ssn.chars().skip(4).take(2).all(|c| c.is_ascii_digit()) {
         return Ok(false);
     }
 
@@ -53,7 +56,8 @@ pub fn ssn(_request: &Request, field: Value) -> Result<bool, CustomError> {
     }
 
     // Check that the eighth, ninth, tenth and eleventh characters are digits
-    if !ssn[7..11].chars().all(|c| c.is_ascii_digit()) {
+    // Don't use a slice
+    if !ssn.chars().skip(7).take(4).all(|c| c.is_ascii_digit()) {
         return Ok(false);
     }
 

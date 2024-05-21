@@ -327,6 +327,12 @@ pub fn _overwrite_plaintext(data: &str, start: i32, end: i32, value: String) -> 
     if end <= start {
         return Err(TransformError::Generic("end index must be greater than start index".to_string()));
     }
+    if end <= 0 || end > data.len() as i32 {
+        return Err(TransformError::Generic("end character out of bounds".to_string()));
+    }
+    if start < 0 || start >= end {
+        return Err(TransformError::Generic("start character out of bounds".to_string()));
+    }
 
     let mut new_data = data.to_string();
     new_data.replace_range(start as usize..end as usize, value.as_str());
@@ -390,6 +396,16 @@ pub fn truncate(req: &Request) -> Result<String, TransformError> {
 }
 
 fn _truncate_plaintext(data: &str, start: i32, end: i32, truncate_options: &TruncateOptions) -> Result<String, TransformError> {
+    if end <= start {
+        return Err(TransformError::Generic("end index must be greater than start index".to_string()));
+    }
+    if end <= 0 || end > data.len() as i32 {
+        return Err(TransformError::Generic("end character out of bounds".to_string()));
+    }
+    if start < 0 || start >= end {
+        return Err(TransformError::Generic("start character out of bounds".to_string()));
+    }
+
     let mut new_data = data.to_string();
     let mut truncate_length = get_truncate_length(truncate_options, end as usize - start as usize);
     truncate_length += start as usize;
@@ -443,11 +459,15 @@ pub fn delete(req: &Request) -> Result<String, TransformError> {
 
     for dr in &req.paths {
         if req.data_format == PIPELINE_DATA_FORMAT_PLAINTEXT {
-            return _delete_plaintext(
+            match _delete_plaintext(
                 data_as_string.as_str(),
                 dr.char_index_start,
                 dr.char_index_end,
-            );
+            ) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            }
+            continue
         }
 
         let data_as_str = data_as_string.as_str();
@@ -461,6 +481,16 @@ pub fn delete(req: &Request) -> Result<String, TransformError> {
 }
 
 fn _delete_plaintext(data: &str, start: i32, end: i32) -> Result<String, TransformError> {
+    if end <= start {
+        return Err(TransformError::Generic("end index must be greater than start index".to_string()));
+    }
+    if end <= 0 || end > data.len() as i32 {
+        return Err(TransformError::Generic("end character out of bounds".to_string()));
+    }
+    if start < 0 || start >= end {
+        return Err(TransformError::Generic("start character out of bounds".to_string()));
+    }
+
     let mut new_data = data.to_string();
     new_data.replace_range(start as usize..end as usize, "");
 
@@ -486,7 +516,12 @@ pub fn obfuscate(req: &Request) -> Result<String, TransformError> {
 
         if req.data_format == PIPELINE_DATA_FORMAT_PLAINTEXT {
             // Replace data from start index to end index with the obfuscated value
-            return _obfuscate_string_plaintext(data_as_str, dr.char_index_start, dr.char_index_end);
+            match _obfuscate_string_plaintext(data_as_str, dr.char_index_start, dr.char_index_end) {
+                Ok(new_data) => data_as_string = new_data,
+                Err(e) => return Err(e),
+            }
+
+            continue
         }
 
         let value = gjson::get(data_as_str, dr.path.as_str());
@@ -541,6 +576,16 @@ fn get_value_plaintext(data: &str, start: i32, end: i32) -> String {
 }
 
 fn _obfuscate_string_plaintext(data: &str, start: i32, end: i32) -> Result<String, TransformError> {
+    if end <= start {
+        return Err(TransformError::Generic("end index must be greater than start index".to_string()));
+    }
+    if end <= 0 || end > data.len() as i32 {
+        return Err(TransformError::Generic("end character out of bounds".to_string()));
+    }
+    if start < 0 || start >= end {
+        return Err(TransformError::Generic("start character out of bounds".to_string()));
+    }
+
     let contents = get_value_plaintext(data, start, end);
     let hashed = sha256::digest(contents.as_bytes());
     let obfuscated = format!("sha256:{}", hashed);
@@ -636,6 +681,12 @@ fn _mask_json(data: &str, path: &str, mask_char: char, quote: bool) -> Result<St
 fn _mask_plaintext(data: &str, start: i32, end: i32, mask_char: char) -> Result<String, TransformError> {
     if end <= start {
         return Err(TransformError::Generic("end index must be greater than start index".to_string()));
+    }
+    if end <= 0 || end > data.len() as i32 {
+        return Err(TransformError::Generic("end character out of bounds".to_string()));
+    }
+    if start < 0 || start >= end {
+        return Err(TransformError::Generic("start character out of bounds".to_string()));
     }
 
     let mut masked = data.to_string();
