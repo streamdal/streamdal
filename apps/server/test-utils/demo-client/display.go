@@ -30,7 +30,7 @@ type Result struct {
 	Metadata              map[string]string        `json:"metadata"`
 }
 
-func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, execTime time.Duration) {
+func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, execTime time.Duration, count int) {
 	if post == nil {
 		panic("display(): post cannot be nil")
 	}
@@ -52,7 +52,7 @@ func (r *Demo) display(pre []byte, post *streamdal.ProcessResponse, execTime tim
 
 	switch r.config.OutputType {
 	case OutputTypePlaintext:
-		r.displayPlaintext(result)
+		r.displayPlaintext(result, count)
 	case OutputTypeTabular:
 		r.displayTabular(result)
 	case OutputTypeJSON:
@@ -131,25 +131,34 @@ func (r *Demo) displayTabular(result *Result) {
 	}
 
 	// Display before/after output if output level is medium
-	if r.config.OutputLevel >= OutputLevelMed {
+	if r.config.OutputLevel >= OutputLevelMedium {
 		generateDataDiffTabular(tw, result)
 	}
 
 	fmt.Print(tw.Render() + "\n")
 }
 
-func (r *Demo) displayPlaintext(result *Result) {
+func (r *Demo) displayPlaintext(result *Result, count int) {
 	if result == nil {
 		panic("displayPlaintext(): result cannot be nil")
 	}
 
-	fmt.Printf("Date:               %s\n", result.Date.Format(time.RFC1123))
-	fmt.Printf("Status:             %s\n", r.translateStatus(result.ProcessStatus))
-	fmt.Printf("Status Message:     %s\n", result.ProcessStatusMessage)
-	fmt.Printf("Exec Time:          %s\n", result.ExecTime)
+	if r.config.OutputLevel >= OutputLevelMinimal {
+		fmt.Printf("Processed:          %d\n", count)
+	}
 
-	// Display metadata if output level is high
-	if r.config.OutputLevel >= OutputLevelMed {
+	if r.config.OutputLevel >= OutputLevelLow {
+		fmt.Printf("Date:               %s\n", result.Date.Format(time.RFC1123))
+		fmt.Printf("Status:             %s\n", r.translateStatus(result.ProcessStatus))
+	}
+
+	if r.config.OutputLevel >= OutputLevelMedium {
+		fmt.Printf("Status Message:     %s\n", result.ProcessStatusMessage)
+		fmt.Printf("Exec Time:          %s\n", result.ExecTime)
+	}
+
+	// Display metadata if output level is medium+
+	if r.config.OutputLevel >= OutputLevelMedium {
 		var metadata string
 
 		if len(result.Metadata) > 0 {
@@ -173,11 +182,13 @@ func (r *Demo) displayPlaintext(result *Result) {
 	}
 
 	// Display before/after output if output level is medium
-	if r.config.OutputLevel >= OutputLevelMed {
+	if r.config.OutputLevel >= OutputLevelMedium {
 		r.displayDataDiffPlaintext(result)
 	}
 
-	fmt.Printf("\n\n====================================================\n\n")
+	if r.config.OutputLevel >= OutputLevelLow {
+		fmt.Printf("\n\n====================================================\n\n")
+	}
 }
 
 func (r *Demo) displayDataDiffPlaintext(result *Result) {

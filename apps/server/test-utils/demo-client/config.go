@@ -27,8 +27,8 @@ type Config struct {
 	DisplayExecTime     bool     `kong:"help='Display execution time for each message',default='false'"`
 	Async               bool     `kong:"help='Use async mode in go-sdk',default='false'"`
 	SamplingRate        int      `kong:"help='Enable sampling and sample rate in go-sdk',default='0'"`
-	OutputLevel         int      `kong:"help='Amount of output displayed by demo client',enum='0,1,2,3',default='2'"`
-	OutputType          string   `kong:"help='Type of output to display',enum='plaintext,tabular,json',default='tabular'"`
+	OutputLevel         int      `kong:"help='Amount of output displayed by demo client (options: 0, 1, 2, 3); higher = more verbose',enum='0,1,2,3',default='2'"`
+	OutputType          string   `kong:"help='Type of output to display (options: plaintext, tabular, json)',enum='plaintext,tabular,json',default='tabular'"`
 	DisableColor        bool     `kong:"help='Disable color output',default='false'"`
 	InjectLogger        bool     `kong:"help='Inject logger into SDK',default='false'"`
 	UniqueOperationName bool     `kong:"help='Use unique operation name for each instance (adds -$i suffix)',default='false'"`

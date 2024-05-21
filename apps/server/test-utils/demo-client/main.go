@@ -51,7 +51,9 @@ func displayConfig(cfg *Config) {
 	logrus.Infof("  reconnect interval : %d", cfg.ReconnectInterval)
 	logrus.Infof("  message rate       : %v", cfg.MessageRate)
 	logrus.Infof("  data source type   : %s", cfg.DataSourceType)
-	logrus.Infof("  data source file   : %s", cfg.DataSourceFile.Name())
+	if cfg.DataSourceFile != nil {
+		logrus.Infof("  data source file   : %s", cfg.DataSourceFile.Name())
+	}
 	logrus.Infof("  output level       : %d", cfg.OutputLevel)
 	logrus.Infof("  output type        : %s", cfg.OutputType)
 	logrus.Infof("  debug              : %t", cfg.Debug)
