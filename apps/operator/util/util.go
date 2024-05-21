@@ -83,11 +83,13 @@ func ComparePipeline(a, b *protos.Pipeline) (bool, string) {
 		// We need Transform() so that baseline compare pkg can properly compare proto messages
 		protocmp.Transform(),
 
-		// When a pipeline config is fetched via external.GetConfig(),
-		// _wasm_function field might not be included in response. Since we are
-		// only supporting bundled wasm for now, this is safe to ignore (bundled
-		// wasm has it hardcoded to 'f').
-		protocmp.IgnoreFields(&protos.PipelineStep{}, "_wasm_function"),
+		// _wasm_function: When a pipeline config is fetched via
+		// external.GetConfig(), _wasm_function field might not be included in
+		// response. Since we are only supporting bundled wasm for now, this is
+		// safe to ignore (bundled wasm has it hardcoded to 'f').
+		//
+		// _wasm_id: ignore wasm id's until bundled wasm has determinative id's
+		protocmp.IgnoreFields(&protos.PipelineStep{}, "_wasm_function", "_wasm_id"),
 	}
 
 	diff := cmp.Diff(a, b, opts...)
