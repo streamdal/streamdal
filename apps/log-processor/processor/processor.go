@@ -10,6 +10,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/pkg/errors"
+
 	streamdal "github.com/streamdal/streamdal/sdks/go"
 
 	"github.com/streamdal/streamdal/apps/log-processor/config"
@@ -60,7 +61,7 @@ type LogstashMessage struct {
 	Version   string `json:"@version"`
 	Path      string `json:"path"`
 	Timestamp string `json:"@timestamp"`
-	Message   string `json:"message"`
+	Message   []byte `json:"message"`
 	Host      string `json:"host"`
 	Type      string `json:"type,omitempty"`
 }
@@ -216,6 +217,8 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return errors.Wrap(err, "failed to unmarshal data")
 	}
 
+	logstashMessage.Message = []byte(`{"email": "user@streamdal.com"}`)
+
 	// If .Message does not contain valid JSON, do not process it via Streamdal,
 	// ship back to logstash.
 	if _, err := json.Marshal(logstashMessage.Message); err != nil {
@@ -236,7 +239,7 @@ func (p *Processor) processorHandler(workerID int, data []byte) error {
 		return nil
 	}
 
-	logstashMessage.Message = string(resp.Data)
+	logstashMessage.Message = resp.Data
 
 	p.sendCh <- logstashMessage
 
