@@ -656,7 +656,7 @@ func (s *Streamdal) runStep(ctx context.Context, df protos.PipelineDataFormat, a
 	defer f.mtx.Unlock()
 
 	// Don't need this anymore, and don't want to send it to the wasm function
-	//step.XWasmBytes = nil
+	step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
 		InputPayload:    data,
