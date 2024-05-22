@@ -24,21 +24,10 @@ const cleanObject = (obj: any): any => {
   return obj;
 };
 
-const testObject = {
-  "parent": {
-    "child": {
-      "foo": 0,
-    },
-    "baz": 1,
-  },
-};
 export const handler: Handlers = {
   async GET() {
     const { config = {} } = await getConfigs();
     const cleanedConfig = cleanObject(config);
-
-    const test = cleanObject(testObject);
-    console.log("here is my test", test);
     return new Response(
       JSON.stringify(cleanedConfig, undefined, 2),
       {
