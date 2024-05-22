@@ -115,6 +115,8 @@ github.com/streamdal/streamdal/apps/server v0.0.43 h1:v5XR/WNOkr11CE0QyxWoBoaMqw
 github.com/streamdal/streamdal/apps/server v0.0.43/go.mod h1:vxW/tPBTn9+JJvYAJWm2K9JZAk+kmzyZFvALq44z5S8=
 github.com/streamdal/streamdal/apps/server v0.0.68 h1:dY2EfXpE80WBR7XAJO0/ieJCUa8899iQ/N6iNOFXY6U=
 github.com/streamdal/streamdal/apps/server v0.0.68/go.mod h1:4vE9V772B6TXGDDLq1i5UvOgnEIVC7hXAUheUrujGcI=
+github.com/streamdal/streamdal/apps/server v0.0.84 h1:y7bLcZDJ1E5okyzIgS7sUSioX/FbUk20gpQAY49WEFA=
+github.com/streamdal/streamdal/apps/server v0.0.84/go.mod h1:4vE9V772B6TXGDDLq1i5UvOgnEIVC7hXAUheUrujGcI=
 github.com/streamdal/streamdal/libs/protos v0.1.39 h1:nO7zIzXtEQLGPweZ90XJ+EMJGNzPIX4vQPg8sQvhHl8=
 github.com/streamdal/streamdal/libs/protos v0.1.39/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/streamdal/streamdal/libs/protos v0.1.40 h1:4U8W/8Y8u+68oGe4R7p55LHS4c7tRy0wwJu71IXLsnY=
