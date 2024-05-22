@@ -13,7 +13,10 @@ export const PORT = Number(
     Deno.env.get("STREAMDAL_CONSOLE_PORT") ??
     8080,
 );
-
+export const REST_URL = env["STREAMDAL_SERVER_REST_URL"] ??
+  Deno.env.get("STREAMDAL_SERVER_REST_URL");
+export const REST_TOKEN = env["STREAMDAL_SERVER_REST_AUTH"] ??
+  Deno.env.get("STREAMDAL_SERVER_REST_AUTH");
 export const GRPC_URL = env["STREAMDAL_CONSOLE_GRPC_WEB_URL"] ??
   Deno.env.get("STREAMDAL_CONSOLE_GRPC_WEB_URL") ??
   "http://localhost:8083";
