@@ -52,6 +52,9 @@ type SDKMode int
 // ProcessResponse is the response struct from a Process() call
 type ProcessResponse protos.SDKResponse
 
+// WazeroExecutionMode is used to indicate how the SDK will execute wasm modules
+type WazeroExecutionMode int
+
 const (
 	// DefaultPipelineTimeoutDurationStr is the default timeout for a pipeline execution.
 	DefaultPipelineTimeoutDurationStr = "100ms"
@@ -113,6 +116,11 @@ const (
 	ExecStatusError    = protos.ExecStatus_EXEC_STATUS_ERROR
 	ExecStatusAsync    = protos.ExecStatus_EXEC_STATUS_ASYNC
 	ExecStatusSampling = protos.ExecStatus_EXEC_STATUS_SAMPLING
+
+	WazeroExecutionModeCompiler    WazeroExecutionMode = 1
+	WazeroExecutionModeInterpreter WazeroExecutionMode = 2
+
+	DefaultWazeroExecutionMode = WazeroExecutionModeCompiler
 )
 
 var (
@@ -297,6 +305,14 @@ type Config struct {
 	//
 	// Default: 1
 	MetricsNumWorkers int
+
+	// WazeroExecutionMode defines how the SDK will execute wasm modules.
+	//
+	// WazeroExecutionModeCompiler = slow instantiation, faster execution
+	// WazeroExecutionModeInterpreter = fast instantiation, slower execution
+	//
+	// Default: WazeroExecutionModeCompiler
+	WazeroExecutionMode WazeroExecutionMode
 }
 
 // ProcessRequest is used to maintain a consistent API for the Process() call
@@ -525,6 +541,10 @@ func validateConfig(cfg *Config) error {
 		cfg.MetricsNumWorkers = DefaultMetricsNumWorkers
 	}
 
+	if cfg.WazeroExecutionMode == 0 {
+		cfg.WazeroExecutionMode = DefaultWazeroExecutionMode
+	}
+
 	return nil
 }
 
@@ -632,18 +652,6 @@ func (s *Streamdal) heartbeat(loop *director.TimedLooper) {
 
 // TODO: refactor this signature
 func (s *Streamdal) runStep(ctx context.Context, df protos.PipelineDataFormat, aud *protos.Audience, step *protos.PipelineStep, data []byte, isr *protos.InterStepResult, workerID int) (*protos.WASMResponse, error) {
-	// TODO: temp fix to ignore schemas for plaintext pipelines
-	// TODO: this should ideally be done by the server
-	if df == protos.PipelineDataFormat_PIPELINE_DATA_FORMAT_PLAINTEXT && step.GetInferSchema() != nil {
-		return &protos.WASMResponse{
-			OutputPayload:   data,
-			ExitCode:        protos.WASMExitCode_WASM_EXIT_CODE_TRUE,
-			ExitMsg:         "Plaintext, skipping infer schema step",
-			OutputStep:      []byte(``),
-			InterStepResult: nil,
-		}, nil
-	}
-
 	s.config.Logger.Debugf("Running step '%s'", step.Name)
 
 	// Get WASM module
@@ -656,7 +664,7 @@ func (s *Streamdal) runStep(ctx context.Context, df protos.PipelineDataFormat, a
 	defer f.mtx.Unlock()
 
 	// Don't need this anymore, and don't want to send it to the wasm function
-	//step.XWasmBytes = nil
+	step.XWasmBytes = nil
 
 	req := &protos.WASMRequest{
 		InputPayload:    data,
