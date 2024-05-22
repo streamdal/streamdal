@@ -962,7 +962,7 @@ fn test_plaintext_mixed() {
 
 #[test]
 fn test_plaintext_pipes() {
-    let sample_text = std::fs::read_to_string("../../apps/server/test-utils/demo-client/assets/stacktrace.log").unwrap();
+    let sample_text = std::fs::read_to_string("./stacktrace.log").unwrap();
 
     let request = &Request {
         match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
