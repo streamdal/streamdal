@@ -1,4 +1,5 @@
 import { client, meta } from "./grpc.ts";
+import { REST_TOKEN, REST_URL } from "./configs.ts";
 import { GetAllResponse } from "streamdal-protos/protos/sp_external.ts";
 import { PipelineInfo } from "streamdal-protos/protos/sp_info.ts";
 import { Audience } from "streamdal-protos/protos/sp_common.ts";
@@ -66,9 +67,9 @@ export const getFormattedSchema = async (
     const { schema } = await getSchema(audience);
     const decoded = new TextDecoder().decode(schema?.jsonSchema);
     const parsed = JSON.parse(decoded);
-    const highlighted =
-      hljs.highlight(JSON.stringify(parsed, null, 2), { language: "json" })
-        .value;
+    const highlighted = hljs.highlight(JSON.stringify(parsed, null, 2), {
+      language: "json",
+    }).value;
 
     return {
       schema: highlighted,
@@ -84,12 +85,23 @@ export const getFormattedSchema = async (
   }
 };
 
-export const getConfigs = async () => {
+const serverHttpHeaders = {
+  Authorization: `Bearer ${REST_TOKEN}`,
+};
+
+export const getConfigs = async (): Promise<any> => {
+  const url = `${REST_URL}/api/v1/config`;
   try {
-    const { response } = await client.getConfig({}, meta);
-    return response;
-  } catch (e) {
-    console.error("Error fetching configs", e);
+    const response = await fetch(url, {
+      method: "GET",
+      headers: serverHttpHeaders,
+    });
+    const body = await response.json();
+    return {
+      config: body,
+    };
+  } catch (err) {
+    console.error("Error fetching configs", err);
     return {};
   }
 };
