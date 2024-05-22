@@ -960,6 +960,27 @@ fn test_plaintext_mixed() {
 
 }
 
+#[test]
+fn test_plaintext_pipes() {
+    let sample_text = std::fs::read_to_string("./stacktrace.log").unwrap();
+
+    let request = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
+        data: &sample_text.as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
+    };
+
+    let results = crate::detective::Detective::new().matches(&request).unwrap();
+
+    assert_eq!(results.len(), 2);
+    assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "fmaghull6m@webeden.co.uk".to_string());
+    assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "fmaghull6m@webeden.co.uk".to_string());
+}
+
 #[bench]
 fn bench_plaintext(b: &mut Bencher) {
     b.iter(|| {
