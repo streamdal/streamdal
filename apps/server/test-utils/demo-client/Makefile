@@ -30,6 +30,8 @@ run/all:
 run1: description = Run signup-service
 run1:
 	rm -f ./demo-client; go build ./... && ./demo-client \
+	--output-type plaintext \
+	--output-level 3 \
 	--display-exec-time \
 	--message-rate 1 \
 	--service-name "signup-service" \
@@ -46,6 +48,8 @@ run1:
 run2: description = Run signup-service
 run2:
 	rm -f ./demo-client; go build ./... && ./demo-client \
+	--output-type plaintext \
+	--output-level 3 \
 	--display-exec-time \
 	--message-rate 1 \
 	--service-name "signup-service" \
