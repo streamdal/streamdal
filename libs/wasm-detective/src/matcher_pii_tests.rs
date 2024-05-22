@@ -962,7 +962,6 @@ fn test_plaintext_mixed() {
 
 #[test]
 fn test_plaintext_pipes() {
-    // Read data from ../../../apps/server/test-utils/demo-client/stacktrace.log
     let sample_text = std::fs::read_to_string("../../apps/server/test-utils/demo-client/assets/stacktrace.log").unwrap();
 
     let request = &Request {
