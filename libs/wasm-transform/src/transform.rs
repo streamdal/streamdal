@@ -689,12 +689,18 @@ fn _mask_plaintext(data: &str, start: i32, end: i32, mask_char: char) -> Result<
         return Err(TransformError::Generic("start character out of bounds".to_string()));
     }
 
-    let mut masked = data.to_string();
+    let contents = get_value_plaintext(data, start, end);
     let num_chars_to_mask = (0.8 * (end - start) as f64).round() as usize;
-    let end = start as usize + num_chars_to_mask;
-    masked.replace_range(start as usize..end, mask_char.to_string().repeat(num_chars_to_mask).as_str());
+    let num_chars_to_skip = contents.len() - num_chars_to_mask;
 
-    Ok(masked)
+    // mask contents with num_chars_to_mask mask_char without using a slice
+    let mut masked = String::new();
+    contents.chars().take(num_chars_to_mask).for_each(|_| masked.push(mask_char));
+    contents.chars().skip(num_chars_to_mask).take(num_chars_to_skip).for_each(|c| masked.push(c));
+
+    let result = data.replace(&contents, masked.as_str());
+
+    Ok(result)
 }
 
 fn validate_request(req: &Request, _value_check: bool) -> Result<(), TransformError> {
