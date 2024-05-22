@@ -43,8 +43,10 @@ var (
 )
 
 type GRPCAPI struct {
-	Options *Options
-	log     *logrus.Entry
+	ExternalServer protos.ExternalServer
+	InternalServer protos.InternalServer
+	Options        *Options
+	log            *logrus.Entry
 }
 
 type stackTracer interface {
@@ -74,10 +76,15 @@ func New(o *Options) (*GRPCAPI, error) {
 		return nil, errors.Wrap(err, "could not validate options")
 	}
 
-	return &GRPCAPI{
+	g := &GRPCAPI{
 		Options: o,
 		log:     logrus.WithField("pkg", "grpcapi"),
-	}, nil
+	}
+
+	g.InternalServer = g.newInternalServer()
+	g.ExternalServer = g.newExternalServer()
+
+	return g, nil
 }
 
 func (g *GRPCAPI) Run() error {
@@ -101,8 +108,8 @@ func (g *GRPCAPI) Run() error {
 		),
 	)
 
-	protos.RegisterInternalServer(grpcServer, g.newInternalServer())
-	protos.RegisterExternalServer(grpcServer, g.newExternalServer())
+	protos.RegisterInternalServer(grpcServer, g.InternalServer)
+	protos.RegisterExternalServer(grpcServer, g.ExternalServer)
 
 	reflection.Register(grpcServer)
 

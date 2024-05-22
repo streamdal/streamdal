@@ -9,6 +9,7 @@ import (
 	"github.com/cactus/go-statsd-client/v5/statsd"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"golang.org/x/crypto/ssh/terminal"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 	_ "gopkg.in/relistan/rubberneck.v1"
@@ -85,10 +86,11 @@ func main() {
 
 func run(d *deps.Dependencies) error {
 	errChan := make(chan error, 1)
+	httpAPIDepsCh := make(chan protos.ExternalServer)
 
 	// Run gRPC server
 	go func() {
-		api, err := grpcapi.New(&grpcapi.Options{
+		grpcAPI, err := grpcapi.New(&grpcapi.Options{
 			Config:          d.Config,
 			StoreService:    d.StoreService,
 			BusService:      d.BusService,
@@ -110,7 +112,18 @@ func run(d *deps.Dependencies) error {
 			return
 		}
 
-		if err := api.Run(); err != nil {
+		// Pass the external server instance to API rest server
+		select {
+		case httpAPIDepsCh <- grpcAPI.ExternalServer:
+		case <-d.ShutdownContext.Done():
+			errChan <- errors.New("detected shutdown during grpc grpcAPI setup")
+			return
+		case <-time.After(5 * time.Second):
+			errChan <- errors.New("timeout waiting for http grpcAPI to consume grpc grpcAPI")
+			return
+		}
+
+		if err := grpcAPI.Run(); err != nil {
 			errChan <- errors.Wrap(err, "error during gRPC API run")
 			return
 		}
@@ -118,7 +131,7 @@ func run(d *deps.Dependencies) error {
 
 	// Run REST server
 	go func() {
-		api, err := httpapi.New(&httpapi.Options{
+		httpAPIOptions := &httpapi.Options{
 			KVService:            d.KVService,
 			HTTPAPIListenAddress: d.Config.HTTPAPIListenAddress,
 			Version:              d.Config.GetVersion(),
@@ -126,13 +139,26 @@ func run(d *deps.Dependencies) error {
 			Health:               d.Health,
 			BusService:           d.BusService,
 			AuthToken:            d.Config.AuthToken,
-		})
+		}
+
+		select {
+		case externalServer := <-httpAPIDepsCh:
+			httpAPIOptions.ExternalServer = externalServer
+		case <-d.ShutdownContext.Done():
+			errChan <- errors.New("detected shutdown during http httpAPI setup")
+			return
+		case <-time.After(5 * time.Second):
+			errChan <- errors.New("timeout waiting for grpc httpAPI to provide external server")
+			return
+		}
+
+		httpAPI, err := httpapi.New(httpAPIOptions)
 		if err != nil {
 			errChan <- errors.Wrap(err, "error during HTTP API setup")
 			return
 		}
 
-		if err := api.Run(); err != nil {
+		if err := httpAPI.Run(); err != nil {
 			errChan <- errors.Wrap(err, "error during HTTP API run")
 		}
 	}()

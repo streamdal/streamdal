@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"gopkg.in/DataDog/dd-trace-go.v1/contrib/julienschmidt/httprouter"
 
 	"github.com/streamdal/streamdal/apps/server/services/bus"
@@ -24,6 +25,7 @@ type Options struct {
 	Health               health.IHealth
 	BusService           bus.IBus
 	AuthToken            string
+	ExternalServer       protos.ExternalServer
 }
 type HTTPAPI struct {
 	Options *Options
@@ -54,6 +56,9 @@ func (a *HTTPAPI) Run() error {
 	server := &http.Server{
 		Addr: a.Options.HTTPAPIListenAddress,
 	}
+
+	// Used by "Download config" menu item in Console
+	router.Handler("GET", "/api/v1/config", a.Auth(a.getConfigHandler))
 
 	// KV-related handlers
 	router.HandlerFunc("GET", "/api/v1/kv", a.Auth(a.getAllKVHandler))
