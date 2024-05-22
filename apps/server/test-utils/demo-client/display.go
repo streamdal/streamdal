@@ -183,7 +183,7 @@ func (r *Demo) displayPlaintext(result *Result, count int) {
 	}
 
 	// Display before/after output if output level is medium
-	if r.config.OutputLevel >= OutputLevelMedium {
+	if r.config.OutputLevel >= OutputLevelHigh {
 		r.displayDataDiffPlaintext(result)
 	}
 
