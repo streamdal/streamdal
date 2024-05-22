@@ -56,6 +56,8 @@ github.com/streamdal/streamdal/sdks/go v0.1.28 h1:iTGyAIO9l9NLgQNWubfdxlf/lPPT0d
 github.com/streamdal/streamdal/sdks/go v0.1.28/go.mod h1:Rf7Jc8I7Qtsy/wF7mvOR0a3btvdaNaJ2R/nIgMM0BRQ=
 github.com/streamdal/streamdal/sdks/go v0.1.29 h1:aoijqCoeLsEvQnfZnl0Ti6xUI89dxdgzlGt/LGtexkc=
 github.com/streamdal/streamdal/sdks/go v0.1.29/go.mod h1:xXLO9ilfy2QJd9D8WgqQu7umVqYOg+iqBueLRzrK6Tg=
+github.com/streamdal/streamdal/sdks/go v0.1.31 h1:+CGi411vwh6+uIlNwnLK4dcF3/sJtalmGNTKrwdKvLk=
+github.com/streamdal/streamdal/sdks/go v0.1.31/go.mod h1:xXLO9ilfy2QJd9D8WgqQu7umVqYOg+iqBueLRzrK6Tg=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=

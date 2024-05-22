@@ -174,6 +174,14 @@ func (r *Demo) newClient() (*streamdal.Streamdal, error) {
 		EnableStderr:    true,
 	}
 
+	if r.config.ExecutionMode == "interpreter" {
+		cfg.WazeroExecutionMode = streamdal.WazeroExecutionModeInterpreter
+	}
+
+	if r.config.ExecutionMode == "compiler" {
+		cfg.WazeroExecutionMode = streamdal.WazeroExecutionModeCompiler
+	}
+
 	if r.config.InjectLogger {
 		cfg.Logger = r.log
 	}
