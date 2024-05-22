@@ -209,6 +209,9 @@ func inferSchema(fileName string) (*protos.WASMResponse, error) {
 		audiences:    map[string]struct{}{},
 		wasmCacheMtx: &sync.RWMutex{},
 		wasmCache:    map[string][]byte{},
+		config: &Config{
+			WazeroExecutionMode: WazeroExecutionModeCompiler,
+		},
 	}
 
 	f, err := s.createFunction(req.Step)

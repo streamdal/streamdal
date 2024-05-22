@@ -65,13 +65,14 @@ var _ = Describe("Streamdal", func() {
 
 		BeforeEach(func() {
 			cfg = &Config{
-				ServiceName: "service",
-				ShutdownCtx: context.Background(),
-				ServerURL:   "http://localhost:8082",
-				ServerToken: "foo",
-				DryRun:      false,
-				StepTimeout: 0,
-				Logger:      &logger.TinyLogger{},
+				ServiceName:         "service",
+				ShutdownCtx:         context.Background(),
+				ServerURL:           "http://localhost:8082",
+				ServerToken:         "foo",
+				DryRun:              false,
+				StepTimeout:         0,
+				Logger:              &logger.TinyLogger{},
+				WazeroExecutionMode: WazeroExecutionModeCompiler,
 			}
 		})
 
@@ -254,7 +255,7 @@ var _ = Describe("Streamdal", func() {
 			Expect(len(resp.PipelineStatus)).To(Equal(0))
 		})
 
-		It("processes successfully", func() {
+		It("processes successfully in compiler mode", func() {
 			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
 			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
@@ -297,6 +298,61 @@ var _ = Describe("Streamdal", func() {
 			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
 			Expect(resp.StatusMessage).ToNot(BeNil())
 			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline:Step 1' returned true: completed detective run (no abort condition)"))
+
+			// Ensuring that pipeline status is populated (execution should've
+			// only contained one pipeline)
+			Expect(len(resp.PipelineStatus)).To(Equal(1))
+
+			// Ensuring that step status is populated (pipeline should've
+			// contained one step)
+			Expect(len(resp.PipelineStatus[0].StepStatus)).To(Equal(1))
+		})
+
+		It("processes successfully in interpreter mode", func() {
+			aud := createAudience("mysvc-interpreter", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic-interpreter")
+
+			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			Expect(err).ToNot(HaveOccurred())
+
+			pipeline := &protos.Pipeline{
+				Id:   uuid.New().String(),
+				Name: "Test Pipeline - Interpreter",
+				Steps: []*protos.PipelineStep{
+					{
+						Name:          "Step 1",
+						XWasmId:       stringPtr(uuid.New().String()),
+						XWasmBytes:    wasmData,
+						XWasmFunction: stringPtr("f"),
+						OnFalse: &protos.PipelineStepConditions{
+							Abort: protos.AbortCondition_ABORT_CONDITION_ABORT_CURRENT,
+						},
+						Step: &protos.PipelineStep_Detective{
+							Detective: &steps.DetectiveStep{
+								Path:   stringPtr("object.payload"),
+								Args:   []string{"gmail.com"},
+								Negate: boolPtr(false),
+								Type:   steps.DetectiveType_DETECTIVE_TYPE_STRING_CONTAINS_ANY,
+							},
+						},
+					},
+				},
+			}
+
+			s := createStreamdalClientFull("mysvc-interpreter", aud, pipeline)
+			s.config.WazeroExecutionMode = WazeroExecutionModeInterpreter
+
+			resp := s.Process(context.Background(), &ProcessRequest{
+				ComponentName: aud.ComponentName,
+				OperationType: OperationType(aud.OperationType),
+				OperationName: aud.OperationName,
+				Data:          []byte(`{"object":{"payload":"streamdal-interpreter@gmail.com"}`),
+			})
+
+			Expect(resp).ToNot(BeNil())
+			Expect(resp.Status).To(Equal(protos.ExecStatus_EXEC_STATUS_TRUE))
+			Expect(resp.StatusMessage).ToNot(BeNil())
+			fmt.Println("status message", *resp.StatusMessage)
+			Expect(*resp.StatusMessage).To(Equal("step 'Test Pipeline - Interpreter:Step 1' returned true: completed detective run (no abort condition)"))
 
 			// Ensuring that pipeline status is populated (execution should've
 			// only contained one pipeline)
@@ -571,11 +627,12 @@ func createStreamdalClientFull(serviceName string, aud *protos.Audience, pipelin
 		wasmCacheMtx: &sync.RWMutex{},
 		wasmCache:    map[string][]byte{},
 		config: &Config{
-			ServiceName:     serviceName,
-			Logger:          &logger.TinyLogger{},
-			StepTimeout:     time.Millisecond * 10,
-			PipelineTimeout: time.Millisecond * 100,
-			Mode:            ModeSync,
+			ServiceName:         serviceName,
+			Logger:              &logger.TinyLogger{},
+			StepTimeout:         time.Millisecond * 10,
+			PipelineTimeout:     time.Millisecond * 100,
+			Mode:                ModeSync,
+			WazeroExecutionMode: WazeroExecutionModeCompiler,
 		},
 		metrics:      &metricsfakes.FakeIMetrics{},
 		tails:        map[string]map[string]*Tail{},
@@ -613,6 +670,9 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 		wasmCache:     map[string][]byte{},
 		funcCreate:    make(map[string]*sync.Mutex),
 		funcCreateMtx: &sync.Mutex{},
+		config: &Config{
+			WazeroExecutionMode: WazeroExecutionModeCompiler,
+		},
 	}, kvClient, nil
 }
 

@@ -47,6 +47,9 @@ var _ = Describe("WASM Modules", func() {
 				audiences:    map[string]struct{}{},
 				wasmCacheMtx: &sync.RWMutex{},
 				wasmCache:    map[string][]byte{},
+				config: &Config{
+					WazeroExecutionMode: WazeroExecutionModeCompiler,
+				},
 			}
 
 			f, err = s.createFunction(req.Step)
@@ -118,6 +121,9 @@ var _ = Describe("WASM Modules", func() {
 				audiences:    map[string]struct{}{},
 				wasmCacheMtx: &sync.RWMutex{},
 				wasmCache:    map[string][]byte{},
+				config: &Config{
+					WazeroExecutionMode: WazeroExecutionModeCompiler,
+				},
 			}
 
 			f, err := s.createFunction(req.Step)
@@ -182,6 +188,9 @@ var _ = Describe("WASM Modules", func() {
 				audiences:    map[string]struct{}{},
 				wasmCacheMtx: &sync.RWMutex{},
 				wasmCache:    map[string][]byte{},
+				config: &Config{
+					WazeroExecutionMode: WazeroExecutionModeCompiler,
+				},
 			}
 
 			f, err = s.createFunction(req.Step)
@@ -277,6 +286,9 @@ var _ = Describe("WASM Modules", func() {
 				wasmCache:     map[string][]byte{},
 				funcCreate:    make(map[string]*sync.Mutex),
 				funcCreateMtx: &sync.Mutex{},
+				config: &Config{
+					WazeroExecutionMode: WazeroExecutionModeCompiler,
+				},
 			}
 
 			req = &protos.WASMRequest{
@@ -513,6 +525,9 @@ var _ = Describe("WASM Modules", func() {
 				audiences:    map[string]struct{}{},
 				wasmCacheMtx: &sync.RWMutex{},
 				wasmCache:    map[string][]byte{},
+				config: &Config{
+					WazeroExecutionMode: WazeroExecutionModeCompiler,
+				},
 			}
 
 			f, err = s.createFunction(req.Step)
@@ -599,6 +614,9 @@ var _ = Describe("WASM Modules", func() {
 				audiences:    map[string]struct{}{},
 				wasmCacheMtx: &sync.RWMutex{},
 				wasmCache:    map[string][]byte{},
+				config: &Config{
+					WazeroExecutionMode: WazeroExecutionModeCompiler,
+				},
 			}
 
 			f, err = s.createFunction(req.Step)

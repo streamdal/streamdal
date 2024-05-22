@@ -225,8 +225,18 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 		"httpRequest": s.hf.HTTPRequest,
 	}
 
-	rCfg := wazero.NewRuntimeConfig().
-		WithMemoryLimitPages(1000) // 64MB (default is 1MB)
+	var rCfg wazero.RuntimeConfig
+
+	switch s.config.WazeroExecutionMode {
+	case WazeroExecutionModeCompiler:
+		rCfg = wazero.NewRuntimeConfig().
+			WithMemoryLimitPages(1000) // (1 page = 64KB, 1000 pages = ~62MB)
+	case WazeroExecutionModeInterpreter:
+		rCfg = wazero.NewRuntimeConfigInterpreter().
+			WithMemoryLimitPages(1000)
+	default:
+		return nil, errors.New("invalid wazero execution mode")
+	}
 
 	ctx := context.Background()
 	r := wazero.NewRuntimeWithConfig(ctx, rCfg)
