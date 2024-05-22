@@ -54,6 +54,7 @@ func displayConfig(cfg *Config) {
 	if cfg.DataSourceFile != nil {
 		logrus.Infof("  data source file   : %s", cfg.DataSourceFile.Name())
 	}
+	logrus.Infof("  execution mode     : %s", cfg.ExecutionMode)
 	logrus.Infof("  output level       : %d", cfg.OutputLevel)
 	logrus.Infof("  output type        : %s", cfg.OutputType)
 	logrus.Infof("  debug              : %t", cfg.Debug)

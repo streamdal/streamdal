@@ -231,6 +231,39 @@ run/wasm-memory-debug:
 	--output-type plaintext \
 	--data-source-file ./assets/transform.log
 
+.PHONY: run/pii-interpreter
+run/pii-interpreter: description = Run in interpreter execution mode
+run/pii-interpreter:
+	rm -f ./demo-client; go build ./... && ./demo-client \
+	--output-type plaintext \
+	--execution-mode interpreter \
+	--output-level 3 \
+	--display-exec-time \
+	--message-rate 1 \
+	--service-name "signup-service" \
+	--operation-type 2 \
+	--operation-name  "recorder" \
+	--component-name "kafka" \
+	--data-source-type file \
+	--data-source-file ./assets/sample.json
+
+.PHONY: run/pii-compiler
+run/pii-compiler: description = Run in compiler mode
+run/pii-compiler:
+	rm -f ./demo-client; go build ./... && ./demo-client \
+	--output-type plaintext \
+	--execution-mode compiler \
+	--output-level 3 \
+	--display-exec-time \
+	--message-rate 1 \
+	--service-name "signup-service" \
+	--operation-type 2 \
+	--operation-name  "recorder" \
+	--component-name "kafka" \
+	--data-source-type file \
+	--data-source-file ./assets/sample.json
+
+
 ### Build
 
 .PHONY: build

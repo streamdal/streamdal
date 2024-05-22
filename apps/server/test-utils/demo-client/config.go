@@ -32,6 +32,7 @@ type Config struct {
 	DisableColor        bool     `kong:"help='Disable color output',default='false'"`
 	InjectLogger        bool     `kong:"help='Inject logger into SDK',default='false'"`
 	UniqueOperationName bool     `kong:"help='Use unique operation name for each instance (adds -$i suffix)',default='false'"`
+	ExecutionMode       string   `kong:"help='Execution mode (options: compiler, interpreter)',enum='compiler,interpreter',default='compiler'"`
 	Debug               bool     `kong:"help='Enable debug log output',short='d'"`
 
 	// Internal bits
