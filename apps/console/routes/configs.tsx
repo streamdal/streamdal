@@ -8,10 +8,18 @@ const cleanObject = (obj: any): any => {
   if (_.isArray(obj)) {
     return _.compact(obj.map(cleanObject)).filter((o) => !_.isEmpty(o));
   } else if (_.isObject(obj)) {
-    return _.omitBy(
+    const cleanedObject = _.omitBy(
       _.mapValues(_.omit(obj, keysToRemove), cleanObject),
       (value) => _.isEmpty(value) && !_.isNumber(value),
     );
+
+    _.forOwn(cleanedObject, (value, key) => {
+      if (value === 0) {
+        delete cleanedObject[key];
+      }
+    });
+
+    return cleanedObject;
   }
   return obj;
 };
@@ -19,7 +27,6 @@ const cleanObject = (obj: any): any => {
 export const handler: Handlers = {
   async GET() {
     const { config = {} } = await getConfigs();
-
     const cleanedConfig = cleanObject(config);
     return new Response(
       JSON.stringify(cleanedConfig, undefined, 2),
