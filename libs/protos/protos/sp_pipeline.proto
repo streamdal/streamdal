@@ -163,6 +163,8 @@ message PipelineStep {
 
   // Set by server
   optional string _wasm_function = 10002; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+
+  bool wasm_precompiled = 10003; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 
 // PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is

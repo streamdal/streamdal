@@ -456,6 +456,8 @@ class PipelineStep(betterproto.Message):
     )
     """Set by server"""
 
+    wasm_precompiled: bool = betterproto.bool_field(10003)
+
 
 @dataclass(eq=False, repr=False)
 class PipelineConfigs(betterproto.Message):

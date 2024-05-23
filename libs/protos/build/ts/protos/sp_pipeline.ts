@@ -311,6 +311,10 @@ export interface PipelineStep {
      * @generated from protobuf field: optional string _wasm_function = 10002;
      */
     WasmFunction?: string; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
+    /**
+     * @generated from protobuf field: bool wasm_precompiled = 10003;
+     */
+    wasmPrecompiled: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 }
 /**
  * PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is
@@ -687,11 +691,12 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
             { no: 1009, name: "schema_validation", kind: "message", oneof: "step", T: () => SchemaValidationStep },
             { no: 10000, name: "_wasm_id", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 10001, name: "_wasm_bytes", kind: "scalar", opt: true, T: 12 /*ScalarType.BYTES*/ },
-            { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ }
+            { no: 10002, name: "_wasm_function", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
+            { no: 10003, name: "wasm_precompiled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value?: PartialMessage<PipelineStep>): PipelineStep {
-        const message = { name: "", dynamic: false, step: { oneofKind: undefined } };
+        const message = { name: "", dynamic: false, step: { oneofKind: undefined }, wasmPrecompiled: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<PipelineStep>(this, message, value);
@@ -786,6 +791,9 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
                 case /* optional string _wasm_function */ 10002:
                     message.WasmFunction = reader.string();
                     break;
+                case /* bool wasm_precompiled */ 10003:
+                    message.wasmPrecompiled = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -852,6 +860,9 @@ class PipelineStep$Type extends MessageType<PipelineStep> {
         /* optional string _wasm_function = 10002; */
         if (message.WasmFunction !== undefined)
             writer.tag(10002, WireType.LengthDelimited).string(message.WasmFunction);
+        /* bool wasm_precompiled = 10003; */
+        if (message.wasmPrecompiled !== false)
+            writer.tag(10003, WireType.Varint).bool(message.wasmPrecompiled);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

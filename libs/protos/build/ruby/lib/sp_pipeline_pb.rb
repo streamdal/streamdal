@@ -57,6 +57,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       proto3_optional :_wasm_id, :string, 10000
       proto3_optional :_wasm_bytes, :bytes, 10001
       proto3_optional :_wasm_function, :string, 10002
+      optional :wasm_precompiled, :bool, 10003
       oneof :step do
         optional :detective, :message, 1000, "protos.steps.DetectiveStep"
         optional :transform, :message, 1001, "protos.steps.TransformStep"

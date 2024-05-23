@@ -296,6 +296,10 @@ export interface PipelineStep {
      * @generated from protobuf field: optional string _wasm_function = 10002;
      */
     WasmFunction?: string;
+    /**
+     * @generated from protobuf field: bool wasm_precompiled = 10003;
+     */
+    wasmPrecompiled: boolean;
 }
 /**
  * PipelineConfigs is stored encoded in redis:streamdal_audience:$audStr; it is
