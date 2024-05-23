@@ -23,8 +23,6 @@ RUN sh ./download-wasm.sh
 # Switch back to root dir
 WORKDIR /
 
-RUN curl https://wazero.io/install.sh | sh
-
 # Build the application
 RUN make build/$TARGETOS-$TARGETARCH
 
@@ -35,6 +33,9 @@ ARG TARGETOS
 
 # SSL and quality-of-life tools
 RUN apk --update add bash curl ca-certificates && update-ca-certificates
+
+# Install wazero binary for precompiling .wasm files
+RUN curl https://wazero.io/install.sh | sh
 
 # Copy bin & WASM
 COPY --from=builder /build/server-$TARGETOS-$TARGETARCH /streamdal-server
