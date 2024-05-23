@@ -218,7 +218,7 @@ export const SIDEBAR: Sidebar = {
             link: "en/data-governance/data-quality"
           },
           {
-            text: "Governance for Compliance",
+            text: "Data Law",
             children: [
               {
                 text: "CCPA",
