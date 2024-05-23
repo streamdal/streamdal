@@ -276,6 +276,22 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 		return nil, errors.Wrap(err, "failed to instantiate module")
 	}
 
+	if step.WasmPrecompiled {
+		println("------------ USING PRECOMPILED WASM")
+		compiled, err := r.CompileModule(ctx, wasmBytes)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to compile wasm module")
+		}
+
+		mod, err := r.InstantiateModule(ctx, compiled, cfg)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to instantiate pre-compiled wasm module")
+		}
+
+		return mod, nil
+	}
+
+	// Not pre-compiled
 	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to instantiate wasm module")

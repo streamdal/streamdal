@@ -23,6 +23,8 @@ RUN sh ./download-wasm.sh
 # Switch back to root dir
 WORKDIR /
 
+RUN curl https://wazero.io/install.sh | sh
+
 # Build the application
 RUN make build/$TARGETOS-$TARGETARCH
 
