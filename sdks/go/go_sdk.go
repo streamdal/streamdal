@@ -414,7 +414,7 @@ func New(cfg *Config) (*Streamdal, error) {
 	}
 
 	// Prepare a cache directory.
-	cacheDir, err := os.MkdirTemp("", "example")
+	cacheDir, err := os.MkdirTemp("./tmp", "example")
 	if err != nil {
 		s.config.Logger.Error(err)
 	}
