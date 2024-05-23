@@ -286,8 +286,6 @@ func (s *Streamdal) setPipelines(_ context.Context, cmd *protos.Command) error {
 				return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
 			}
 
-			fmt.Printf("precompiled map: %#v\n\n", wasmData.Precompiled)
-
 			// Get pre-compiled data for this arch
 			archStr := "wazero-1.7.2-arm64-darwin" // TODO: compute this
 			compiledData, ok := wasmData.Precompiled[archStr]
