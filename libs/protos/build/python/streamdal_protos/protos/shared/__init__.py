@@ -4,7 +4,10 @@
 # This file has been @generated
 import builtins
 from dataclasses import dataclass
-from typing import Optional
+from typing import (
+    Dict,
+    Optional,
+)
 
 import betterproto
 
@@ -57,6 +60,11 @@ class WasmModule(betterproto.Message):
     Indicates whether this wasm entry is for bundled wasm or for wasm added via
     CreateWasm(); ignored in CreateWasm() and UpdateWasm().
     """
+
+    precompiled: Dict[str, bytes] = betterproto.map_field(
+        7, betterproto.TYPE_STRING, betterproto.TYPE_BYTES
+    )
+    """Key = $OS_$ARCH_$WAZERO_VERSION, Value = precompiled bytes"""
 
     description: Optional[str] = betterproto.string_field(
         101, optional=True, group="_description"

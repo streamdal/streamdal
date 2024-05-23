@@ -45,10 +45,15 @@ message WasmModule {
   // CreateWasm(); ignored in CreateWasm() and UpdateWasm().
   bool _bundled = 6; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
 
+  // Key = $OS_$ARCH_$WAZERO_VERSION, Value = precompiled bytes
+  map<string,bytes> precompiled = 7;
+
   // Informative, debug fields
   optional string description = 101;
   optional string version = 102;
   optional string url = 103;
+
+
 
   // Set by server
   optional int64 _created_at_unix_ts_ns_utc = 1000; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE

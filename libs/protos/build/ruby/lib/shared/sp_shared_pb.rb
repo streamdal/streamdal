@@ -12,6 +12,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :name, :string, 4
       optional :_filename, :string, 5
       optional :_bundled, :bool, 6
+      map :precompiled, :string, :bytes, 7
       proto3_optional :description, :string, 101
       proto3_optional :version, :string, 102
       proto3_optional :url, :string, 103

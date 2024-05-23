@@ -51,6 +51,14 @@ export interface WasmModule {
      */
     Bundled: boolean;
     /**
+     * Key = $OS_$ARCH_$WAZERO_VERSION, Value = precompiled bytes
+     *
+     * @generated from protobuf field: map<string, bytes> precompiled = 7;
+     */
+    precompiled: {
+        [key: string]: Uint8Array;
+    };
+    /**
      * Informative, debug fields
      *
      * @generated from protobuf field: optional string description = 101;
@@ -126,6 +134,7 @@ declare class WasmModule$Type extends MessageType<WasmModule> {
     constructor();
     create(value?: PartialMessage<WasmModule>): WasmModule;
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: WasmModule): WasmModule;
+    private binaryReadMap7;
     internalBinaryWrite(message: WasmModule, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**

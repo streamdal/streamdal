@@ -58,6 +58,14 @@ export interface WasmModule {
      */
     Bundled: boolean; // protolint:disable:this FIELD_NAMES_LOWER_SNAKE_CASE
     /**
+     * Key = $OS_$ARCH_$WAZERO_VERSION, Value = precompiled bytes
+     *
+     * @generated from protobuf field: map<string, bytes> precompiled = 7;
+     */
+    precompiled: {
+        [key: string]: Uint8Array;
+    };
+    /**
      * Informative, debug fields
      *
      * @generated from protobuf field: optional string description = 101;
@@ -139,6 +147,7 @@ class WasmModule$Type extends MessageType<WasmModule> {
             { no: 4, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "_filename", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 6, name: "_bundled", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "precompiled", kind: "map", K: 9 /*ScalarType.STRING*/, V: { kind: "scalar", T: 12 /*ScalarType.BYTES*/ } },
             { no: 101, name: "description", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 102, name: "version", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
             { no: 103, name: "url", kind: "scalar", opt: true, T: 9 /*ScalarType.STRING*/ },
@@ -148,7 +157,7 @@ class WasmModule$Type extends MessageType<WasmModule> {
         ]);
     }
     create(value?: PartialMessage<WasmModule>): WasmModule {
-        const message = { id: "", bytes: new Uint8Array(0), function: "", name: "", Filename: "", Bundled: false };
+        const message = { id: "", bytes: new Uint8Array(0), function: "", name: "", Filename: "", Bundled: false, precompiled: {} };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<WasmModule>(this, message, value);
@@ -176,6 +185,9 @@ class WasmModule$Type extends MessageType<WasmModule> {
                     break;
                 case /* bool _bundled */ 6:
                     message.Bundled = reader.bool();
+                    break;
+                case /* map<string, bytes> precompiled */ 7:
+                    this.binaryReadMap7(message.precompiled, reader, options);
                     break;
                 case /* optional string description */ 101:
                     message.description = reader.string();
@@ -206,6 +218,22 @@ class WasmModule$Type extends MessageType<WasmModule> {
         }
         return message;
     }
+    private binaryReadMap7(map: WasmModule["precompiled"], reader: IBinaryReader, options: BinaryReadOptions): void {
+        let len = reader.uint32(), end = reader.pos + len, key: keyof WasmModule["precompiled"] | undefined, val: WasmModule["precompiled"][any] | undefined;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.string();
+                    break;
+                case 2:
+                    val = reader.bytes();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field protos.shared.WasmModule.precompiled");
+            }
+        }
+        map[key ?? ""] = val ?? new Uint8Array(0);
+    }
     internalBinaryWrite(message: WasmModule, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string id = 1; */
         if (message.id !== "")
@@ -225,6 +253,9 @@ class WasmModule$Type extends MessageType<WasmModule> {
         /* bool _bundled = 6; */
         if (message.Bundled !== false)
             writer.tag(6, WireType.Varint).bool(message.Bundled);
+        /* map<string, bytes> precompiled = 7; */
+        for (let k of Object.keys(message.precompiled))
+            writer.tag(7, WireType.LengthDelimited).fork().tag(1, WireType.LengthDelimited).string(k).tag(2, WireType.LengthDelimited).bytes(message.precompiled[k]).join();
         /* optional string description = 101; */
         if (message.description !== undefined)
             writer.tag(101, WireType.LengthDelimited).string(message.description);
