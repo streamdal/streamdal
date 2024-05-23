@@ -279,12 +279,12 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 	if step.WasmPrecompiled {
 		println("------------ USING PRECOMPILED WASM")
 		println("headers bytes should say WAZEVO1.7.2: ", string(wasmBytes[:20]))
-		//compiled, err := r.CompileModule(ctx, wasmBytes)
-		//if err != nil {
-		//	return nil, errors.Wrap(err, "failed to compile wasm module")
-		//}
+		compiled, err := r.CompileModule(ctx, wasmBytes)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to compile wasm module")
+		}
 
-		mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
+		mod, err := r.InstantiateModule(ctx, compiled, cfg)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to instantiate pre-compiled wasm module")
 		}
