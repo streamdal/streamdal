@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240523191325-0d15d7d18201
-	github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240523204224-bf92d703dde1
+	github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240523213736-157ca97ea5f8
 )
 
 require (
