@@ -28,6 +28,8 @@ services:
       - STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN=1234
       - STREAMDAL_CONSOLE_PORT=8080
       - STREAMDAL_CONSOLE_PRODUCTION=true
+      - STREAMDAL_SERVER_REST_URL=http://streamdal-server:8081
+      - STREAMDAL_SERVER_REST_AUTH=1234
     ports:
       - "8080:8080"
     networks:
