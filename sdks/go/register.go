@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
@@ -283,6 +284,15 @@ func (s *Streamdal) setPipelines(_ context.Context, cmd *protos.Command) error {
 			wasmData, ok := cmd.GetSetPipelines().WasmModules[step.GetXWasmId()]
 			if !ok {
 				return errors.Errorf("BUG: unable to find WASM data for step '%s'", step.Name)
+			}
+
+			// Get pre-compiled data for this arch
+			archStr := "wazero-1.7.2-arm64-darwin" // TODO: compute this
+			compiledData, ok := wasmData.Precompiled[archStr]
+			if ok {
+				step.WasmPrecompiled = true
+				step.XWasmBytes = compiledData
+				continue
 			}
 
 			step.XWasmBytes = wasmData.Bytes
