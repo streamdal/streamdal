@@ -230,9 +230,11 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 	switch s.config.WazeroExecutionMode {
 	case WazeroExecutionModeCompiler:
 		rCfg = wazero.NewRuntimeConfig().
+			WithCompilationCache(s.CompilationCache).
 			WithMemoryLimitPages(1000) // (1 page = 64KB, 1000 pages = ~62MB)
 	case WazeroExecutionModeInterpreter:
 		rCfg = wazero.NewRuntimeConfigInterpreter().
+			WithCompilationCache(s.CompilationCache).
 			WithMemoryLimitPages(1000)
 	default:
 		return nil, errors.New("invalid wazero execution mode")
@@ -271,6 +273,13 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 			WithFunc(fn).
 			Export(name)
 	}
+	//
+	//compiled, err := builder.Compile(ctx)
+	//if err != nil {
+	//	return nil, errors.Wrap(err, "failed to compile module")
+	//}
+	//
+	//compiled.
 
 	if _, err := builder.Instantiate(ctx); err != nil {
 		return nil, errors.Wrap(err, "failed to instantiate module")

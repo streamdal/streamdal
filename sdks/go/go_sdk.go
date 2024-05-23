@@ -17,10 +17,13 @@ package streamdal
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/tetratelabs/wazero"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -186,6 +189,8 @@ type Streamdal struct {
 	// Set to true when .Close() is called; used to prevent calling .Process()
 	// when library instance is stopped.
 	closed bool
+
+	CompilationCache wazero.CompilationCache
 }
 
 type Config struct {
@@ -407,6 +412,21 @@ func New(cfg *Config) (*Streamdal, error) {
 		interval := time.Duration(cfg.SamplingIntervalSeconds/cfg.SamplingRate) * time.Second
 		s.limiter = rate.NewLimiter(rate.Every(interval), cfg.SamplingRate)
 	}
+
+	// Prepare a cache directory.
+	cacheDir, err := os.MkdirTemp("", "example")
+	if err != nil {
+		s.config.Logger.Error(err)
+	}
+
+	// Initializes the new compilation cache with the cache directory.
+	// This allows the compilation caches to be shared even across multiple OS processes.
+	cache, err := wazero.NewCompilationCacheWithDir(cacheDir)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	s.CompilationCache = cache
 
 	if err := s.pullInitialPipelines(cfg.ShutdownCtx); err != nil {
 		return nil, err
