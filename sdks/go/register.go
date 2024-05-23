@@ -296,6 +296,7 @@ func (s *Streamdal) setPipelines(_ context.Context, cmd *protos.Command) error {
 				continue
 			}
 
+			println("SETTING NON-PRECOMPILED WASM")
 			step.XWasmBytes = wasmData.Bytes
 		}
 	}
