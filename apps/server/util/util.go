@@ -155,12 +155,17 @@ func GenerateWasmMapping(commands ...*protos.Command) map[string]*shared.WasmMod
 				}
 
 				// Precompile the WASM data for SDK efficiency
-				println("\n\nprecompiling wasm for " + step.Name)
-				println("First 20 bytes: ", string(step.GetXWasmBytes()[:20]))
 				precompiled, err := PrecompileWasm(step.GetXWasmBytes())
 				if err != nil {
-					// TODO: this func should return an error?
-					logrus.Fatalf("unable to precompile wasm: %v", err)
+					logrus.Errorf("unable to precompile wasm for step '%s': %s", step.Name, err)
+					wasmModules[step.GetXWasmId()] = &shared.WasmModule{
+						Id:          step.GetXWasmId(),
+						Bytes:       step.GetXWasmBytes(),
+						Function:    step.GetXWasmFunction(),
+						Precompiled: map[string][]byte{},
+					}
+					step.XWasmBytes = nil
+					continue
 				}
 
 				wasmModules[step.GetXWasmId()] = &shared.WasmModule{
