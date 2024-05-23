@@ -175,7 +175,8 @@ run/async-sampling:
 .PHONY: run/plaintext
 run/plaintext: description = Plaintext Logs
 run/plaintext:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	docker run --platform linux/arm64 --network server_streamdal-network demo-client:marktest \
+	--server-address "streamdal-server:8082" \
 	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
@@ -183,7 +184,10 @@ run/plaintext:
 	--component-name "plaintext-logger" \
 	--display-exec-time \
 	--data-source-type file \
-	--data-source-file ./assets/plaintext-logs.txt
+	--data-source-file ./assets/plaintext-logs.txt \
+	--output-level 2 \
+	--output-type plaintext \
+	--debug
 
 .PHONY: run/plaintext2
 run/plaintext2: description = Plaintext Logs
