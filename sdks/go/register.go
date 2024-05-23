@@ -290,6 +290,7 @@ func (s *Streamdal) setPipelines(_ context.Context, cmd *protos.Command) error {
 			archStr := "wazero-1.7.2-arm64-darwin" // TODO: compute this
 			compiledData, ok := wasmData.Precompiled[archStr]
 			if ok {
+				println("SETTING PRECOMPILED WASM")
 				step.WasmPrecompiled = true
 				step.XWasmBytes = compiledData
 				continue
