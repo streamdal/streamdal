@@ -419,6 +419,8 @@ func New(cfg *Config) (*Streamdal, error) {
 		s.config.Logger.Error(err)
 	}
 
+	println("CACHE DIR: ", cacheDir)
+
 	// Initializes the new compilation cache with the cache directory.
 	// This allows the compilation caches to be shared even across multiple OS processes.
 	cache, err := wazero.NewCompilationCacheWithDir(cacheDir)
