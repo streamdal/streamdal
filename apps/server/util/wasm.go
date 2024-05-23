@@ -56,9 +56,9 @@ func PrecompileWasm(wasmData []byte) (map[string][]byte, error) {
 			return nil, errors.Wrap(err, "unable to read compiled wasm")
 		}
 
-		// match is this format ./wazero-1.7.2-arm64-darwin/f075f2716ee05741e581b6e3baaf4bdfc636282384c3083e73e2e74736e04d30
+		// match is this format /tmp/wazero-1.7.2-arm64-darwin/f075f2716ee05741e581b6e3baaf4bdfc636282384c3083e73e2e74736e04d30
 		// Need to parse out the directory name and the file name
-		fp := filepath.Base(match)
+		fp := filepath.Base(filepath.Dir(match))
 		precompiled[fp] = data
 
 		return precompiled, nil
