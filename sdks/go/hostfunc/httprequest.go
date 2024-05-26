@@ -118,6 +118,7 @@ func getRequestBodyForMode(request *protos.WASMRequest) (io.Reader, error) {
 	return nil, nil
 }
 
+// httpRequestResponse is a helper for HostFuncHTTPRequest()
 func httpRequestResponse(caller *wasmtime.Caller, code int, body string, headers map[string]string) int64 {
 	if headers == nil {
 		headers = make(map[string]string)
