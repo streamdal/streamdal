@@ -38,7 +38,7 @@ func ReadRequestFromMemory(caller *wasmtime.Caller, msg proto.Message, ptr, leng
 	data := memBytes[ptr : ptr+length]
 
 	if err := proto.Unmarshal(data, msg); err != nil {
-		return errors.Wrap(err, "unable to unmarshal HTTPRequest")
+		return errors.Wrap(err, "unable to unmarshal HttpRequest")
 	}
 
 	return nil
