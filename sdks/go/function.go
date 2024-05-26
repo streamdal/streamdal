@@ -3,76 +3,87 @@ package streamdal
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 	"sync"
 
+	"github.com/bytecodealliance/wasmtime-go"
 	"github.com/pkg/errors"
-	"github.com/tetratelabs/wazero"
-	"github.com/tetratelabs/wazero/api"
-	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 )
 
 type function struct {
 	ID      string
-	Inst    api.Module
-	entry   api.Function
-	alloc   api.Function
-	dealloc api.Function
+	Inst    *wasmtime.Instance
+	entry   *wasmtime.Func
+	alloc   *wasmtime.Func
+	dealloc *wasmtime.Func
+	memory  *wasmtime.Memory
 	mtx     *sync.Mutex
+	store   *wasmtime.Store
 }
 
-func (f *function) Exec(ctx context.Context, req []byte) ([]byte, error) {
-	ptrLen := uint64(len(req))
+func (f *function) Exec(_ context.Context, req []byte) ([]byte, error) {
+	ptrLen := int32(len(req))
 
-	inputPtr, err := f.alloc.Call(ctx, ptrLen)
+	inputPtr, err := f.alloc.Call(f.store, ptrLen)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to allocate memory")
 	}
 
-	if len(inputPtr) == 0 {
+	inputPtr32, ok := inputPtr.(int32)
+	if !ok {
+		return nil, errors.New("unable to type-assert alloc() result")
+	}
+
+	if inputPtr32 == 0 {
 		return nil, errors.New("unable to allocate memory")
 	}
 
-	ptrVal := inputPtr[0]
+	ptrVal := inputPtr32
 
-	if !f.Inst.Memory().Write(uint32(ptrVal), req) {
-		return nil, fmt.Errorf("Memory.Write(%d, %d) out of range of memory size %d",
-			ptrVal, len(req), f.Inst.Memory().Size())
+	// Write memory to wasmtime
+	memBytes := f.memory.UnsafeData(f.store)
+	if len(memBytes) < int(ptrLen) {
+		return nil, errors.New("payload length is greater than memory size")
 	}
 
-	result, err := f.entry.Call(ctx, ptrVal, ptrLen)
+	copy(memBytes[ptrVal:], req)
+
+	result, err := f.entry.Call(f.store, ptrVal, ptrLen)
 	if err != nil {
 		// Clear mem on error
-		if _, err := f.dealloc.Call(ctx, ptrVal, ptrLen); err != nil {
-			return nil, errors.Wrap(err, "unable to deallocate memory")
+		if _, err := f.dealloc.Call(f.store, ptrVal, ptrLen); err != nil {
+			return nil, errors.Wrap(err, "unable to deallocate result memory")
 		}
 		return nil, errors.Wrap(err, "error during func call")
 	}
 
-	resultPtr := uint32(result[0] >> 32)
-	resultSize := uint32(result[0])
+	result64, ok := result.(int64)
+	if !ok {
+		return nil, errors.New("unable to typecast result")
+	}
+
+	resultPtr := uint32(result64 >> 32)
+	resultSize := uint32(result64)
 
 	// Dealloc request memory
-	if _, err := f.dealloc.Call(ctx, ptrVal, ptrLen); err != nil {
-		return nil, errors.Wrap(err, "unable to deallocate memory")
+	if _, err := f.dealloc.Call(f.store, ptrVal, ptrLen); err != nil {
+		return nil, errors.Wrap(err, "unable to deallocate request memory")
 	}
 
 	// Read memory starting from result ptr
 	resBytes, err := f.readMemory(resultPtr, resultSize)
 	if err != nil {
 		// Dealloc response memory
-		if _, err := f.dealloc.Call(ctx, uint64(resultPtr), uint64(resultSize)); err != nil {
-			return nil, errors.Wrap(err, "unable to deallocate memory")
+		if _, err := f.dealloc.Call(f.store, int32(resultPtr), int32(resultSize)); err != nil {
+			return nil, errors.Wrap(err, "unable to deallocate result memory")
 		}
 		return nil, errors.Wrap(err, "unable to read memory")
 	}
 
-	// Dealloc response memory
-	if _, err := f.dealloc.Call(ctx, uint64(resultPtr), uint64(resultSize)); err != nil {
-		return nil, errors.Wrap(err, "unable to deallocate memory")
+	// Dealloc result memory
+	if _, err := f.dealloc.Call(f.store, int32(resultPtr), int32(resultSize)); err != nil {
+		return nil, errors.Wrap(err, "unable to deallocate result memory")
 	}
 
 	return resBytes, nil
@@ -137,7 +148,7 @@ func (s *Streamdal) getFunctionFromCache(wasmID string, workerID int) (*function
 	wasmIDMtx := s.getLockForWasmID(wasmID)
 
 	// If this blocks, it is because createFunction() is in the process of
-	// creating a function. Once it complete, the lock will be released and
+	// creating a function. Once it is complete, the lock will be released and
 	// our cache lookup will succeed.
 	wasmIDMtx.Lock()
 	wasmIDMtx.Unlock()
@@ -151,40 +162,6 @@ func (s *Streamdal) getFunctionFromCache(wasmID string, workerID int) (*function
 
 	f, ok := s.functions[workerID][wasmID]
 	return f, ok
-}
-
-func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error) {
-	inst, err := s.createWASMInstance(step)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to create WASM instance")
-	}
-
-	// This is the actual function we'll be executing
-	f := inst.ExportedFunction(step.GetXWasmFunction())
-	if f == nil {
-		return nil, fmt.Errorf("unable to get exported function '%s'", step.GetXWasmFunction())
-	}
-
-	// alloc allows us to pre-allocate memory in order to pass data to the WASM module
-	alloc := inst.ExportedFunction("alloc")
-	if alloc == nil {
-		return nil, errors.New("unable to get alloc func")
-	}
-
-	// dealloc allows us to free memory passed to the wasm module after we're done with it
-	dealloc := inst.ExportedFunction("dealloc")
-	if dealloc == nil {
-		return nil, errors.New("unable to get dealloc func")
-	}
-
-	return &function{
-		ID:      step.GetXWasmId(),
-		Inst:    inst,
-		entry:   f,
-		alloc:   alloc,
-		dealloc: dealloc,
-		mtx:     &sync.Mutex{},
-	}, nil
 }
 
 func (s *Streamdal) getWasmBytesCache(funcID string) ([]byte, bool) {
@@ -202,9 +179,9 @@ func (s *Streamdal) setWasmBytesCache(funcID string, wb []byte) {
 	s.wasmCache[funcID] = wb
 }
 
-func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, error) {
+func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error) {
 	// We need to cache wasm bytes so that we can instantiate the module
-	// When running in async mode, createWASMInstance will be hit multiple times, but we need to wipe the wasmBytes
+	// When running in async mode, createWASMInstanceWasmtime will be hit multiple times, but we need to wipe the wasmBytes
 	// from the pipeline step after the first run, so that we don't hold multiple MB of duplicate data in memory
 	wasmBytes, ok := s.getWasmBytesCache(step.GetXWasmId())
 	if !ok {
@@ -220,76 +197,95 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 		wasmBytes = stepWasmBytes
 	}
 
-	hostFuncs := map[string]func(_ context.Context, module api.Module, ptr, length int32) uint64{
+	hostFuncs := map[string]func(caller *wasmtime.Caller, ptr, length int32) int64{
 		"kvExists":    s.hf.KVExists,
 		"httpRequest": s.hf.HTTPRequest,
 	}
 
-	var rCfg wazero.RuntimeConfig
+	config := wasmtime.NewConfig()
+	config.SetEpochInterruption(true)
+	engine := wasmtime.NewEngineWithConfig(config)
 
-	switch s.config.WazeroExecutionMode {
-	case WazeroExecutionModeCompiler:
-		rCfg = wazero.NewRuntimeConfig().
-			WithMemoryLimitPages(1000) // (1 page = 64KB, 1000 pages = ~62MB)
-	case WazeroExecutionModeInterpreter:
-		rCfg = wazero.NewRuntimeConfigInterpreter().
-			WithMemoryLimitPages(1000)
-	default:
-		return nil, errors.New("invalid wazero execution mode")
-	}
-
-	ctx := context.Background()
-	r := wazero.NewRuntimeWithConfig(ctx, rCfg)
-
-	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-
-	stdoutOutput := io.Discard
-	stderrOutput := io.Discard
-
-	if s.config != nil && s.config.EnableStdout {
-		stdoutOutput = os.Stdout
-	}
-
-	if s.config != nil && s.config.EnableStderr {
-		stderrOutput = os.Stderr
-	}
-
-	cfg := wazero.NewModuleConfig().
-		WithStderr(stderrOutput).
-		WithStdout(stdoutOutput).
-		WithSysNanotime().
-		WithSysNanosleep().
-		WithSysWalltime().
-		WithStartFunctions("") // We don't need _start() to be called for our purposes
-
-	builder := r.NewHostModuleBuilder("env")
-
-	// This is how multiple host funcs are exported:
-	// https://github.com/tetratelabs/wazero/blob/b7e8191cceb83c7335d6b8922b40b957475beecf/examples/import-go/age-calculator.go#L41
-	for name, fn := range hostFuncs {
-		builder = builder.NewFunctionBuilder().
-			WithFunc(fn).
-			Export(name)
-	}
-
-	if _, err := builder.Instantiate(ctx); err != nil {
-		return nil, errors.Wrap(err, "failed to instantiate module")
-	}
-
-	mod, err := r.InstantiateWithConfig(ctx, wasmBytes, cfg)
+	module, err := wasmtime.NewModule(engine, wasmBytes)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to instantiate wasm module")
+		return nil, errors.Wrap(err, "unable to compile WASM module")
 	}
 
-	return mod, nil
+	linker := wasmtime.NewLinker(engine)
+
+	if err := linker.DefineWasi(); err != nil {
+		return nil, errors.Wrap(err, "unable to define WASI")
+	}
+
+	store := wasmtime.NewStore(engine)
+
+	// TODO: this is how wasmtime controls execution timeouts
+	// TODO: is it possible to do this in a way that doesn't require a global setting?
+	store.SetEpochDeadline(60)
+
+	for name, fn := range hostFuncs {
+		if err := linker.DefineFunc(store, "env", name, fn); err != nil {
+			return nil, errors.Wrapf(err, "unable to define host function '%s'", name)
+		}
+	}
+
+	wasiConfig := wasmtime.NewWasiConfig()
+
+	store.SetWasi(wasiConfig)
+
+	inst, err := linker.Instantiate(store, module)
+	if err != nil {
+		panic("unable to instantiate module" + err.Error())
+	}
+
+	// alloc allows us to pre-allocate memory in order to pass data to the WASM module
+	alloc := inst.GetExport(store, "alloc").Func()
+	if alloc == nil {
+		return nil, errors.New("unable to get alloc func")
+	}
+
+	// dealloc allows us to free memory passed to the wasm module after we're done with it
+	dealloc := inst.GetExport(store, "dealloc").Func()
+	if dealloc == nil {
+		return nil, errors.New("unable to get dealloc func")
+	}
+
+	mem := inst.GetExport(store, "memory").Memory()
+	if mem == nil {
+		return nil, errors.New("unable to get memory")
+
+	}
+
+	// This is the actual function we'll be executing
+	f := inst.GetExport(store, step.GetXWasmFunction()).Func()
+	if f == nil {
+		return nil, fmt.Errorf("unable to get exported function '%s'", step.GetXWasmFunction())
+	}
+
+	return &function{
+		ID:      step.GetXWasmId(),
+		Inst:    inst,
+		entry:   f,
+		alloc:   alloc,
+		dealloc: dealloc,
+		memory:  mem,
+		store:   store,
+		mtx:     &sync.Mutex{},
+	}, nil
 }
 
 func (f *function) readMemory(ptr, length uint32) ([]byte, error) {
-	mem, ok := f.Inst.Memory().Read(ptr, length)
-	if !ok {
-		return nil, fmt.Errorf("unable to read memory at '%d' with length '%d'", ptr, length)
+	if length == 0 {
+		return nil, errors.New("must read at least 1 byte of memory")
+	}
+	if ptr < 0 || length < 0 {
+		return nil, errors.New("ptr and length must be positive")
 	}
 
-	return mem, nil
+	memBytes := f.memory.UnsafeData(f.store)
+	if length > uint32(len(memBytes)) {
+		return nil, errors.New("length is greater than memory size")
+	}
 
+	return memBytes[ptr : ptr+length], nil
 }

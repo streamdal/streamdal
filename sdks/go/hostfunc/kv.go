@@ -1,28 +1,26 @@
 package hostfunc
 
 import (
-	"context"
 	"fmt"
 
+	"github.com/bytecodealliance/wasmtime-go"
 	"github.com/pkg/errors"
-	"github.com/tetratelabs/wazero/api"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
-
 	"github.com/streamdal/streamdal/sdks/go/helper"
 )
 
 // KVExists is function that is exported to and called from a Rust WASM module
-func (h *HostFunc) KVExists(_ context.Context, module api.Module, ptr, length int32) uint64 {
+func (h *HostFunc) KVExists(caller *wasmtime.Caller, ptr, length int32) int64 {
 	// Read request
 	request := &steps.KVStep{}
 
-	if err := helper.ReadRequestFromMemory(module, request, ptr, length); err != nil {
-		return kvExistsResponse(module, "unable to read KVExistsRequest params: "+err.Error(), true, false)
+	if err := helper.ReadRequestFromMemory(caller, request, ptr, length); err != nil {
+		return kvExistsResponse(caller, "unable to read KVExistsRequest params: "+err.Error(), true, false)
 	}
 
 	if err := validateKVStep(request); err != nil {
-		return kvExistsResponse(module, "unable to validate KVExistsRequest: "+err.Error(), true, false)
+		return kvExistsResponse(caller, "unable to validate KVExistsRequest: "+err.Error(), true, false)
 	}
 
 	// Perform operation
@@ -35,11 +33,11 @@ func (h *HostFunc) KVExists(_ context.Context, module api.Module, ptr, length in
 	}
 
 	// Return response
-	return kvExistsResponse(module, msg, false, exists)
+	return kvExistsResponse(caller, msg, false, exists)
 }
 
 // Generates a protobuf response, writes to mem, and returns ptr to mem
-func kvExistsResponse(module api.Module, msg string, isError, exists bool) uint64 {
+func kvExistsResponse(caller *wasmtime.Caller, msg string, isError, exists bool) int64 {
 	var status steps.KVStatus
 
 	if exists {
@@ -58,7 +56,7 @@ func kvExistsResponse(module api.Module, msg string, isError, exists bool) uint6
 		Value:   nil, // KVExists does not fill value
 	}
 
-	addr, err := helper.WriteResponseToMemory(module, resp)
+	addr, err := helper.WriteResponseToMemory(caller, resp)
 	if err != nil {
 		panic("unable to write KVExistsResponse to memory: " + err.Error())
 	}
