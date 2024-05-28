@@ -1,8 +1,8 @@
 # Use the specified Alpine version for the build stage
-ARG ALPINE_VERSION=3.18
+ARG ALPINE_VERSION=3.20
 
 # Use the Go Alpine image for the builder stage
-FROM golang:1.21-alpine$ALPINE_VERSION AS builder
+FROM golang:1.22-bullseye AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -17,7 +17,7 @@ COPY . .
 
 # Build the application using Makefile (assuming it's set up for your project)
 RUN go get .
-RUN make build/$TARGETOS-$TARGETARCH
+RUN CGO_ENABLED=1 make build/$TARGETOS-$TARGETARCH
 
 # Now, in the 2nd build stage, use a lightweight Alpine image
 FROM alpine:$ALPINE_VERSION

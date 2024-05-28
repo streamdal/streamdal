@@ -3,6 +3,11 @@ SERVICE = demo-client
 ARCH ?= $(shell uname -m)
 GO = go
 
+GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
+CGO_ENABLED ?= 1
+GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION} -linkmode=external"
+
+
 # Pattern #1 example: "example : description = Description for example target"
 # Pattern #2 example: "### Example separator text
 help: HELP_SCRIPT = \
@@ -29,7 +34,7 @@ run/all:
 .PHONY: run1
 run1: description = Run signup-service
 run1:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-type plaintext \
 	--output-level 3 \
 	--display-exec-time \
@@ -47,7 +52,7 @@ run1:
 .PHONY: run2
 run2: description = Run signup-service
 run2:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-type plaintext \
 	--output-level 3 \
 	--display-exec-time \
@@ -62,7 +67,7 @@ run2:
 .PHONY: run3
 run3: description = Run billing-service
 run3:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--output-type plaintext \
 	--message-rate 1,4 \
@@ -76,7 +81,7 @@ run3:
 .PHONY: run4
 run4: description = Run billing-service
 run4:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--output-type plaintext \
 	--message-rate 3,5 \
@@ -90,7 +95,7 @@ run4:
 .PHONY: run5
 run5: description = Run welcome-service
 run5:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--message-rate 1,5 \
 	--service-name "welcome-service" \
@@ -103,7 +108,7 @@ run5:
 .PHONY: run6
 run6: description = Run welcome-service
 run6:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--message-rate 1,3 \
 	--service-name "welcome-service" \
@@ -116,7 +121,7 @@ run6:
 .PHONY: run7
 run7: description = PII Key word
 run7:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--message-rate 1,10 \
 	--service-name "pii-keyword" \
 	--operation-type 2 \
@@ -129,7 +134,7 @@ run7:
 .PHONY: run/async
 run/async: description = Run signup-service-async service configured with async
 run/async:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--async \
 	--display-exec-time \
@@ -144,7 +149,7 @@ run/async:
 .PHONY: run/sampling
 run/sampling: description = Run signup-service-async service configured with sampling rate of 1 message/sec
 run/sampling:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--sampling-rate 1 \
 	--display-exec-time \
@@ -159,7 +164,7 @@ run/sampling:
 .PHONY: run/async-sampling
 run/async-sampling: description = Run signup-service-async service configured with async and sampling
 run/async-sampling:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-level 1 \
 	--async \
 	--sampling-rate 1 \
@@ -175,7 +180,7 @@ run/async-sampling:
 .PHONY: run/plaintext
 run/plaintext: description = Plaintext Logs
 run/plaintext:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
@@ -188,7 +193,7 @@ run/plaintext:
 .PHONY: run/plaintext2
 run/plaintext2: description = Plaintext Logs
 run/plaintext2:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--message-rate 10 \
 	--service-name "plaintext-logs" \
 	--operation-type 2 \
@@ -201,7 +206,7 @@ run/plaintext2:
 .PHONY: run/wasm-dedupe-debug
 run/wasm-dedupe-debug: description = Used for troubleshooting wasm dedupe issues
 run/wasm-dedupe-debug:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--message-rate 1 \
 	--num-instances 10 \
 	--inject-logger \
@@ -218,7 +223,7 @@ run/wasm-dedupe-debug:
 .PHONY: run/wasm-memory-debug
 run/wasm-memory-debug: description = Used for troubleshooting wasm memory issues
 run/wasm-memory-debug:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--message-rate 1000 \
 	--num-instances 4 \
 	--service-name "memory-svc" \
@@ -234,7 +239,7 @@ run/wasm-memory-debug:
 .PHONY: run/pii-interpreter
 run/pii-interpreter: description = Run in interpreter execution mode
 run/pii-interpreter:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-type plaintext \
 	--execution-mode interpreter \
 	--output-level 3 \
@@ -250,7 +255,7 @@ run/pii-interpreter:
 .PHONY: run/pii-compiler
 run/pii-compiler: description = Run in compiler mode
 run/pii-compiler:
-	rm -f ./demo-client; go build ./... && ./demo-client \
+	rm -f ./demo-client; $(GO) build $(GO_BUILD_FLAGS) ./... && ./demo-client \
 	--output-type plaintext \
 	--execution-mode compiler \
 	--output-level 3 \
