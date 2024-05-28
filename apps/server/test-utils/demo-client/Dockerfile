@@ -17,12 +17,12 @@ RUN go get .
 RUN CGO_ENABLED=1 make build/$TARGETOS-$TARGETARCH
 
 # Now, in the 2nd build stage, use a lightweight Alpine image
-FROM alpine:$ALPINE_VERSION
+FROM debian:bookworm-slim
 ARG TARGETARCH
 ARG TARGETOS
 
 # Install SSL certificates and some quality-of-life tools
-RUN apk --update add bash curl ca-certificates && update-ca-certificates
+RUN apt-get update && apt-get autoclean && apt-get install ca-certificates -y && update-ca-certificates
 
 # Copy the built binary, test data, and assets directory
 COPY --from=builder /build/demo-client-$TARGETOS-$TARGETARCH /demo-client
