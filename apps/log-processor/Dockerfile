@@ -15,12 +15,12 @@ COPY . .
 RUN CGO_ENABLED=1 make build/$TARGETOS-$TARGETARCH
 
 # Next stage
-FROM golang:1.22-alpine$ALPINE_VERSION AS builder
+FROM library/alpine:$ALPINE_VERSION
 ARG TARGETARCH
 ARG TARGETOS
 
 # SSL and quality-of-life tools
-RUN apt-get update && apt-get install ca-certificates -y && update-ca-certificates
+RUN apk --update add bash curl ca-certificates && update-ca-certificates
 
 # Copy bin
 COPY --from=builder /build/log-processor-$TARGETOS-$TARGETARCH /log-processor
