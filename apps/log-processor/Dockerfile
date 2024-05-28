@@ -15,12 +15,12 @@ COPY . .
 RUN CGO_ENABLED=1 make build/$TARGETOS-$TARGETARCH
 
 # Next stage
-FROM library/alpine:$ALPINE_VERSION
+FROM debian:bookworm-slim
 ARG TARGETARCH
 ARG TARGETOS
 
 # SSL and quality-of-life tools
-RUN apk --update add bash curl ca-certificates && update-ca-certificates
+RUN apt-get update && apt-get autoclean && apt-get install ca-certificates -y && update-ca-certificates
 
 # Copy bin
 COPY --from=builder /build/log-processor-$TARGETOS-$TARGETARCH /log-processor
