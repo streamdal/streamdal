@@ -7,6 +7,16 @@ github.com/aymanbagabas/go-osc52/v2
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
 github.com/beorn7/perks/quantile
+# github.com/bytecodealliance/wasmtime-go v1.0.0
+## explicit; go 1.18
+github.com/bytecodealliance/wasmtime-go
+github.com/bytecodealliance/wasmtime-go/build/include
+github.com/bytecodealliance/wasmtime-go/build/include/wasmtime
+github.com/bytecodealliance/wasmtime-go/build/linux-aarch64
+github.com/bytecodealliance/wasmtime-go/build/linux-x86_64
+github.com/bytecodealliance/wasmtime-go/build/macos-aarch64
+github.com/bytecodealliance/wasmtime-go/build/macos-x86_64
+github.com/bytecodealliance/wasmtime-go/build/windows-x86_64
 # github.com/cespare/xxhash/v2 v2.2.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
@@ -84,7 +94,7 @@ github.com/rivo/uniseg
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
 github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
-# github.com/streamdal/streamdal/sdks/go v0.1.31
+# github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240526180147-58b9aced88bd
 ## explicit; go 1.19
 github.com/streamdal/streamdal/sdks/go
 github.com/streamdal/streamdal/sdks/go/helper
@@ -95,43 +105,6 @@ github.com/streamdal/streamdal/sdks/go/metrics
 github.com/streamdal/streamdal/sdks/go/server
 github.com/streamdal/streamdal/sdks/go/types
 github.com/streamdal/streamdal/sdks/go/validate
-# github.com/tetratelabs/wazero v1.7.2
-## explicit; go 1.20
-github.com/tetratelabs/wazero
-github.com/tetratelabs/wazero/api
-github.com/tetratelabs/wazero/experimental
-github.com/tetratelabs/wazero/experimental/sys
-github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1
-github.com/tetratelabs/wazero/internal/descriptor
-github.com/tetratelabs/wazero/internal/engine/interpreter
-github.com/tetratelabs/wazero/internal/engine/wazevo
-github.com/tetratelabs/wazero/internal/engine/wazevo/backend
-github.com/tetratelabs/wazero/internal/engine/wazevo/backend/isa/amd64
-github.com/tetratelabs/wazero/internal/engine/wazevo/backend/isa/arm64
-github.com/tetratelabs/wazero/internal/engine/wazevo/backend/regalloc
-github.com/tetratelabs/wazero/internal/engine/wazevo/frontend
-github.com/tetratelabs/wazero/internal/engine/wazevo/ssa
-github.com/tetratelabs/wazero/internal/engine/wazevo/wazevoapi
-github.com/tetratelabs/wazero/internal/expctxkeys
-github.com/tetratelabs/wazero/internal/filecache
-github.com/tetratelabs/wazero/internal/fsapi
-github.com/tetratelabs/wazero/internal/ieee754
-github.com/tetratelabs/wazero/internal/internalapi
-github.com/tetratelabs/wazero/internal/leb128
-github.com/tetratelabs/wazero/internal/moremath
-github.com/tetratelabs/wazero/internal/platform
-github.com/tetratelabs/wazero/internal/sock
-github.com/tetratelabs/wazero/internal/sys
-github.com/tetratelabs/wazero/internal/sysfs
-github.com/tetratelabs/wazero/internal/u32
-github.com/tetratelabs/wazero/internal/u64
-github.com/tetratelabs/wazero/internal/version
-github.com/tetratelabs/wazero/internal/wasip1
-github.com/tetratelabs/wazero/internal/wasm
-github.com/tetratelabs/wazero/internal/wasm/binary
-github.com/tetratelabs/wazero/internal/wasmdebug
-github.com/tetratelabs/wazero/internal/wasmruntime
-github.com/tetratelabs/wazero/sys
 # golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 ## explicit; go 1.20
 golang.org/x/exp/constraints

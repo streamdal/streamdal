@@ -11,7 +11,7 @@ endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 0
-GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION}"
+GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION} -extldflags=-static -linkmode=external"
 
 # Utility functions
 check_defined = \

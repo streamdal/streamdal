@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bytecodealliance/wasmtime-go"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
-	"github.com/tetratelabs/wazero/api"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
@@ -18,27 +18,27 @@ import (
 )
 
 // HTTPRequest is function that is exported to and called from a Rust WASM module
-func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length int32) uint64 {
+func (h *HostFunc) HTTPRequest(caller *wasmtime.Caller, ptr, length int32) int64 {
 	request := &protos.WASMRequest{}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	if err := helper.ReadRequestFromMemory(module, request, ptr, length); err != nil {
-		return httpRequestResponse(module, http.StatusInternalServerError, "unable to read HTTP request params: "+err.Error(), nil)
+	if err := helper.ReadRequestFromMemory(caller, request, ptr, length); err != nil {
+		return httpRequestResponse(caller, http.StatusInternalServerError, "unable to read HTTP request params: "+err.Error(), nil)
 	}
 
 	req := request.Step.GetHttpRequest().Request
 
 	reqBody, err := getRequestBodyForMode(request)
 	if err != nil {
-		return httpRequestResponse(module, http.StatusInternalServerError, err.Error(), nil)
+		return httpRequestResponse(caller, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	httpReq, err := http.NewRequestWithContext(ctx, methodFromProto(req.Method), req.Url, reqBody)
 	if err != nil {
 		err = errors.Wrap(err, "unable to create http request")
-		return httpRequestResponse(module, http.StatusInternalServerError, err.Error(), nil)
+		return httpRequestResponse(caller, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	// Set headers
@@ -54,17 +54,17 @@ func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length
 	resp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
 		err = errors.Wrap(err, "unable to perform http request")
-		return httpRequestResponse(module, http.StatusInternalServerError, err.Error(), nil)
+		return httpRequestResponse(caller, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return httpRequestResponse(module, http.StatusInternalServerError, err.Error(), nil)
+		return httpRequestResponse(caller, http.StatusInternalServerError, err.Error(), nil)
 	}
 
 	if resp.StatusCode > 299 {
-		return httpRequestResponse(module, resp.StatusCode, string(body), nil)
+		return httpRequestResponse(caller, resp.StatusCode, string(body), nil)
 	}
 
 	// Get all headers from the response
@@ -73,7 +73,7 @@ func (h *HostFunc) HTTPRequest(_ context.Context, module api.Module, ptr, length
 		headers[k] = strings.Join(v, ", ")
 	}
 
-	return httpRequestResponse(module, resp.StatusCode, string(body), headers)
+	return httpRequestResponse(caller, resp.StatusCode, string(body), headers)
 }
 
 // getRequestBodyForMode returns the request body for the given mode
@@ -119,7 +119,7 @@ func getRequestBodyForMode(request *protos.WASMRequest) (io.Reader, error) {
 }
 
 // httpRequestResponse is a helper for HostFuncHTTPRequest()
-func httpRequestResponse(module api.Module, code int, body string, headers map[string]string) uint64 {
+func httpRequestResponse(caller *wasmtime.Caller, code int, body string, headers map[string]string) int64 {
 	if headers == nil {
 		headers = make(map[string]string)
 	}
@@ -130,7 +130,7 @@ func httpRequestResponse(module api.Module, code int, body string, headers map[s
 		Headers: headers,
 	}
 
-	addr, err := helper.WriteResponseToMemory(module, resp)
+	addr, err := helper.WriteResponseToMemory(caller, resp)
 	if err != nil {
 		panic("unable to write HTTP response to memory: " + err.Error())
 	}

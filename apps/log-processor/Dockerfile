@@ -1,12 +1,9 @@
 # Start from the official Golang base image
-ARG ALPINE_VERSION=3.18
+ARG ALPINE_VERSION=3.20
 
-FROM golang:1.22-alpine$ALPINE_VERSION AS builder
+FROM golang:1.22-bullseye AS builder
 ARG TARGETARCH
 ARG TARGETOS
-
-# Install necessary build tools
-RUN apk --update add make bash curl git
 
 # Set the Current Working Directory inside the container
 WORKDIR /
@@ -15,15 +12,15 @@ WORKDIR /
 COPY . .
 
 # Build the Go app
-RUN make build/$TARGETOS-$TARGETARCH
+RUN CGO_ENABLED=1 make build/$TARGETOS-$TARGETARCH
 
 # Next stage
-FROM library/alpine:$ALPINE_VERSION
+FROM golang:1.22-alpine$ALPINE_VERSION AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
 # SSL and quality-of-life tools
-RUN apk --update add bash curl ca-certificates && update-ca-certificates
+RUN apt-get update && apt-get install ca-certificates -y && update-ca-certificates
 
 # Copy bin
 COPY --from=builder /build/log-processor-$TARGETOS-$TARGETARCH /log-processor
