@@ -6,9 +6,6 @@ FROM golang:1.22-bullseye AS builder
 ARG TARGETARCH
 ARG TARGETOS
 
-# Install necessary build tools
-RUN apk --update add make bash curl git
-
 # Set the working directory
 WORKDIR /
 
