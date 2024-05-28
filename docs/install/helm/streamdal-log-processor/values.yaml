@@ -39,10 +39,10 @@ logrotate:
 resources:
   logProcessor:
     limits:
-      cpu: "1000m"  # 500 millicores
+      cpu: "1200m"  # 500 millicores
       memory: "1Gi"  # 512 Mebibytes
     requests:
-      cpu: "500m"  # 100 millicores
+      cpu: "1000m"  # 100 millicores
       memory: "512Mi"  # 256 Mebibytes
   logstash:
     limits:

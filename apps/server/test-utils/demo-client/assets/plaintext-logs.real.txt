@@ -1,7 +1,7 @@
 2024-04-29T15:59:41.289946276Z stdout Hello World!
 2024-04-29T15:59:41.60221245Z stdout F  - using code:    gin.SetMode(gin.ReleaseMode)
 2024-04-29T15:59:41.60221514Z stdout Found user with email test@streamdal.com
-2024-04-29T15:59:41.60221515Z stdout Exporting data {"user": {"ccnum": "4111111111111111"}} to billing service
+2024-04-29T15:59:41.60221515Z stdout Exporting data {"user": {"ccnum": "4111111111111111" }} to billing service
 2024-04-29T15:59:41.60221516Z stdout Run Completed
 2024-04-23T14:13:34.194080221Z stdout F 2024-04-23T14:13:34.193890Z	info	Istio iptables environment:
 2024-04-23T14:13:34.194114492Z stdout F ENVOY_PORT=
@@ -106,9 +106,9 @@
 2024-05-16 13:45:22 - User logged in with JWT: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 2024-04-23T14:13:34.201893177Z stdout - String with PII SSN: 123-45-6789 <- this should get masked
 2024-04-23T14:13:34.201893177Z stdout - String with PII UK NINO: AB123456C <- this should get masked
-2024-04-23T14:13:34.201893177Z stdout - String with PII VIN number: 1G1YY26U055136480 <- this should get masked
-2024-04-23T14:13:34.201893177Z stdout - String with PII Canada SIN: 123-456-789 <- this should get masked
-2024-04-23T14:13:34.201893177Z stdout - String with PII credit card: 1234 5678 9012 3456 <- this should get masked
+2024-04-23T14:13:34.201893177Z stdout - String with PII VIN number: 4T1G11AKXRU906563 <- this should get masked
+2024-04-23T14:13:34.201893177Z stdout - String with PII Canada SIN: 046-454-286 <- this should get masked
+2024-04-23T14:13:34.201893177Z stdout - String with PII credit card: 4111111111111111 <- this should get masked
 2024-04-23T14:13:34.201893177Z stdout F -A ISTIO_OUTPUT -m owner --gid-owner 1337 -j RETURN
 2024-04-23T14:13:34.201895567Z stdout F -A ISTIO_OUTPUT -d 127.0.0.1/32 -j RETURN
 2024-04-23T14:13:34.201897807Z stdout F -A ISTIO_OUTPUT -j ISTIO_REDIRECT
