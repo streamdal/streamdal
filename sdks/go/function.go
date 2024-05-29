@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/bytecodealliance/wasmtime-go"
+	"github.com/bytecodealliance/wasmtime-go/v21"
 	"github.com/pkg/errors"
 
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"

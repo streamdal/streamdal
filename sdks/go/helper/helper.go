@@ -4,7 +4,7 @@
 package helper
 
 import (
-	"github.com/bytecodealliance/wasmtime-go"
+	"github.com/bytecodealliance/wasmtime-go/v21"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 )

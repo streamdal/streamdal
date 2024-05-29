@@ -1,5 +1,5 @@
-github.com/bytecodealliance/wasmtime-go v1.0.0 h1:9u9gqaUiaJeN5IoD1L7egD8atOnTGyJcNp8BhkL9cUU=
-github.com/bytecodealliance/wasmtime-go v1.0.0/go.mod h1:jjlqQbWUfVSbehpErw3UoWFndBXRRMvfikYH6KsCwOg=
+github.com/bytecodealliance/wasmtime-go/v21 v21.0.0 h1:d2m3R7TpNpOGuIi2PTC9w2nUY/A2IJinHOZTL76jyhg=
+github.com/bytecodealliance/wasmtime-go/v21 v21.0.0/go.mod h1:o/HNPe7TdXkqbrkmU9YgHBFXU9OIF1FVPlqhZwC1tyk=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

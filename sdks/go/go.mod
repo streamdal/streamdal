@@ -3,7 +3,7 @@ module github.com/streamdal/streamdal/sdks/go
 go 1.19
 
 require (
-	github.com/bytecodealliance/wasmtime-go v1.0.0
+	github.com/bytecodealliance/wasmtime-go/v21 v21.0.0
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.5.0
 	github.com/onsi/ginkgo/v2 v2.13.2
