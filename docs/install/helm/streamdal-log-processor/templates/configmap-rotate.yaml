@@ -7,11 +7,11 @@ data:
   logrotate.conf: |
     /logs/*/*/*.log {
         daily
-        size 250M
+        size {{ .Values.logrotate.env.LOGROTATE_SIZE }}
         dateext
         dateformat -%Y-%m-%d-%H-%M
         rotate 3
-        maxage 5
+        maxage 3
         missingok
         notifempty
         compress
