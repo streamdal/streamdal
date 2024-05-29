@@ -11,7 +11,7 @@ endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
 CGO_ENABLED ?= 1
-GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION} -linkmode=external"
+GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION} -linkmode=external" -tags netgo,wasmtime
 
 # Utility functions
 check_defined = \
@@ -102,9 +102,7 @@ docker/build/local:
 docker/build: description = Build docker image
 docker/build:
 	docker buildx build --push --platform=linux/amd64,linux/arm64 \
-	-t streamdal/$(SERVICE):$(VERSION) \
 	-t streamdal/$(SERVICE):$(SHORT_SHA) \
-	-t streamdal/$(SERVICE):latest \
 	-f ./Dockerfile .
 
 .PHONY: docker/push

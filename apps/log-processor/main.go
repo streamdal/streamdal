@@ -1,6 +1,3 @@
-//go:build cgo
-// +build cgo
-
 package main
 
 import (
@@ -9,8 +6,6 @@ import (
 	"os/signal"
 
 	"github.com/charmbracelet/log"
-
-	_ "github.com/bytecodealliance/wasmtime-go/v21"
 
 	"github.com/streamdal/streamdal/apps/log-processor/api"
 	"github.com/streamdal/streamdal/apps/log-processor/config"
