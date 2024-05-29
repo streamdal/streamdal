@@ -19,7 +19,7 @@ spec:
         image: skymatic/logrotate:latest
         env:
         - name: CRON_SCHEDULE
-          value: "*/5 * * * *"
+          value: "{{ .Values.logrotate.env.CRON_SCHEDULE }}"
         volumeMounts:
           - name: logs
             mountPath: /logs
