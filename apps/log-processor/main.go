@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/signal"
 
+	"C"
+
 	"github.com/charmbracelet/log"
 
 	"github.com/streamdal/streamdal/apps/log-processor/api"
@@ -18,6 +20,8 @@ var (
 )
 
 func main() {
+
+	C.CString("")
 
 	cfg := config.New(version)
 	if err := cfg.Validate(); err != nil {
