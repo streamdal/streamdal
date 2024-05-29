@@ -49,6 +49,8 @@ spec:
             readOnly: true
           - name: var
             mountPath: /var
+          - name: logs
+            mountPath: /logs
         env:
           - name: ELASTICSEARCH_HOSTS
             value: "{{ .Values.config.elasticsearchHosts }}"
