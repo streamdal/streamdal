@@ -1,11 +1,12 @@
+//go:build cgo
+// +build cgo
+
 package main
 
 import (
 	"context"
 	"os"
 	"os/signal"
-
-	"C"
 
 	"github.com/charmbracelet/log"
 
@@ -20,8 +21,6 @@ var (
 )
 
 func main() {
-
-	C.CString("")
 
 	cfg := config.New(version)
 	if err := cfg.Validate(); err != nil {
