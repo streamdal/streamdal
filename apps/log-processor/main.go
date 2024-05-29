@@ -18,6 +18,7 @@ var (
 )
 
 func main() {
+
 	cfg := config.New(version)
 	if err := cfg.Validate(); err != nil {
 		log.Fatalf("Failed to validate configuration: %v", err)
