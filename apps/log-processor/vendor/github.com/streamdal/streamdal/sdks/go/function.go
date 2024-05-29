@@ -262,6 +262,10 @@ func (s *Streamdal) createFunction(step *protos.PipelineStep) (*function, error)
 		return nil, fmt.Errorf("unable to get exported function '%s'", step.GetXWasmFunction())
 	}
 
+	if _, err := mem.Grow(store, 1000); err != nil {
+		return nil, errors.Wrap(err, "unable to grow memory")
+	}
+
 	return &function{
 		ID:      step.GetXWasmId(),
 		Inst:    inst,

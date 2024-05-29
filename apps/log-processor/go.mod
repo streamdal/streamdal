@@ -8,7 +8,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
-	github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240529173752-497a481c299a
+	github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240529191950-9ead5325e69c
 )
 
 require (
