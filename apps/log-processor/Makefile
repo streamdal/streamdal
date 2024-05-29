@@ -10,7 +10,7 @@ GIT_TAG := 0.0.0
 endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
-CGO_ENABLED ?= 0
+CGO_ENABLED ?= 1
 GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION} -extldflags=-static -linkmode=external"
 
 # Utility functions
