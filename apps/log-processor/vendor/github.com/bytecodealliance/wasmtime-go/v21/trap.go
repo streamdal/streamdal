@@ -50,6 +50,8 @@ const (
 	UnreachableCodeReached
 	// Interrupt: execution has been interrupted.
 	Interrupt
+	// OutOfFuel: Execution has run out of the configured fuel amount.
+	OutOfFuel
 )
 
 // NewTrap creates a new `Trap` with the `name` and the type provided.
@@ -69,8 +71,23 @@ func mkTrap(ptr *C.wasm_trap_t) *Trap {
 
 func (t *Trap) ptr() *C.wasm_trap_t {
 	ret := t._ptr
+	if ret == nil {
+		panic("object has been closed already")
+	}
 	maybeGC()
 	return ret
+}
+
+// Close will deallocate this type's state explicitly.
+//
+// For more information see the documentation for engine.Close()
+func (t *Trap) Close() {
+	if t._ptr == nil {
+		return
+	}
+	runtime.SetFinalizer(t, nil)
+	C.wasm_trap_delete(t._ptr)
+	t._ptr = nil
 }
 
 // Message returns the message of the `Trap`
@@ -108,12 +125,13 @@ func unwrapStrOr(s *string, other string) string {
 }
 
 type frameList struct {
-	vec C.wasm_frame_vec_t
+	vec   C.wasm_frame_vec_t
+	owner interface{}
 }
 
 // Frames returns the wasm function frames that make up this trap
 func (t *Trap) Frames() []*Frame {
-	frames := &frameList{}
+	frames := &frameList{owner: t}
 	C.wasm_trap_trace(t.ptr(), &frames.vec)
 	runtime.KeepAlive(t)
 	runtime.SetFinalizer(frames, func(frames *frameList) {
@@ -135,6 +153,9 @@ func (t *Trap) Frames() []*Frame {
 
 func (f *Frame) ptr() *C.wasm_frame_t {
 	ret := f._ptr
+	if ret == nil {
+		panic("object has been closed already")
+	}
 	maybeGC()
 	return ret
 }

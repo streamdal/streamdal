@@ -51,7 +51,7 @@ type Config struct {
 func NewConfig() *Config {
 	config := &Config{_ptr: C.wasm_config_new()}
 	runtime.SetFinalizer(config, func(config *Config) {
-		C.wasm_config_delete(config._ptr)
+		config.Close()
 	})
 	return config
 }
@@ -59,6 +59,15 @@ func NewConfig() *Config {
 // SetDebugInfo configures whether dwarf debug information for JIT code is enabled
 func (cfg *Config) SetDebugInfo(enabled bool) {
 	C.wasmtime_config_debug_info_set(cfg.ptr(), C.bool(enabled))
+	runtime.KeepAlive(cfg)
+}
+
+// SetMaxWasmStack configures the maximum stack size, in bytes, that JIT code can use.
+// The amount of stack space that wasm takes is always relative to the first invocation of wasm on the stack.
+// Recursive calls with host frames in the middle will all need to fit within this setting.
+// Note that this setting is not interpreted with 100% precision.
+func (cfg *Config) SetMaxWasmStack(size int) {
+	C.wasmtime_config_max_wasm_stack_set(cfg.ptr(), C.size_t(size))
 	runtime.KeepAlive(cfg)
 }
 
@@ -173,12 +182,75 @@ func (cfg *Config) SetEpochInterruption(enable bool) {
 	runtime.KeepAlive(cfg)
 }
 
+// SetTarget configures the target triple that this configuration will produce
+// machine code for.
+//
+// This option defaults to the native host. Calling this method will
+// additionally disable inference of the native features of the host (e.g.
+// detection of SSE4.2 on x86_64 hosts). Native features can be reenabled with
+// the `cranelift_flag_{set,enable}` properties.
+//
+// For more information see the Rust documentation at
+// https://docs.wasmtime.dev/api/wasmtime/struct.Config.html#method.config
+func (cfg *Config) SetTarget(target string) error {
+	cstr := C.CString(target)
+	err := C.wasmtime_config_target_set(cfg.ptr(), cstr)
+	C.free(unsafe.Pointer(cstr))
+	runtime.KeepAlive(cfg)
+	if err != nil {
+		return mkError(err)
+	}
+	return nil
+}
+
+// EnableCraneliftFlag enables a target-specific flag in Cranelift.
+//
+// This can be used, for example, to enable SSE4.2 on x86_64 hosts. Settings can
+// be explored with `wasmtime settings` on the CLI.
+//
+// For more information see the Rust documentation at
+// https://docs.wasmtime.dev/api/wasmtime/struct.Config.html#method.cranelift_flag_enable
+func (cfg *Config) EnableCraneliftFlag(flag string) {
+	cstr := C.CString(flag)
+	C.wasmtime_config_cranelift_flag_enable(cfg.ptr(), cstr)
+	C.free(unsafe.Pointer(cstr))
+	runtime.KeepAlive(cfg)
+}
+
+// SetCraneliftFlag sets a target-specific flag in Cranelift to the specified value.
+//
+// This can be used, for example, to enable SSE4.2 on x86_64 hosts. Settings can
+// be explored with `wasmtime settings` on the CLI.
+//
+// For more information see the Rust documentation at
+// https://docs.wasmtime.dev/api/wasmtime/struct.Config.html#method.cranelift_flag_set
+func (cfg *Config) SetCraneliftFlag(name string, value string) {
+	cstrName := C.CString(name)
+	cstrValue := C.CString(value)
+	C.wasmtime_config_cranelift_flag_set(cfg.ptr(), cstrName, cstrValue)
+	C.free(unsafe.Pointer(cstrName))
+	C.free(unsafe.Pointer(cstrValue))
+	runtime.KeepAlive(cfg)
+}
+
 // See comments in `ffi.go` for what's going on here
 func (cfg *Config) ptr() *C.wasm_config_t {
 	ret := cfg._ptr
-	maybeGC()
 	if ret == nil {
 		panic("Config has already been used up")
 	}
+	maybeGC()
 	return ret
+}
+
+// Close will deallocate this config's state explicitly.
+//
+// For more information see the documentation for engine.Close()
+func (cfg *Config) Close() {
+	if cfg._ptr == nil {
+		return
+	}
+	runtime.SetFinalizer(cfg, nil)
+	C.wasm_config_delete(cfg._ptr)
+	cfg._ptr = nil
 }

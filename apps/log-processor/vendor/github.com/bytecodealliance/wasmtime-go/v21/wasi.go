@@ -17,15 +17,31 @@ func NewWasiConfig() *WasiConfig {
 	ptr := C.wasi_config_new()
 	config := &WasiConfig{_ptr: ptr}
 	runtime.SetFinalizer(config, func(config *WasiConfig) {
-		C.wasi_config_delete(config._ptr)
+		config.Close()
 	})
 	return config
 }
 
 func (c *WasiConfig) ptr() *C.wasi_config_t {
 	ret := c._ptr
+	if ret == nil {
+		panic("object has been closed already")
+	}
 	maybeGC()
 	return ret
+}
+
+// Close will deallocate this WASI configuration's state explicitly.
+//
+// For more information see the documentation for engine.Close()
+func (c *WasiConfig) Close() {
+	if c._ptr == nil {
+		return
+	}
+	runtime.SetFinalizer(c, nil)
+	C.wasi_config_delete(c._ptr)
+	c._ptr = nil
+
 }
 
 // SetArgv will explicitly configure the argv for this WASI configuration.
@@ -39,7 +55,7 @@ func (c *WasiConfig) SetArgv(argv []string) {
 	if len(ptrs) > 0 {
 		argvRaw = &ptrs[0]
 	}
-	C.wasi_config_set_argv(c.ptr(), C.int(len(argv)), argvRaw)
+	C.wasi_config_set_argv(c.ptr(), C.size_t(len(argv)), argvRaw)
 	runtime.KeepAlive(c)
 	for _, ptr := range ptrs {
 		C.free(unsafe.Pointer(ptr))
@@ -71,7 +87,7 @@ func (c *WasiConfig) SetEnv(keys, values []string) {
 		namesRaw = &namePtrs[0]
 		valuesRaw = &valuePtrs[0]
 	}
-	C.wasi_config_set_env(c.ptr(), C.int(len(keys)), namesRaw, valuesRaw)
+	C.wasi_config_set_env(c.ptr(), C.size_t(len(keys)), namesRaw, valuesRaw)
 	runtime.KeepAlive(c)
 	for i, ptr := range namePtrs {
 		C.free(unsafe.Pointer(ptr))

@@ -17,7 +17,7 @@ const (
 	// KindF64 is the types f64 classify 64 bit floating-point data. They correspond to the respective binary floating-point representations, also known as single and double precision, as defined by the IEEE 754-2019 standard.
 	KindF64 ValKind = C.WASM_F64
 	// TODO: Unknown
-	KindExternref ValKind = C.WASM_ANYREF
+	KindExternref ValKind = C.WASM_EXTERNREF
 	// KindFuncref is the infinite union of all function types.
 	KindFuncref ValKind = C.WASM_FUNCREF
 )
@@ -57,7 +57,7 @@ func mkValType(ptr *C.wasm_valtype_t, owner interface{}) *ValType {
 	valtype := &ValType{_ptr: ptr, _owner: owner}
 	if owner == nil {
 		runtime.SetFinalizer(valtype, func(valtype *ValType) {
-			C.wasm_valtype_delete(valtype._ptr)
+			valtype.Close()
 		})
 	}
 	return valtype
@@ -78,6 +78,9 @@ func (t *ValType) String() string {
 
 func (t *ValType) ptr() *C.wasm_valtype_t {
 	ret := t._ptr
+	if ret == nil {
+		panic("object has been closed already")
+	}
 	maybeGC()
 	return ret
 }
@@ -87,4 +90,16 @@ func (t *ValType) owner() interface{} {
 		return t._owner
 	}
 	return t
+}
+
+// Close will deallocate this type's state explicitly.
+//
+// For more information see the documentation for engine.Close()
+func (ty *ValType) Close() {
+	if ty._ptr == nil || ty._owner != nil {
+		return
+	}
+	runtime.SetFinalizer(ty, nil)
+	C.wasm_valtype_delete(ty._ptr)
+	ty._ptr = nil
 }

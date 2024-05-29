@@ -8,13 +8,13 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
-	github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240526180147-58b9aced88bd
+	github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240529173752-497a481c299a
 )
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytecodealliance/wasmtime-go v1.0.0 // indirect
+	github.com/bytecodealliance/wasmtime-go/v21 v21.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/charmbracelet/lipgloss v0.10.0 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect

@@ -7,16 +7,16 @@ github.com/aymanbagabas/go-osc52/v2
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
 github.com/beorn7/perks/quantile
-# github.com/bytecodealliance/wasmtime-go v1.0.0
+# github.com/bytecodealliance/wasmtime-go/v21 v21.0.0
 ## explicit; go 1.18
-github.com/bytecodealliance/wasmtime-go
-github.com/bytecodealliance/wasmtime-go/build/include
-github.com/bytecodealliance/wasmtime-go/build/include/wasmtime
-github.com/bytecodealliance/wasmtime-go/build/linux-aarch64
-github.com/bytecodealliance/wasmtime-go/build/linux-x86_64
-github.com/bytecodealliance/wasmtime-go/build/macos-aarch64
-github.com/bytecodealliance/wasmtime-go/build/macos-x86_64
-github.com/bytecodealliance/wasmtime-go/build/windows-x86_64
+github.com/bytecodealliance/wasmtime-go/v21
+github.com/bytecodealliance/wasmtime-go/v21/build/include
+github.com/bytecodealliance/wasmtime-go/v21/build/include/wasmtime
+github.com/bytecodealliance/wasmtime-go/v21/build/linux-aarch64
+github.com/bytecodealliance/wasmtime-go/v21/build/linux-x86_64
+github.com/bytecodealliance/wasmtime-go/v21/build/macos-aarch64
+github.com/bytecodealliance/wasmtime-go/v21/build/macos-x86_64
+github.com/bytecodealliance/wasmtime-go/v21/build/windows-x86_64
 # github.com/cespare/xxhash/v2 v2.2.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
@@ -94,7 +94,7 @@ github.com/rivo/uniseg
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
 github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
-# github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240526180147-58b9aced88bd
+# github.com/streamdal/streamdal/sdks/go v0.1.32-0.20240529173752-497a481c299a
 ## explicit; go 1.19
 github.com/streamdal/streamdal/sdks/go
 github.com/streamdal/streamdal/sdks/go/helper

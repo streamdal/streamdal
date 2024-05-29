@@ -20,15 +20,31 @@ func NewLinker(engine *Engine) *Linker {
 	ptr := C.wasmtime_linker_new(engine.ptr())
 	linker := &Linker{_ptr: ptr, Engine: engine}
 	runtime.SetFinalizer(linker, func(linker *Linker) {
-		C.wasmtime_linker_delete(linker._ptr)
+		linker.Close()
 	})
 	return linker
 }
 
 func (l *Linker) ptr() *C.wasmtime_linker_t {
 	ret := l._ptr
+	if ret == nil {
+		panic("object has been closed already")
+	}
 	maybeGC()
 	return ret
+}
+
+// Close will deallocate this linker's state explicitly.
+//
+// For more information see the documentation for engine.Close()
+func (l *Linker) Close() {
+	if l._ptr == nil {
+		return
+	}
+	runtime.SetFinalizer(l, nil)
+	C.wasmtime_linker_delete(l._ptr)
+	l._ptr = nil
+
 }
 
 // AllowShadowing configures whether names can be redefined after they've already been defined
@@ -40,10 +56,11 @@ func (l *Linker) AllowShadowing(allow bool) {
 
 // Define defines a new item in this linker with the given module/name pair. Returns
 // an error if shadowing is disallowed and the module/name is already defined.
-func (l *Linker) Define(module, name string, item AsExtern) error {
+func (l *Linker) Define(store Storelike, module, name string, item AsExtern) error {
 	extern := item.AsExtern()
 	err := C.wasmtime_linker_define(
 		l.ptr(),
+		store.Context(),
 		C._GoStringPtr(module),
 		C._GoStringLen(module),
 		C._GoStringPtr(name),
@@ -54,6 +71,7 @@ func (l *Linker) Define(module, name string, item AsExtern) error {
 	runtime.KeepAlive(module)
 	runtime.KeepAlive(name)
 	runtime.KeepAlive(item)
+	runtime.KeepAlive(store)
 	if err == nil {
 		return nil
 	}
@@ -65,7 +83,7 @@ func (l *Linker) Define(module, name string, item AsExtern) error {
 //
 // Returns an error if shadowing is disabled and the name is already defined.
 func (l *Linker) DefineFunc(store Storelike, module, name string, f interface{}) error {
-	return l.Define(module, name, WrapFunc(store, f))
+	return l.Define(store, module, name, WrapFunc(store, f))
 }
 
 // FuncNew defines a function in this linker in the same style as `NewFunc`

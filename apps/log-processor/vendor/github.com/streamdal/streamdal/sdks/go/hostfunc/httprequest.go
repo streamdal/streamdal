@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bytecodealliance/wasmtime-go"
+	"github.com/bytecodealliance/wasmtime-go/v21"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
 
