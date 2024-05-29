@@ -10,6 +10,8 @@ import (
 
 	"github.com/charmbracelet/log"
 
+	_ "github.com/bytecodealliance/wasmtime-go/v21"
+
 	"github.com/streamdal/streamdal/apps/log-processor/api"
 	"github.com/streamdal/streamdal/apps/log-processor/config"
 	"github.com/streamdal/streamdal/apps/log-processor/processor"
