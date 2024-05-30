@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/shared"
 
@@ -19,7 +20,7 @@ func (s *Streamdal) genClientInfo() *protos.ClientInfo {
 	return &protos.ClientInfo{
 		ClientType:     protos.ClientType(s.config.ClientType),
 		LibraryName:    "go-sdk",
-		LibraryVersion: "0.1.31",
+		LibraryVersion: "0.1.37-wasmtime",
 		Language:       "go",
 		Arch:           runtime.GOARCH,
 		Os:             runtime.GOOS,
