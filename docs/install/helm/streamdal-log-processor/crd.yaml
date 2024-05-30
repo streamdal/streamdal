@@ -1,0 +1,190 @@
+apiVersion: crd.streamdal.com/v1
+kind: StreamdalConfig
+metadata:
+  labels:
+    app.kubernetes.io/name: operator
+    app.kubernetes.io/managed-by: kustomize
+  name: demo.streamdal.com
+spec:
+  serverAddress: "server.vector.svc.cluster.local:8082"
+  serverAuth: "1234"
+  configs:
+    - name: "config for demo.streamdal.com"
+      config: >
+        {
+          "audiences": [
+            {
+              "serviceName": "log-processor",
+              "componentName": "logstash",
+              "operationType": 1,
+              "operationName": "logstash-process"
+            }
+          ],
+          "pipelines": [
+            {
+              "id": "a3343e9e-14f8-4dfd-9206-aced00124e27",
+              "name": "mask-pii",
+              "steps": [
+                {
+                  "name": "Step #1",
+                  "dynamic": false,
+                  "step": {
+                    "oneofKind": "detective",
+                    "detective": {
+                      "args": [],
+                      "type": 2037,
+                      "path": "",
+                      "negate": false
+                    }
+                  },
+                  "onTrue": {
+                    "abort": 0,
+                    "notify": false,
+                    "metadata": {}
+                  },
+                  "onFalse": {
+                    "abort": 1,
+                    "notify": false,
+                    "metadata": {}
+                  },
+                  "onError": {
+                    "abort": 0,
+                    "notify": false,
+                    "metadata": {}
+                  },
+                  "WasmId": "4237d448-2e67-82e9-e8d4-8f14d549d627",
+                  "WasmFunction": "f"
+                },
+                {
+                  "name": "Step #2",
+                  "dynamic": true,
+                  "step": {
+                    "oneofKind": "transform",
+                    "transform": {
+                      "path": "",
+                      "value": "",
+                      "type": 4,
+                      "options": {
+                        "oneofKind": "maskOptions",
+                        "maskOptions": {
+                          "path": "",
+                          "mask": ""
+                        }
+                      }
+                    }
+                  },
+                  "onTrue": {
+                    "abort": 0,
+                    "notify": false,
+                    "metadata": {}
+                  },
+                  "onFalse": {
+                    "abort": 0,
+                    "notify": false,
+                    "metadata": {}
+                  },
+                  "onError": {
+                    "abort": 0,
+                    "notify": false,
+                    "metadata": {}
+                  },
+                  "WasmId": "180a9193-9725-e919-30b0-74a26b1e9f84",
+                  "WasmFunction": "f"
+                }
+              ],
+              "NotificationConfigs": [],
+              "dataFormat": 2
+            }
+          ],
+          "notifications": [],
+          "wasmModules": [
+            {
+              "id": "4ae1c082-d16e-dffb-99a1-982048cce504",
+              "bytes": {},
+              "function": "f",
+              "name": "schemavalidation",
+              "Filename": "schemavalidation.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762910242580"
+            },
+            {
+              "id": "eb0ce33e-4293-fdd7-11bb-dbc5b70add76",
+              "bytes": {},
+              "function": "f",
+              "name": "kv",
+              "Filename": "kv.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762946240978"
+            },
+            {
+              "id": "4237d448-2e67-82e9-e8d4-8f14d549d627",
+              "bytes": {},
+              "function": "f",
+              "name": "detective",
+              "Filename": "detective.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762926238649"
+            },
+            {
+              "id": "2efefef2-7dc0-d03c-2291-0402b7a9de81",
+              "bytes": {},
+              "function": "f",
+              "name": "inferschema",
+              "Filename": "inferschema.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762970446558"
+            },
+            {
+              "id": "b05c9b3a-cee8-3a67-7f25-6e266cfbdfe8",
+              "bytes": {},
+              "function": "f",
+              "name": "httprequest",
+              "Filename": "httprequest.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762944021936"
+            },
+            {
+              "id": "180a9193-9725-e919-30b0-74a26b1e9f84",
+              "bytes": {},
+              "function": "f",
+              "name": "transform",
+              "Filename": "transform.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762937754640"
+            },
+            {
+              "id": "dfa7db42-b1b1-a849-fee1-f2293221658e",
+              "bytes": {},
+              "function": "f",
+              "name": "validjson",
+              "Filename": "validjson.wasm",
+              "Bundled": true,
+              "description": "Bundled Wasm module",
+              "url": "https://github.com/streamdal/streamdal/tree/main/libs/wasm",
+              "CreatedAtUnixTsNsUtc": "1716407762903833915"
+            }
+          ],
+          "audienceMappings": {
+            "log-processor:operation_type_consumer:logstash-process:logstash": {
+              "configs": [
+                {
+                  "id": "a3343e9e-14f8-4dfd-9206-aced00124e27",
+                  "paused": false,
+                  "createdAtUnixTsUtc": "1716361894"
+                }
+              ]
+            }
+          }
+        }

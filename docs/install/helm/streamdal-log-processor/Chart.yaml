@@ -1,5 +1,5 @@
 apiVersion: v2
 name: log-processor-chart
 description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
-version: 0.1.10
+version: 0.1.11
 appVersion: "1.1"

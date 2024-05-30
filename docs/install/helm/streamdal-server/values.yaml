@@ -8,7 +8,7 @@ image:
   repository: streamdal/server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.0.86-59f66fe"
+  tag: "0.0.88-a8ef970"
 nameOverride: "server"
 fullnameOverride: ""
 
@@ -92,7 +92,7 @@ env:
   STREAMDAL_SERVER_AUTH_TOKEN: "1234"
   STREAMDAL_SERVER_DEMO: "false"
   STREAMDAL_CONSOLE_DEMO: "false"
-  STREAMDAL_SERVER_LOG_LEVEL: "ERROR"
+  STREAMDAL_SERVER_LOG_LEVEL: "DEBUG"
 
 consoleService:
   type: ClusterIP
