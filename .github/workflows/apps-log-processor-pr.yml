@@ -32,5 +32,6 @@ jobs:
 
     - name: Test
       run: |
+        sudo apt-get update -y
         sudo apt-get install libwasmtime-dev
         sudo make test
