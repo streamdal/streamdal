@@ -31,4 +31,6 @@ jobs:
 #        time: '30s'
 
     - name: Test
-      run: sudo make test
+      run: |
+        go get -t ./...
+        sudo make test
