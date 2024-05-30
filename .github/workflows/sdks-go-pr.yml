@@ -23,4 +23,5 @@ jobs:
 
       - name: Test
         run: |
+          go get -t ./...
           make test
