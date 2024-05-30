@@ -77,7 +77,7 @@ clean:
 test: description = Run Go tests
 test: GOFLAGS=
 test:
-	TEST=true $(GO) test ./... -v -count=1
+	$(GO) test ./... -v -count=1
 
 ### Run
 
