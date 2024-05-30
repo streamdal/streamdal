@@ -32,7 +32,7 @@ jobs:
 
     - name: Test
       env:
-        CGO_CFLAGS: ""-I${{ github.workspace }}/vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include"
+        CGO_CFLAGS: "-I${{ github.workspace }}/vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include"
         LD_LIBRARY_PATH: "${{ github.workspace }}/vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include/"
       run: |
         go get -t ./...
