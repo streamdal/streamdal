@@ -31,7 +31,8 @@ jobs:
 #        time: '30s'
 
     - name: Test
+      env:
+        LD_LIBRARY_PATH: "./vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include/"
       run: |
         go get -t ./...
-        setenv LD_LIBRARY_PATH="./vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include/:/usr/lib:${LD_LIBRARY_PATH}"
         sudo make test
