@@ -32,6 +32,6 @@ jobs:
 
     - name: Test
       run: |
-        sudo apt-get update -y
-        sudo apt-get install libwasmtime-dev
+        go get -t ./...
+        EXPORT LD_LIBRARY_PATH="./vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include/:/usr/lib:${LD_LIBRARY_PATH}"
         sudo make test
