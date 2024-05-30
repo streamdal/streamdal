@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
-	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/streamdal/streamdal/apps/server/util"
 )
 
 func (a *HTTPAPI) getConfigHandler(rw http.ResponseWriter, r *http.Request) {
@@ -20,15 +22,14 @@ func (a *HTTPAPI) getConfigHandler(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := protojson.Marshal(resp.Config)
+	cleaned, err := util.CleanConfig(resp)
 	if err != nil {
-		Write(rw, http.StatusInternalServerError, "unable to marshal config: %s", err)
-		return
+		Write(rw, http.StatusInternalServerError, "unable to clean config response: %s", err)
 	}
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusOK)
-	if _, err := rw.Write(data); err != nil {
+	if _, err := rw.Write(cleaned); err != nil {
 		logrus.Errorf("unable to write resp in getConfigHandler: %s", err)
 		return
 	}

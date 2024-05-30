@@ -4,7 +4,7 @@ images:
   logProcessor:
     repository: streamdal/log-processor
     pullPolicy: Always
-    tag: "e932b88"
+    tag: "958275a60"
   logstash:
     repository: logstash
     tag: "7.17.20"
@@ -34,20 +34,21 @@ logrotate:
   image: blacklabelops/logrotate
   env:
     LOGS_DIRECTORIES: "/var/log/pods"
-    LOGROTATE_SIZE: "1G"
+    LOGROTATE_SIZE: "100M"
+    CRON_SCHEDULE: "*/5 * * * *"
 
 resources:
   logProcessor:
     limits:
-      cpu: "1000m"  # 500 millicores
-      memory: "1Gi"  # 512 Mebibytes
+      cpu: "2000m"
+      memory: "1Gi"
     requests:
-      cpu: "500m"  # 100 millicores
-      memory: "512Mi"  # 256 Mebibytes
+      cpu: "1500m"
+      memory: "512Mi"
   logstash:
     limits:
-      cpu: "1000m"  # 1 core
-      memory: "1Gi"  # 1 Gibibyte
+      cpu: "1000m"
+      memory: "1Gi"
     requests:
-      cpu: "500m"  # 500 millicores
-      memory: "512Mi"  # 512 Mebibytes
+      cpu: "500m"
+      memory: "512Mi"

@@ -161,11 +161,15 @@ the failed operator).
 
 ## For Developers
 
-* You can build and push an operator image by doing:]
+* You can build and push an operator image by doing:
     ```bash
-    make docker-build IMG=streamdal/operator:latest
-    make docker-push IMG=streamdal/operator:latest
+    make docker-build 
     ```
+
+* By default, `make docker-build` will build + push `streamdal/operator:latest`
+and `streamdal/operator:$CURRENT_SHORT_GIT_SHA`.
+
+* Updating the helm chart version + `values.yaml` is _MANUAL_.
 
 * Use the following flow when developing the operator:
     1. Make changes to operator code
