@@ -34,7 +34,7 @@ controllerManager:
       periodicReoncilerInterval: 10s
     image:
       repository: streamdal/operator
-      tag: latest
+      tag: fa1cbc88
     resources:
       limits:
         cpu: 500m
