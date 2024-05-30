@@ -32,7 +32,7 @@ jobs:
 
     - name: Test
       env:
-        LD_LIBRARY_PATH: "./vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include/"
+        LD_LIBRARY_PATH: "${{ github.workspace }}/vendor/github.com/bytecodealliance/wasmtime-go/v21/build/include/"
       run: |
         go get -t ./...
         sudo make test
