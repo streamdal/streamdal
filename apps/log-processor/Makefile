@@ -10,8 +10,10 @@ GIT_TAG := 0.0.0
 endif
 
 GO = CGO_ENABLED=$(CGO_ENABLED) GOFLAGS=-mod=vendor go
+# WASM requires cgo
 CGO_ENABLED ?= 1
-GO_BUILD_FLAGS = -ldflags "-X main.version=${GIT_TAG}-${VERSION} -linkmode=external" -tags netgo,wasmtime
+GO_BUILD_FLAGS = -ldflags "-X main.version=${VERSION} -extldflags=-static" -tags netgo,wasmtime
+
 
 # Utility functions
 check_defined = \
@@ -75,7 +77,7 @@ clean:
 test: description = Run Go tests
 test: GOFLAGS=
 test:
-	TEST=true go test ./... -v -count=1
+	TEST=true $(GO) test ./... -v -count=1
 
 ### Run
 
