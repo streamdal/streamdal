@@ -6,6 +6,11 @@ use iban::Iban;
 pub fn credit_card(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let num = field.str().trim().replace(['-', ' '], "");
 
+    // Check if all characters are digits
+    if !num.chars().all(|c| c.is_digit(10)) {
+        return Ok(false);
+    }
+
     // Convert the card number string to a vector of digits
     let digits: Vec<u32> = num.chars().filter_map(|c| c.to_digit(10)).collect();
 
