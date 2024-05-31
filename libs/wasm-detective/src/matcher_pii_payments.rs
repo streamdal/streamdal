@@ -7,7 +7,7 @@ pub fn credit_card(_request: &Request, field: Value) -> Result<bool, CustomError
     let num = field.str().trim().replace(['-', ' '], "");
 
     // Check if all characters are digits
-    if !num.chars().all(|c| c.is_digit(10)) {
+    if !num.chars().all(|c| c.is_ascii_digit()) {
         return Ok(false);
     }
 
