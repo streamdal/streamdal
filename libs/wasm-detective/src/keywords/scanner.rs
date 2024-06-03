@@ -166,14 +166,14 @@ impl FieldPII {
         fields
     }
 
-    /// Match a field against our keyword lists
-    /// There are two lists computed at initialization:
-    /// 1. scalar_keywords: A list of single keywords to match against
-    /// 2. path_keywords: A list of keywords with periods in them to match against. These represent
-    ///          a path in the JSON payload
-    /// scalar_keywords will be a O(1) lookup
-    /// strict path_keywords will be a O(1) lookup
-    /// fuzzy path_keywords will be a O(n) lookup
+    // Match a field against our keyword lists
+    // There are two lists computed at initialization:
+    // 1. scalar_keywords: A list of single keywords to match against
+    // 2. path_keywords: A list of keywords with periods in them to match against. These represent
+    //          a path in the JSON payload
+    // scalar_keywords will be a O(1) lookup
+    // strict path_keywords will be a O(1) lookup
+    // fuzzy path_keywords will be a O(n) lookup
     fn match_against_fields(&mut self, f: &Field, mode: DetectiveTypePIIKeywordMode) -> Vec<KeywordMatch> {
         let mut matches: Vec<KeywordMatch> = Vec::new();
 
