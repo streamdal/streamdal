@@ -492,3 +492,31 @@ pub fn canada_sin(_request: &Request, field: Value) -> Result<bool, CustomError>
 
     Ok(sum % 10 == 0)
 }
+
+// TODO: needs to be added to protos as a matcher
+pub fn hashed_password(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let val = field.str().trim();
+
+    // Check for common hash prefixes
+    let prefixes = [
+        "$2a$", // bcrypt
+        "$2b$", // bcrypt
+        "$2y$", // bcrypt
+        "$5$", // sha256crypt
+        "$6$", // sha512crypt
+        "$y$", // yescript
+        "$sha1", // sha1crypt
+        "$gy$", // gost-yescript
+        "$md5", // sunMD5
+        "$1$", // md5crypt
+        "$3$", // ntlm
+    ];
+
+    for prefix in prefixes.iter() {
+        if val.starts_with(prefix) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}

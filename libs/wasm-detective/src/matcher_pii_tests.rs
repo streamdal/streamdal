@@ -996,6 +996,25 @@ fn test_plaintext_pipes() {
     assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "fmaghull6m@webeden.co.uk".to_string());
 }
 
+#[test]
+fn test_plaintext_embedded_json() {
+    let sample_text = std::fs::read_to_string("./assets/test-payloads/escaped_json_logs.txt");
+
+    let request = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
+        data: &sample_text.unwrap().as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
+    };
+
+    let results = crate::detective::Detective::new().matches(&request).unwrap();
+
+    assert_eq!(results.len(), 11);
+}
+
 #[bench]
 fn bench_plaintext(b: &mut Bencher) {
     b.iter(|| {
