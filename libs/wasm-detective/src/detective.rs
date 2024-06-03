@@ -15,7 +15,7 @@ use protos::sp_pipeline::PipelineDataFormat;
 use unicode_segmentation::UnicodeSegmentation;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
-use crate::matcher_pii::{canada_sin, email, jwt, phone, ssn, uk_nino, vin_number};
+use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, phone, ssn, uk_nino, vin_number};
 use crate::matcher_pii_cloud::aws_key_id;
 use crate::matcher_pii_payments::credit_card;
 use any_ascii::any_ascii;
@@ -450,6 +450,7 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         canada_sin,
         credit_card,
         phone,
+        hashed_password,
     ];
 
     let mut found: Vec<Word> = Vec::new();

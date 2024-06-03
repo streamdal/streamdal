@@ -997,7 +997,7 @@ fn test_plaintext_embedded_json() {
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
-    assert_eq!(results.len(), 9);
+    assert_eq!(results.len(), 11);
 }
 
 #[bench]
