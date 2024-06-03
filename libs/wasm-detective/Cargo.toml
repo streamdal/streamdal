@@ -32,3 +32,4 @@ bs58 = "0.5.0"
 toml = "0.8.12"
 rand = "0.8.5"
 unicode-segmentation = { version = "1.11.0", features = ["no_std"] }
+any_ascii = "0.3.2"

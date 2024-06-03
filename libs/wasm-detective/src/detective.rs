@@ -15,9 +15,10 @@ use protos::sp_pipeline::PipelineDataFormat;
 use unicode_segmentation::UnicodeSegmentation;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
-use crate::matcher_pii::{canada_sin, email, jwt, ssn, uk_nino, vin_number};
+use crate::matcher_pii::{canada_sin, email, jwt, phone, ssn, uk_nino, vin_number};
 use crate::matcher_pii_cloud::aws_key_id;
 use crate::matcher_pii_payments::credit_card;
+use any_ascii::any_ascii;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
@@ -65,7 +66,9 @@ impl Detective {
         let data_as_str = str::from_utf8(request.data)
             .map_err(|e| CustomError::Error(format!("unable to convert bytes to string: {}", e)))?;
 
-        Ok(plaintext(request, data_as_str))
+        let normalized = any_ascii(data_as_str);
+
+        Ok(plaintext(request, normalized.as_str()))
     }
 
     pub fn matches_keyword(request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
@@ -430,7 +433,10 @@ pub struct Word {
 
 pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch> {
     let mut res = Vec::<DetectiveStepResultMatch>::new();
-    let sentences = input.split_sentence_bound_indices();
+
+    let cleaned = input.replace('\"', " ");
+
+    let sentences = cleaned.split_sentence_bound_indices();
 
     // These functions take a gjson value, but we can just mock that
     // rather than changing around the entire library for now
@@ -443,6 +449,7 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         vin_number,
         canada_sin,
         credit_card,
+        phone,
     ];
 
     let mut found: Vec<Word> = Vec::new();
@@ -515,7 +522,7 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         }
     }
 
-    for found_word in found {
+    'words: for found_word in found {
         for scanner in &scanners {
             let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
             if let Ok(found) = scanner(request, gjson::parse(&payload).get("key")) {
@@ -533,6 +540,7 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
                     };
 
                     res.push(result);
+                    continue 'words;
                 }
             }
         }
