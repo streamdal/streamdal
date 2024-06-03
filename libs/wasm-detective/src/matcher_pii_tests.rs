@@ -295,6 +295,21 @@ fn test_credit_card() {
             text: "equal credit_card.jcb.invalid".to_string(),
             should_error: false,
         },
+        // False positive
+        crate::test_utils::TestCase {
+            request: Request {
+                match_type: DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD,
+                data: sample_json,
+                path: "object.credit_card.false_positive".to_string(),
+                args: vec![],
+                negate: false,
+                mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET,
+                data_format: PIPELINE_DATA_FORMAT_JSON,
+            },
+            expected_matches: 0,
+            text: "credit_card.false_positive should not match".to_string(),
+            should_error: false,
+        },
     ];
 
     crate::test_utils::run_tests(&test_cases);
