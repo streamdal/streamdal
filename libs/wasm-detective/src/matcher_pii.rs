@@ -155,14 +155,13 @@ pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError>
         return Ok(false);
     }
 
-    return Ok(true);
+    Ok(true)
 
     // Scrapping north american VIN checking ~MG 2024-06-03
     // The check digit only applies to VINS being sold in North America, irrespective
     // of the manufacturing location. So it will not be good enough to validate
 
     // let weights: [u32; 17] = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
-    // // wf0sxxgbws8b28564
     // let transliterations: std::collections::HashMap<char, u32> = [
     //     ('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('h', 8),
     //     ('j', 1), ('k', 2), ('l', 3), ('m', 4), ('n', 5), ('p', 7), ('r', 9), ('s', 2),

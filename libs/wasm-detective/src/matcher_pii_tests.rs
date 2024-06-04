@@ -1013,7 +1013,7 @@ fn test_plaintext_embedded_json() {
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
     assert_eq!(results.len(), 10);
-    assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "+447876442401".to_string());
+    assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "+1-512-974-2220".to_string());
     assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "$2a$10$485VpRwnHq/m8yzlGREZtewsGXafgRdgDV4RUam68PGlF3szQCopQ".to_string());
     assert_eq!(String::from_utf8(results[2].value.clone()).unwrap(), "first+last.name@domain.net".to_string());
     assert_eq!(String::from_utf8(results[3].value.clone()).unwrap(), "+44.787644-2401".to_string());
