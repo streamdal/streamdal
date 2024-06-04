@@ -932,7 +932,7 @@ fn test_pii_keyword_accuracy() {
 
 #[test]
 fn test_plaintext() {
-    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111";
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is JH4NA1152MT000412. I have AA000000B as my NHS number. My credit card is 4111111111111111";
 
     let request = &Request {
         match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
@@ -1012,7 +1012,17 @@ fn test_plaintext_embedded_json() {
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
-    assert_eq!(results.len(), 11);
+    assert_eq!(results.len(), 10);
+    assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "+447876442401".to_string());
+    assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "$2a$10$485VpRwnHq/m8yzlGREZtewsGXafgRdgDV4RUam68PGlF3szQCopQ".to_string());
+    assert_eq!(String::from_utf8(results[2].value.clone()).unwrap(), "first+last.name@domain.net".to_string());
+    assert_eq!(String::from_utf8(results[3].value.clone()).unwrap(), "+44.787644-2401".to_string());
+    assert_eq!(String::from_utf8(results[4].value.clone()).unwrap(), "00-B0-D0-63-C2-26".to_string());
+    assert_eq!(String::from_utf8(results[5].value.clone()).unwrap(), "4T1G11AKXRU906563".to_string());
+    assert_eq!(String::from_utf8(results[6].value.clone()).unwrap(), "first+last@domain.net".to_string());
+    assert_eq!(String::from_utf8(results[7].value.clone()).unwrap(), "192.168.1.37".to_string());
+    assert_eq!(String::from_utf8(results[8].value.clone()).unwrap(), "111-22-3456".to_string());
+    assert_eq!(String::from_utf8(results[9].value.clone()).unwrap(), "2001:db8:0:1:1:1:1:1".to_string());
 }
 
 #[bench]

@@ -61,9 +61,9 @@ pub fn ip_address(request: &Request, field: Value) -> Result<bool, CustomError> 
         DetectiveType::DETECTIVE_TYPE_IPV6_ADDRESS => {
             IpAddr::from_str(field.str()).map_or(Ok(false), |i| Ok(i.is_ipv6()))
         }
-        _ => Err(CustomError::MatchError(
-            "unknown ip address match type".to_string(),
-        )),
+        _ => {
+            IpAddr::from_str(field.str()).map_or(Ok(false), |i| Ok(i.is_ipv4() || i.is_ipv6()))
+        }
     }
 }
 
