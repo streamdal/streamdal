@@ -1,11 +1,12 @@
+use idna::domain_to_ascii_strict;
+use streamdal_gjson as gjson;
+use streamdal_gjson::Value;
+use validators::prelude::*;
+use validators_prelude::phonenumber::PhoneNumber;
+
 use crate::detective::Request;
 use crate::error::CustomError;
 use crate::matcher_pii_payments as pii_payments;
-use streamdal_gjson::Value;
-use streamdal_gjson as gjson;
-use idna::domain_to_ascii_strict;
-use validators::prelude::*;
-use validators_prelude::phonenumber::PhoneNumber;
 
 pub fn any(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let matchers = vec![pii_payments::credit_card, ssn, email];
@@ -379,10 +380,11 @@ pub fn postal_code_ca(_request: &Request, postal_code: String) -> Result<bool, C
     Ok(is_valid)
 }
 
-const RSA_KEY_PREFIXES: [&str; 3] = [
+const RSA_KEY_PREFIXES: [&str; 4] = [
     "-----BEGIN PRIVATE",
-    "-----BEGIN RSA PRIVATE",
+    "-----BEGIN RSA",
     "-----BEGIN ENCRYPTED",
+    "-----BEGIN PGP",
 ];
 
 pub fn rsa_key(_request: &Request, field: Value) -> Result<bool, CustomError> {

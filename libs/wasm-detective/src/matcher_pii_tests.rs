@@ -1,11 +1,14 @@
-use crate::detective::{plaintext, Request};
 #[cfg(test)]
 extern crate test;
-use protos::sp_steps_detective::DetectiveType;
-use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
+
 use std::collections::HashMap;
 use test::Bencher;
+
 use protos::sp_pipeline::PipelineDataFormat::{PIPELINE_DATA_FORMAT_JSON, PIPELINE_DATA_FORMAT_PLAINTEXT};
+use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
+
+use crate::detective::Request;
 
 #[test]
 fn test_email() {
@@ -971,7 +974,18 @@ fn test_plaintext_mixed() {
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
+    // Since the ccnum is inside JSON inside plaintext. This operation will result in duplicates
+    // That is okay
     assert_eq!(results.len(), 1);
+
+    assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "4111111111111111".to_string());
+    assert_eq!(results[0].char_index_start, 72);
+    assert_eq!(results[0].char_index_end, 88);
+
+    // // Assert value == "4111111111111111"
+    // assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "4111111111111111".to_string());
+    // assert_eq!(results[1].char_index_start, 72);
+    // assert_eq!(results[1].char_index_end, 88);
 
 }
 
@@ -1011,18 +1025,23 @@ fn test_plaintext_embedded_json() {
     };
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
+    // Print out all of the results
+    for r in results.iter() {
+        println!("{}: {} - {}", r.char_index_start, r.pii_type, String::from_utf8(r.value.clone()).unwrap());
+    }
 
-    assert_eq!(results.len(), 10);
+    assert_eq!(results.len(), 11);
     assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "+1-512-974-2220".to_string());
     assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "$2a$10$485VpRwnHq/m8yzlGREZtewsGXafgRdgDV4RUam68PGlF3szQCopQ".to_string());
-    assert_eq!(String::from_utf8(results[2].value.clone()).unwrap(), "first+last.name@domain.net".to_string());
-    assert_eq!(String::from_utf8(results[3].value.clone()).unwrap(), "+44.787644-2401".to_string());
-    assert_eq!(String::from_utf8(results[4].value.clone()).unwrap(), "00-B0-D0-63-C2-26".to_string());
-    assert_eq!(String::from_utf8(results[5].value.clone()).unwrap(), "4T1G11AKXRU906563".to_string());
-    assert_eq!(String::from_utf8(results[6].value.clone()).unwrap(), "first+last@domain.net".to_string());
-    assert_eq!(String::from_utf8(results[7].value.clone()).unwrap(), "192.168.1.37".to_string());
-    assert_eq!(String::from_utf8(results[8].value.clone()).unwrap(), "111-22-3456".to_string());
-    assert_eq!(String::from_utf8(results[9].value.clone()).unwrap(), "2001:db8:0:1:1:1:1:1".to_string());
+    assert_eq!(String::from_utf8(results[2].value.clone()).unwrap(), "GB".to_string());
+    assert_eq!(String::from_utf8(results[3].value.clone()).unwrap(), "first+last.name@domain.net".to_string());
+    assert_eq!(String::from_utf8(results[4].value.clone()).unwrap(), "+44.787644-2401".to_string());
+    assert_eq!(String::from_utf8(results[5].value.clone()).unwrap(), "00-B0-D0-63-C2-26".to_string());
+    assert_eq!(String::from_utf8(results[6].value.clone()).unwrap(), "4T1G11AKXRU906563".to_string());
+    assert_eq!(String::from_utf8(results[7].value.clone()).unwrap(), "first+last@domain.net".to_string());
+    assert_eq!(String::from_utf8(results[8].value.clone()).unwrap(), "192.168.1.37".to_string());
+    assert_eq!(String::from_utf8(results[9].value.clone()).unwrap(), "111-22-3456".to_string());
+    assert_eq!(String::from_utf8(results[10].value.clone()).unwrap(), "2001:db8:0:1:1:1:1:1".to_string());
 }
 
 #[bench]
@@ -1040,6 +1059,6 @@ fn bench_plaintext(b: &mut Bencher) {
             data_format: PIPELINE_DATA_FORMAT_JSON,
         };
 
-        let _ = plaintext(&req, sample_text);
+        let _ =  crate::detective::Detective::new().matches_plaintext(&req);
     });
 }
