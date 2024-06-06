@@ -1,9 +1,11 @@
 extern crate test;
 
+use test::Bencher;
+
+use protos::sp_steps_detective::DetectiveType;
+
 use crate::detective::parse_field;
 use crate::test_utils::generate_request_for_bench;
-use protos::sp_steps_detective::DetectiveType;
-use test::Bencher;
 
 #[bench]
 fn bench_ipv4_address(b: &mut Bencher) {
@@ -189,5 +191,18 @@ fn bench_credit_card_payload(b: &mut Bencher) {
 
     b.iter(|| {
         let _ = crate::detective::Detective::new().matches(&request);
+    });
+}
+
+
+#[bench]
+fn bench_get_json_payloads(b : &mut Bencher) {
+    // Load the test data
+    let test_data = std::fs::read_to_string("./assets/test-payloads/escaped_json_logs.txt").unwrap();
+
+    let det = crate::detective::Detective::new();
+
+    b.iter(|| {
+        let _ = det.get_embedded_json(&test_data);
     });
 }

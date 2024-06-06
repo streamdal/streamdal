@@ -524,7 +524,7 @@ impl Detective {
         res
     }
 
-    fn get_embedded_json(&self, input: &str) -> VecDeque<EmbeddedJSON> {
+    pub fn get_embedded_json(&self, input: &str) -> VecDeque<EmbeddedJSON> {
         let mut bracket_stack = VecDeque::new();
         let mut json_strings: VecDeque<EmbeddedJSON> = VecDeque::new();
 
