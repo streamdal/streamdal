@@ -2,7 +2,6 @@
 extern crate test;
 
 use std::collections::HashMap;
-use test::Bencher;
 
 use protos::sp_pipeline::PipelineDataFormat::{PIPELINE_DATA_FORMAT_JSON, PIPELINE_DATA_FORMAT_PLAINTEXT};
 use protos::sp_steps_detective::DetectiveType;
@@ -1037,21 +1036,3 @@ fn test_plaintext_embedded_json() {
     assert_eq!(String::from_utf8(results[10].value.clone()).unwrap(), "2001:db8:0:1:1:1:1:1".to_string());
 }
 
-#[bench]
-fn bench_plaintext(b: &mut Bencher) {
-    b.iter(|| {
-        let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111.";
-
-        let req = &Request {
-            match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
-            data: &&sample_text.as_bytes().to_vec(),
-            path: "".to_string(),
-            args: Vec::new(),
-            negate: false,
-            mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
-            data_format: PIPELINE_DATA_FORMAT_JSON,
-        };
-
-        let _ =  crate::detective::Detective::new().matches_plaintext(&req);
-    });
-}

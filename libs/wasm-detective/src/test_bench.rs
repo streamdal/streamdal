@@ -2,9 +2,11 @@ extern crate test;
 
 use test::Bencher;
 
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_PLAINTEXT;
 use protos::sp_steps_detective::DetectiveType;
+use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE;
 
-use crate::detective::parse_field;
+use crate::detective::{parse_field, Request};
 use crate::test_utils::generate_request_for_bench;
 
 #[bench]
@@ -194,15 +196,80 @@ fn bench_credit_card_payload(b: &mut Bencher) {
     });
 }
 
+#[bench]
+fn bench_plaintext(b: &mut Bencher) {
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111.";
+
+    let req = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+        data: &&sample_text.as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
+    };
+
+    b.iter(|| {
+
+        let _ =  crate::detective::Detective::new().matches_plaintext(&req);
+    });
+}
 
 #[bench]
-fn bench_get_json_payloads(b : &mut Bencher) {
-    // Load the test data
-    let test_data = std::fs::read_to_string("./assets/test-payloads/escaped_json_logs.txt").unwrap();
+fn bench_plaintext_without_embedded(b: &mut Bencher) {
+    let sample_text = std::fs::read_to_string("./assets/test-payloads/escaped_json_logs.txt").unwrap();
+
+    // Replace { and } inside text to avoid embedded json
+    let sample_text = sample_text.replace("{", "").replace("}", "");
+
+    let req = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+        data: &&sample_text.as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
+    };
 
     let det = crate::detective::Detective::new();
 
     b.iter(|| {
-        let _ = det.get_embedded_json(&test_data);
+        let _= det.matches_plaintext(&req);
+    });
+}
+
+#[bench]
+fn bench_plaintext_with_embedded(b: &mut Bencher) {
+    let sample_text = std::fs::read_to_string("./assets/test-payloads/escaped_json_logs.txt").unwrap();
+
+    let req = &Request {
+        match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
+        data: &&sample_text.as_bytes().to_vec(),
+        path: "".to_string(),
+        args: Vec::new(),
+        negate: false,
+        mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
+        data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
+    };
+
+    let det = crate::detective::Detective::new();
+
+    b.iter(|| {
+        let _= det.matches_plaintext(&req);
+    });
+}
+
+
+#[bench]
+fn bench_get_json_payloads(b : &mut Bencher) {
+    // Load the test data
+    let sample_text = std::fs::read_to_string("./assets/test-payloads/escaped_json_logs.txt").unwrap();
+
+    let det = crate::detective::Detective::new();
+
+    b.iter(|| {
+        let _ = det.get_embedded_json(&sample_text);
     });
 }
