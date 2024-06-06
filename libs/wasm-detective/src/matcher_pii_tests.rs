@@ -974,19 +974,11 @@ fn test_plaintext_mixed() {
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
-    // Since the ccnum is inside JSON inside plaintext. This operation will result in duplicates
-    // That is okay
     assert_eq!(results.len(), 1);
 
     assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "4111111111111111".to_string());
     assert_eq!(results[0].char_index_start, 72);
     assert_eq!(results[0].char_index_end, 88);
-
-    // // Assert value == "4111111111111111"
-    // assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "4111111111111111".to_string());
-    // assert_eq!(results[1].char_index_start, 72);
-    // assert_eq!(results[1].char_index_end, 88);
-
 }
 
 #[test]
