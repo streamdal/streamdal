@@ -132,58 +132,78 @@ pub fn passport_id(_request: &Request, _field: Value) -> Result<bool, CustomErro
     Err(CustomError::Error("not implemented".to_string()))
 }
 
-pub fn vin_number(_request: &Request, _field: Value) -> Result<bool, CustomError> {
-    let vin = _field.str().trim().to_lowercase();
+pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError> {
+    let vin = field.str().trim().to_lowercase();
 
     // Check if VIN has 17 characters
     if vin.len() != 17 {
         return Ok(false);
     }
 
-    let weights: [u32; 17] = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
-
-    let transliterations: std::collections::HashMap<char, u32> = [
-        ('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('h', 8),
-        ('j', 1), ('k', 2), ('l', 3), ('m', 4), ('n', 5), ('p', 7), ('r', 9), ('s', 2),
-        ('t', 3), ('u', 4), ('v', 5), ('w', 6), ('x', 7), ('y', 8), ('z', 9)
-    ].iter().cloned().collect();
-
-    let mut sum = 0;
-
-    for (i, c) in vin.chars().enumerate() {
-        if c.is_numeric() {
-            if let Some(got_digit) = c.to_digit(10) {
-                sum += got_digit * weights[i];
-            } else {
-                return Ok(false);
-            }
-        } else if let Some(got_translit) = transliterations.get(&c) {
-            sum += got_translit * weights[i];
-        } else {
-            return Ok(false);
-        }
-    }
-
-    let checkdigit = sum % 11;
-
-    let checkdigit = if checkdigit == 10 {
-        'x'
-    } else {
-        let found_char = char::from_u32(checkdigit + '0' as u32);
-        if found_char.is_none() {
-            return Ok(false);
-        }
-        found_char.unwrap()
-    };
-
-    let eighth_char = vin.chars().nth(8);
-    if eighth_char.is_none() {
+    // Check if all characters are ascii alphanumeric
+    if !vin.chars().all(|c| c.is_ascii_alphanumeric()) {
         return Ok(false);
     }
 
-    let res = checkdigit == eighth_char.unwrap();
+    // "i", "o", or "q" are not valid characters in a VIN
+    if vin.contains('i') || vin.contains('o') || vin.contains('q') {
+        return Ok(false);
+    }
 
-    Ok(res)
+    // Zero is not a valid first character
+    if vin.starts_with('0') {
+        return Ok(false);
+    }
+
+    Ok(true)
+
+    // Scrapping north american VIN checking ~MG 2024-06-03
+    // The check digit only applies to VINS being sold in North America, irrespective
+    // of the manufacturing location. So it will not be good enough to validate
+
+    // let weights: [u32; 17] = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
+    // let transliterations: std::collections::HashMap<char, u32> = [
+    //     ('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7), ('h', 8),
+    //     ('j', 1), ('k', 2), ('l', 3), ('m', 4), ('n', 5), ('p', 7), ('r', 9), ('s', 2),
+    //     ('t', 3), ('u', 4), ('v', 5), ('w', 6), ('x', 7), ('y', 8), ('z', 9)
+    // ].iter().cloned().collect();
+
+    // let mut sum = 0;
+    //
+    // for (i, c) in vin.chars().enumerate() {
+    //     if c.is_numeric() {
+    //         if let Some(got_digit) = c.to_digit(10) {
+    //             sum += got_digit * weights[i];
+    //         } else {
+    //             return Ok(false);
+    //         }
+    //     } else if let Some(got_translit) = transliterations.get(&c) {
+    //         sum += got_translit * weights[i];
+    //     } else {
+    //         return Ok(false);
+    //     }
+    // }
+    //
+    // let checkdigit = sum % 11;
+    //
+    // let checkdigit = if checkdigit == 10 {
+    //     'x'
+    // } else {
+    //     let found_char = char::from_u32(checkdigit + '0' as u32);
+    //     if found_char.is_none() {
+    //         return Ok(false);
+    //     }
+    //     found_char.unwrap()
+    // };
+    //
+    // let eighth_char = vin.chars().nth(8);
+    // if eighth_char.is_none() {
+    //     return Ok(false);
+    // }
+    //
+    // let res = checkdigit == eighth_char.unwrap();
+
+    // Ok(res)
 }
 
 #[derive(Validator)]

@@ -19,6 +19,7 @@ use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, phone, ssn, uk
 use crate::matcher_pii_cloud::aws_key_id;
 use crate::matcher_pii_payments::credit_card;
 use any_ascii::any_ascii;
+use crate::matcher_core::{ip_address, mac_address};
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
@@ -451,6 +452,8 @@ pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch
         credit_card,
         phone,
         hashed_password,
+        mac_address,
+        ip_address,
     ];
 
     let mut found: Vec<Word> = Vec::new();
