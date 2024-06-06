@@ -923,9 +923,9 @@ fn test_pii_keyword_accuracy() {
     assert_eq!(result.is_ok(), true);
 
     for r in result.unwrap() {
-        println!("testing if result path {:?} exists in expected", &r.path);
-        println!("testing if result value {:?} exists in expected", String::from_utf8(r.value.clone()).unwrap());
-        println!("testing if result pii_type {:?} exists in expected", &r.pii_type);
+        // println!("testing if result path {:?} exists in expected", &r.path);
+        // println!("testing if result value {:?} exists in expected", String::from_utf8(r.value.clone()).unwrap());
+        // println!("testing if result pii_type {:?} exists in expected", &r.pii_type);
 
         assert!(expected.contains_key(&r.path));
         assert_eq!(expected.get(&r.path).unwrap().pii_type, r.pii_type);
@@ -1017,10 +1017,11 @@ fn test_plaintext_embedded_json() {
     };
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
-    // Print out all of the results
-    for r in results.iter() {
-        println!("{}: {} - {}", r.char_index_start, r.pii_type, String::from_utf8(r.value.clone()).unwrap());
-    }
+
+    // // Print out all of the results
+    // for r in results.iter() {
+    //     println!("{}: {} - {}", r.char_index_start, r.pii_type, String::from_utf8(r.value.clone()).unwrap());
+    // }
 
     assert_eq!(results.len(), 11);
     assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "+1-512-974-2220".to_string());
