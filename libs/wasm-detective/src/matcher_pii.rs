@@ -1,8 +1,7 @@
 use idna::domain_to_ascii_strict;
+use regex::Regex;
 use streamdal_gjson as gjson;
 use streamdal_gjson::Value;
-use validators::prelude::*;
-use validators_prelude::phonenumber::PhoneNumber;
 
 use crate::detective::Request;
 use crate::error::CustomError;
@@ -207,13 +206,16 @@ pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError>
     // Ok(res)
 }
 
-#[derive(Validator)]
-#[validator(phone)]
-pub struct InternationalPhone(pub PhoneNumber);
-
 pub fn phone(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let val = field.str().trim().replace(['-', ' ', '.'], "");
-    let res = InternationalPhone::parse_string(val).is_ok();
+    let val = field.str().trim().replace(['-', ' ', '.', '(', ')'], "");
+
+    let re = Regex::new(r"^\+(\d{1,3}) ?(\(?\d+\)?)?([ -]?\d+)+$");
+    if re.is_err() {
+        return Ok(false)
+    }
+
+    let res = re.unwrap().is_match(val.as_str());
+
     Ok(res)
 }
 
