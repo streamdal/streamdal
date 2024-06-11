@@ -6,6 +6,7 @@ import { IInternalClient } from "@streamdal/protos/protos/sp_internal.client";
 import {
   ExecStatus,
   SDKResponse as InternalSDKResponse,
+  SDKMode,
 } from "@streamdal/protos/protos/sp_sdk";
 import { v4 as uuidv4 } from "uuid";
 
@@ -188,6 +189,7 @@ export const registerStreamdal = async (
           statusMessage: "Failed to parse JSON data. Not",
           pipelineStatus: [],
           metadata: {},
+          sdkMode: SDKMode.SDK_MODE_SYNC,
         });
       }
     },

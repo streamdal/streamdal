@@ -8,6 +8,7 @@ import {
 import {
   ExecStatus,
   PipelineStatus,
+  SDKMode,
   StepStatus,
 } from "@streamdal/protos/protos/sp_sdk";
 import { InterStepResult, WASMExitCode } from "@streamdal/protos/protos/sp_wsm";
@@ -108,6 +109,7 @@ export const retryProcessPipelines = async ({
     pipelineStatus: [],
     statusMessage,
     metadata: {},
+    sdkMode: SDKMode.SDK_MODE_SYNC,
   });
 };
 
@@ -209,6 +211,7 @@ export const processPipelines = async ({
       statusMessage,
       pipelineStatus: [],
       metadata: {},
+      sdkMode: SDKMode.SDK_MODE_SYNC,
     };
   }
 
@@ -219,6 +222,7 @@ export const processPipelines = async ({
     status: ExecStatus.TRUE,
     statusMessage: "",
     metadata: {},
+    sdkMode: SDKMode.SDK_MODE_SYNC,
   };
 
   for (const pipeline of pipelines.values()) {
