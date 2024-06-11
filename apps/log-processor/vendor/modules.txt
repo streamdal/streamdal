@@ -84,7 +84,7 @@ github.com/rivo/uniseg
 github.com/streamdal/streamdal/libs/protos/build/go/protos
 github.com/streamdal/streamdal/libs/protos/build/go/protos/shared
 github.com/streamdal/streamdal/libs/protos/build/go/protos/steps
-# github.com/streamdal/streamdal/sdks/go v0.1.31
+# github.com/streamdal/streamdal/sdks/go v0.1.32
 ## explicit; go 1.19
 github.com/streamdal/streamdal/sdks/go
 github.com/streamdal/streamdal/sdks/go/helper
@@ -95,7 +95,7 @@ github.com/streamdal/streamdal/sdks/go/metrics
 github.com/streamdal/streamdal/sdks/go/server
 github.com/streamdal/streamdal/sdks/go/types
 github.com/streamdal/streamdal/sdks/go/validate
-# github.com/tetratelabs/wazero v1.7.2
+# github.com/tetratelabs/wazero v1.7.3
 ## explicit; go 1.20
 github.com/tetratelabs/wazero
 github.com/tetratelabs/wazero/api
