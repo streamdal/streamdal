@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tetratelabs/wazero"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
@@ -177,6 +179,7 @@ type Streamdal struct {
 	wasmCacheMtx   *sync.RWMutex
 	funcCreateMtx  *sync.Mutex
 	funcCreate     map[string]*sync.Mutex
+	wazeroCache    wazero.CompilationCache
 
 	// Sampling rate limiter, uses token bucket algo
 	limiter *rate.Limiter
@@ -397,6 +400,7 @@ func New(cfg *Config) (*Streamdal, error) {
 		// Used for blocking getFunctionFromCache() calls when a function is being created
 		funcCreate:    make(map[string]*sync.Mutex),
 		funcCreateMtx: &sync.Mutex{},
+		wazeroCache:   wazero.NewCompilationCache(),
 	}
 
 	if cfg.DryRun {
