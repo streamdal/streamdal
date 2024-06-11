@@ -22,11 +22,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tetratelabs/wazero"
-
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/relistan/go-director"
+	"github.com/tetratelabs/wazero"
 	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
 
