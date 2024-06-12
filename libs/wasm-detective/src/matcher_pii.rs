@@ -3,7 +3,7 @@ use regex::Regex;
 use streamdal_gjson as gjson;
 use streamdal_gjson::Value;
 
-use crate::detective::Request;
+use crate::detective::{Request, PHONE_NUMBER_REGEX};
 use crate::error::CustomError;
 use crate::matcher_pii_payments as pii_payments;
 
@@ -207,14 +207,16 @@ pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError>
 }
 
 pub fn phone(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let val = field.str().trim().replace(['-', ' ', '.', '(', ')'], "");
+    let re: &Regex = unsafe {
+        // If phone() is being called within a wasm module, PHONE_NUMBER_REGEX
+        // will be correctly initialized via init() by wizer. If phone() is
+        // called from non-wasm (eg. tests), PHONE_NUMBER_REGEX will be None.
+        if PHONE_NUMBER_REGEX.is_none() {
+            crate::detective::init();
+        }
 
-    let re = Regex::new(r"^\+(\d{1,3}) ?(\(?\d+\)?)?([ -]?\d+)+$");
-    if re.is_err() {
-        return Ok(false)
-    }
-
-    let res = re.unwrap().is_match(val.as_str());
+        PHONE_NUMBER_REGEX.as_ref().unwrap() };
+    let res = re.is_match(field.str());
 
     Ok(res)
 }

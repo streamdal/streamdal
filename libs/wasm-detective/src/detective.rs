@@ -1,6 +1,7 @@
 use std::collections::{HashMap, VecDeque};
 use std::default::Default;
 use std::str;
+use regex::Regex;
 
 use any_ascii::any_ascii;
 use protos::sp_pipeline::PipelineDataFormat;
@@ -26,6 +27,51 @@ use crate::matcher_pii_payments::credit_card;
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
+
+pub static mut PHONE_NUMBER_REGEX: Option<Regex> = None;
+pub const PHONE_NUMBER_REGEX_STR: &str = r"^\s*(?:\+?(\d{1,3}))?([ -.(]*(\d{3})[-. )]*)?((\d{3})[ -.]*(\d{3,6})(?:[ -.x]*(\d+))?)\s*$";
+
+// This is a special function used by the 'wizer' pre-initializer utility.
+//
+// After building the wasm binary, we run the 'wizer' tool against the binary
+// which will call on this function and write the result into a new wasm binary.
+//
+// The result is that we are able to avoid a heavy CPU hit for operations like
+// compiling regexes on every new request to detective.
+//
+// https://github.com/bytecodealliance/wizer
+#[export_name = "wizer.initialize"]
+pub fn init() {
+    unsafe {
+        // +919367788755    <- match
+        // 8989829304       <- match
+        // +16308520397     <- match
+        // 786-307-3615     <- match
+        // +44.787644-2401  <- match
+        // +447876442401    <- match
+        // 407.865.2052     <- match
+        // 407-865-2052     <- match
+        // 407 865 2052     <- match
+        // +1 407 123 1231  <- match
+        // (407) 865 2052   <- match
+        // +372 512 3456    <- match (Estonia)
+        // 011 372 512 3456 <- match (Estonia dial out from US)
+        // 1                <- no match
+        // 12               <- no match
+        // 123              <- no match
+        // 1234             <- no match
+        // 12345            <- no match
+        // 123456           <- no match
+        // 1234567          <- match
+        // 12345678         <- match
+        // 123456789        <- match
+        // 1234567890       <- match
+        // 12345678901      <- match
+        // 1-1-1            <- no match
+        // +982             <- no match
+        PHONE_NUMBER_REGEX = Some(Regex::new(PHONE_NUMBER_REGEX_STR).unwrap());
+    }
+}
 
 #[derive(Clone)]
 pub struct Request<'a> {
@@ -404,23 +450,21 @@ impl Detective {
         let cleaned = input.replace('\"', " ");
 
         let sentences = cleaned.split_sentence_bound_indices();
-
-        // These functions take a gjson value, but we can just mock that
-        // rather than changing around the entire library for now
-        let scanners: Vec<MatcherFunc> = vec![
-            email,
-            aws_key_id,
-            jwt,
-            ssn,
-            uk_nino,
-            vin_number,
-            canada_sin,
-            credit_card,
-            phone,
-            hashed_password,
-            mac_address,
-            ip_address,
-        ];
+        
+        let scanners = HashMap::from([
+            (email as MatcherFunc, "Person"),
+            (aws_key_id as MatcherFunc, "AWS"),
+            (jwt as MatcherFunc, "JWT"),
+            (ssn as MatcherFunc, "Person"),
+            (uk_nino as MatcherFunc, "Person"),
+            (vin_number as MatcherFunc, "Vehicle_Information"),
+            (canada_sin as MatcherFunc, "Person"),
+            (credit_card as MatcherFunc, "Billing"),
+            (phone as MatcherFunc, "Person"),
+            (hashed_password as MatcherFunc, "Credentials"),
+            (mac_address as MatcherFunc, "Device"),
+            (ip_address as MatcherFunc, "IP_Information"),
+        ]);
 
         let mut found: Vec<Word> = Vec::new();
 
@@ -494,17 +538,15 @@ impl Detective {
 
 
         'words: for found_word in found {
-            for scanner in &scanners {
+            for (scanner_fn, scanner_name) in &scanners {
                 let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
-                if let Ok(found) = scanner(request, gjson::parse(&payload).get("key")) {
+                if let Ok(found) = scanner_fn(request, gjson::parse(&payload).get("key")) {
                     if found {
                         let result = DetectiveStepResultMatch {
                             type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
                             path: "".to_string(),
                             value: found_word.word.clone().into_bytes(),
-                            // TODO: this should return a useful type, but there's no way to get the name of the scanner
-                            // TODO: Using `stringify!(scanner)` will just return "scanner"
-                            pii_type: "plaintext".to_string(),
+                            pii_type: scanner_name.to_string(),
                             char_index_start: found_word.char_index_start as i32,
                             char_index_end: found_word.char_index_end as i32,
                             ..Default::default()

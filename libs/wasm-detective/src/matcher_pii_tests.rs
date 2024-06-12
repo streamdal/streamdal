@@ -532,7 +532,6 @@ fn test_phone() {
     ];
 
     crate::test_utils::run_tests(&test_cases);
-
 }
 
 #[test]
@@ -934,7 +933,7 @@ fn test_pii_keyword_accuracy() {
 
 #[test]
 fn test_plaintext() {
-    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is JH4NA1152MT000412. I have AA000000B as my NHS number. My credit card is 4111111111111111";
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is JH4NA1152MT000412. I have AA000000B as my NHS number. My credit card is 4111111111111111 my phone number is || (372)-512-3456";
 
     let request = &Request {
         match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
@@ -948,8 +947,9 @@ fn test_plaintext() {
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
-    // This should match 4 PII types: email, vin, nhs number, and credit card
-    assert_eq!(results.len(), 4);
+    // This should match 4 PII types: email, vin, nhs number, credit card and phone
+    assert_eq!(results.len(), 5);
+    println!("{:?}", results);
 
     // assert_eq!(&results[0].pii_type, "Person");
     // assert_eq!(&results[1].pii_type, "Vehicle_Information");
