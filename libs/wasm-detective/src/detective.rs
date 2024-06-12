@@ -450,7 +450,7 @@ impl Detective {
         let cleaned = input.replace('\"', " ");
 
         let sentences = cleaned.split_sentence_bound_indices();
-        
+
         let scanners = HashMap::from([
             (email as MatcherFunc, "Person"),
             (aws_key_id as MatcherFunc, "AWS"),
