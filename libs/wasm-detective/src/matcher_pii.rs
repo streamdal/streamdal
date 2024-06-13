@@ -1,9 +1,8 @@
 use idna::domain_to_ascii_strict;
-use regex::Regex;
 use streamdal_gjson as gjson;
 use streamdal_gjson::Value;
 
-use crate::detective::{Request, PHONE_NUMBER_REGEX};
+use crate::detective::Request;
 use crate::error::CustomError;
 use crate::matcher_pii_payments as pii_payments;
 
@@ -204,26 +203,6 @@ pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError>
     // let res = checkdigit == eighth_char.unwrap();
 
     // Ok(res)
-}
-
-pub fn phone(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    // let phone_number_regex = Some(Regex::new(crate::detective::PHONE_NUMBER_REGEX_STR).unwrap());
-    //
-    let re: Regex = unsafe {
-        // If phone() is being called within a wasm module, PHONE_NUMBER_REGEX
-        // will be correctly initialized via init() by wizer. If phone() is
-        // called from non-wasm (eg. tests), PHONE_NUMBER_REGEX will be None so
-        // we have to call on init() ourselves.
-        if PHONE_NUMBER_REGEX.is_none() {
-            crate::detective::init();
-        }
-
-        PHONE_NUMBER_REGEX.clone().unwrap()
-    };
-
-    let res = re.is_match(field.str());
-
-    Ok(res)
 }
 
 // Intended to operate on the entire payload
