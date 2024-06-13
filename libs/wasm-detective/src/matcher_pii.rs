@@ -207,15 +207,20 @@ pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError>
 }
 
 pub fn phone(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let re: &Regex = unsafe {
+    // let phone_number_regex = Some(Regex::new(crate::detective::PHONE_NUMBER_REGEX_STR).unwrap());
+    //
+    let re: Regex = unsafe {
         // If phone() is being called within a wasm module, PHONE_NUMBER_REGEX
         // will be correctly initialized via init() by wizer. If phone() is
-        // called from non-wasm (eg. tests), PHONE_NUMBER_REGEX will be None.
+        // called from non-wasm (eg. tests), PHONE_NUMBER_REGEX will be None so
+        // we have to call on init() ourselves.
         if PHONE_NUMBER_REGEX.is_none() {
             crate::detective::init();
         }
 
-        PHONE_NUMBER_REGEX.as_ref().unwrap() };
+        PHONE_NUMBER_REGEX.clone().unwrap()
+    };
+
     let res = re.is_match(field.str());
 
     Ok(res)
