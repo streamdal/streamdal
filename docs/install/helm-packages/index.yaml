@@ -3,16 +3,16 @@ entries:
   log-processor-chart:
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.752895607Z"
+    created: "2024-06-13T20:50:40.499214362Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
-    digest: d2241bed3e8a8cf5048c2f0e20e67999ea4abe47d971cf4d6d5fa06e5b61e1dc
+    digest: ccc6ea769576a574101ed5bf0462cd81892b1dd2215b680f2e2040eab2005243
     name: log-processor-chart
     urls:
     - https://streamdal.github.io/streamdal/helm-packages/log-processor-chart-0.1.11.tgz
     version: 0.1.11
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.752425632Z"
+    created: "2024-06-13T20:50:40.498912573Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 7b7f5283d03f9cf2726727422dccd3ad818599c9b0a6c140667f096d2b42b921
     name: log-processor-chart
@@ -21,7 +21,7 @@ entries:
     version: 0.1.10
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.761352572Z"
+    created: "2024-06-13T20:50:40.501273315Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: b806d4a3f410159d46a5b9b7920e5b56fa4339ba3702fd69236fdf18af58c736
     name: log-processor-chart
@@ -30,7 +30,7 @@ entries:
     version: 0.1.9
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.761066203Z"
+    created: "2024-06-13T20:50:40.501008554Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: f6bfdfb21f8cdfeee57c6b534c00e7d9d1a1a0b9e4d0f3f39c55eac7b1350a4d
     name: log-processor-chart
@@ -39,7 +39,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.760795654Z"
+    created: "2024-06-13T20:50:40.500729348Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 833ae8b934fbe77820995bfe57190b36708f95f3d5d333d7981a2d4c774006be
     name: log-processor-chart
@@ -48,7 +48,7 @@ entries:
     version: 0.1.7
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.760488866Z"
+    created: "2024-06-13T20:50:40.500448718Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 150733f0b9aae69d07ee039bc8e09f7484564f4053d5206132d622ea1384c881
     name: log-processor-chart
@@ -57,7 +57,7 @@ entries:
     version: 0.1.6
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.755964462Z"
+    created: "2024-06-13T20:50:40.500189728Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: fdae5ce598c06df63354476d39a00a94e8ac431c220130b8c0a5121af71ee082
     name: log-processor-chart
@@ -66,7 +66,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.755644891Z"
+    created: "2024-06-13T20:50:40.499956106Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 2629ea0c440347c14aa4be1a35b52b8a6f25f6859810798582a600a4b2443782
     name: log-processor-chart
@@ -75,7 +75,7 @@ entries:
     version: 0.1.4
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.755123339Z"
+    created: "2024-06-13T20:50:40.499702326Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 778009a9ca78280121257315ab069fbe2a0ce8201b077a61bc26c5712394c815
     name: log-processor-chart
@@ -84,7 +84,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.754655641Z"
+    created: "2024-06-13T20:50:40.499464796Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 3e7dd98361011210be75c21f4d4bb912ba9b2cf6ea013a584dfb2d5b7e10fc82
     name: log-processor-chart
@@ -93,7 +93,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: "1.1"
-    created: "2024-06-03T19:27:37.752114146Z"
+    created: "2024-06-13T20:50:40.498465005Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: 165cffbbbdaa51b02bce07194540ba144aedf997c705682ec16098c3a018f368
     name: log-processor-chart
@@ -102,7 +102,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: "1.0"
-    created: "2024-06-03T19:27:37.751865137Z"
+    created: "2024-06-13T20:50:40.497905078Z"
     description: A Helm chart for Kubernetes to deploy Log Processor and Logstash
     digest: dfa99d012213ba0b2d70291d385f62e5b816262fa99a9ebd5580375ac099e435
     name: log-processor-chart
@@ -112,7 +112,17 @@ entries:
   streamdal-operator:
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2024-06-03T19:27:37.766094185Z"
+    created: "2024-06-13T20:50:40.506958651Z"
+    description: Operator used for managing Streamdal server configs
+    digest: 82c551042e1c3bcb469702c5541d1c1063f7451e462065f10b0b48586d1cdc53
+    name: streamdal-operator
+    type: application
+    urls:
+    - https://streamdal.github.io/streamdal/helm-packages/streamdal-operator-0.1.23.tgz
+    version: 0.1.23
+  - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2024-06-13T20:50:40.505928283Z"
     description: Operator used for managing Streamdal server configs
     digest: f4ce7200a6d96616a2505f6870481988b68125a5c0bed7ca182cf262389e34ca
     name: streamdal-operator
@@ -122,7 +132,7 @@ entries:
     version: 0.1.21
   - apiVersion: v2
     appVersion: 0.1.1
-    created: "2024-06-03T19:27:37.765739087Z"
+    created: "2024-06-13T20:50:40.505577233Z"
     description: Operator used for managing Streamdal server configs
     digest: dee5b89a57e5e4b96947cc3dbab0435594ca4aa5c577bf2387a82b8f52b67e84
     name: streamdal-operator
@@ -132,7 +142,7 @@ entries:
     version: 0.1.20
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.765027398Z"
+    created: "2024-06-13T20:50:40.504883289Z"
     description: Operator used for managing Streamdal server configs
     digest: cb0bddfe07f69ce65bd4cc8fb4f301e3f864dbcfa6315e93fdba8bb9044bd3e3
     name: streamdal-operator
@@ -142,7 +152,7 @@ entries:
     version: 0.1.18
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.764675405Z"
+    created: "2024-06-13T20:50:40.504537739Z"
     description: Operator used for managing Streamdal server configs
     digest: acbd450eef32ce9f2f9f54a113f2865e68649c1c053cc0892f1be531c2233a42
     name: streamdal-operator
@@ -152,7 +162,7 @@ entries:
     version: 0.1.17
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.764289669Z"
+    created: "2024-06-13T20:50:40.504186859Z"
     description: Operator used for managing Streamdal server configs
     digest: 82f70cbaefaac1c8aa46c5094d8dfda9738d030e6450187ed6e2bed4f0fdc328
     name: streamdal-operator
@@ -162,7 +172,7 @@ entries:
     version: 0.1.16
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.763904324Z"
+    created: "2024-06-13T20:50:40.503834346Z"
     description: Operator used for managing Streamdal server configs
     digest: 9214521c46cd7885d9aee7b1f4fe5685b399e86cea40f2d0bcba8cc96c4a4aeb
     name: streamdal-operator
@@ -172,7 +182,7 @@ entries:
     version: 0.1.15
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.76355146Z"
+    created: "2024-06-13T20:50:40.503486292Z"
     description: Operator used for managing Streamdal server configs
     digest: 468fec156e83687b171c5d6f69a83139445104078dde8c4c0238c69e148102cf
     name: streamdal-operator
@@ -182,7 +192,7 @@ entries:
     version: 0.1.13
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.763178428Z"
+    created: "2024-06-13T20:50:40.503127297Z"
     description: Operator used for managing Streamdal server configs
     digest: 8cec44e9111ade908204fccaae16e17bee4a8ad96e47ed32c3da5cb59901810e
     name: streamdal-operator
@@ -192,7 +202,7 @@ entries:
     version: 0.1.12
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.762798874Z"
+    created: "2024-06-13T20:50:40.502775025Z"
     description: Operator used for managing Streamdal server configs
     digest: 23cccbffac71b46b42fac198601891adf97d3707158ce840774355f5b4579502
     name: streamdal-operator
@@ -202,7 +212,7 @@ entries:
     version: 0.1.11
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.762441111Z"
+    created: "2024-06-13T20:50:40.502380274Z"
     description: Operator used for managing Streamdal server configs
     digest: 35fef7d8972a3e6917abfa704b9dabe09a93e2ff699497ba1308e692b4cb3747
     name: streamdal-operator
@@ -212,7 +222,7 @@ entries:
     version: 0.1.10
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.773956674Z"
+    created: "2024-06-13T20:50:40.50971519Z"
     description: Operator used for managing Streamdal server configs
     digest: bec594089a59cc682c5a576592773db1e2e2210598d2cb87b29abbcd20349299
     name: streamdal-operator
@@ -222,7 +232,7 @@ entries:
     version: 0.1.9
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.773575276Z"
+    created: "2024-06-13T20:50:40.509365483Z"
     description: Operator used for managing Streamdal server configs
     digest: 37c95facaf1734b7d8645a3429c6d26b994d32f71bba7fc6c9819488df54175c
     name: streamdal-operator
@@ -232,7 +242,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.773140067Z"
+    created: "2024-06-13T20:50:40.509016376Z"
     description: Operator used for managing Streamdal server configs
     digest: 2dfd2bdc6b27d0ce733c9e4d1073651e1d57de13ad04fa9b8a764f58ea452586
     name: streamdal-operator
@@ -242,7 +252,7 @@ entries:
     version: 0.1.7
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.772779899Z"
+    created: "2024-06-13T20:50:40.508657742Z"
     description: Operator used for managing Streamdal server configs
     digest: 907e6f8726069c3c3fbbe45e1037f2db1f63a7f1640a1ad13fb8aeb6a003d640
     name: streamdal-operator
@@ -252,7 +262,7 @@ entries:
     version: 0.1.6
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.772420413Z"
+    created: "2024-06-13T20:50:40.50830557Z"
     description: Operator used for managing Streamdal server configs
     digest: 6eed71be5ee1a8b231c5c638c0537b15e0320f4a25056c6ab2dbcfc9f3217767
     name: streamdal-operator
@@ -262,7 +272,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.771989592Z"
+    created: "2024-06-13T20:50:40.507948008Z"
     description: Operator used for managing Streamdal server configs
     digest: 76cd693f3388936daef07c4ecc9157417b8d7126406e9e4ac06877699d762924
     name: streamdal-operator
@@ -272,7 +282,7 @@ entries:
     version: 0.1.4
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.76645248Z"
+    created: "2024-06-13T20:50:40.507578454Z"
     description: Operator used for managing Streamdal server configs
     digest: eb35ad6033e699c36ea588c3cc4fa2172ae2fa972f5f760cd41348b62bb1bde9
     name: streamdal-operator
@@ -282,7 +292,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.765376595Z"
+    created: "2024-06-13T20:50:40.505232736Z"
     description: Operator used for managing Streamdal server configs
     digest: b3323ecca648d3db0041e523328b3a34516f22a88e5774479dcfae7b70eb531a
     name: streamdal-operator
@@ -292,7 +302,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.762068269Z"
+    created: "2024-06-13T20:50:40.501989651Z"
     description: Operator used for managing Streamdal server configs
     digest: ac0c768c3170bfa57c59dc29d70e04a57ec8efeef9d5be59f36b70c24c198dc2
     name: streamdal-operator
@@ -302,7 +312,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 0.1.0
-    created: "2024-06-03T19:27:37.761703783Z"
+    created: "2024-06-13T20:50:40.501632219Z"
     description: A Helm chart for Kubernetes
     digest: 9f564f45b65ca5dff30fca2ec54b70a975b8d88d778980f2384705f4766f171c
     name: streamdal-operator
@@ -313,7 +323,21 @@ entries:
   streamdal-server:
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.080892001Z"
+    created: "2024-06-13T20:50:40.808307983Z"
+    dependencies:
+    - name: redis
+      repository: oci://registry-1.docker.io/bitnamicharts
+      version: 18.0.4
+    description: Deploy Streamdal server and console in K8S
+    digest: 1084eb02cce928619ff10e4729ab0d6a4d2c836afba61e8ed8f2288f15968973
+    name: streamdal-server
+    type: application
+    urls:
+    - https://streamdal.github.io/streamdal/helm-packages/streamdal-server-0.1.76.tgz
+    version: 0.1.76
+  - apiVersion: v2
+    appVersion: 0.0.4
+    created: "2024-06-13T20:50:40.803818811Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -327,7 +351,7 @@ entries:
     version: 0.1.74
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.076214368Z"
+    created: "2024-06-13T20:50:40.798570475Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -341,7 +365,7 @@ entries:
     version: 0.1.73
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.071361595Z"
+    created: "2024-06-13T20:50:40.793989443Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -355,7 +379,7 @@ entries:
     version: 0.1.72
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.066236712Z"
+    created: "2024-06-13T20:50:40.78880357Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -369,7 +393,7 @@ entries:
     version: 0.1.71
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.061821454Z"
+    created: "2024-06-13T20:50:40.78426143Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -383,7 +407,7 @@ entries:
     version: 0.1.70
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.050084673Z"
+    created: "2024-06-13T20:50:40.773349105Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -397,7 +421,7 @@ entries:
     version: 0.1.69
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.042105619Z"
+    created: "2024-06-13T20:50:40.768754468Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -411,7 +435,7 @@ entries:
     version: 0.1.67
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.037670122Z"
+    created: "2024-06-13T20:50:40.764175479Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -425,7 +449,7 @@ entries:
     version: 0.1.66
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.032242716Z"
+    created: "2024-06-13T20:50:40.758474435Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -439,7 +463,7 @@ entries:
     version: 0.1.65
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.027798823Z"
+    created: "2024-06-13T20:50:40.753974543Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -453,7 +477,7 @@ entries:
     version: 0.1.64
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.022469125Z"
+    created: "2024-06-13T20:50:40.748703552Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -467,7 +491,7 @@ entries:
     version: 0.1.63
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.017296909Z"
+    created: "2024-06-13T20:50:40.744249936Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -481,7 +505,7 @@ entries:
     version: 0.1.62
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.012927196Z"
+    created: "2024-06-13T20:50:40.738641471Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -495,7 +519,7 @@ entries:
     version: 0.1.61
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.007713113Z"
+    created: "2024-06-13T20:50:40.734172857Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -509,7 +533,7 @@ entries:
     version: 0.1.60
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:38.003340474Z"
+    created: "2024-06-13T20:50:40.728897059Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -523,7 +547,7 @@ entries:
     version: 0.1.59
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.998301952Z"
+    created: "2024-06-13T20:50:40.724445166Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -537,7 +561,7 @@ entries:
     version: 0.1.58
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.993885671Z"
+    created: "2024-06-13T20:50:40.71920509Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -551,7 +575,7 @@ entries:
     version: 0.1.57
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.988568126Z"
+    created: "2024-06-13T20:50:40.714743939Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -565,7 +589,7 @@ entries:
     version: 0.1.56
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.983923886Z"
+    created: "2024-06-13T20:50:40.709501833Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -579,7 +603,7 @@ entries:
     version: 0.1.55
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.978413015Z"
+    created: "2024-06-13T20:50:40.705053898Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -593,7 +617,7 @@ entries:
     version: 0.1.54
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.973239246Z"
+    created: "2024-06-13T20:50:40.699649226Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -607,7 +631,7 @@ entries:
     version: 0.1.51
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.968861618Z"
+    created: "2024-06-13T20:50:40.695239751Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -621,7 +645,7 @@ entries:
     version: 0.1.50
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.963764005Z"
+    created: "2024-06-13T20:50:40.68986229Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -635,7 +659,7 @@ entries:
     version: 0.1.49
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.959396015Z"
+    created: "2024-06-13T20:50:40.685397533Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -649,7 +673,7 @@ entries:
     version: 0.1.48
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.95456256Z"
+    created: "2024-06-13T20:50:40.680254179Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -663,7 +687,7 @@ entries:
     version: 0.1.47
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.950183269Z"
+    created: "2024-06-13T20:50:40.67586342Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -677,7 +701,7 @@ entries:
     version: 0.1.46
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.94507836Z"
+    created: "2024-06-13T20:50:40.670660079Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -691,7 +715,7 @@ entries:
     version: 0.1.45
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.940499553Z"
+    created: "2024-06-13T20:50:40.666263358Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -705,7 +729,7 @@ entries:
     version: 0.1.44
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.935677428Z"
+    created: "2024-06-13T20:50:40.661026241Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -719,7 +743,7 @@ entries:
     version: 0.1.42
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.930688168Z"
+    created: "2024-06-13T20:50:40.656655839Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -733,7 +757,7 @@ entries:
     version: 0.1.41
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.9262204Z"
+    created: "2024-06-13T20:50:40.65140291Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -747,7 +771,7 @@ entries:
     version: 0.1.40
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.92117637Z"
+    created: "2024-06-13T20:50:40.647008954Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -761,7 +785,7 @@ entries:
     version: 0.1.39
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.916867371Z"
+    created: "2024-06-13T20:50:40.641731376Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -775,7 +799,7 @@ entries:
     version: 0.1.38
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.911757895Z"
+    created: "2024-06-13T20:50:40.637344353Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -789,7 +813,7 @@ entries:
     version: 0.1.37
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.907385447Z"
+    created: "2024-06-13T20:50:40.632213755Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -803,7 +827,7 @@ entries:
     version: 0.1.36
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.902130027Z"
+    created: "2024-06-13T20:50:40.627486161Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -817,7 +841,7 @@ entries:
     version: 0.1.35
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.897234431Z"
+    created: "2024-06-13T20:50:40.62199281Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -831,7 +855,7 @@ entries:
     version: 0.1.34
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.892900075Z"
+    created: "2024-06-13T20:50:40.617557848Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -845,7 +869,7 @@ entries:
     version: 0.1.33
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.887578672Z"
+    created: "2024-06-13T20:50:40.611945947Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -859,7 +883,7 @@ entries:
     version: 0.1.32
   - apiVersion: v2
     appVersion: 0.0.4
-    created: "2024-06-03T19:27:37.883217654Z"
+    created: "2024-06-13T20:50:40.607123917Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -873,7 +897,7 @@ entries:
     version: 0.1.31
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.878199371Z"
+    created: "2024-06-13T20:50:40.602421891Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -887,7 +911,7 @@ entries:
     version: 0.1.30
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.873815731Z"
+    created: "2024-06-13T20:50:40.597411925Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -901,7 +925,7 @@ entries:
     version: 0.1.29
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.868497461Z"
+    created: "2024-06-13T20:50:40.593012569Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -915,7 +939,7 @@ entries:
     version: 0.1.28
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.863774262Z"
+    created: "2024-06-13T20:50:40.587886545Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -929,7 +953,7 @@ entries:
     version: 0.1.27
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.858252582Z"
+    created: "2024-06-13T20:50:40.583461522Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -943,7 +967,7 @@ entries:
     version: 0.1.26
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.853158345Z"
+    created: "2024-06-13T20:50:40.578261257Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -957,7 +981,7 @@ entries:
     version: 0.1.25
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.848770337Z"
+    created: "2024-06-13T20:50:40.573742961Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -971,7 +995,7 @@ entries:
     version: 0.1.24
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.843694964Z"
+    created: "2024-06-13T20:50:40.568391612Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -985,7 +1009,7 @@ entries:
     version: 0.1.23
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.83879348Z"
+    created: "2024-06-13T20:50:40.563391912Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -999,7 +1023,7 @@ entries:
     version: 0.1.22
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.830936093Z"
+    created: "2024-06-13T20:50:40.558752672Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1013,7 +1037,7 @@ entries:
     version: 0.1.21
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.826447756Z"
+    created: "2024-06-13T20:50:40.553724622Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1027,7 +1051,7 @@ entries:
     version: 0.1.19
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.820802474Z"
+    created: "2024-06-13T20:50:40.549297655Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1041,7 +1065,7 @@ entries:
     version: 0.1.18
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.816321431Z"
+    created: "2024-06-13T20:50:40.544210309Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1055,7 +1079,7 @@ entries:
     version: 0.1.17
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.805542496Z"
+    created: "2024-06-13T20:50:40.539771701Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1069,7 +1093,7 @@ entries:
     version: 0.1.16
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.801129852Z"
+    created: "2024-06-13T20:50:40.534420292Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1083,7 +1107,7 @@ entries:
     version: 0.1.15
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-06-03T19:27:37.795418231Z"
+    created: "2024-06-13T20:50:40.529277757Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1097,7 +1121,7 @@ entries:
     version: 0.1.13
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2024-06-03T19:27:37.791015345Z"
+    created: "2024-06-13T20:50:40.524846142Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1111,7 +1135,7 @@ entries:
     version: 0.1.12
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2024-06-03T19:27:37.786452398Z"
+    created: "2024-06-13T20:50:40.519479198Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1125,7 +1149,7 @@ entries:
     version: 0.1.11
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2024-06-03T19:27:37.780362139Z"
+    created: "2024-06-13T20:50:40.515020322Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1139,7 +1163,7 @@ entries:
     version: 0.1.10
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2024-06-03T19:27:38.090566938Z"
+    created: "2024-06-13T20:50:40.817750443Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1153,7 +1177,7 @@ entries:
     version: 0.1.9
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2024-06-03T19:27:38.085707914Z"
+    created: "2024-06-13T20:50:40.813335529Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1167,7 +1191,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: 1.1.19
-    created: "2024-06-03T19:27:38.056811984Z"
+    created: "2024-06-13T20:50:40.778880567Z"
     dependencies:
     - name: redis
       repository: oci://registry-1.docker.io/bitnamicharts
@@ -1179,4 +1203,4 @@ entries:
     urls:
     - https://streamdal.github.io/streamdal/helm-packages/streamdal-server-0.1.7.tgz
     version: 0.1.7
-generated: "2024-06-03T19:27:37.751471827Z"
+generated: "2024-06-13T20:50:40.497379004Z"
