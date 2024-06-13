@@ -67,7 +67,7 @@ validate:
       - I32
       results:
       - I64
-    max: 3
+    max: 4
   size:
     max: 3.0 MiB
   complexity:

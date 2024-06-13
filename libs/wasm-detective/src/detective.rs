@@ -1,29 +1,77 @@
-use std::collections::HashMap;
-use crate::error::CustomError;
-use crate::matcher_core as core;
-use crate::matcher_numeric as numeric;
-use crate::matcher_pii as pii;
-use crate::matcher_pii_payments as pii_payments;
-use crate::matcher_pii_cloud as pii_cloud;
-use crate::matcher_pii_keywords as pii_keywords;
-use streamdal_gjson as gjson;
-
-use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType, DetectiveTypePIIKeywordMode};
-use std::str;
+use std::collections::{HashMap, VecDeque};
 use std::default::Default;
+use std::str;
+use regex::Regex;
+
+use any_ascii::any_ascii;
 use protos::sp_pipeline::PipelineDataFormat;
+use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
+use protos::sp_steps_detective::{DetectiveStepResultMatch, DetectiveType, DetectiveTypePIIKeywordMode};
+use streamdal_gjson as gjson;
 use unicode_segmentation::UnicodeSegmentation;
+
+use crate::error::CustomError;
 use crate::keywords::config::get_keywords;
 use crate::keywords::scanner::{Field, FieldPII};
-use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, phone, ssn, uk_nino, vin_number};
-use crate::matcher_pii_cloud::aws_key_id;
-use crate::matcher_pii_payments::credit_card;
-use any_ascii::any_ascii;
+use crate::matcher_core as core;
 use crate::matcher_core::{ip_address, mac_address};
+use crate::matcher_numeric as numeric;
+use crate::matcher_pii as pii;
+use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, phone, ssn, uk_nino, vin_number};
+use crate::matcher_pii_cloud as pii_cloud;
+use crate::matcher_pii_cloud::aws_key_id;
+use crate::matcher_pii_keywords as pii_keywords;
+use crate::matcher_pii_payments as pii_payments;
+use crate::matcher_pii_payments::credit_card;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
+
+pub static mut PHONE_NUMBER_REGEX: Option<Regex> = None;
+pub const PHONE_NUMBER_REGEX_STR: &str = r"^\s*(?:\+?(\d{1,3}))?([ -.(]*(\d{3})[-. )]*)?((\d{3})[ -.]*(\d{3,6})(?:[ -.x]*(\d+))?)\s*$";
+
+// This is a special function used by the 'wizer' pre-initializer utility.
+//
+// After building the wasm binary, we run the 'wizer' tool against the binary
+// which will call on this function and write the result into a new wasm binary.
+//
+// The result is that we are able to avoid a heavy CPU hit for operations like
+// compiling regexes on every new request to detective.
+//
+// https://github.com/bytecodealliance/wizer
+#[export_name = "wizer.initialize"]
+pub fn init() {
+    unsafe {
+        // +919367788755    <- match
+        // 8989829304       <- match
+        // +16308520397     <- match
+        // 786-307-3615     <- match
+        // +44.787644-2401  <- match
+        // +447876442401    <- match
+        // 407.865.2052     <- match
+        // 407-865-2052     <- match
+        // 407 865 2052     <- match
+        // +1 407 123 1231  <- match
+        // (407) 865 2052   <- match
+        // +372 512 3456    <- match (Estonia)
+        // 011 372 512 3456 <- match (Estonia dial out from US)
+        // 1                <- no match
+        // 12               <- no match
+        // 123              <- no match
+        // 1234             <- no match
+        // 12345            <- no match
+        // 123456           <- no match
+        // 1234567          <- match
+        // 12345678         <- match
+        // 123456789        <- match
+        // 1234567890       <- match
+        // 12345678901      <- match
+        // 1-1-1            <- no match
+        // +982             <- no match
+        PHONE_NUMBER_REGEX = Some(Regex::new(PHONE_NUMBER_REGEX_STR).unwrap());
+    }
+}
 
 #[derive(Clone)]
 pub struct Request<'a> {
@@ -34,6 +82,14 @@ pub struct Request<'a> {
     pub negate: bool,
     pub mode: DetectiveTypePIIKeywordMode,
     pub data_format: PipelineDataFormat,
+}
+
+#[derive(Debug)]
+pub struct EmbeddedJSON {
+    pub start_char: i32,
+    pub end_char: i32,
+    pub cleaned_json: String,
+    pub escaped_data: String,
 }
 
 impl Default for Detective {
@@ -69,7 +125,7 @@ impl Detective {
 
         let normalized = any_ascii(data_as_str);
 
-        Ok(plaintext(request, normalized.as_str()))
+        Ok(self.plaintext(request, normalized.as_str()))
     }
 
     pub fn matches_keyword(request: &Request) -> Result<Vec<DetectiveStepResultMatch>, CustomError> {
@@ -320,6 +376,271 @@ impl Detective {
 
         Ok(f)
     }
+
+    pub fn plaintext(&self, request: &Request, input: &str) -> Vec<DetectiveStepResultMatch> {
+        let mut res = Vec::<DetectiveStepResultMatch>::new();
+
+        //let mut string_input = input.to_string();
+
+        // Get any embedded json
+        // TODO: extract all of this out to it's own function
+        let embedded_jsons = self.get_embedded_json(input);
+        if !embedded_jsons.is_empty() {
+
+            // We have embedded JSON, loop through each and run keyword matcher on it
+            for embedded_json in embedded_jsons {
+                let req = Request {
+                    match_type: DetectiveType::DETECTIVE_TYPE_PII_KEYWORD,
+                    data: &embedded_json.cleaned_json.as_bytes().to_owned(),
+                    path: "".to_string(),
+                    args: Vec::new(),
+                    negate: false,
+                    mode: request.mode,
+                    data_format: PIPELINE_DATA_FORMAT_JSON,
+                };
+
+                // TODO: Scrapping this for now. I don't think it's worth it since we can
+                // TODO: deduplicate the results at the end. ~MG 2024-06-05
+                // Remove the embedded JSON from input so that plaintext matcher
+                // won't also run on it causing duplicate results. This is perfectly fine
+                // since we're not returning the original input
+               //  let replacement = "|".repeat(embedded_json.data.len());
+               //
+               //  // Replace the embedded JSON with a placeholder
+               //  string_input = string_input[..embedded_json.start_char as usize].to_string() + replacement.as_str() + &string_input[embedded_json.end_char as usize..].to_string();
+               // // string_input = string_input.replace(&embedded_json.data, replacement.as_str());
+
+                match Self::matches_keyword(&req) {
+                    Ok(matches) => {
+                        if !matches.is_empty() {
+                            // The start/end of each match here will be as if it was only
+                            // the JSON string. However since we're parsing JSON out of a plaintext
+                            // string, we must find where the JSON string starts in the plaintext
+                            // and add that offset to the char_index_start and char_index_end
+                            for m in matches {
+                                let mut corrected = m.clone();
+
+                                // Search for the actual position of the data using the value
+                                // We need to do this because we need the location inside the escaped string json
+                                // However the keyword search gets performed on unescaped json, so it's start/end
+                                // index will be different from where we actually need to find the data in the
+                                // escaped string json.
+                                let v = String::from_utf8(m.value.clone()).unwrap();
+                                let actual_start = &embedded_json.escaped_data.find(v.as_str());
+                                if actual_start.is_none() {
+                                    // This shouldn't happen, but if it does, just skip this match
+                                    // so that we don't mask the incorrect location.
+                                    continue;
+                                }
+
+                                corrected.char_index_start = actual_start.unwrap() as i32 + embedded_json.start_char;
+                                corrected.char_index_end = actual_start.unwrap() as i32 + m.value.len() as i32 + embedded_json.start_char;
+                                res.push(corrected);
+                            }
+                        }
+                    }
+                    _ => {
+                        // Purposefully ignoring any errors here
+                    }
+                }
+
+            }
+        }
+
+        let cleaned = input.replace('\"', " ");
+
+        let sentences = cleaned.split_sentence_bound_indices();
+
+        let scanners = HashMap::from([
+            (email as MatcherFunc, "Person"),
+            (aws_key_id as MatcherFunc, "AWS"),
+            (jwt as MatcherFunc, "JWT"),
+            (ssn as MatcherFunc, "Person"),
+            (uk_nino as MatcherFunc, "Person"),
+            (vin_number as MatcherFunc, "Vehicle_Information"),
+            (canada_sin as MatcherFunc, "Person"),
+            (credit_card as MatcherFunc, "Billing"),
+            (phone as MatcherFunc, "Person"),
+            (hashed_password as MatcherFunc, "Credentials"),
+            (mac_address as MatcherFunc, "Device"),
+            (ip_address as MatcherFunc, "IP_Information"),
+        ]);
+
+        let mut found: Vec<Word> = Vec::new();
+
+        for (sentence_start, sentence) in sentences {
+            // Trim junk off the end. This won't affect offsets because
+            // it's at the end of a sentence
+            let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
+            // Parse sentences into words
+            let words = new_sentence.split_word_bound_indices();
+
+            // The splitter lib considers these word bounds, but we don't want to
+            // split on them since they might be inside an email, ipv6, macaddr, etc.
+            let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
+
+            // Ignore these characters so that we can properly find PII inside JSON that is inside a plaintext string
+            let ignore_chars = HashMap::from([('"', 0), ('{', 0), ('}', 0), ('\'', 0), ('║', 0), ('\\', 0), (',', 0)]);
+
+            // This is our word-part accumulator and is used to
+            // combine "user", "@", "somedomain.com" words into a single word
+            let mut accum: Vec<Word> = Vec::new();
+
+            for (word_start, word) in words {
+
+                // Some characters cause the word to be nothing but spaces for some reason
+                // Trip the word, and if it's empty, we've reached the end
+                let tmp_word = word.trim();
+                if tmp_word.is_empty() {
+                    // Loop over accumulator and join the string value of each word
+                    // and push it to the found vector
+                    let combined = accumulate_parts(&mut accum);
+                    found.push(combined);
+                    accum.clear();
+                    continue
+                }
+
+                if tmp_word.len() == 1 && ignore_chars.contains_key(&tmp_word.chars().next().unwrap()) {
+                    continue;
+                }
+
+                // We've reached the end of a word, combine our accumulator into a single Word struct
+                if word == " " {
+                    // Loop over accumulator and join the string value of each word
+                    // and push it to the found vector
+                    let combined = accumulate_parts(&mut accum);
+                    found.push(combined);
+                    accum.clear();
+                    continue
+                }
+
+                // Push the word the splitter has seen to the accumulator
+                accum.push(Word {
+                    char_index_start: sentence_start + word_start,
+                    char_index_end: sentence_start + word_start + word.chars().count(),
+                    word: word.to_string(),
+                });
+
+                // If the word is a character we don't want to split on, continue to the next word
+                if no_split.contains_key(&word.chars().next().unwrap()) {
+                    continue;
+                }
+            }
+
+            // We might have hit the end of a sentence in the loop above but not triggered the
+            // summation of the accumulator. Check if it's empty and if not, combine it into a single word
+            if !accum.is_empty() {
+                let combined = accumulate_parts(&mut accum);
+                found.push(combined);
+                accum.clear();
+            }
+        }
+
+
+        'words: for found_word in found {
+            for (scanner_fn, scanner_name) in &scanners {
+                let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
+                if let Ok(found) = scanner_fn(request, gjson::parse(&payload).get("key")) {
+                    if found {
+                        let result = DetectiveStepResultMatch {
+                            type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
+                            path: "".to_string(),
+                            value: found_word.word.clone().into_bytes(),
+                            pii_type: scanner_name.to_string(),
+                            char_index_start: found_word.char_index_start as i32,
+                            char_index_end: found_word.char_index_end as i32,
+                            ..Default::default()
+                        };
+
+                        res.push(result);
+                        continue 'words;
+                    }
+                }
+            }
+        }
+
+        // Deduplicate results
+        res.sort_by(|a, b| a.char_index_start.cmp(&b.char_index_start));
+        res.dedup_by(|a, b| a.char_index_start == b.char_index_start && a.char_index_end == b.char_index_end);
+
+        res
+    }
+
+    pub fn get_embedded_json(&self, input: &str) -> VecDeque<EmbeddedJSON> {
+        let mut bracket_stack = VecDeque::new();
+        let mut json_strings: VecDeque<EmbeddedJSON> = VecDeque::new();
+
+        // Loop through chars and find every opening or closing bracket
+        for (i, c) in input.char_indices() {
+            match c {
+                '{' => {
+                    // Found opening bracket, record its char index on the stack
+                    bracket_stack.push_back(i);
+                },
+                '}' => {
+                    // Grab the closes start index from the queue
+                    let start = match bracket_stack.pop_back() {
+                        Some(start) => start,
+                        None => continue, // No start bracket, continue processing string
+                    };
+
+                    // Rename to end for clarity
+                    let end = i;
+
+                    // Shouldn't happen, but prevent panics just in case
+                    // TODO: do we still need the +1?
+                    if end <= start || end+1 > input.len() {
+                        continue;
+                    }
+
+                    // Grab the possible match from the input string
+                    // TODO: change to inclusive ..=?
+                    let possible_match = &input[start..end+1];
+
+                    // Unescape quotes in possible_match
+                    let possible_match_cleaned = possible_match.trim().replace("\\\"", "\"");
+
+                    // Our current match is not valid JSON, ignore it
+                    if !streamdal_gjson::valid(&possible_match_cleaned) {
+                        continue;
+                    }
+
+                    // We have valid JSON at this point
+
+                    // Wwe may have matched a smaller JSON sub-object already
+                    // For example, when processing the following string:
+                    //     {"level-1a": {"level-2a": "value"}, "level-1b": {"level-2b": "value"}}
+                    // the ending bracket of the level-2a object will be matched first and pushed onto
+                    // the results queue. On a subsequent loop iteration, we'll hit the ending bracket
+                    // of the level-1a object. We should check the most recent result to see if its start
+                    // and end indicies are within the bounds of the current match.
+                    // If they are, we should discard the previous level2 match and then push the
+                    // entire level1 object onto the queue.
+                    while let Some(prev_obj) = json_strings.back() {
+                        if prev_obj.start_char > start as i32 && prev_obj.end_char < end as i32 {
+                            // Previous match is a sub-object of the current match
+                            // Discard the previous match from the queue since we'll push the newer
+                            // parent match onto the queue
+                            json_strings.pop_back();
+                        } else {
+                            break;
+                        }
+                    }
+
+                    // Put our result onto the queue
+                    json_strings.push_back(EmbeddedJSON {
+                        start_char: start as i32,
+                        end_char: end as i32,
+                        cleaned_json: possible_match_cleaned.to_string(),
+                        escaped_data: possible_match.to_string(),
+                    });
+                },
+                _ => {}
+            }
+        }
+
+        json_strings
+    }
 }
 
 pub fn parse_field<'a>(data: &'a [u8], path: &'a String) -> Result<gjson::Value<'a>, CustomError> {
@@ -432,126 +753,7 @@ pub struct Word {
     word: String,
 }
 
-pub fn plaintext(request: &Request, input: &str) -> Vec<DetectiveStepResultMatch> {
-    let mut res = Vec::<DetectiveStepResultMatch>::new();
 
-    let cleaned = input.replace('\"', " ");
-
-    let sentences = cleaned.split_sentence_bound_indices();
-
-    // These functions take a gjson value, but we can just mock that
-    // rather than changing around the entire library for now
-    let scanners: Vec<MatcherFunc> = vec![
-        email,
-        aws_key_id,
-        jwt,
-        ssn,
-        uk_nino,
-        vin_number,
-        canada_sin,
-        credit_card,
-        phone,
-        hashed_password,
-        mac_address,
-        ip_address,
-    ];
-
-    let mut found: Vec<Word> = Vec::new();
-
-    for (sentence_start, sentence) in sentences {
-        // Trim junk off the end. This won't affect offsets because
-        // it's at the end of a sentence
-        let new_sentence = sentence.trim_end_matches(['.', ' ']).to_string();
-        // Parse sentences into words
-        let words = new_sentence.split_word_bound_indices();
-
-        // The splitter lib considers these word bounds, but we don't want to
-        // split on them since they might be inside an email, ipv6, macaddr, etc.
-        let no_split: HashMap<char, usize> = HashMap::from([('@', 0), (':', 0)]);
-
-        // Ignore these characters so that we can properly find PII inside JSON that is inside a plaintext string
-        let ignore_chars = HashMap::from([('"', 0), ('{', 0), ('}', 0), ('\'', 0), ('║', 0), ('\\', 0), (',', 0)]);
-
-        // This is our word-part accumulator and is used to
-        // combine "user", "@", "somedomain.com" words into a single word
-        let mut accum: Vec<Word> = Vec::new();
-
-        for (word_start, word) in words {
-
-            // Some characters cause the word to be nothing but spaces for some reason
-            // Trip the word, and if it's empty, we've reached the end
-            let tmp_word = word.trim();
-            if tmp_word.is_empty() {
-                // Loop over accumulator and join the string value of each word
-                // and push it to the found vector
-                let combined = accumulate_parts(&mut accum);
-                found.push(combined);
-                accum.clear();
-                continue
-            }
-
-            if tmp_word.len() == 1 && ignore_chars.contains_key(&tmp_word.chars().next().unwrap()) {
-                continue;
-            }
-
-            // We've reached the end of a word, combine our accumulator into a single Word struct
-            if word == " " {
-                // Loop over accumulator and join the string value of each word
-                // and push it to the found vector
-                let combined = accumulate_parts(&mut accum);
-                found.push(combined);
-                accum.clear();
-                continue
-            }
-
-            // Push the word the splitter has seen to the accumulator
-            accum.push(Word {
-                char_index_start: sentence_start + word_start,
-                char_index_end: sentence_start + word_start + word.chars().count(),
-                word: word.to_string(),
-            });
-
-            // If the word is a character we don't want to split on, continue to the next word
-            if no_split.contains_key(&word.chars().next().unwrap()) {
-                continue;
-            }
-        }
-
-        // We might have hit the end of a sentence in the loop above but not triggered the
-        // summation of the accumulator. Check if it's empty and if not, combine it into a single word
-        if !accum.is_empty() {
-            let combined = accumulate_parts(&mut accum);
-            found.push(combined);
-            accum.clear();
-        }
-    }
-
-    'words: for found_word in found {
-        for scanner in &scanners {
-            let payload = format!("{{\"key\": \"{}\"}}", found_word.word);
-            if let Ok(found) = scanner(request, gjson::parse(&payload).get("key")) {
-                if found {
-                    let result = DetectiveStepResultMatch {
-                        type_: ::protobuf::EnumOrUnknown::new(DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY),
-                        path: "".to_string(),
-                        value: found_word.word.clone().into_bytes(),
-                        // TODO: this should return a useful type, but there's no way to get the name of the scanner
-                        // TODO: Using `stringify!(scanner)` will just return "scanner"
-                        pii_type: "plaintext".to_string(),
-                        char_index_start: found_word.char_index_start as i32,
-                        char_index_end: found_word.char_index_end as i32,
-                        ..Default::default()
-                    };
-
-                    res.push(result);
-                    continue 'words;
-                }
-            }
-        }
-    }
-
-    res
-}
 
 fn accumulate_parts(accum: &mut [Word]) -> Word {
     let mut combined = Word {

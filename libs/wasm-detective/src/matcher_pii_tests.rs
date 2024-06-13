@@ -1,11 +1,13 @@
-use crate::detective::{plaintext, Request};
 #[cfg(test)]
 extern crate test;
+
+use std::collections::HashMap;
+
+use protos::sp_pipeline::PipelineDataFormat::{PIPELINE_DATA_FORMAT_JSON, PIPELINE_DATA_FORMAT_PLAINTEXT};
 use protos::sp_steps_detective::DetectiveType;
 use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::{DETECTIVE_TYPE_PII_KEYWORD_MODE_ACCURACY, DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE, DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET};
-use std::collections::HashMap;
-use test::Bencher;
-use protos::sp_pipeline::PipelineDataFormat::{PIPELINE_DATA_FORMAT_JSON, PIPELINE_DATA_FORMAT_PLAINTEXT};
+
+use crate::detective::Request;
 
 #[test]
 fn test_email() {
@@ -530,7 +532,6 @@ fn test_phone() {
     ];
 
     crate::test_utils::run_tests(&test_cases);
-
 }
 
 #[test]
@@ -920,9 +921,9 @@ fn test_pii_keyword_accuracy() {
     assert_eq!(result.is_ok(), true);
 
     for r in result.unwrap() {
-        println!("testing if result path {:?} exists in expected", &r.path);
-        println!("testing if result value {:?} exists in expected", String::from_utf8(r.value.clone()).unwrap());
-        println!("testing if result pii_type {:?} exists in expected", &r.pii_type);
+        // println!("testing if result path {:?} exists in expected", &r.path);
+        // println!("testing if result value {:?} exists in expected", String::from_utf8(r.value.clone()).unwrap());
+        // println!("testing if result pii_type {:?} exists in expected", &r.pii_type);
 
         assert!(expected.contains_key(&r.path));
         assert_eq!(expected.get(&r.path).unwrap().pii_type, r.pii_type);
@@ -932,7 +933,7 @@ fn test_pii_keyword_accuracy() {
 
 #[test]
 fn test_plaintext() {
-    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is JH4NA1152MT000412. I have AA000000B as my NHS number. My credit card is 4111111111111111";
+    let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is JH4NA1152MT000412. I have AA000000B as my NHS number. My credit card is 4111111111111111 my phone number is || (372)-512-3456";
 
     let request = &Request {
         match_type: DetectiveType::DETECTIVE_TYPE_PII_PLAINTEXT_ANY,
@@ -944,15 +945,22 @@ fn test_plaintext() {
         data_format: PIPELINE_DATA_FORMAT_PLAINTEXT,
     };
 
+    // let expected = HashMap::from(
+    //     [
+    //         (String::from("mark@streamdal.com"), "Person"),
+    //         (String::from("JH4NA1152MT000412"), "Vehicle_Information"),
+    //          (String::from("AA000000B"), "Health"),
+    //       (String::from("4111111111111111"), "Billing"),
+    //         (String::from("(372)-512-3456"), "Person"),
+    //     ]
+    // );
+
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
-    // This should match 4 PII types: email, vin, nhs number, and credit card
-    assert_eq!(results.len(), 4);
+    // This should match 5 PII types: email, vin, nhs number, credit card and phone
+    assert_eq!(results.len(), 5);
 
-    // assert_eq!(&results[0].pii_type, "Person");
-    // assert_eq!(&results[1].pii_type, "Vehicle_Information");
-    // assert_eq!(&results[2].pii_type, "Health");
-    // assert_eq!(&results[3].pii_type, "Billing");
+    // TODO: Should test the entity types
 }
 
 #[test]
@@ -973,6 +981,9 @@ fn test_plaintext_mixed() {
 
     assert_eq!(results.len(), 1);
 
+    assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "4111111111111111".to_string());
+    assert_eq!(results[0].char_index_start, 72);
+    assert_eq!(results[0].char_index_end, 88);
 }
 
 #[test]
@@ -1012,34 +1023,22 @@ fn test_plaintext_embedded_json() {
 
     let results = crate::detective::Detective::new().matches(&request).unwrap();
 
-    assert_eq!(results.len(), 10);
+    // // Print out all of the results
+    // for r in results.iter() {
+    //     println!("{}: {} - {}", r.char_index_start, r.pii_type, String::from_utf8(r.value.clone()).unwrap());
+    // }
+
+    assert_eq!(results.len(), 11);
     assert_eq!(String::from_utf8(results[0].value.clone()).unwrap(), "+1-512-974-2220".to_string());
     assert_eq!(String::from_utf8(results[1].value.clone()).unwrap(), "$2a$10$485VpRwnHq/m8yzlGREZtewsGXafgRdgDV4RUam68PGlF3szQCopQ".to_string());
-    assert_eq!(String::from_utf8(results[2].value.clone()).unwrap(), "first+last.name@domain.net".to_string());
-    assert_eq!(String::from_utf8(results[3].value.clone()).unwrap(), "+44.787644-2401".to_string());
-    assert_eq!(String::from_utf8(results[4].value.clone()).unwrap(), "00-B0-D0-63-C2-26".to_string());
-    assert_eq!(String::from_utf8(results[5].value.clone()).unwrap(), "4T1G11AKXRU906563".to_string());
-    assert_eq!(String::from_utf8(results[6].value.clone()).unwrap(), "first+last@domain.net".to_string());
-    assert_eq!(String::from_utf8(results[7].value.clone()).unwrap(), "192.168.1.37".to_string());
-    assert_eq!(String::from_utf8(results[8].value.clone()).unwrap(), "111-22-3456".to_string());
-    assert_eq!(String::from_utf8(results[9].value.clone()).unwrap(), "2001:db8:0:1:1:1:1:1".to_string());
+    assert_eq!(String::from_utf8(results[2].value.clone()).unwrap(), "GB".to_string());
+    assert_eq!(String::from_utf8(results[3].value.clone()).unwrap(), "first+last.name@domain.net".to_string());
+    assert_eq!(String::from_utf8(results[4].value.clone()).unwrap(), "+44.787644-2401".to_string());
+    assert_eq!(String::from_utf8(results[5].value.clone()).unwrap(), "00-B0-D0-63-C2-26".to_string());
+    assert_eq!(String::from_utf8(results[6].value.clone()).unwrap(), "4T1G11AKXRU906563".to_string());
+    assert_eq!(String::from_utf8(results[7].value.clone()).unwrap(), "first+last@domain.net".to_string());
+    assert_eq!(String::from_utf8(results[8].value.clone()).unwrap(), "192.168.1.37".to_string());
+    assert_eq!(String::from_utf8(results[9].value.clone()).unwrap(), "111-22-3456".to_string());
+    assert_eq!(String::from_utf8(results[10].value.clone()).unwrap(), "2001:db8:0:1:1:1:1:1".to_string());
 }
 
-#[bench]
-fn bench_plaintext(b: &mut Bencher) {
-    b.iter(|| {
-        let sample_text = "Hello my name is Mark, my email is mark@streamdal.com and the vin of my car is 4T1G11AKXRU906563. I have AA000000B as my NHS number. My credit card is 4111111111111111.";
-
-        let req = &Request {
-            match_type: DetectiveType::DETECTIVE_TYPE_PII_ANY,
-            data: &&sample_text.as_bytes().to_vec(),
-            path: "".to_string(),
-            args: Vec::new(),
-            negate: false,
-            mode: DETECTIVE_TYPE_PII_KEYWORD_MODE_PERFORMANCE,
-            data_format: PIPELINE_DATA_FORMAT_JSON,
-        };
-
-        let _ = plaintext(&req, sample_text);
-    });
-}

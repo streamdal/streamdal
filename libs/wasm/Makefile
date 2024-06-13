@@ -23,6 +23,9 @@ setup/darwin:
 	# Install WASM optimizer
 	cargo install wasm-opt sccache
 
+	# Install Wizer for detective (pre-initializer)
+	cargo install wizer --all-features
+
 .PHONY: build
 build: description = Build all targets
 build: clean build/detective build/transform build/httprequest build/kv build/inferschema build/validjson build/schemavalidation build/custom
@@ -32,7 +35,8 @@ build/detective: description = Build WASM target for detective
 build/detective: clean/detective
 	cd detective && \
 	cargo build --target=wasm32-wasi --release && \
-	wasm-opt -Os -o ../build/detective.wasm target/wasm32-wasi/release/detective.wasm
+	wizer --wasm-bulk-memory true --allow-wasi target/wasm32-wasi/release/detective.wasm -o target/wasm32-wasi/release/detective.wizer.wasm && \
+	wasm-opt -Os -o ../build/detective.wasm target/wasm32-wasi/release/detective.wizer.wasm
 
 .PHONY: clean/detective
 clean/detective: description = Remove detective WASM artifacts

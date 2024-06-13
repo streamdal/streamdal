@@ -1,11 +1,11 @@
-use crate::detective::Request;
+use idna::domain_to_ascii_strict;
+use regex::Regex;
+use streamdal_gjson as gjson;
+use streamdal_gjson::Value;
+
+use crate::detective::{Request, PHONE_NUMBER_REGEX};
 use crate::error::CustomError;
 use crate::matcher_pii_payments as pii_payments;
-use streamdal_gjson::Value;
-use streamdal_gjson as gjson;
-use idna::domain_to_ascii_strict;
-use validators::prelude::*;
-use validators_prelude::phonenumber::PhoneNumber;
 
 pub fn any(_request: &Request, field: Value) -> Result<bool, CustomError> {
     let matchers = vec![pii_payments::credit_card, ssn, email];
@@ -206,13 +206,23 @@ pub fn vin_number(_request: &Request, field: Value) -> Result<bool, CustomError>
     // Ok(res)
 }
 
-#[derive(Validator)]
-#[validator(phone)]
-pub struct InternationalPhone(pub PhoneNumber);
-
 pub fn phone(_request: &Request, field: Value) -> Result<bool, CustomError> {
-    let val = field.str().trim().replace(['-', ' ', '.'], "");
-    let res = InternationalPhone::parse_string(val).is_ok();
+    // let phone_number_regex = Some(Regex::new(crate::detective::PHONE_NUMBER_REGEX_STR).unwrap());
+    //
+    let re: Regex = unsafe {
+        // If phone() is being called within a wasm module, PHONE_NUMBER_REGEX
+        // will be correctly initialized via init() by wizer. If phone() is
+        // called from non-wasm (eg. tests), PHONE_NUMBER_REGEX will be None so
+        // we have to call on init() ourselves.
+        if PHONE_NUMBER_REGEX.is_none() {
+            crate::detective::init();
+        }
+
+        PHONE_NUMBER_REGEX.clone().unwrap()
+    };
+
+    let res = re.is_match(field.str());
+
     Ok(res)
 }
 
@@ -379,10 +389,11 @@ pub fn postal_code_ca(_request: &Request, postal_code: String) -> Result<bool, C
     Ok(is_valid)
 }
 
-const RSA_KEY_PREFIXES: [&str; 3] = [
+const RSA_KEY_PREFIXES: [&str; 4] = [
     "-----BEGIN PRIVATE",
-    "-----BEGIN RSA PRIVATE",
+    "-----BEGIN RSA",
     "-----BEGIN ENCRYPTED",
+    "-----BEGIN PGP",
 ];
 
 pub fn rsa_key(_request: &Request, field: Value) -> Result<bool, CustomError> {
