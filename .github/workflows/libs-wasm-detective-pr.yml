@@ -22,7 +22,10 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
-
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: wizer --all-features
       - uses: actions-rs/cargo@v1
         with:
           command: test
