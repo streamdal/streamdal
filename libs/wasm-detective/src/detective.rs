@@ -1,7 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 use std::default::Default;
 use std::str;
-use regex::Regex;
 
 use any_ascii::any_ascii;
 use protos::sp_pipeline::PipelineDataFormat;
@@ -17,19 +16,21 @@ use crate::matcher_core as core;
 use crate::matcher_core::{ip_address, mac_address};
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
-use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, phone, ssn, uk_nino, vin_number};
+use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, ssn, uk_nino, vin_number};
 use crate::matcher_pii_cloud as pii_cloud;
 use crate::matcher_pii_cloud::aws_key_id;
 use crate::matcher_pii_keywords as pii_keywords;
 use crate::matcher_pii_payments as pii_payments;
 use crate::matcher_pii_payments::credit_card;
+use crate::matcher_pii_phone::phone;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
 
 pub struct Detective {}
 
-pub static mut PHONE_NUMBER_REGEX: Option<Regex> = None;
-pub const PHONE_NUMBER_REGEX_STR: &str = r"^\s*(?:\+?(\d{1,3}))?([ -.(]*(\d{3})[-. )]*)?((\d{3})[ -.]*(\d{3,6})(?:[ -.x]*(\d+))?)\s*$";
+// Commented out as wizer is breaking wasm ~MG 2024-06-13
+// pub static mut PHONE_NUMBER_REGEX: Option<Regex> = None;
+// pub const PHONE_NUMBER_REGEX_STR: &str = r"^\s*(?:\+?(\d{1,3}))?([ -.(]*(\d{3})[-. )]*)?((\d{3})[ -.]*(\d{3,6})(?:[ -.x]*(\d+))?)\s*$";
 
 // This is a special function used by the 'wizer' pre-initializer utility.
 //
@@ -40,38 +41,38 @@ pub const PHONE_NUMBER_REGEX_STR: &str = r"^\s*(?:\+?(\d{1,3}))?([ -.(]*(\d{3})[
 // compiling regexes on every new request to detective.
 //
 // https://github.com/bytecodealliance/wizer
-#[export_name = "wizer.initialize"]
-pub fn init() {
-    unsafe {
-        // +919367788755    <- match
-        // 8989829304       <- match
-        // +16308520397     <- match
-        // 786-307-3615     <- match
-        // +44.787644-2401  <- match
-        // +447876442401    <- match
-        // 407.865.2052     <- match
-        // 407-865-2052     <- match
-        // 407 865 2052     <- match
-        // +1 407 123 1231  <- match
-        // (407) 865 2052   <- match
-        // +372 512 3456    <- match (Estonia)
-        // 011 372 512 3456 <- match (Estonia dial out from US)
-        // 1                <- no match
-        // 12               <- no match
-        // 123              <- no match
-        // 1234             <- no match
-        // 12345            <- no match
-        // 123456           <- no match
-        // 1234567          <- match
-        // 12345678         <- match
-        // 123456789        <- match
-        // 1234567890       <- match
-        // 12345678901      <- match
-        // 1-1-1            <- no match
-        // +982             <- no match
-        PHONE_NUMBER_REGEX = Some(Regex::new(PHONE_NUMBER_REGEX_STR).unwrap());
-    }
-}
+// #[export_name = "wizer.initialize"]
+// pub fn init() {
+//     unsafe {
+//         // +919367788755    <- match
+//         // 8989829304       <- match
+//         // +16308520397     <- match
+//         // 786-307-3615     <- match
+//         // +44.787644-2401  <- match
+//         // +447876442401    <- match
+//         // 407.865.2052     <- match
+//         // 407-865-2052     <- match
+//         // 407 865 2052     <- match
+//         // +1 407 123 1231  <- match
+//         // (407) 865 2052   <- match
+//         // +372 512 3456    <- match (Estonia)
+//         // 011 372 512 3456 <- match (Estonia dial out from US)
+//         // 1                <- no match
+//         // 12               <- no match
+//         // 123              <- no match
+//         // 1234             <- no match
+//         // 12345            <- no match
+//         // 123456           <- no match
+//         // 1234567          <- match
+//         // 12345678         <- match
+//         // 123456789        <- match
+//         // 1234567890       <- match
+//         // 12345678901      <- match
+//         // 1-1-1            <- no match
+//         // +982             <- no match
+//         PHONE_NUMBER_REGEX = Some(Regex::new(PHONE_NUMBER_REGEX_STR).unwrap());
+//     }
+// }
 
 #[derive(Clone)]
 pub struct Request<'a> {
@@ -331,7 +332,7 @@ impl Detective {
             DetectiveType::DETECTIVE_TYPE_PII_CREDIT_CARD => pii_payments::credit_card,
             DetectiveType::DETECTIVE_TYPE_PII_SSN => pii::ssn,
             DetectiveType::DETECTIVE_TYPE_PII_EMAIL => pii::email,
-            DetectiveType::DETECTIVE_TYPE_PII_PHONE => pii::phone,
+            DetectiveType::DETECTIVE_TYPE_PII_PHONE => phone,
             DetectiveType::DETECTIVE_TYPE_PII_DRIVER_LICENSE => pii::drivers_license,
             DetectiveType::DETECTIVE_TYPE_PII_PASSPORT_ID => pii::passport_id,
             DetectiveType::DETECTIVE_TYPE_PII_VIN_NUMBER => pii::vin_number,
