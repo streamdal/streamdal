@@ -35,7 +35,7 @@ jobs:
       - name: build
         run: |
           rustup target add wasm32-wasi
-          cargo install wasm-opt
+          cargo install wasm-opt wizer
           make build/${{ matrix.funcs }}
 
       - name: modsurfer validate
