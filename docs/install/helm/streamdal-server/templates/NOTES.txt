@@ -2,7 +2,7 @@
 
 {{- if .Values.consoleIngress.enabled }}
 NOTE: It may take a few minutes for the Ingress to be available.
-You can watch the status by running 'kubectl get ingress --namespace {{ .Release.Namespace }} -w {{ include "streamdal-server.fullname" . }}-console'
+You can watch the status by running 'kubectl get ingress --namespace {{ .Release.Namespace }} -w {{ include "streamdal.fullname" . }}-console'
 {{- else }}
 >> Create a port-forward to access Streamdal Console on http://127.0.0.1:8080/":
 
