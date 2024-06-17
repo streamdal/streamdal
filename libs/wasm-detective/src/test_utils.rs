@@ -1,8 +1,9 @@
-use crate::detective::Request;
 use lazy_static::lazy_static;
 use protos::sp_pipeline::PipelineDataFormat::PIPELINE_DATA_FORMAT_JSON;
 use protos::sp_steps_detective::DetectiveType;
 use protos::sp_steps_detective::DetectiveTypePIIKeywordMode::DETECTIVE_TYPE_PII_KEYWORD_MODE_UNSET;
+
+use crate::detective::Request;
 
 pub const SAMPLE_JSON: &str = r#"{
     "boolean_t": true,
@@ -111,7 +112,17 @@ pub const SAMPLE_JSON: &str = r#"{
     },
     "payments": {
         "crypto": {
-            "eth": "0x1ABC7154748D1CE5144478CDEB574AE244B939B5"
+            "eth": "0x999999cf1046e68e36E1aA2E0E07105eDDD1f08E",
+            "btc": {
+                "segwit": "3NW7DCZ13LhXMCLuFsuNmXGR7poLahKJXQ",
+                "bech32": "bc1qjvu7n5k9dgwh4ewg5hq7v60yzsspt7k7l4lh45",
+                "legacy": "1QA4nSaH2ZEKx5GHZwHDzPQbhdt4gBkzfK"
+
+            },
+            "sol": "7MNADbtSvWjuSuJ7mCEEy7m5gP8Kc51tSgkZ1PuSNHW6",
+            "xrp": "rNmokJdw1yfMpyJ7F1JVJ62tXzhj35nhv7",
+            "xlm": "GDPGF3Q7MGWO5VP6OQ4R54AYFGENKBC32OIWVHX5QMV66CQL5J3HG4GS",
+            "xmr": "4831czoX36Xbawh1DGy6Qm5AidNTyDhDfVNxrfghvfsCgfdDCi5BGKpQ7abMyLX3FmZTKj9Q1NXVXL2Dfq17mFFx9qR84rM"
         },
         "routing_number": "122105155",
         "swift_bic": "AAAA-BB-CC-123",
