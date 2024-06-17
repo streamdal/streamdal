@@ -6,6 +6,7 @@ Streamdal Go SDK
 
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/streamdal/sdks/go)](https://goreportcard.com/report/github.com/streamdal/streamdal/sdks/go)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d5956adb6a84c66b7df0/test_coverage)](https://codeclimate.com/github/streamdal/streamdal/test_coverage)
 
 _**Golang SDK for [Streamdal](https://streamdal.com).**_
 
