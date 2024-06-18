@@ -18,19 +18,7 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 )
 
-// Allow specifying the directory where the WASM files are located
-// so that these tests can be reused in for CI during PRs for libs/wasm/*
-// This is necessary since some problems are not visible when running rust
-// code directly, but are when running via WASM
-var WasmDir = os.Getenv("WASM_DIR")
-
 var _ = Describe("WASM Modules", func() {
-	BeforeEach(func() {
-		if WasmDir == "" {
-			WasmDir = "test-assets/wasm"
-		}
-	})
-
 	Context("ValidJSON", func() {
 
 		var req *protos.WASMRequest
