@@ -43,3 +43,13 @@ jobs:
         with:
             path: libs/wasm/build/${{ matrix.funcs }}.wasm
             check: libs/wasm/validation/${{ matrix.funcs }}.wasm.mod.yaml
+
+      - name: WASM interface tests via Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21'
+        working-directory: ./sdks/go
+        env:
+          WASM_DIR: ../../libs/wasm/build
+        run: |
+          go test -v ./...

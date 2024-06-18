@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"sync"
 	"time"
 
@@ -17,7 +18,19 @@ import (
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos/steps"
 )
 
+// Allow specifying the directory where the WASM files are located
+// so that these tests can be reused in for CI during PRs for libs/wasm/*
+// This is necessary since some problems are not visible when running rust
+// code directly, but are when running via WASM
+var WasmDir = os.Getenv("WASM_DIR")
+
 var _ = Describe("WASM Modules", func() {
+	BeforeEach(func() {
+		if WasmDir == "" {
+			WasmDir = "test-assets/wasm"
+		}
+	})
+
 	Context("ValidJSON", func() {
 
 		var req *protos.WASMRequest
@@ -25,7 +38,7 @@ var _ = Describe("WASM Modules", func() {
 		var f *function
 
 		BeforeEach(func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/validjson.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "validjson.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req = &protos.WASMRequest{
@@ -93,7 +106,7 @@ var _ = Describe("WASM Modules", func() {
 
 	Context("httpRequest", func() {
 		It("performs a HTTP request", func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/httprequest.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "httprequest.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req := &protos.WASMRequest{
@@ -161,7 +174,7 @@ var _ = Describe("WASM Modules", func() {
 		var f *function
 
 		BeforeEach(func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req = &protos.WASMRequest{
@@ -303,7 +316,7 @@ var _ = Describe("WASM Modules", func() {
 		})
 
 		It("modifies a field value", func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req.Step.XWasmBytes = wasmData
@@ -345,7 +358,7 @@ var _ = Describe("WASM Modules", func() {
 		})
 
 		It("deletes multiple fields", func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req.Step.XWasmBytes = wasmData
@@ -382,7 +395,7 @@ var _ = Describe("WASM Modules", func() {
 		})
 
 		It("truncates a field by total length", func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req.Step.XWasmBytes = wasmData
@@ -421,7 +434,7 @@ var _ = Describe("WASM Modules", func() {
 		})
 
 		It("truncates a field by percent length", func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req.Step.XWasmBytes = wasmData
@@ -494,7 +507,7 @@ var _ = Describe("WASM Modules", func() {
   ]
 }`)
 
-			wasmData, err := os.ReadFile("test-assets/wasm/schemavalidation.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "schemavalidation.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req = &protos.WASMRequest{
@@ -587,7 +600,7 @@ var _ = Describe("WASM Modules", func() {
 		var f *function
 
 		BeforeEach(func() {
-			wasmData, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			req = &protos.WASMRequest{
@@ -668,9 +681,9 @@ var _ = Describe("WASM Modules", func() {
 			}
 		]
 	}`)
-			detectiveWASM, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			detectiveWASM, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
-			transformWASM, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			transformWASM, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -745,9 +758,9 @@ var _ = Describe("WASM Modules", func() {
 	Context("keyword matching", func() {
 		It("finds and transforms PII in a payload without a path or type", func() {
 			payload := []byte(`{"github": {"token": "pat_abc123", "size": "Medium"}}`)
-			detectiveWASM, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			detectiveWASM, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
-			transformWASM, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			transformWASM, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
