@@ -1,5 +1,4 @@
-# TODO: implement token bucket limiter
-require "bozos_buckets"
+require 'bozos_buckets'
 
 NUM_TAIL_WORKERS = 2
 MIN_TAIL_RESPONSE_INTERVAL_MS = 100
@@ -70,15 +69,15 @@ module Streamdal
           next
         end
 
-        unless stub.nil?
-          tail_response = @queue.pop(non_block = false)
-          @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
+        next if stub.nil?
 
-          begin
-            stub.send_tail([tail_response], metadata: { "auth-token" => @auth_token })
-          rescue => e
-            @logger.error("Error sending tail request: #{e}")
-          end
+        tail_response = @queue.pop(false)
+        @logger.debug("Sending tail request for '#{tail_response.tail_request_id}'")
+
+        begin
+          stub.send_tail([tail_response], metadata: { 'auth-token' => @auth_token })
+        rescue Error => e
+          @logger.error("Error sending tail request: #{e}")
         end
       end
 
