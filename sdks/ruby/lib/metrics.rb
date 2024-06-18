@@ -33,18 +33,18 @@ module Streamdal
 
   class Metrics
 
-    COUNTER_CONSUME_BYTES = "counter_consume_bytes"
-    COUNTER_CONSUME_PROCESSED = "counter_consume_processed"
-    COUNTER_CONSUME_ERRORS = "counter_consume_errors"
-    COUNTER_PRODUCE_BYTES = "counter_produce_bytes"
-    COUNTER_PRODUCE_PROCESSED = "counter_produce_processed"
-    COUNTER_PRODUCE_ERRORS = "counter_produce_errors"
-    COUNTER_NOTIFY = "counter_notify"
-    COUNTER_DROPPED_TAIL_MESSAGES = "counter_dropped_tail_messages"
-    COUNTER_CONSUME_BYTES_RATE = "counter_consume_bytes_rate"
-    COUNTER_PRODUCE_BYTES_RATE = "counter_produce_bytes_rate"
-    COUNTER_CONSUME_PROCESSED_RATE = "counter_consume_processed_rate"
-    COUNTER_PRODUCE_PROCESSED_RATE = "counter_produce_processed_rate"
+    COUNTER_CONSUME_BYTES = 'counter_consume_bytes'.freeze
+    COUNTER_CONSUME_PROCESSED = 'counter_consume_processed'.freeze
+    COUNTER_CONSUME_ERRORS = 'counter_consume_errors'.freeze
+    COUNTER_PRODUCE_BYTES = 'counter_produce_bytes'.freeze
+    COUNTER_PRODUCE_PROCESSED = 'counter_produce_processed'.freeze
+    COUNTER_PRODUCE_ERRORS = 'counter_produce_errors'.freeze
+    COUNTER_NOTIFY = 'counter_notify'.freeze
+    COUNTER_DROPPED_TAIL_MESSAGES = 'counter_dropped_tail_messages'.freeze
+    COUNTER_CONSUME_BYTES_RATE = 'counter_consume_bytes_rate'.freeze
+    COUNTER_PRODUCE_BYTES_RATE = 'counter_produce_bytes_rate'.freeze
+    COUNTER_CONSUME_PROCESSED_RATE = 'counter_consume_processed_rate'.freeze
+    COUNTER_PRODUCE_PROCESSED_RATE = 'counter_produce_processed_rate'.freeze
 
     WORKER_POOL_SIZE = 3
     DEFAULT_COUNTER_REAPER_INTERVAL = 10
@@ -54,9 +54,7 @@ module Streamdal
     CounterEntry = Struct.new(:name, :aud, :labels, :value)
 
     def initialize(cfg)
-      if cfg.nil?
-        raise ArgumentError, "cfg is nil"
-      end
+      raise ArgumentError, 'cfg is nil' if cfg.nil?
 
       @cfg = cfg
       @log = cfg[:log]
@@ -80,30 +78,22 @@ module Streamdal
 
       # Exit any remaining threads
       @workers.each do |w|
-        if w.running?
-          w.exit
-        end
+        w.exit if w.running?
       end
     end
 
     def self.composite_id(counter_name, labels = {})
-      if labels.nil?
-        labels = {}
-      end
+      labels = {} if labels.nil?
       "#{counter_name}-#{labels.values.join("-")}".freeze
     end
 
     def get_counter(ce)
-      if ce.nil?
-        raise ArgumentError, "ce is nil"
-      end
+      raise ArgumentError, 'ce is nil' if ce.nil?
 
       k = Metrics::composite_id(ce.name, ce.labels)
 
       @counters_mtx.synchronize do
-        if @counters.key?(k)
-          @counters[k]
-        end
+        @counters[k] if @counters.key?(k)
       end
 
       # No counter exists, create a new one and return it
@@ -167,7 +157,7 @@ module Streamdal
       # Background thread that reads values from counters, adds them to the publish queue, and then
       # resets the counter's value back to zero
       unless @exit
-        @log.debug("Starting publisher")
+        @log.debug('Starting publisher')
 
         # Sleep on startup and then and between each loop run
         sleep(DEFAULT_COUNTER_PUBLISH_INTERVAL)
@@ -181,10 +171,8 @@ module Streamdal
         new_counters = @counters.dup
         @counters_mtx.unlock
 
-        new_counters.each do |_, counter|
-          if counter.val == 0
-            next
-          end
+        new_counters.each_value do |counter|
+          next if counter.val.zero?
 
           ce = CounterEntry.new(counter.name, counter.aud, counter.labels, counter.val)
           counter.reset
@@ -199,9 +187,7 @@ module Streamdal
 
       until @exit
         ce = @incr_queue.pop
-        if ce.nil?
-          next
-        end
+        next if ce.nil?
         begin
           _publish_metrics(ce)
         rescue => e
@@ -213,7 +199,7 @@ module Streamdal
     end
 
     def _run_reaper
-      @log.debug("Starting reaper")
+      @log.debug('Starting reaper')
 
       until @exit
         # Sleep on startup and then and between each loop run
@@ -226,9 +212,7 @@ module Streamdal
         # Grab copy of counters
         @counters_mtx.synchronize do
           @counters.each do |name, counter|
-            if counter.val > 0
-              next
-            end
+            next if counter.val.positive?
 
             if Time::now - counter.last_updated > DEFAULT_COUNTER_TTL
               @log.debug("Reaping counter '#{name}'")
@@ -238,7 +222,7 @@ module Streamdal
         end
       end
 
-      @log.debug("Exiting reaper")
+      @log.debug('Exiting reaper')
     end
 
     def _run_incrementer_worker(worker_id)
@@ -259,7 +243,7 @@ module Streamdal
 
     # Returns metadata for gRPC requests to the internal gRPC API
     def _metadata
-      { "auth-token" => @cfg[:streamdal_token].to_s }
+      { 'auth-token' => @cfg[:streamdal_token].to_s }
     end
   end
 end
