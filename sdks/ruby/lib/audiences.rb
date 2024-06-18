@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Audiences
   def aud_to_str(aud)
     "#{aud.service_name}.#{aud.component_name}.#{aud.operation_type}.#{aud.operation_name}"
@@ -5,7 +7,7 @@ module Audiences
 
   def str_to_aud(str)
     # TODO: move to common package
-    parts = str.split(".")
+    parts = str.split('.')
     aud = Streamdal::Protos::Audience.new
     aud.service_name = parts[0]
     aud.component_name = parts[1]
@@ -20,9 +22,7 @@ module Audiences
 
   def _add_audience(aud)
     # Add an audience to the local cache map and send to server
-    if _seen_audience(aud)
-      return
-    end
+    return if _seen_audience(aud)
 
     @audiences[aud_to_str(aud)] = aud
 

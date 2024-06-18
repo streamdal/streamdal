@@ -14,18 +14,19 @@ module Streamdal
       @logger = log
       @metrics = metrics
       @active = active
-      @last_msg = Time::at(0)
+      @last_msg = Time.at(0)
       @queue = Queue.new
       @workers = []
 
       # Only use rate limiting if sample_options is set
-      unless request.sample_options.nil?
-        @limiter = BozosBuckets::Bucket.new(
-          initial_token_count: request.sample_options.sample_rate,
-          refill_rate: request.sample_options.sample_interval_seconds,
-          max_token_count: request.sample_options.sample_rate
-        )
-      end
+      return if request.sample_options.nil?
+
+      @limiter = BozosBuckets::Bucket.new(
+        initial_token_count: request.sample_options.sample_rate,
+        refill_rate: request.sample_options.sample_interval_seconds,
+        max_token_count: request.sample_options.sample_rate
+      )
+
     end
 
     def start_tail_workers
@@ -42,11 +43,8 @@ module Streamdal
       sleep(1)
 
       @workers.each do |worker|
-        if worker.alive?
-          worker.exit
-        end
+        worker.exit if worker.alive?
       end
-
     end
 
     def start_tail_worker(worker_id)
@@ -62,7 +60,7 @@ module Streamdal
           next
         end
 
-        if Time::now - @last_msg < MIN_TAIL_RESPONSE_INTERVAL_MS
+        if Time.now - @last_msg < MIN_TAIL_RESPONSE_INTERVAL_MS
           sleep(MIN_TAIL_RESPONSE_INTERVAL_MS)
           @metrics.incr(Metrics::CounterEntry.new(COUNTER_DROPPED_TAIL_MESSAGES, nil, {}, 1))
           @logger.debug("Dropped tail message for '#{@request.id}' due to rate limiting")
@@ -82,13 +80,10 @@ module Streamdal
       end
 
       @logger.debug "Tail worker #{worker_id} exited"
-
     end
 
     def should_send
-      if @limiter.nil?
-        true
-      end
+      true if @limiter.nil?
 
       @limiter.use_tokens(1)
     end

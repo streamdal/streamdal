@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include Streamdal::Protos
 
 module Schemas
@@ -8,29 +10,21 @@ module Schemas
   end
 
   def _get_schema(aud)
-    if @schemas.key?(aud_to_str(aud))
-      return @schemas[aud_to_str(aud)].json_schema
-    end
+    return @schemas[aud_to_str(aud)].json_schema if @schemas.key?(aud_to_str(aud))
 
-    ""
+    ''
   end
 
   def _handle_schema(aud, step, wasm_resp)
     # Only handle schema steps
-    if step.infer_schema.nil?
-      return nil
-    end
+    return nil if step.infer_schema.nil?
 
     # Only successful schema inferences
-    if wasm_resp.exit_code != :WASM_EXIT_CODE_TRUE
-      return nil
-    end
+    return nil if wasm_resp.exit_code != :WASM_EXIT_CODE_TRUE
 
     # If existing schema matches, do nothing
     existing_schema = _get_schema(aud)
-    if existing_schema == wasm_resp.output_step
-      return nil
-    end
+    return nil if existing_schema == wasm_resp.output_step
 
     _set_schema(aud, wasm_resp.output_step)
 
