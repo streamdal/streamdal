@@ -23,35 +23,34 @@ class HostFunc:
 
         data = common.read_memory(memory, caller, ptr, length)
 
-        req = protos.steps.HttpRequest().parse(data)
+        req = protos.WasmRequest().parse(data)
 
-        response = self.__http_request_perform(req)
+        try:
+            req_body = self.get_request_body_for_mode(req)
+        except ValueError as e:
+            return self.http_request_response(caller, 400, str(e).encode("utf-8"), {})
+
+        resp = self.__http_request_perform(req.step.http_request.request, req_body)
 
         headers = {}
-        for k, v in response.headers.items():
+        for k, v in resp.headers.items():
             headers[k] = v
 
-        res = protos.steps.HttpResponse(
-            code=response.status_code,
-            body=response.text.encode("utf-8"),
-            headers=headers,
-        )
-
-        return HostFunc.write_to_memory(caller, res)
+        return self.http_request_response(caller, resp.status_code, resp.text.encode("utf-8"), headers)
 
     def __http_request_perform(
-        self, req: protos.steps.HttpRequest
+            self, req: protos.steps.HttpRequest, body: bytes
     ) -> requests.Response:
         if req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET:
             response = requests.get(req.url)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_POST:
-            response = requests.post(req.url, json=req.body)
+            response = requests.post(req.url, json=body)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PUT:
-            response = requests.put(req.url, json=req.body)
+            response = requests.put(req.url, json=body)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_DELETE:
             response = requests.delete(req.url)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_PATCH:
-            response = requests.patch(req.url, json=req.body)
+            response = requests.patch(req.url, json=body)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_HEAD:
             response = requests.head(req.url)
         elif req.method == protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_OPTIONS:
@@ -60,6 +59,15 @@ class HostFunc:
             raise ValueError(f"Invalid HTTP method provided: '{req.method}'")
 
         return response
+
+    def http_request_response(self, caller: Caller, code, body, headers) -> int:
+        res = protos.steps.HttpResponse(
+            code=code,
+            body=body,
+            headers=headers,
+        )
+
+        return self.write_to_memory(caller, res)
 
     def kv_exists(self, caller: Caller, ptr: int, length: int) -> int:
         """
@@ -80,7 +88,7 @@ class HostFunc:
         return self.kv_exists_response(caller, msg, False, exists)
 
     def kv_exists_response(
-        self, caller: Caller, msg: str, is_error: bool, exists: bool
+            self, caller: Caller, msg: str, is_error: bool, exists: bool
     ) -> int:
         """
         kv_exists_response is a host function that is used to check if a key exists in the KV store
@@ -99,10 +107,30 @@ class HostFunc:
             value=None,  # No value for KVExists
         )
 
-        return HostFunc.write_to_memory(caller, resp)
+        return self.write_to_memory(caller, resp)
 
-    @staticmethod
-    def write_to_memory(caller: Caller, res) -> int:
+    def get_request_body_for_mode(self, req: protos.WasmRequest):
+        mode = req.step.http_request.request.body_mode
+        if mode == protos.steps.HttpRequestBodyMode.HTTP_REQUEST_BODY_MODE_STATIC:
+            return req.step.http_request.request.body
+        elif mode == protos.steps.HttpRequestBodyMode.HTTP_REQUEST_BODY_MODE_INTER_STEP_RESULT:
+            if req.inter_step_result is None:
+                raise ValueError("Inter step result not provided")
+
+            detective_res = req.inter_step_result.detective_result
+
+            if detective_res is None:
+                raise ValueError("Detective result not provided")
+
+            # Wipe values to prevent PII from being passed
+            for step_res in detective_res.matches:
+                step_res.value = ""
+
+            return req.inter_step_result.SerializeToString()
+        else:
+            raise ValueError(f"Invalid HTTP request mode provided: '{mode}'")
+
+    def write_to_memory(self, caller: Caller, res) -> int:
         """
         write_to_memory is a host function that is used to write a response to memory
         """

@@ -94,6 +94,8 @@ class TestStreamdalWasm:
                 request=protos.steps.HttpRequest(
                     url="https://www.streamdal.com/404_me",
                     method=protos.steps.HttpRequestMethod.HTTP_REQUEST_METHOD_GET,
+                    body_mode=protos.steps.HttpRequestBodyMode.HTTP_REQUEST_BODY_MODE_STATIC,
+                    body=b"",
                 ),
             ),
         )
