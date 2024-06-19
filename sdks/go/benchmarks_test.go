@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 	"sync"
 	"testing"
@@ -32,7 +33,7 @@ func BenchmarkTransform_Replace(b *testing.B) {
 					},
 				},
 			}
-			benchmarkWASM("test-assets/wasm/transform.wasm", jsonFile, step, b)
+			benchmarkWASM(path.Join(WasmDir, "transform.wasm"), jsonFile, step, b)
 		})
 	}
 }
@@ -49,7 +50,7 @@ func BenchmarkInferSchema_FreshSchema(b *testing.B) {
 					},
 				},
 			}
-			benchmarkWASM("test-assets/wasm/inferschema.wasm", jsonFile, step, b)
+			benchmarkWASM(path.Join(WasmDir, "inferschema.wasm"), jsonFile, step, b)
 		})
 	}
 }
@@ -69,7 +70,7 @@ func BenchmarkInferSchema_MatchExisting(b *testing.B) {
 				},
 			}
 
-			benchmarkWASM("test-assets/wasm/inferschema.wasm", jsonFile, step, b)
+			benchmarkWASM(path.Join(WasmDir, "inferschema.wasm"), jsonFile, step, b)
 		})
 	}
 }
@@ -89,7 +90,7 @@ func BenchmarkDetective(b *testing.B) {
 					},
 				},
 			}
-			benchmarkWASM("test-assets/wasm/detective.wasm", jsonFile, step, b)
+			benchmarkWASM(path.Join(WasmDir, "detective.wasm"), jsonFile, step, b)
 		})
 	}
 }
@@ -107,7 +108,7 @@ func BenchmarkDetective(b *testing.B) {
 //			},
 //		},
 //	}
-//	benchmarkWASM("test-assets/wasm/httprequest.wasm", "test-assets/json-examples/small.json", step, b)
+//	benchmarkWASM(path.Join(WasmDir, "httprequest.wasm", "test-assets/json-examples/small.json", step, b)
 //}
 
 // ---------------------------- Helper Methods ----------------------------
@@ -178,7 +179,7 @@ func benchmarkWASM(wasmFile, testPayloadFile string, step *protos.PipelineStep, 
 // inferSchema is used to generate an existing schema for benchmarks
 // It is not used in the actual benchmark itself
 func inferSchema(fileName string) (*protos.WASMResponse, error) {
-	wasmData, err := os.ReadFile("test-assets/wasm/inferschema.wasm")
+	wasmData, err := os.ReadFile(path.Join(WasmDir, "inferschema.wasm"))
 	if err != nil {
 		return nil, err
 	}
