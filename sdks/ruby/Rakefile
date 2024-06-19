@@ -1,6 +1,10 @@
 task default: %w[test]
 
 task :test do
-  sh "bundle exec rspec lib/"
+  # Download WASM
+  sh 'sh init_wasm.sh'
+
+  # Run tests
+  sh 'bundle exec rspec lib/'
 end
 

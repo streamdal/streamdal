@@ -43,9 +43,9 @@ module Streamdal
       req = Streamdal::Protos::WASMRequest.decode(data)
 
       begin
-        req_body = self._get_request_body_for_mode(req)
+        req_body = _get_request_body_for_mode(req)
       rescue => e
-        return self._http_request_response(caller, 400, e.to_s, {})
+        return _http_request_response(caller, 400, e.to_s, {})
       end
 
       # Attempt to make HTTP request
@@ -53,10 +53,17 @@ module Streamdal
       begin
         response = _make_http_request(req.step.http_request.request, req_body)
       rescue => e
-        return self._http_request_response(caller, 400, "Unable to execute HTTP request: #{e}", {})
+        return _http_request_response(caller, 400, "Unable to execute HTTP request: #{e}", {})
       end
 
-      self._http_request_response(caller, response.code, response.body, response.headers)
+      # Convert body to utf8
+      out = encode(response.body)
+
+      _http_request_response(caller, response.code, out, response.headers)
+    end
+
+    def encode(str)
+      str.force_encoding('ascii-8bit').encode('utf-8', invalid: :replace, undef: :replace, replace: '?')
     end
 
     private
@@ -95,22 +102,18 @@ module Streamdal
         }
 
         req.inter_step_result.to_json
-      when :HTTP_REQUEST_BODY_MODE_STATIC
-        http_req.body
       else
-        raise 'invalid http request body mode'
+        http_req.body
       end
     end
 
     ##
     # Performs an http request
     def _make_http_request(req, body)
-      if req.nil?
-        raise 'req is required'
-      end
+      raise 'req is required' if req.nil?
 
       options = {
-        headers: { "Content-Type": 'application/json', },
+        headers: { "Content-Type": 'application/json' }
       }
 
       req.headers.each { |key, value| options.headers[key] = value }
@@ -137,5 +140,25 @@ module Streamdal
         raise ArgumentError, "Invalid http request method: #{req.method}"
       end
     end
+
+    # Called by host functions to write memory to wasm instance so that
+    # the wasm module can read the result of a host function call
+    def write_to_memory(caller, res)
+      alloc = caller.export('alloc').to_func
+      memory = caller.export('memory').to_memory
+
+      # Serialize protobuf message
+      resp = res.to_proto
+
+      # Allocate memory for response
+      resp_ptr = alloc.call(resp.length)
+
+      # Write response to memory
+      memory.write(resp_ptr, resp)
+
+      # return 64bit integer where first 32 bits is the pointer, and the last 32 is the length
+      resp_ptr << 32 | resp.length
+    end
+
   end
 end
