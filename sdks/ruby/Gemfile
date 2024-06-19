@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
-gem "streamdal-protos", "0.1.52"
+gem 'rubocop', group: 'development', require: false
+gem "streamdal-protos", "0.1.57"
 gem "securerandom", "~> 0.3.1"
 gem "wasmtime", "~> 18.0.0"
 gem "google-protobuf", "~> 3.25"
