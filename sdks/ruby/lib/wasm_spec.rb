@@ -41,7 +41,7 @@ RSpec.describe 'WASM' do
 
   context 'detective.wasm' do
     before(:each) do
-      wasm_bytes = File.read(File.join(File.dirname(__FILE__), '..', 'test-assets', 'wasm', 'detective.wasm'))
+      wasm_bytes = load_wasm('detective.wasm')
 
       @step = Streamdal::Protos::PipelineStep.new
       @step.name = 'detective'
@@ -77,7 +77,7 @@ RSpec.describe 'WASM' do
 
   context 'httprequest.wasm' do
     before(:each) do
-      wasm_bytes = File.read(File.join(File.dirname(__FILE__), '..', 'test-assets', 'wasm', 'httprequest.wasm'))
+      wasm_bytes = load_wasm('httprequest.wasm')
 
       http_req_step = Streamdal::Protos::HttpRequestStep.new
       http_req_step.request = Streamdal::Protos::HttpRequest.new
@@ -104,7 +104,7 @@ RSpec.describe 'WASM' do
 
   context 'inferschema.wasm' do
     before(:each) do
-      wasm_bytes = File.read(File.join(File.dirname(__FILE__), '..', 'test-assets', 'wasm', 'inferschema.wasm'))
+      wasm_bytes = load_wasm('inferschema.wasm')
 
       @step = Streamdal::Protos::PipelineStep.new
       @step.name = 'schema inference'
@@ -130,7 +130,7 @@ RSpec.describe 'WASM' do
 
   context 'transform.wasm' do
     before(:each) do
-      wasm_bytes = File.read(File.join(File.dirname(__FILE__), '..', 'test-assets', 'wasm', 'transform.wasm'))
+      wasm_bytes = load_wasm('transform.wasm')
 
       @step = Streamdal::Protos::PipelineStep.new
       @step.name = 'transform'
@@ -194,7 +194,7 @@ RSpec.describe 'WASM' do
 
   context 'validjson.wasm' do
     before(:each) do
-      wasm_bytes = File.read(File.join(File.dirname(__FILE__), '..', 'test-assets', 'wasm', 'validjson.wasm'))
+      wasm_bytes = load_wasm('validjson.wasm')
 
       @step = Streamdal::Protos::PipelineStep.new
       @step.name = 'validate json'
@@ -226,7 +226,7 @@ RSpec.describe 'WASM' do
 
   context 'kv.wasm' do
     before(:each) do
-      wasm_bytes = File.read(File.join(File.dirname(__FILE__), '..', 'test-assets', 'wasm', 'kv.wasm'))
+      wasm_bytes = load_wasm('kv.wasm')
 
       client.kv.set('test', 'test')
 

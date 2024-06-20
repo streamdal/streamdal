@@ -13,12 +13,9 @@ defaults:
     working-directory: ./libs/wasm
 
 jobs:
-  test:
-    name: Test build
+  build:
+    name: Build all WASM
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        funcs: ["detective", "httprequest", "inferschema", "kv", "transform", "validjson"]
     env:
       SCCACHE_GHA_ENABLED: "true"
       RUSTC_WRAPPER: "sccache"
@@ -36,14 +33,39 @@ jobs:
         run: |
           rustup target add wasm32-wasi
           cargo install wasm-opt
-          make build/${{ matrix.funcs }}
-
+          make build
+      - uses: actions/upload-artifact@master
+        with:
+          name: wasm-test-artifact
+          path: libs/wasm/build
+  test:
+    name: Test build
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      matrix:
+        funcs: ["detective", "httprequest", "inferschema", "kv", "transform", "validjson"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@master
+        with:
+          name: wasm-test-artifact
+          path: libs/wasm/build
       - name: modsurfer validate
         uses: dylibso/modsurfer-validate-action@main
         with:
             path: libs/wasm/build/${{ matrix.funcs }}.wasm
             check: libs/wasm/validation/${{ matrix.funcs }}.wasm.mod.yaml
-
+  test-go-sdk:
+    name: Test with Go SDK
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@master
+        with:
+          name: wasm-test-artifact
+          path: libs/wasm/build
       - uses: actions/setup-go@v2
         with:
           go-version: '1.21'
@@ -53,3 +75,30 @@ jobs:
           WASM_DIR: ../../libs/wasm/build
         run: |
           go test -v ./...
+
+  test-ruby-sdk:
+    name: Test with Ruby SDK
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@master
+        with:
+          name: wasm-test-artifact
+          path: libs/wasm/build
+      - name: Set up Ruby 3.3
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+      - name: Install dependencies
+        working-directory: ./sdks/ruby
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: WASM interface tests via Ruby
+        working-directory: ./sdks/ruby
+        env:
+          WASM_DIR: ../../libs/wasm/build
+        run: |
+          bundle exec rake test_wasm_ci

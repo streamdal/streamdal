@@ -8,3 +8,6 @@ task :test do
   sh 'bundle exec rspec lib/'
 end
 
+task :test_wasm_ci do
+  sh 'bundle exec rspec lib/'
+end
