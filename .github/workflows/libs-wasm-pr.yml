@@ -117,10 +117,12 @@ jobs:
         with:
           name: wasm-test-artifact
       - name: Install dependencies
+        working-directory: ./sdks/python
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Run Pytest
+        working-directory: ./sdks/python
         env:
           WASM_DIR: ../../libs/wasm/build
         run: |
