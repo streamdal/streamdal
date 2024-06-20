@@ -1,10 +1,19 @@
 import asyncio
+import os
 import pytest
 import streamdal
 import streamdal_protos.protos as protos
 import unittest.mock as mock
 import uuid
 from streamdal import StreamdalClient, StreamdalConfig, hostfunc, kv
+
+WASM_DIR = os.getenv("WASM_DIR", "./test-assets/wasm")
+
+
+def load_wasm(path):
+    path = os.path.join(WASM_DIR, path)
+    with open(path, "rb") as file:
+        return file.read()
 
 
 class TestStreamdalWasm:
@@ -48,8 +57,7 @@ class TestStreamdalWasm:
     def test_detective_wasm(self):
         """Test we can execute the detective wasm file"""
 
-        with open("./test-assets/wasm/detective.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("detective.wasm")
 
         step = protos.PipelineStep(
             name="detective",
@@ -82,8 +90,7 @@ class TestStreamdalWasm:
     def test_http_request_wasm(self):
         """Test we can execute http_request wasm file"""
 
-        with open("./test-assets/wasm/httprequest.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("httprequest.wasm")
 
         step = protos.PipelineStep(
             name="httprequest test",
@@ -109,8 +116,7 @@ class TestStreamdalWasm:
     def test_infer_schema(self):
         """Test we can infer schema from json using the wasm module"""
 
-        with open("./test-assets/wasm/inferschema.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("inferschema.wasm")
 
         step = protos.PipelineStep(
             name="inferschema test",
@@ -138,8 +144,7 @@ class TestStreamdalWasm:
     def test_transform_wasm_delete(self):
         """Test we can delete field(s)"""
 
-        with open("./test-assets/wasm/transform.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("transform.wasm")
 
         step = protos.PipelineStep(
             name="transform test - delete fields",
@@ -167,8 +172,7 @@ class TestStreamdalWasm:
     def test_transform_wasm_replace(self):
         """Test we can execute the transform wasm module"""
 
-        with open("./test-assets/wasm/transform.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("transform.wasm")
 
         step = protos.PipelineStep(
             name="transform test - replace",
@@ -198,8 +202,7 @@ class TestStreamdalWasm:
     def test_transform_wasm_truncate(self):
         """Test we can execute the transform wasm module"""
 
-        with open("./test-assets/wasm/transform.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("transform.wasm")
 
         step = protos.PipelineStep(
             name="transform test - truncate",
@@ -225,8 +228,9 @@ class TestStreamdalWasm:
         assert res.output_payload == b'{"object": {"payload": "old"}}'
 
     def test_validjson_wasm(self):
-        with open("./test-assets/wasm/validjson.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        """Test we can execute the validjson wasm module"""
+
+        wasm_bytes = load_wasm("validjson.wasm")
 
         step = protos.PipelineStep(
             name="valid json test",
@@ -259,8 +263,7 @@ class TestStreamdalWasm:
 
         self.client.kv.set("test", "test")
 
-        with open("./test-assets/wasm/kv.wasm", "rb") as file:
-            wasm_bytes = file.read()
+        wasm_bytes = load_wasm("kv.wasm")
 
         step = protos.PipelineStep(
             name="KV exists test",
@@ -283,11 +286,8 @@ class TestStreamdalWasm:
     def test_dynamic_transform(self):
         """Test that we can pass detective results to a transform step"""
 
-        with open("./test-assets/wasm/detective.wasm", "rb") as file:
-            detective_wasm_bytes = file.read()
-
-        with open("./test-assets/wasm/transform.wasm", "rb") as file:
-            transform_wasm_bytes = file.read()
+        detective_wasm_bytes = load_wasm("detective.wasm")
+        transform_wasm_bytes = load_wasm("transform.wasm")
 
         pipeline = protos.Pipeline(
             id=uuid.uuid4().__str__(),
