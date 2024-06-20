@@ -13,6 +13,36 @@ defaults:
     working-directory: ./sdks/ruby
 
 jobs:
+  coverage:
+    name: Generate code coverage report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Ruby 3.3
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: Install Code Climate reporter
+        run: |
+          sudo curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          sudo chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
+      - name: Run coverage
+        run: |
+          bundle exec rake test
+      - name: Upload coverage information
+        run: |
+          ./cc-test-reporter format-coverage -t simplecov
+          GIT_BRANCH="${GITHUB_HEAD_REF}" ./cc-test-reporter after-build \
+            -r ${{ secrets.CC_TEST_REPORTER_ID }} \
+            -t simplecov
+
   build:
     name: Tag and Release
     if: ${{ !contains(github.event.head_commit.message, 'norelease') }}
