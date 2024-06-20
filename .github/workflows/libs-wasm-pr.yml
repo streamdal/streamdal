@@ -59,6 +59,7 @@ jobs:
   test-go-sdk:
     name: Test with Go SDK
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@master
@@ -78,6 +79,7 @@ jobs:
   test-ruby-sdk:
     name: Test with Ruby SDK
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Set up Ruby 3.3
         uses: ruby/setup-ruby@v1
