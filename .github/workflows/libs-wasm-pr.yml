@@ -101,4 +101,4 @@ jobs:
         env:
           WASM_DIR: ../../libs/wasm/build
         run: |
-          bundle exec rake test
+          bundle exec rake test_wasm_ci
