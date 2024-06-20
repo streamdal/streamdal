@@ -328,6 +328,9 @@ func (m *Metrics) FetchCounters(ctx context.Context) ([]*protos.Metric, error) {
 
 func (m *Metrics) dumpCounters() error {
 	counters, err := m.FetchCounters(context.Background())
+	if err != nil {
+		return err
+	}
 
 	data, err := json.Marshal(counters)
 	if err != nil {

@@ -2,6 +2,7 @@ CLI
 ===
 [![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-release.yml)
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-cli-pr.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/streamdal/apps/cli)](https://goreportcard.com/report/github.com/streamdal/streamdal/apps/cli)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 _**CLI tool for [Streamdal](https://streamdal.com).**_
