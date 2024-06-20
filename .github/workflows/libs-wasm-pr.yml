@@ -41,6 +41,7 @@ jobs:
   test:
     name: Test build
     runs-on: ubuntu-latest
+    needs: build
     strategy:
       matrix:
         funcs: ["detective", "httprequest", "inferschema", "kv", "transform", "validjson"]
