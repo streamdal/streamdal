@@ -3,7 +3,6 @@ Streamdal Python SDK
 [![Release](https://github.com/streamdal/streamdal/actions/workflows/sdks-python-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/sdks-python-release.yml)
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/sdks-python-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/sdks-python-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
-
 [![codecov](https://codecov.io/github/streamdal/streamdal/graph/badge.svg?token=yYbG9PCM2k&flag=python-sdk)](https://codecov.io/github/streamdal/streamdal)
 
 _**Python SDK for [Streamdal](https://streamdal.com).**_
