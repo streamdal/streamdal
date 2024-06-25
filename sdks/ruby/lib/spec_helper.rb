@@ -1,7 +1,9 @@
 require 'simplecov'
-require 'simplecov_json_formatter'
-SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
+require 'simplecov-cobertura'
+
 SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+
 
 # This environment variable exists so that we can run WASM tests
 # via the CI process for libs/wasm* and not just through the CI
