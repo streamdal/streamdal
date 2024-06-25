@@ -18,18 +18,18 @@ class Command(_message.Message):
     SET_PIPELINES_FIELD_NUMBER: _ClassVar[int]
     TAIL_FIELD_NUMBER: _ClassVar[int]
     audience: _sp_common_pb2.Audience
-    delete: DeleteAudienceCommand
+    delete: DeleteAudiencesCommand
     keep_alive: KeepAliveCommand
     kv: KVCommand
     set_pipelines: SetPipelinesCommand
     tail: TailCommand
-    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ..., delete: _Optional[_Union[DeleteAudienceCommand, _Mapping]] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ..., delete: _Optional[_Union[DeleteAudiencesCommand, _Mapping]] = ...) -> None: ...
 
-class DeleteAudienceCommand(_message.Message):
+class DeleteAudiencesCommand(_message.Message):
     __slots__ = ["audience"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    audience: _sp_common_pb2.Audience
-    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ...) -> None: ...
+    audience: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
+    def __init__(self, audience: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
 
 class KVCommand(_message.Message):
     __slots__ = ["instructions", "overwrite"]

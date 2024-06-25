@@ -34,10 +34,13 @@ message Command {
     KVCommand kv = 102;
 
     // Emitted by server when a user makes a Tail() call
-    // Consumed by all server instances and by SDKs
+    // Consumed by all server instances and by SDK
     TailCommand tail = 103;
 
-    DeleteAudienceCommand delete = 104;
+    // Emitted by the server when a user deletes an audience or service
+    // Consumed by SDK to delete audience from it's internal cache so
+    // that the heartbeat does not send the audience back to the server
+    DeleteAudiencesCommand delete = 104;
   }
 }
 
@@ -65,6 +68,6 @@ message TailCommand {
   TailRequest request = 2;
 }
 
-message DeleteAudienceCommand {
-  protos.Audience audience = 1;
+message DeleteAudiencesCommand {
+  repeated protos.Audience audience = 1;
 }

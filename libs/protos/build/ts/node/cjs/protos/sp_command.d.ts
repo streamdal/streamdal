@@ -56,7 +56,7 @@ export interface Command {
         oneofKind: "tail";
         /**
          * Emitted by server when a user makes a Tail() call
-         * Consumed by all server instances and by SDKs
+         * Consumed by all server instances and by SDK
          *
          * @generated from protobuf field: protos.TailCommand tail = 103;
          */
@@ -64,9 +64,13 @@ export interface Command {
     } | {
         oneofKind: "delete";
         /**
-         * @generated from protobuf field: protos.DeleteAudienceCommand delete = 104;
+         * Emitted by the server when a user deletes an audience or service
+         * Consumed by SDK to delete audience from it's internal cache so
+         * that the heartbeat does not send the audience back to the server
+         *
+         * @generated from protobuf field: protos.DeleteAudiencesCommand delete = 104;
          */
-        delete: DeleteAudienceCommand;
+        delete: DeleteAudiencesCommand;
     } | {
         oneofKind: undefined;
     };
@@ -123,13 +127,13 @@ export interface TailCommand {
     request?: TailRequest;
 }
 /**
- * @generated from protobuf message protos.DeleteAudienceCommand
+ * @generated from protobuf message protos.DeleteAudiencesCommand
  */
-export interface DeleteAudienceCommand {
+export interface DeleteAudiencesCommand {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * @generated from protobuf field: repeated protos.Audience audience = 1;
      */
-    audience?: Audience;
+    audience: Audience[];
 }
 declare class Command$Type extends MessageType<Command> {
     constructor();
@@ -182,14 +186,14 @@ declare class TailCommand$Type extends MessageType<TailCommand> {
  * @generated MessageType for protobuf message protos.TailCommand
  */
 export declare const TailCommand: TailCommand$Type;
-declare class DeleteAudienceCommand$Type extends MessageType<DeleteAudienceCommand> {
+declare class DeleteAudiencesCommand$Type extends MessageType<DeleteAudiencesCommand> {
     constructor();
-    create(value?: PartialMessage<DeleteAudienceCommand>): DeleteAudienceCommand;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudienceCommand): DeleteAudienceCommand;
-    internalBinaryWrite(message: DeleteAudienceCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<DeleteAudiencesCommand>): DeleteAudiencesCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudiencesCommand): DeleteAudiencesCommand;
+    internalBinaryWrite(message: DeleteAudiencesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message protos.DeleteAudienceCommand
+ * @generated MessageType for protobuf message protos.DeleteAudiencesCommand
  */
-export declare const DeleteAudienceCommand: DeleteAudienceCommand$Type;
+export declare const DeleteAudiencesCommand: DeleteAudiencesCommand$Type;
 export {};

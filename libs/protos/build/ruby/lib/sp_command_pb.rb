@@ -17,7 +17,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
         optional :keep_alive, :message, 101, "protos.KeepAliveCommand"
         optional :kv, :message, 102, "protos.KVCommand"
         optional :tail, :message, 103, "protos.TailCommand"
-        optional :delete, :message, 104, "protos.DeleteAudienceCommand"
+        optional :delete, :message, 104, "protos.DeleteAudiencesCommand"
       end
     end
     add_message "protos.SetPipelinesCommand" do
@@ -33,8 +33,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "protos.TailCommand" do
       optional :request, :message, 2, "protos.TailRequest"
     end
-    add_message "protos.DeleteAudienceCommand" do
-      optional :audience, :message, 1, "protos.Audience"
+    add_message "protos.DeleteAudiencesCommand" do
+      repeated :audience, :message, 1, "protos.Audience"
     end
   end
 end
@@ -46,6 +46,6 @@ module Streamdal
     KeepAliveCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.KeepAliveCommand").msgclass
     KVCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.KVCommand").msgclass
     TailCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.TailCommand").msgclass
-    DeleteAudienceCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.DeleteAudienceCommand").msgclass
+    DeleteAudiencesCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("protos.DeleteAudiencesCommand").msgclass
   end
 end

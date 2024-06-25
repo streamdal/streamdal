@@ -63,7 +63,7 @@ export interface Command {
         oneofKind: "tail";
         /**
          * Emitted by server when a user makes a Tail() call
-         * Consumed by all server instances and by SDKs
+         * Consumed by all server instances and by SDK
          *
          * @generated from protobuf field: protos.TailCommand tail = 103;
          */
@@ -71,9 +71,13 @@ export interface Command {
     } | {
         oneofKind: "delete";
         /**
-         * @generated from protobuf field: protos.DeleteAudienceCommand delete = 104;
+         * Emitted by the server when a user deletes an audience or service
+         * Consumed by SDK to delete audience from it's internal cache so
+         * that the heartbeat does not send the audience back to the server
+         *
+         * @generated from protobuf field: protos.DeleteAudiencesCommand delete = 104;
          */
-        delete: DeleteAudienceCommand;
+        delete: DeleteAudiencesCommand;
     } | {
         oneofKind: undefined;
     };
@@ -130,13 +134,13 @@ export interface TailCommand {
     request?: TailRequest;
 }
 /**
- * @generated from protobuf message protos.DeleteAudienceCommand
+ * @generated from protobuf message protos.DeleteAudiencesCommand
  */
-export interface DeleteAudienceCommand {
+export interface DeleteAudiencesCommand {
     /**
-     * @generated from protobuf field: protos.Audience audience = 1;
+     * @generated from protobuf field: repeated protos.Audience audience = 1;
      */
-    audience?: Audience;
+    audience: Audience[];
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class Command$Type extends MessageType<Command> {
@@ -147,7 +151,7 @@ class Command$Type extends MessageType<Command> {
             { no: 101, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
             { no: 102, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
             { no: 103, name: "tail", kind: "message", oneof: "command", T: () => TailCommand },
-            { no: 104, name: "delete", kind: "message", oneof: "command", T: () => DeleteAudienceCommand }
+            { no: 104, name: "delete", kind: "message", oneof: "command", T: () => DeleteAudiencesCommand }
         ]);
     }
     create(value?: PartialMessage<Command>): Command {
@@ -189,10 +193,10 @@ class Command$Type extends MessageType<Command> {
                         tail: TailCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).tail)
                     };
                     break;
-                case /* protos.DeleteAudienceCommand delete */ 104:
+                case /* protos.DeleteAudiencesCommand delete */ 104:
                     message.command = {
                         oneofKind: "delete",
-                        delete: DeleteAudienceCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).delete)
+                        delete: DeleteAudiencesCommand.internalBinaryRead(reader, reader.uint32(), options, (message.command as any).delete)
                     };
                     break;
                 default:
@@ -222,9 +226,9 @@ class Command$Type extends MessageType<Command> {
         /* protos.TailCommand tail = 103; */
         if (message.command.oneofKind === "tail")
             TailCommand.internalBinaryWrite(message.command.tail, writer.tag(103, WireType.LengthDelimited).fork(), options).join();
-        /* protos.DeleteAudienceCommand delete = 104; */
+        /* protos.DeleteAudiencesCommand delete = 104; */
         if (message.command.oneofKind === "delete")
-            DeleteAudienceCommand.internalBinaryWrite(message.command.delete, writer.tag(104, WireType.LengthDelimited).fork(), options).join();
+            DeleteAudiencesCommand.internalBinaryWrite(message.command.delete, writer.tag(104, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -437,26 +441,26 @@ class TailCommand$Type extends MessageType<TailCommand> {
  */
 export const TailCommand = new TailCommand$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class DeleteAudienceCommand$Type extends MessageType<DeleteAudienceCommand> {
+class DeleteAudiencesCommand$Type extends MessageType<DeleteAudiencesCommand> {
     constructor() {
-        super("protos.DeleteAudienceCommand", [
-            { no: 1, name: "audience", kind: "message", T: () => Audience }
+        super("protos.DeleteAudiencesCommand", [
+            { no: 1, name: "audience", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Audience }
         ]);
     }
-    create(value?: PartialMessage<DeleteAudienceCommand>): DeleteAudienceCommand {
-        const message = {};
+    create(value?: PartialMessage<DeleteAudiencesCommand>): DeleteAudiencesCommand {
+        const message = { audience: [] };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<DeleteAudienceCommand>(this, message, value);
+            reflectionMergePartial<DeleteAudiencesCommand>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudienceCommand): DeleteAudienceCommand {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudiencesCommand): DeleteAudiencesCommand {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* protos.Audience audience */ 1:
-                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                case /* repeated protos.Audience audience */ 1:
+                    message.audience.push(Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -469,10 +473,10 @@ class DeleteAudienceCommand$Type extends MessageType<DeleteAudienceCommand> {
         }
         return message;
     }
-    internalBinaryWrite(message: DeleteAudienceCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* protos.Audience audience = 1; */
-        if (message.audience)
-            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+    internalBinaryWrite(message: DeleteAudiencesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated protos.Audience audience = 1; */
+        for (let i = 0; i < message.audience.length; i++)
+            Audience.internalBinaryWrite(message.audience[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -480,6 +484,6 @@ class DeleteAudienceCommand$Type extends MessageType<DeleteAudienceCommand> {
     }
 }
 /**
- * @generated MessageType for protobuf message protos.DeleteAudienceCommand
+ * @generated MessageType for protobuf message protos.DeleteAudiencesCommand
  */
-export const DeleteAudienceCommand = new DeleteAudienceCommand$Type();
+export const DeleteAudiencesCommand = new DeleteAudiencesCommand$Type();
