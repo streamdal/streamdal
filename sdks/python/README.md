@@ -4,9 +4,7 @@ Streamdal Python SDK
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/sdks-python-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/sdks-python-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
-<!-- TODO: UPDATE CODECLIMATE LINKS -->
-<!-- [![Test Coverage](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/test_coverage)](https://codeclimate.com/github/streamdal/python-sdk/test_coverage)
-[![Maintainability](https://api.codeclimate.com/v1/badges/75e54383c741bd7c1bca/maintainability)](https://codeclimate.com/github/streamdal/python-sdk/maintainability) -->
+[![codecov](https://codecov.io/github/streamdal/streamdal/graph/badge.svg?token=yYbG9PCM2k&flag=python-sdk)](https://codecov.io/github/streamdal/streamdal)
 
 _**Python SDK for [Streamdal](https://streamdal.com).**_
 
