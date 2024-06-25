@@ -16,7 +16,8 @@ class Command$Type extends MessageType {
             { no: 100, name: "set_pipelines", kind: "message", oneof: "command", T: () => SetPipelinesCommand },
             { no: 101, name: "keep_alive", kind: "message", oneof: "command", T: () => KeepAliveCommand },
             { no: 102, name: "kv", kind: "message", oneof: "command", T: () => KVCommand },
-            { no: 103, name: "tail", kind: "message", oneof: "command", T: () => TailCommand }
+            { no: 103, name: "tail", kind: "message", oneof: "command", T: () => TailCommand },
+            { no: 104, name: "delete", kind: "message", oneof: "command", T: () => DeleteAudienceCommand }
         ]);
     }
     create(value) {
@@ -58,6 +59,12 @@ class Command$Type extends MessageType {
                         tail: TailCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.tail)
                     };
                     break;
+                case /* protos.DeleteAudienceCommand delete */ 104:
+                    message.command = {
+                        oneofKind: "delete",
+                        delete: DeleteAudienceCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.delete)
+                    };
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -85,6 +92,9 @@ class Command$Type extends MessageType {
         /* protos.TailCommand tail = 103; */
         if (message.command.oneofKind === "tail")
             TailCommand.internalBinaryWrite(message.command.tail, writer.tag(103, WireType.LengthDelimited).fork(), options).join();
+        /* protos.DeleteAudienceCommand delete = 104; */
+        if (message.command.oneofKind === "delete")
+            DeleteAudienceCommand.internalBinaryWrite(message.command.delete, writer.tag(104, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -296,3 +306,50 @@ class TailCommand$Type extends MessageType {
  * @generated MessageType for protobuf message protos.TailCommand
  */
 export const TailCommand = new TailCommand$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DeleteAudienceCommand$Type extends MessageType {
+    constructor() {
+        super("protos.DeleteAudienceCommand", [
+            { no: 1, name: "audience", kind: "message", T: () => Audience }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target !== null && target !== void 0 ? target : this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* protos.Audience audience */ 1:
+                    message.audience = Audience.internalBinaryRead(reader, reader.uint32(), options, message.audience);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* protos.Audience audience = 1; */
+        if (message.audience)
+            Audience.internalBinaryWrite(message.audience, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteAudienceCommand
+ */
+export const DeleteAudienceCommand = new DeleteAudienceCommand$Type();

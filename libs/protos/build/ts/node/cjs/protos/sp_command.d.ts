@@ -62,6 +62,12 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
+        oneofKind: "delete";
+        /**
+         * @generated from protobuf field: protos.DeleteAudienceCommand delete = 104;
+         */
+        delete: DeleteAudienceCommand;
+    } | {
         oneofKind: undefined;
     };
 }
@@ -116,6 +122,15 @@ export interface TailCommand {
      */
     request?: TailRequest;
 }
+/**
+ * @generated from protobuf message protos.DeleteAudienceCommand
+ */
+export interface DeleteAudienceCommand {
+    /**
+     * @generated from protobuf field: protos.Audience audience = 1;
+     */
+    audience?: Audience;
+}
 declare class Command$Type extends MessageType<Command> {
     constructor();
     create(value?: PartialMessage<Command>): Command;
@@ -167,4 +182,14 @@ declare class TailCommand$Type extends MessageType<TailCommand> {
  * @generated MessageType for protobuf message protos.TailCommand
  */
 export declare const TailCommand: TailCommand$Type;
+declare class DeleteAudienceCommand$Type extends MessageType<DeleteAudienceCommand> {
+    constructor();
+    create(value?: PartialMessage<DeleteAudienceCommand>): DeleteAudienceCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudienceCommand): DeleteAudienceCommand;
+    internalBinaryWrite(message: DeleteAudienceCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteAudienceCommand
+ */
+export declare const DeleteAudienceCommand: DeleteAudienceCommand$Type;
 export {};

@@ -1136,6 +1136,8 @@ class Command(betterproto.Message):
     instances and by SDKs
     """
 
+    delete: "DeleteAudienceCommand" = betterproto.message_field(104, group="command")
+
 
 @dataclass(eq=False, repr=False)
 class SetPipelinesCommand(betterproto.Message):
@@ -1166,6 +1168,11 @@ class KvCommand(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TailCommand(betterproto.Message):
     request: "TailRequest" = betterproto.message_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class DeleteAudienceCommand(betterproto.Message):
+    audience: "Audience" = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

@@ -36,6 +36,8 @@ message Command {
     // Emitted by server when a user makes a Tail() call
     // Consumed by all server instances and by SDKs
     TailCommand tail = 103;
+
+    DeleteAudienceCommand delete = 104;
   }
 }
 
@@ -61,4 +63,8 @@ message KVCommand {
 
 message TailCommand {
   TailRequest request = 2;
+}
+
+message DeleteAudienceCommand {
+  protos.Audience audience = 1;
 }
