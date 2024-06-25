@@ -27,3 +27,11 @@ jobs:
           files: coverage.out
           working-directory: sdks/go
           disable_search: true
+      - name: Upload ruby-sdk coverage
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ruby-sdk
+          files: coverage/coverage.xml
+          working-directory: sdks/ruby
+          disable_search: true

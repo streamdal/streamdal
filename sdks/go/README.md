@@ -4,7 +4,7 @@ Streamdal Go SDK
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/sdks-go-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/sdks-go-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/streamdal/sdks/go)](https://goreportcard.com/report/github.com/streamdal/streamdal/sdks/go)
-[![codecov](https://codecov.io/github/streamdal/streamdal/graph/badge.svg?token=yYbG9PCM2k&flag=go-sdk)](https://codecov.io/github/streamdal/streamdal)
+[![codecov](https://codecov.io/github/streamdal/streamdal/graph/badge.svg?token=yYbG9PCM2k&flag=go-sdk)](https://app.codecov.io/github/streamdal/streamdal?flags[0]=go-sdk)
 
 _**Golang SDK for [Streamdal](https://streamdal.com).**_
 
