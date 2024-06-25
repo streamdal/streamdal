@@ -16,10 +16,14 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: python-sdk
-          files: sdks/python/coverage.xml
+          files: coverage.xml
+          working-directory: sdks/python
+          disable_search: true
       - name: Upload go-sdk coverage
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: go-sdk
-          files: sdks/go/coverage.out
+          files: coverage.out
+          working-directory: sdks/go
+          disable_search: true
