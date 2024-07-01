@@ -131,9 +131,9 @@ export interface TailCommand {
  */
 export interface DeleteAudiencesCommand {
     /**
-     * @generated from protobuf field: repeated protos.Audience audience = 1;
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
      */
-    audience: Audience[];
+    audiences: Audience[];
 }
 declare class Command$Type extends MessageType<Command> {
     constructor();

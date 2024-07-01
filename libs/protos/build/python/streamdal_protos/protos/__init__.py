@@ -1179,7 +1179,7 @@ class TailCommand(betterproto.Message):
 
 @dataclass(eq=False, repr=False)
 class DeleteAudiencesCommand(betterproto.Message):
-    audience: List["Audience"] = betterproto.message_field(1)
+    audiences: List["Audience"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

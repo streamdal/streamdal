@@ -34,7 +34,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :request, :message, 2, "protos.TailRequest"
     end
     add_message "protos.DeleteAudiencesCommand" do
-      repeated :audience, :message, 1, "protos.Audience"
+      repeated :audiences, :message, 1, "protos.Audience"
     end
   end
 end

@@ -313,11 +313,11 @@ exports.TailCommand = new TailCommand$Type();
 class DeleteAudiencesCommand$Type extends runtime_5.MessageType {
     constructor() {
         super("protos.DeleteAudiencesCommand", [
-            { no: 1, name: "audience", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_2.Audience }
+            { no: 1, name: "audiences", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => sp_common_2.Audience }
         ]);
     }
     create(value) {
-        const message = { audience: [] };
+        const message = { audiences: [] };
         globalThis.Object.defineProperty(message, runtime_4.MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             (0, runtime_3.reflectionMergePartial)(this, message, value);
@@ -328,8 +328,8 @@ class DeleteAudiencesCommand$Type extends runtime_5.MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated protos.Audience audience */ 1:
-                    message.audience.push(sp_common_2.Audience.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated protos.Audience audiences */ 1:
+                    message.audiences.push(sp_common_2.Audience.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -343,9 +343,9 @@ class DeleteAudiencesCommand$Type extends runtime_5.MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated protos.Audience audience = 1; */
-        for (let i = 0; i < message.audience.length; i++)
-            sp_common_2.Audience.internalBinaryWrite(message.audience[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* repeated protos.Audience audiences = 1; */
+        for (let i = 0; i < message.audiences.length; i++)
+            sp_common_2.Audience.internalBinaryWrite(message.audiences[i], writer.tag(1, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

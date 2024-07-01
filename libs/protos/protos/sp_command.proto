@@ -69,5 +69,5 @@ message TailCommand {
 }
 
 message DeleteAudiencesCommand {
-  repeated protos.Audience audience = 1;
+  repeated protos.Audience audiences = 1;
 }

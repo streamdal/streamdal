@@ -26,10 +26,10 @@ class Command(_message.Message):
     def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ..., delete_audiences: _Optional[_Union[DeleteAudiencesCommand, _Mapping]] = ...) -> None: ...
 
 class DeleteAudiencesCommand(_message.Message):
-    __slots__ = ["audience"]
-    AUDIENCE_FIELD_NUMBER: _ClassVar[int]
-    audience: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
-    def __init__(self, audience: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
+    __slots__ = ["audiences"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
 
 class KVCommand(_message.Message):
     __slots__ = ["instructions", "overwrite"]
