@@ -204,8 +204,8 @@ github.com/smartystreets/goconvey v1.6.4 h1:fv0U8FUIMPNf1L9lnHLvLhgicrIVChEkdzIK
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
 github.com/spaolacci/murmur3 v1.1.0 h1:7c1g84S4BPRrfL5Xrdp6fOJ206sU9y293DDHaoy0bLI=
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
-github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240625184620-3278ccfd8179 h1:IuMWcFYRbH8nJAIVivi3VOyt3hB98/VYPrJz8DP/UiE=
-github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240625184620-3278ccfd8179/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
+github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240701143227-deb55f835ecc h1:TdA+Gfq5lf/7yFN+0rL5p5c5lvTcal8iAr4zJi7k7qc=
+github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240701143227-deb55f835ecc/go.mod h1:1rQ250ydoKeRoJftIV9qGrR28Iqdb9+7Jcnoxber/eQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=

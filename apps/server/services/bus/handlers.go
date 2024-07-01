@@ -180,9 +180,9 @@ func (b *Bus) sendDeleteAudienceCommand(_ context.Context, aud *protos.Audience,
 
 	cmd := &protos.Command{
 		Audience: aud,
-		Command: &protos.Command_Delete{
-			Delete: &protos.DeleteAudiencesCommand{
-				Audience: []*protos.Audience{aud},
+		Command: &protos.Command_DeleteAudiences{
+			DeleteAudiences: &protos.DeleteAudiencesCommand{
+				Audiences: []*protos.Audience{aud},
 			},
 		},
 	}
