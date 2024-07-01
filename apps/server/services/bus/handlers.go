@@ -145,8 +145,8 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 
 // Send a SetPipelines command with empty pipelines to all sessions that have
 // the audience specified in request.
-func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.DeleteAudienceRequest) error {
-	llog := b.log.WithField("method", "handleDeleteAudienceRequest")
+func (b *Bus) handleDeleteAudiencesRequest(ctx context.Context, req *protos.DeleteAudienceRequest) error {
+	llog := b.log.WithField("method", "handleDeleteAudiencesRequest")
 	llog.Debugf("handling delete audience request bus event: %v", req)
 
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience broadcast handler")

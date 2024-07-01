@@ -363,7 +363,7 @@ func (b *Bus) handler(shutdownCtx context.Context, msg *redis.Message, source st
 		err = b.handleNewAudienceRequest(shutdownCtx, busEvent.GetNewAudienceRequest())
 	case *protos.BusEvent_DeleteAudienceRequest:
 		llog.Debug("received DeleteAudienceRequest")
-		err = b.handleDeleteAudienceRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
+		err = b.handleDeleteAudiencesRequest(shutdownCtx, busEvent.GetDeleteAudienceRequest())
 	case *protos.BusEvent_UpdatePipelineRequest:
 		// Injects schema inference pipeline
 		llog.Debug("received UpdatePipelineRequest")
