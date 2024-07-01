@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
@@ -162,7 +163,45 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
 
+	if _, err := b.sendDeleteAudienceCommand(ctx, req.Audience, sessionIDs); err != nil {
+		llog.Errorf("unable to send DeleteAudiences command: %v", err)
+		return errors.Wrap(err, "error sending DeleteAudiences command")
+	}
+
 	return nil
+}
+
+func (b *Bus) sendDeleteAudienceCommand(_ context.Context, aud *protos.Audience, sessionIDs []string) (int, error) {
+	llog := b.log.WithFields(logrus.Fields{
+		"method": "sendDeleteAudienceCommand",
+	})
+
+	var sent int
+
+	cmd := &protos.Command{
+		Audience: aud,
+		Command: &protos.Command_Delete{
+			Delete: &protos.DeleteAudiencesCommand{
+				Audience: []*protos.Audience{aud},
+			},
+		},
+	}
+
+	for _, sessionID := range sessionIDs {
+		ch := b.options.Cmd.GetChannel(sessionID)
+		if ch == nil {
+			llog.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", sessionID)
+			continue
+		}
+
+		llog.Debugf("sending DeleteAudiences command to session id '%s' on node '%s'", sessionID, b.options.NodeName)
+
+		ch <- cmd
+
+		sent += 1
+	}
+
+	return sent, nil
 }
 
 // Checks if the SetPipelines request is for an audience that has an active
