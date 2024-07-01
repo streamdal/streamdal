@@ -9,7 +9,7 @@ require (
 	github.com/onsi/gomega v1.30.0
 	github.com/pkg/errors v0.9.1
 	github.com/relistan/go-director v0.0.0-20200406104025-dbbf5d95248d
-	github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240625184620-3278ccfd8179
+	github.com/streamdal/streamdal/libs/protos v0.1.58-0.20240701143227-deb55f835ecc
 	github.com/tetratelabs/wazero v1.7.3
 	golang.org/x/time v0.5.0
 	google.golang.org/grpc v1.60.1

@@ -195,9 +195,9 @@ func (s *Streamdal) handleCommand(ctx context.Context, cmd *protos.Command) erro
 	case *protos.Command_Tail:
 		s.config.Logger.Debug("Received tail command")
 		err = s.handleTailCommand(ctx, cmd)
-	case *protos.Command_Delete:
+	case *protos.Command_DeleteAudiences:
 		s.config.Logger.Debug("Received delete command")
-		err = s.handleDeleteCommand(ctx, cmd)
+		err = s.handleDeleteAudiencesCommand(ctx, cmd)
 	default:
 		err = fmt.Errorf("unknown command type: %+v", cmd.Command)
 	}
@@ -205,17 +205,18 @@ func (s *Streamdal) handleCommand(ctx context.Context, cmd *protos.Command) erro
 	return err
 }
 
-func (s *Streamdal) handleDeleteCommand(ctx context.Context, cmd *protos.Command) error {
+func (s *Streamdal) handleDeleteAudiencesCommand(ctx context.Context, cmd *protos.Command) error {
 	if cmd == nil {
 		return errors.New("cmd cannot be nil")
 	}
 
-	if cmd.GetDelete() == nil {
-		return errors.New("delete cannot be nil")
+	if cmd.GetDeleteAudiences() == nil {
+		return errors.New("cmd.delete_audiences cannot be nil")
 	}
 
-	audiences := cmd.GetDelete().GetAudience()
-	if audiences == nil {
+	audiences := cmd.GetDeleteAudiences().GetAudiences()
+	if len(audiences) == 0 {
+		s.config.Logger.Debugf("Received delete command with empty audiences")
 		return nil
 	}
 
