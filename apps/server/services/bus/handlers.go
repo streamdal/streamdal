@@ -163,7 +163,7 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
 
-	if _, err := b.sendDeleteAudienceCommand(ctx, req.Audience, sessionIDs); err != nil {
+	if _, err := b.sendDeleteAudiencesCommand(ctx, req.Audience, sessionIDs); err != nil {
 		llog.Errorf("unable to send DeleteAudiences command: %v", err)
 		return errors.Wrap(err, "error sending DeleteAudiences command")
 	}
@@ -171,9 +171,9 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 	return nil
 }
 
-func (b *Bus) sendDeleteAudienceCommand(_ context.Context, aud *protos.Audience, sessionIDs []string) (int, error) {
+func (b *Bus) sendDeleteAudiencesCommand(_ context.Context, aud *protos.Audience, sessionIDs []string) (int, error) {
 	llog := b.log.WithFields(logrus.Fields{
-		"method": "sendDeleteAudienceCommand",
+		"method": "sendDeleteAudiencesCommand",
 	})
 
 	var sent int
