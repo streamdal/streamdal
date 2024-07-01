@@ -62,15 +62,15 @@ export interface Command {
          */
         tail: TailCommand;
     } | {
-        oneofKind: "delete";
+        oneofKind: "deleteAudiences";
         /**
          * Emitted by the server when a user deletes an audience or service
          * Consumed by SDK to delete audience from it's internal cache so
          * that the heartbeat does not send the audience back to the server
          *
-         * @generated from protobuf field: protos.DeleteAudiencesCommand delete = 104;
+         * @generated from protobuf field: protos.DeleteAudiencesCommand delete_audiences = 104;
          */
-        delete: DeleteAudiencesCommand;
+        deleteAudiences: DeleteAudiencesCommand;
     } | {
         oneofKind: undefined;
     };

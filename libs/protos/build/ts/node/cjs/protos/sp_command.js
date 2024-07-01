@@ -20,7 +20,7 @@ class Command$Type extends runtime_5.MessageType {
             { no: 101, name: "keep_alive", kind: "message", oneof: "command", T: () => exports.KeepAliveCommand },
             { no: 102, name: "kv", kind: "message", oneof: "command", T: () => exports.KVCommand },
             { no: 103, name: "tail", kind: "message", oneof: "command", T: () => exports.TailCommand },
-            { no: 104, name: "delete", kind: "message", oneof: "command", T: () => exports.DeleteAudiencesCommand }
+            { no: 104, name: "delete_audiences", kind: "message", oneof: "command", T: () => exports.DeleteAudiencesCommand }
         ]);
     }
     create(value) {
@@ -62,10 +62,10 @@ class Command$Type extends runtime_5.MessageType {
                         tail: exports.TailCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.tail)
                     };
                     break;
-                case /* protos.DeleteAudiencesCommand delete */ 104:
+                case /* protos.DeleteAudiencesCommand delete_audiences */ 104:
                     message.command = {
-                        oneofKind: "delete",
-                        delete: exports.DeleteAudiencesCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.delete)
+                        oneofKind: "deleteAudiences",
+                        deleteAudiences: exports.DeleteAudiencesCommand.internalBinaryRead(reader, reader.uint32(), options, message.command.deleteAudiences)
                     };
                     break;
                 default:
@@ -95,9 +95,9 @@ class Command$Type extends runtime_5.MessageType {
         /* protos.TailCommand tail = 103; */
         if (message.command.oneofKind === "tail")
             exports.TailCommand.internalBinaryWrite(message.command.tail, writer.tag(103, runtime_1.WireType.LengthDelimited).fork(), options).join();
-        /* protos.DeleteAudiencesCommand delete = 104; */
-        if (message.command.oneofKind === "delete")
-            exports.DeleteAudiencesCommand.internalBinaryWrite(message.command.delete, writer.tag(104, runtime_1.WireType.LengthDelimited).fork(), options).join();
+        /* protos.DeleteAudiencesCommand delete_audiences = 104; */
+        if (message.command.oneofKind === "deleteAudiences")
+            exports.DeleteAudiencesCommand.internalBinaryWrite(message.command.deleteAudiences, writer.tag(104, runtime_1.WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? runtime_2.UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -17,7 +17,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
         optional :keep_alive, :message, 101, "protos.KeepAliveCommand"
         optional :kv, :message, 102, "protos.KVCommand"
         optional :tail, :message, 103, "protos.TailCommand"
-        optional :delete, :message, 104, "protos.DeleteAudiencesCommand"
+        optional :delete_audiences, :message, 104, "protos.DeleteAudiencesCommand"
       end
     end
     add_message "protos.SetPipelinesCommand" do

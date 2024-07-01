@@ -1136,7 +1136,9 @@ class Command(betterproto.Message):
     instances and by SDK
     """
 
-    delete: "DeleteAudiencesCommand" = betterproto.message_field(104, group="command")
+    delete_audiences: "DeleteAudiencesCommand" = betterproto.message_field(
+        104, group="command"
+    )
     """
     Emitted by the server when a user deletes an audience or service Consumed
     by SDK to delete audience from it's internal cache so that the heartbeat

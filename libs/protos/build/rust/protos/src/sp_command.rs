@@ -248,48 +248,48 @@ impl Command {
         }
     }
 
-    // .protos.DeleteAudiencesCommand delete = 104;
+    // .protos.DeleteAudiencesCommand delete_audiences = 104;
 
-    pub fn delete(&self) -> &DeleteAudiencesCommand {
+    pub fn delete_audiences(&self) -> &DeleteAudiencesCommand {
         match self.command {
-            ::std::option::Option::Some(command::Command::Delete(ref v)) => v,
+            ::std::option::Option::Some(command::Command::DeleteAudiences(ref v)) => v,
             _ => <DeleteAudiencesCommand as ::protobuf::Message>::default_instance(),
         }
     }
 
-    pub fn clear_delete(&mut self) {
+    pub fn clear_delete_audiences(&mut self) {
         self.command = ::std::option::Option::None;
     }
 
-    pub fn has_delete(&self) -> bool {
+    pub fn has_delete_audiences(&self) -> bool {
         match self.command {
-            ::std::option::Option::Some(command::Command::Delete(..)) => true,
+            ::std::option::Option::Some(command::Command::DeleteAudiences(..)) => true,
             _ => false,
         }
     }
 
     // Param is passed by value, moved
-    pub fn set_delete(&mut self, v: DeleteAudiencesCommand) {
-        self.command = ::std::option::Option::Some(command::Command::Delete(v))
+    pub fn set_delete_audiences(&mut self, v: DeleteAudiencesCommand) {
+        self.command = ::std::option::Option::Some(command::Command::DeleteAudiences(v))
     }
 
     // Mutable pointer to the field.
-    pub fn mut_delete(&mut self) -> &mut DeleteAudiencesCommand {
-        if let ::std::option::Option::Some(command::Command::Delete(_)) = self.command {
+    pub fn mut_delete_audiences(&mut self) -> &mut DeleteAudiencesCommand {
+        if let ::std::option::Option::Some(command::Command::DeleteAudiences(_)) = self.command {
         } else {
-            self.command = ::std::option::Option::Some(command::Command::Delete(DeleteAudiencesCommand::new()));
+            self.command = ::std::option::Option::Some(command::Command::DeleteAudiences(DeleteAudiencesCommand::new()));
         }
         match self.command {
-            ::std::option::Option::Some(command::Command::Delete(ref mut v)) => v,
+            ::std::option::Option::Some(command::Command::DeleteAudiences(ref mut v)) => v,
             _ => panic!(),
         }
     }
 
     // Take field
-    pub fn take_delete(&mut self) -> DeleteAudiencesCommand {
-        if self.has_delete() {
+    pub fn take_delete_audiences(&mut self) -> DeleteAudiencesCommand {
+        if self.has_delete_audiences() {
             match self.command.take() {
-                ::std::option::Option::Some(command::Command::Delete(v)) => v,
+                ::std::option::Option::Some(command::Command::DeleteAudiences(v)) => v,
                 _ => panic!(),
             }
         } else {
@@ -334,11 +334,11 @@ impl Command {
             Command::set_tail,
         ));
         fields.push(::protobuf::reflect::rt::v2::make_oneof_message_has_get_mut_set_accessor::<_, DeleteAudiencesCommand>(
-            "delete",
-            Command::has_delete,
-            Command::delete,
-            Command::mut_delete,
-            Command::set_delete,
+            "delete_audiences",
+            Command::has_delete_audiences,
+            Command::delete_audiences,
+            Command::mut_delete_audiences,
+            Command::set_delete_audiences,
         ));
         oneofs.push(command::Command::generated_oneof_descriptor_data());
         ::protobuf::reflect::GeneratedMessageDescriptorData::new_2::<Command>(
@@ -375,7 +375,7 @@ impl ::protobuf::Message for Command {
                     self.command = ::std::option::Option::Some(command::Command::Tail(is.read_message()?));
                 },
                 834 => {
-                    self.command = ::std::option::Option::Some(command::Command::Delete(is.read_message()?));
+                    self.command = ::std::option::Option::Some(command::Command::DeleteAudiences(is.read_message()?));
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -411,7 +411,7 @@ impl ::protobuf::Message for Command {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
-                &command::Command::Delete(ref v) => {
+                &command::Command::DeleteAudiences(ref v) => {
                     let len = v.compute_size();
                     my_size += 2 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
                 },
@@ -440,7 +440,7 @@ impl ::protobuf::Message for Command {
                 &command::Command::Tail(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(103, v, os)?;
                 },
-                &command::Command::Delete(ref v) => {
+                &command::Command::DeleteAudiences(ref v) => {
                     ::protobuf::rt::write_message_field_with_cached_size(104, v, os)?;
                 },
             };
@@ -513,8 +513,8 @@ pub mod command {
         Kv(super::KVCommand),
         // @@protoc_insertion_point(oneof_field:protos.Command.tail)
         Tail(super::TailCommand),
-        // @@protoc_insertion_point(oneof_field:protos.Command.delete)
-        Delete(super::DeleteAudiencesCommand),
+        // @@protoc_insertion_point(oneof_field:protos.Command.delete_audiences)
+        DeleteAudiences(super::DeleteAudiencesCommand),
     }
 
     impl ::protobuf::Oneof for Command {
@@ -1190,100 +1190,100 @@ impl ::protobuf::reflect::ProtobufValue for DeleteAudiencesCommand {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x10sp_command.proto\x12\x06protos\x1a\x16shared/sp_shared.proto\x1a\
-    \x0fsp_common.proto\x1a\x0bsp_kv.proto\x1a\x11sp_pipeline.proto\"\xcb\
+    \x0fsp_common.proto\x1a\x0bsp_kv.proto\x1a\x11sp_pipeline.proto\"\xde\
     \x02\n\x07Command\x12,\n\x08audience\x18\x01\x20\x01(\x0b2\x10.protos.Au\
     dienceR\x08audience\x12B\n\rset_pipelines\x18d\x20\x01(\x0b2\x1b.protos.\
     SetPipelinesCommandH\0R\x0csetPipelines\x129\n\nkeep_alive\x18e\x20\x01(\
     \x0b2\x18.protos.KeepAliveCommandH\0R\tkeepAlive\x12#\n\x02kv\x18f\x20\
     \x01(\x0b2\x11.protos.KVCommandH\0R\x02kv\x12)\n\x04tail\x18g\x20\x01(\
-    \x0b2\x13.protos.TailCommandH\0R\x04tail\x128\n\x06delete\x18h\x20\x01(\
-    \x0b2\x1e.protos.DeleteAudiencesCommandH\0R\x06deleteB\t\n\x07command\"\
-    \xf1\x01\n\x13SetPipelinesCommand\x12.\n\tpipelines\x18\x01\x20\x03(\x0b\
-    2\x10.protos.PipelineR\tpipelines\x12O\n\x0cwasm_modules\x18\x02\x20\x03\
-    (\x0b2,.protos.SetPipelinesCommand.WasmModulesEntryR\x0bwasmModules\x1aY\
-    \n\x10WasmModulesEntry\x12\x10\n\x03key\x18\x01\x20\x01(\tR\x03key\x12/\
-    \n\x05value\x18\x02\x20\x01(\x0b2\x19.protos.shared.WasmModuleR\x05value\
-    :\x028\x01\"\x12\n\x10KeepAliveCommand\"d\n\tKVCommand\x129\n\x0cinstruc\
-    tions\x18\x01\x20\x03(\x0b2\x15.protos.KVInstructionR\x0cinstructions\
-    \x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\"<\n\x0bTailComma\
-    nd\x12-\n\x07request\x18\x02\x20\x01(\x0b2\x13.protos.TailRequestR\x07re\
-    quest\"F\n\x16DeleteAudiencesCommand\x12,\n\x08audience\x18\x01\x20\x03(\
-    \x0b2\x10.protos.AudienceR\x08audienceBPZ:github.com/streamdal/streamdal\
-    /libs/protos/build/go/protos\xea\x02\x11Streamdal::ProtosJ\xf0\x11\n\x06\
-    \x12\x04\0\0H\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\x08\n\x01\x02\x12\
-    \x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x20\n\t\n\x02\x03\x01\x12\
-    \x03\x05\0\x19\n\t\n\x02\x03\x02\x12\x03\x06\0\x15\n\t\n\x02\x03\x03\x12\
-    \x03\x07\0\x1b\n\x08\n\x01\x08\x12\x03\t\0Q\n\t\n\x02\x08\x0b\x12\x03\t\
-    \0Q\n\x08\n\x01\x08\x12\x03\n\0*\n\t\n\x02\x08-\x12\x03\n\0*\nN\n\x02\
-    \x04\0\x12\x04\r\0,\x01\x1aB\x20Command\x20is\x20used\x20by\x20streamdal\
-    \x20server\x20for\x20sending\x20commands\x20to\x20SDKs\n\n\n\n\x03\x04\0\
-    \x01\x12\x03\r\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\x12\x03\x10\x02\x1f\
-    \x1a\x85\x01\x20Who\x20is\x20this\x20command\x20intended\x20for?\n\x20NO\
-    TE:\x20Some\x20commands\x20(such\x20as\x20KeepAliveCommand,\x20KVCommand\
-    )\x20do\x20NOT\x20use\x20audience\x20and\x20will\x20ignore\x20it\n\n\x0c\
-    \n\x05\x04\0\x02\0\x06\x12\x03\x10\x02\x11\n\x0c\n\x05\x04\0\x02\0\x01\
-    \x12\x03\x10\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\x03\x10\x1d\x1e\n\
-    \xed\x01\n\x04\x04\0\x08\0\x12\x04\x12\x02+\x03\"\xde\x01\x20NOTE:\x20As\
-    \x20of\x2001.29.2024,\x20pause,\x20resume,\x20delete\x20and\x20update\
-    \x20pipeline\x20commands\n\x20are\x20replaced\x20with\x20the\x20SetPipel\
-    inesCommand.\x20When\x20a\x20pause/resume/etc.\x20are\n\x20called\x20on\
-    \x20server,\x20the\x20server\x20will\x20emit\x20an\x20appropriate\x20Set\
-    Pipelines\x20cmd.\n\n\x0c\n\x05\x04\0\x08\0\x01\x12\x03\x12\x08\x0f\n\
-    \xc5\x01\n\x04\x04\0\x02\x01\x12\x03\x1a\x04,\x1a\xb7\x01\x20Emitted\x20\
-    by\x20server\x20when\x20a\x20user\x20makes\x20a\x20pause,\x20resume,\x20\
-    delete\x20or\x20update\n\x20pipeline\x20and\x20set\x20pipelines\x20exter\
-    nal\x20grpc\x20API\x20call.\n\x20NOTE:\x20This\x20was\x20introduced\x20d\
-    uring\x20ordered\x20pipeline\x20updates.\n\n\x0c\n\x05\x04\0\x02\x01\x06\
-    \x12\x03\x1a\x04\x17\n\x0c\n\x05\x04\0\x02\x01\x01\x12\x03\x1a\x18%\n\
-    \x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1a(+\nR\n\x04\x04\0\x02\x02\x12\
-    \x03\x1d\x04&\x1aE\x20Server\x20sends\x20this\x20periodically\x20to\x20S\
-    DKs\x20to\x20keep\x20the\x20connection\x20alive\n\n\x0c\n\x05\x04\0\x02\
-    \x02\x06\x12\x03\x1d\x04\x14\n\x0c\n\x05\x04\0\x02\x02\x01\x12\x03\x1d\
-    \x15\x1f\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1d\"%\nd\n\x04\x04\0\x02\
-    \x03\x12\x03!\x04\x17\x1aW\x20Server\x20will\x20emit\x20this\x20when\x20\
-    a\x20user\x20makes\x20changes\x20to\x20the\x20KV\x20store\n\x20via\x20th\
-    e\x20KV\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\x03\x06\x12\x03!\x04\r\n\
-    \x0c\n\x05\x04\0\x02\x03\x01\x12\x03!\x0e\x10\n\x0c\n\x05\x04\0\x02\x03\
-    \x03\x12\x03!\x13\x16\nm\n\x04\x04\0\x02\x04\x12\x03%\x04\x1b\x1a`\x20Em\
-    itted\x20by\x20server\x20when\x20a\x20user\x20makes\x20a\x20Tail()\x20ca\
-    ll\n\x20Consumed\x20by\x20all\x20server\x20instances\x20and\x20by\x20SDK\
-    \n\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03%\x04\x0f\n\x0c\n\x05\x04\0\x02\
-    \x04\x01\x12\x03%\x10\x14\n\x0c\n\x05\x04\0\x02\x04\x03\x12\x03%\x17\x1a\
-    \n\xd2\x01\n\x04\x04\0\x02\x05\x12\x03*\x04(\x1a\xc4\x01\x20Emitted\x20b\
-    y\x20the\x20server\x20when\x20a\x20user\x20deletes\x20an\x20audience\x20\
-    or\x20service\n\x20Consumed\x20by\x20SDK\x20to\x20delete\x20audience\x20\
-    from\x20it's\x20internal\x20cache\x20so\n\x20that\x20the\x20heartbeat\
-    \x20does\x20not\x20send\x20the\x20audience\x20back\x20to\x20the\x20serve\
-    r\n\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03*\x04\x1a\n\x0c\n\x05\x04\0\x02\
-    \x05\x01\x12\x03*\x1b!\n\x0c\n\x05\x04\0\x02\x05\x03\x12\x03*$'\n\n\n\
-    \x02\x04\x01\x12\x04.\03\x01\n\n\n\x03\x04\x01\x01\x12\x03.\x08\x1b\n\
-    \x0b\n\x04\x04\x01\x02\0\x12\x03/\x02)\n\x0c\n\x05\x04\x01\x02\0\x04\x12\
-    \x03/\x02\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\x03/\x0b\x1a\n\x0c\n\x05\
-    \x04\x01\x02\0\x01\x12\x03/\x1b$\n\x0c\n\x05\x04\x01\x02\0\x03\x12\x03/'\
-    (\n\x1b\n\x04\x04\x01\x02\x01\x12\x032\x028\x1a\x0e\x20ID\x20=\x20wasm\
-    \x20ID\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\x032\x02&\n\x0c\n\x05\x04\
-    \x01\x02\x01\x01\x12\x032'3\n\x0c\n\x05\x04\x01\x02\x01\x03\x12\x03267\n\
-    D\n\x02\x04\x02\x12\x045\07\x01\"8\x20Nothing\x20needed\x20in\x20here,\
-    \x20just\x20a\x20ping\x20from\x20server\x20to\x20SDK\n\n\n\n\x03\x04\x02\
-    \x01\x12\x035\x08\x18\n@\n\x02\x04\x03\x12\x04:\0@\x01\x1a4\x20Sent\x20b\
-    y\x20server\x20on\x20Register\x20channel(s)\x20to\x20live\x20SDKs\n\n\n\
-    \n\x03\x04\x03\x01\x12\x03:\x08\x11\n\x0b\n\x04\x04\x03\x02\0\x12\x03;\
-    \x021\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x03;\x02\n\n\x0c\n\x05\x04\x03\
-    \x02\0\x06\x12\x03;\x0b\x1f\n\x0c\n\x05\x04\x03\x02\0\x01\x12\x03;\x20,\
-    \n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03;/0\nk\n\x04\x04\x03\x02\x01\x12\
-    \x03?\x02\x15\x1a^\x20Create\x20&\x20Update\x20specific\x20setting\x20th\
-    at\x20will\x20cause\x20the\x20Create\x20or\x20Update\x20to\n\x20work\x20\
-    as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x03\x02\x01\x05\x12\x03?\x02\x06\n\
-    \x0c\n\x05\x04\x03\x02\x01\x01\x12\x03?\x07\x10\n\x0c\n\x05\x04\x03\x02\
-    \x01\x03\x12\x03?\x13\x14\n\n\n\x02\x04\x04\x12\x04B\0D\x01\n\n\n\x03\
-    \x04\x04\x01\x12\x03B\x08\x13\n\x0b\n\x04\x04\x04\x02\0\x12\x03C\x02\x1a\
-    \n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03C\x02\r\n\x0c\n\x05\x04\x04\x02\0\
-    \x01\x12\x03C\x0e\x15\n\x0c\n\x05\x04\x04\x02\0\x03\x12\x03C\x18\x19\n\n\
-    \n\x02\x04\x05\x12\x04F\0H\x01\n\n\n\x03\x04\x05\x01\x12\x03F\x08\x1e\n\
-    \x0b\n\x04\x04\x05\x02\0\x12\x03G\x02(\n\x0c\n\x05\x04\x05\x02\0\x04\x12\
-    \x03G\x02\n\n\x0c\n\x05\x04\x05\x02\0\x06\x12\x03G\x0b\x1a\n\x0c\n\x05\
-    \x04\x05\x02\0\x01\x12\x03G\x1b#\n\x0c\n\x05\x04\x05\x02\0\x03\x12\x03G&\
-    'b\x06proto3\
+    \x0b2\x13.protos.TailCommandH\0R\x04tail\x12K\n\x10delete_audiences\x18h\
+    \x20\x01(\x0b2\x1e.protos.DeleteAudiencesCommandH\0R\x0fdeleteAudiencesB\
+    \t\n\x07command\"\xf1\x01\n\x13SetPipelinesCommand\x12.\n\tpipelines\x18\
+    \x01\x20\x03(\x0b2\x10.protos.PipelineR\tpipelines\x12O\n\x0cwasm_module\
+    s\x18\x02\x20\x03(\x0b2,.protos.SetPipelinesCommand.WasmModulesEntryR\
+    \x0bwasmModules\x1aY\n\x10WasmModulesEntry\x12\x10\n\x03key\x18\x01\x20\
+    \x01(\tR\x03key\x12/\n\x05value\x18\x02\x20\x01(\x0b2\x19.protos.shared.\
+    WasmModuleR\x05value:\x028\x01\"\x12\n\x10KeepAliveCommand\"d\n\tKVComma\
+    nd\x129\n\x0cinstructions\x18\x01\x20\x03(\x0b2\x15.protos.KVInstruction\
+    R\x0cinstructions\x12\x1c\n\toverwrite\x18\x02\x20\x01(\x08R\toverwrite\
+    \"<\n\x0bTailCommand\x12-\n\x07request\x18\x02\x20\x01(\x0b2\x13.protos.\
+    TailRequestR\x07request\"F\n\x16DeleteAudiencesCommand\x12,\n\x08audienc\
+    e\x18\x01\x20\x03(\x0b2\x10.protos.AudienceR\x08audienceBPZ:github.com/s\
+    treamdal/streamdal/libs/protos/build/go/protos\xea\x02\x11Streamdal::Pro\
+    tosJ\xf0\x11\n\x06\x12\x04\0\0H\x01\n\x08\n\x01\x0c\x12\x03\0\0\x12\n\
+    \x08\n\x01\x02\x12\x03\x02\0\x0f\n\t\n\x02\x03\0\x12\x03\x04\0\x20\n\t\n\
+    \x02\x03\x01\x12\x03\x05\0\x19\n\t\n\x02\x03\x02\x12\x03\x06\0\x15\n\t\n\
+    \x02\x03\x03\x12\x03\x07\0\x1b\n\x08\n\x01\x08\x12\x03\t\0Q\n\t\n\x02\
+    \x08\x0b\x12\x03\t\0Q\n\x08\n\x01\x08\x12\x03\n\0*\n\t\n\x02\x08-\x12\
+    \x03\n\0*\nN\n\x02\x04\0\x12\x04\r\0,\x01\x1aB\x20Command\x20is\x20used\
+    \x20by\x20streamdal\x20server\x20for\x20sending\x20commands\x20to\x20SDK\
+    s\n\n\n\n\x03\x04\0\x01\x12\x03\r\x08\x0f\n\x93\x01\n\x04\x04\0\x02\0\
+    \x12\x03\x10\x02\x1f\x1a\x85\x01\x20Who\x20is\x20this\x20command\x20inte\
+    nded\x20for?\n\x20NOTE:\x20Some\x20commands\x20(such\x20as\x20KeepAliveC\
+    ommand,\x20KVCommand)\x20do\x20NOT\x20use\x20audience\x20and\x20will\x20\
+    ignore\x20it\n\n\x0c\n\x05\x04\0\x02\0\x06\x12\x03\x10\x02\x11\n\x0c\n\
+    \x05\x04\0\x02\0\x01\x12\x03\x10\x12\x1a\n\x0c\n\x05\x04\0\x02\0\x03\x12\
+    \x03\x10\x1d\x1e\n\xed\x01\n\x04\x04\0\x08\0\x12\x04\x12\x02+\x03\"\xde\
+    \x01\x20NOTE:\x20As\x20of\x2001.29.2024,\x20pause,\x20resume,\x20delete\
+    \x20and\x20update\x20pipeline\x20commands\n\x20are\x20replaced\x20with\
+    \x20the\x20SetPipelinesCommand.\x20When\x20a\x20pause/resume/etc.\x20are\
+    \n\x20called\x20on\x20server,\x20the\x20server\x20will\x20emit\x20an\x20\
+    appropriate\x20SetPipelines\x20cmd.\n\n\x0c\n\x05\x04\0\x08\0\x01\x12\
+    \x03\x12\x08\x0f\n\xc5\x01\n\x04\x04\0\x02\x01\x12\x03\x1a\x04,\x1a\xb7\
+    \x01\x20Emitted\x20by\x20server\x20when\x20a\x20user\x20makes\x20a\x20pa\
+    use,\x20resume,\x20delete\x20or\x20update\n\x20pipeline\x20and\x20set\
+    \x20pipelines\x20external\x20grpc\x20API\x20call.\n\x20NOTE:\x20This\x20\
+    was\x20introduced\x20during\x20ordered\x20pipeline\x20updates.\n\n\x0c\n\
+    \x05\x04\0\x02\x01\x06\x12\x03\x1a\x04\x17\n\x0c\n\x05\x04\0\x02\x01\x01\
+    \x12\x03\x1a\x18%\n\x0c\n\x05\x04\0\x02\x01\x03\x12\x03\x1a(+\nR\n\x04\
+    \x04\0\x02\x02\x12\x03\x1d\x04&\x1aE\x20Server\x20sends\x20this\x20perio\
+    dically\x20to\x20SDKs\x20to\x20keep\x20the\x20connection\x20alive\n\n\
+    \x0c\n\x05\x04\0\x02\x02\x06\x12\x03\x1d\x04\x14\n\x0c\n\x05\x04\0\x02\
+    \x02\x01\x12\x03\x1d\x15\x1f\n\x0c\n\x05\x04\0\x02\x02\x03\x12\x03\x1d\"\
+    %\nd\n\x04\x04\0\x02\x03\x12\x03!\x04\x17\x1aW\x20Server\x20will\x20emit\
+    \x20this\x20when\x20a\x20user\x20makes\x20changes\x20to\x20the\x20KV\x20\
+    store\n\x20via\x20the\x20KV\x20HTTP\x20API.\n\n\x0c\n\x05\x04\0\x02\x03\
+    \x06\x12\x03!\x04\r\n\x0c\n\x05\x04\0\x02\x03\x01\x12\x03!\x0e\x10\n\x0c\
+    \n\x05\x04\0\x02\x03\x03\x12\x03!\x13\x16\nm\n\x04\x04\0\x02\x04\x12\x03\
+    %\x04\x1b\x1a`\x20Emitted\x20by\x20server\x20when\x20a\x20user\x20makes\
+    \x20a\x20Tail()\x20call\n\x20Consumed\x20by\x20all\x20server\x20instance\
+    s\x20and\x20by\x20SDK\n\n\x0c\n\x05\x04\0\x02\x04\x06\x12\x03%\x04\x0f\n\
+    \x0c\n\x05\x04\0\x02\x04\x01\x12\x03%\x10\x14\n\x0c\n\x05\x04\0\x02\x04\
+    \x03\x12\x03%\x17\x1a\n\xd2\x01\n\x04\x04\0\x02\x05\x12\x03*\x042\x1a\
+    \xc4\x01\x20Emitted\x20by\x20the\x20server\x20when\x20a\x20user\x20delet\
+    es\x20an\x20audience\x20or\x20service\n\x20Consumed\x20by\x20SDK\x20to\
+    \x20delete\x20audience\x20from\x20it's\x20internal\x20cache\x20so\n\x20t\
+    hat\x20the\x20heartbeat\x20does\x20not\x20send\x20the\x20audience\x20bac\
+    k\x20to\x20the\x20server\n\n\x0c\n\x05\x04\0\x02\x05\x06\x12\x03*\x04\
+    \x1a\n\x0c\n\x05\x04\0\x02\x05\x01\x12\x03*\x1b+\n\x0c\n\x05\x04\0\x02\
+    \x05\x03\x12\x03*.1\n\n\n\x02\x04\x01\x12\x04.\03\x01\n\n\n\x03\x04\x01\
+    \x01\x12\x03.\x08\x1b\n\x0b\n\x04\x04\x01\x02\0\x12\x03/\x02)\n\x0c\n\
+    \x05\x04\x01\x02\0\x04\x12\x03/\x02\n\n\x0c\n\x05\x04\x01\x02\0\x06\x12\
+    \x03/\x0b\x1a\n\x0c\n\x05\x04\x01\x02\0\x01\x12\x03/\x1b$\n\x0c\n\x05\
+    \x04\x01\x02\0\x03\x12\x03/'(\n\x1b\n\x04\x04\x01\x02\x01\x12\x032\x028\
+    \x1a\x0e\x20ID\x20=\x20wasm\x20ID\n\n\x0c\n\x05\x04\x01\x02\x01\x06\x12\
+    \x032\x02&\n\x0c\n\x05\x04\x01\x02\x01\x01\x12\x032'3\n\x0c\n\x05\x04\
+    \x01\x02\x01\x03\x12\x03267\nD\n\x02\x04\x02\x12\x045\07\x01\"8\x20Nothi\
+    ng\x20needed\x20in\x20here,\x20just\x20a\x20ping\x20from\x20server\x20to\
+    \x20SDK\n\n\n\n\x03\x04\x02\x01\x12\x035\x08\x18\n@\n\x02\x04\x03\x12\
+    \x04:\0@\x01\x1a4\x20Sent\x20by\x20server\x20on\x20Register\x20channel(s\
+    )\x20to\x20live\x20SDKs\n\n\n\n\x03\x04\x03\x01\x12\x03:\x08\x11\n\x0b\n\
+    \x04\x04\x03\x02\0\x12\x03;\x021\n\x0c\n\x05\x04\x03\x02\0\x04\x12\x03;\
+    \x02\n\n\x0c\n\x05\x04\x03\x02\0\x06\x12\x03;\x0b\x1f\n\x0c\n\x05\x04\
+    \x03\x02\0\x01\x12\x03;\x20,\n\x0c\n\x05\x04\x03\x02\0\x03\x12\x03;/0\nk\
+    \n\x04\x04\x03\x02\x01\x12\x03?\x02\x15\x1a^\x20Create\x20&\x20Update\
+    \x20specific\x20setting\x20that\x20will\x20cause\x20the\x20Create\x20or\
+    \x20Update\x20to\n\x20work\x20as\x20an\x20upsert.\n\n\x0c\n\x05\x04\x03\
+    \x02\x01\x05\x12\x03?\x02\x06\n\x0c\n\x05\x04\x03\x02\x01\x01\x12\x03?\
+    \x07\x10\n\x0c\n\x05\x04\x03\x02\x01\x03\x12\x03?\x13\x14\n\n\n\x02\x04\
+    \x04\x12\x04B\0D\x01\n\n\n\x03\x04\x04\x01\x12\x03B\x08\x13\n\x0b\n\x04\
+    \x04\x04\x02\0\x12\x03C\x02\x1a\n\x0c\n\x05\x04\x04\x02\0\x06\x12\x03C\
+    \x02\r\n\x0c\n\x05\x04\x04\x02\0\x01\x12\x03C\x0e\x15\n\x0c\n\x05\x04\
+    \x04\x02\0\x03\x12\x03C\x18\x19\n\n\n\x02\x04\x05\x12\x04F\0H\x01\n\n\n\
+    \x03\x04\x05\x01\x12\x03F\x08\x1e\n\x0b\n\x04\x04\x05\x02\0\x12\x03G\x02\
+    (\n\x0c\n\x05\x04\x05\x02\0\x04\x12\x03G\x02\n\n\x0c\n\x05\x04\x05\x02\0\
+    \x06\x12\x03G\x0b\x1a\n\x0c\n\x05\x04\x05\x02\0\x01\x12\x03G\x1b#\n\x0c\
+    \n\x05\x04\x05\x02\0\x03\x12\x03G&'b\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
