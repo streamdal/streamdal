@@ -1133,7 +1133,16 @@ class Command(betterproto.Message):
     tail: "TailCommand" = betterproto.message_field(103, group="command")
     """
     Emitted by server when a user makes a Tail() call Consumed by all server
-    instances and by SDKs
+    instances and by SDK
+    """
+
+    delete_audiences: "DeleteAudiencesCommand" = betterproto.message_field(
+        104, group="command"
+    )
+    """
+    Emitted by the server when a user deletes an audience or service Consumed
+    by SDK to delete audience from it's internal cache so that the heartbeat
+    does not send the audience back to the server
     """
 
 
@@ -1166,6 +1175,11 @@ class KvCommand(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class TailCommand(betterproto.Message):
     request: "TailRequest" = betterproto.message_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class DeleteAudiencesCommand(betterproto.Message):
+    audiences: List["Audience"] = betterproto.message_field(1)
 
 
 @dataclass(eq=False, repr=False)

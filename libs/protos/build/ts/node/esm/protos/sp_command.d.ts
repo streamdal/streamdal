@@ -56,11 +56,21 @@ export interface Command {
         oneofKind: "tail";
         /**
          * Emitted by server when a user makes a Tail() call
-         * Consumed by all server instances and by SDKs
+         * Consumed by all server instances and by SDK
          *
          * @generated from protobuf field: protos.TailCommand tail = 103;
          */
         tail: TailCommand;
+    } | {
+        oneofKind: "deleteAudiences";
+        /**
+         * Emitted by the server when a user deletes an audience or service
+         * Consumed by SDK to delete audience from it's internal cache so
+         * that the heartbeat does not send the audience back to the server
+         *
+         * @generated from protobuf field: protos.DeleteAudiencesCommand delete_audiences = 104;
+         */
+        deleteAudiences: DeleteAudiencesCommand;
     } | {
         oneofKind: undefined;
     };
@@ -116,6 +126,15 @@ export interface TailCommand {
      */
     request?: TailRequest;
 }
+/**
+ * @generated from protobuf message protos.DeleteAudiencesCommand
+ */
+export interface DeleteAudiencesCommand {
+    /**
+     * @generated from protobuf field: repeated protos.Audience audiences = 1;
+     */
+    audiences: Audience[];
+}
 declare class Command$Type extends MessageType<Command> {
     constructor();
     create(value?: PartialMessage<Command>): Command;
@@ -167,4 +186,14 @@ declare class TailCommand$Type extends MessageType<TailCommand> {
  * @generated MessageType for protobuf message protos.TailCommand
  */
 export declare const TailCommand: TailCommand$Type;
+declare class DeleteAudiencesCommand$Type extends MessageType<DeleteAudiencesCommand> {
+    constructor();
+    create(value?: PartialMessage<DeleteAudiencesCommand>): DeleteAudiencesCommand;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DeleteAudiencesCommand): DeleteAudiencesCommand;
+    internalBinaryWrite(message: DeleteAudiencesCommand, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message protos.DeleteAudiencesCommand
+ */
+export declare const DeleteAudiencesCommand: DeleteAudiencesCommand$Type;
 export {};
