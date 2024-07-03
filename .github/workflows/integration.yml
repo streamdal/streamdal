@@ -25,7 +25,7 @@ jobs:
     - name: Start console with deno task run
       working-directory: apps/console
       run: |
-        deno task start &
+        deno run --allow-net -A --watch=static/,routes/ dev.ts
     - name: Wait for server to start
       run: sleep 10
     - uses: actions/setup-node@v4
