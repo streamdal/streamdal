@@ -30,7 +30,7 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
       env:
-        CONSOLE_URL: "http://streamdal-console:8080"
+        CONSOLE_URL: "http://localhost:8080"
     - uses: actions/upload-artifact@v4
       if: always()
       with:
