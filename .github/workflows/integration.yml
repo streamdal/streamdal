@@ -16,7 +16,7 @@ jobs:
     - name: Docker Compose Up
       working-directory: apps/server
       run: |
-        docker-compose -f apps/server/docker-compose.yml up -d
+        docker compose -f apps/server/docker-compose.yml up -d
     - name: Setup Deno
       uses: denoland/setup-deno@v1
       with:
