@@ -25,7 +25,7 @@ jobs:
     - name: Start console with deno task run
       working-directory: apps/console
       run: |
-        deno task start
+        deno task start &
     - name: Wait f  or server to start
       run: sleep 10
     - uses: actions/setup-node@v4
