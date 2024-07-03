@@ -24,12 +24,7 @@ test.describe("Streamdal Console", () => {
   test.beforeEach(async () => {
     await client.flushAll()
   })
-
-  test.afterAll(async () => {
-    // Not necessary for CI, but in case we run this locally
-    await client.flushAll()
-  })
-
+  
   test('loads empty console', async ({ page }) => {
     await page.goto('http://streamdal-console:8080');
 
