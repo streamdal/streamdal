@@ -7,7 +7,9 @@ test.describe("Streamdal Console", () => {
   let client
 
   test.beforeAll(async () => {
-    client = createClient();
+    client = createClient({
+      url: 'redis://redis:6379'
+    });
   })
 
   test.beforeEach(async () => {
