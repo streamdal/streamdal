@@ -8,7 +8,7 @@ test.describe("Streamdal Console", () => {
 
   test.beforeAll(async () => {
     client = createClient({
-      url: 'redis://redis:6379'
+      url: 'redis://localhost:6379'
     });
 
     client.on('connect', () => {
