@@ -8,7 +8,7 @@ test.describe("Streamdal Console", () => {
 
   test.beforeAll(async () => {
     client = createClient({
-      url: 'redis://streamdal-redis:6379'
+      url: 'redis://redis:6379'
     });
     await client.connect();
 
@@ -24,7 +24,7 @@ test.describe("Streamdal Console", () => {
   test.beforeEach(async () => {
     await client.flushAll()
   })
-  
+
   test('loads empty console', async ({ page }) => {
     await page.goto('http://streamdal-console:8080');
 
