@@ -8,7 +8,7 @@ test.describe("Streamdal Console", () => {
 
   test.beforeAll(async () => {
     client = createClient({
-      url: 'redis://localhost:6379'
+      url: 'redis://streamdal-redis:6379'
     });
     await client.connect();
 
@@ -31,7 +31,7 @@ test.describe("Streamdal Console", () => {
   })
 
   test('loads empty console', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto('http://streamdal-console:8080');
 
     // Expect a title "to contain" a substring.
     await expect(page).toHaveTitle(/Streamdal/);
@@ -39,7 +39,7 @@ test.describe("Streamdal Console", () => {
   });
 
   test('create pipeline', async ({ page }) => {
-    await page.goto('http://localhost:3000/pipelines/add');
+    await page.goto('http://streamdal-console:8080/pipelines/add');
     await page.fill('input[name="name"]', 'Test Pipeline');
     await page.selectOption('select[name="dataFormat"]', 'JSON');
     await page.fill('input[name="steps.0.name"]', 'Detect PII');
@@ -79,7 +79,7 @@ test.describe("Streamdal Console", () => {
     await page.waitForTimeout(20000);
 
     // See demo-client producer on page
-    await page.goto('http://localhost:3000');
+    await page.goto('http://streamdal-console:8080');
     await expect(page.getByText('signup-service')).toBeVisible();
     await expect(page.getByText('verifier')).toBeVisible();
     await expect(page.getByText('postgresql')).toBeVisible();

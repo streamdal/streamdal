@@ -17,15 +17,7 @@ jobs:
     - name: Docker Compose Up
       working-directory: apps/server
       run: |
-        docker compose -f docker-compose.dev.yaml up -d
-    - name: Setup Deno
-      uses: denoland/setup-deno@v1
-      with:
-        deno-version: v1.x
-    - name: Start console with deno task run
-      working-directory: apps/console
-      run: |
-        deno run --allow-net -A --watch=static/,routes/ dev.ts &
+        docker compose -f docker-compose.ci.yaml up -d
     - name: Wait for server to start
       run: sleep 10
     - uses: actions/setup-node@v4
@@ -37,6 +29,8 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
+      env:
+        CONSOLE_URL: "http://streamdal-console:8080"
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -47,7 +41,7 @@ jobs:
       working-directory: apps/server
       if: always()
       run: |
-        docker compose -f docker-compose.dev.yaml down
+        docker compose -f docker-compose.ci.yaml down
     - name: Stop console with deno task stop
       working-directory: apps/console
       if: always()
