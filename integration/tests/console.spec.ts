@@ -10,6 +10,7 @@ test.describe("Streamdal Console", () => {
     client = createClient({
       url: 'redis://localhost:6379'
     });
+    await client.connect();
 
     client.on('connect', () => {
       console.log('Connected to Redis server');
