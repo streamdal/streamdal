@@ -10,6 +10,11 @@ test.describe("Streamdal Console", () => {
     client = createClient({
       url: 'redis://redis:6379'
     });
+
+    client.isConnected().then((connected: any) => {
+      if (!connected) {
+        throw new Error('Redis is not connected');
+    }
   })
 
   test.beforeEach(async () => {
