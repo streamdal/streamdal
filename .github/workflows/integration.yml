@@ -26,7 +26,7 @@ jobs:
       working-directory: apps/console
       run: |
         deno task start &
-    - name: Wait f  or server to start
+    - name: Wait for server to start
       run: sleep 10
     - uses: actions/setup-node@v4
       with:

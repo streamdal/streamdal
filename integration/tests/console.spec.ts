@@ -4,14 +4,18 @@ import { createClient } from 'redis'
 
 test.describe("Streamdal Console", () => {
 
+  let client
+
+  test.beforeAll(async () => {
+    client = createClient();
+  })
+
   test.beforeEach(async () => {
-    const client = createClient();
     await client.flushAll()
   })
 
   test.afterAll(async () => {
     // Not necessary for CI, but in case we run this locally
-    const client = createClient();
     await client.flushAll()
   })
 
