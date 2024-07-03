@@ -12,6 +12,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v4
     # Bring up docker-compose under apps/server
     - name: Docker Compose Up
       working-directory: apps/server
@@ -27,7 +28,6 @@ jobs:
         deno task start
     - name: Wait f  or server to start
       run: sleep 10
-    - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
