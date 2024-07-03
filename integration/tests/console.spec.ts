@@ -14,7 +14,8 @@ test.describe("Streamdal Console", () => {
     client.isConnected().then((connected: any) => {
       if (!connected) {
         throw new Error('Redis is not connected');
-    }
+      }
+    });
   })
 
   test.beforeEach(async () => {
