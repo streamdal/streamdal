@@ -38,6 +38,7 @@ services:
     networks:
       - streamdal-network
   streamdal-console:
+    image: streamdal/console:latest
     depends_on:
       - streamdal-envoy
     environment:
