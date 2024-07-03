@@ -1,4 +1,3 @@
-version: "3"
 services:
   streamdal-server:
     image: streamdal/server:latest
@@ -28,7 +27,7 @@ services:
     networks:
       - streamdal-network
 
-  envoy:
+  streamdal-envoy:
     image: envoyproxy/envoy:tools-v1.28.0
     container_name: streamdal-envoy
     ports:
