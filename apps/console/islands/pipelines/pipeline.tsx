@@ -212,7 +212,7 @@ export default function PipelineDetail({
             </div>
             <IconPlus
               data-tooltip-target="step-add"
-              class="h-5 w-5 cursor-pointer"
+              class="h-5 w-5 cursor-pointer add-step-button"
               onClick={() => {
                 addStep();
               }}

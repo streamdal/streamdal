@@ -1,0 +1,45 @@
+name: Playwright Tests
+on:
+#  push:
+#    branches: [ main, master ]
+  pull_request:
+#    branches: [ main, master ]
+jobs:
+  test:
+    defaults:
+      run:
+        working-directory: integration/
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    # Bring up docker-compose under apps/server
+    - name: Docker Compose Up
+      working-directory: apps/server
+      run: |
+        docker-compose -f apps/server/docker-compose.yml up -d
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: v1.x
+    - name: Start console with deno task run
+      working-directory: apps/console
+      run: |
+        deno task start
+    - name: Wait f  or server to start
+      run: sleep 10
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 1
