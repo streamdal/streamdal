@@ -1,6 +1,7 @@
 services:
   streamdal-server:
     image: streamdal/server:latest
+    pull_policy: always
     depends_on:
       - redis
     environment:
@@ -38,6 +39,7 @@ services:
       - streamdal-network
   streamdal-console:
     image: streamdal/console:latest
+    pull_policy: always
     depends_on:
       - streamdal-envoy
     environment:
