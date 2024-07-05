@@ -48,7 +48,7 @@ export const SchemaNav = (
           />
         </div>
         <pre className={"h-[150px]"}>
-          <code class={"schema"}>
+          <code>
             <div
                 class={"font-sm "}
                 dangerouslySetInnerHTML={{
