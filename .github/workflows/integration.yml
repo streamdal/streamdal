@@ -42,8 +42,3 @@ jobs:
       if: always()
       run: |
         docker compose -f docker-compose.ci.yaml down
-    - name: Stop console with deno task stop
-      working-directory: apps/console
-      if: always()
-      run: |
-        run: pkill -f "deno"
