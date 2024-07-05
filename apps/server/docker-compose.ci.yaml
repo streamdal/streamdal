@@ -1,0 +1,60 @@
+services:
+  streamdal-server:
+    image: streamdal/server:latest
+    depends_on:
+      - redis
+    environment:
+      - STREAMDAL_SERVER_NODE_NAME=node1
+      - STREAMDAL_SERVER_AUTH_TOKEN=1234
+      - STREAMDAL_SERVER_REDIS_URL=redis:6379
+      - STREAMDAL_SERVER_LOG_LEVEL=DEBUG
+      - STREAMDAL_SERVER_TELEMETRY_DISABLE=true
+    container_name: streamdal-server
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+    networks:
+      - streamdal-network
+
+  redis:
+    container_name: streamdal-redis
+    image: redis:latest
+    command: redis-server --appendonly yes # This enables AOF persistence
+    volumes:
+      - redis-data:/data # Persist redis data to this volume
+    ports:
+      - "6379:6379"
+    networks:
+      - streamdal-network
+
+  streamdal-envoy:
+    image: envoyproxy/envoy:tools-v1.28.0
+    container_name: streamdal-envoy
+    ports:
+      - "8083:8083"
+    volumes:
+      - ${PWD}/assets/envoy/envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      - streamdal-network
+  streamdal-console:
+    image: streamdal/console:latest
+    depends_on:
+      - streamdal-envoy
+    environment:
+      - STREAMDAL_CONSOLE_GRPC_WEB_URL=http://streamdal-envoy:8083
+      - STREAMDAL_CONSOLE_GRPC_AUTH_TOKEN=1234
+      - STREAMDAL_CONSOLE_PORT=8080
+      - STREAMDAL_CONSOLE_PRODUCTION=false
+      - STREAMDAL_SERVER_REST_URL=http://streamdal-server:8081
+      - STREAMDAL_SERVER_REST_AUTH=1234
+    ports:
+      - "8080:8080"
+    networks:
+      - streamdal-network
+
+
+volumes:
+  redis-data:
+
+networks:
+  streamdal-network:
