@@ -41,6 +41,7 @@ const AttachDetach = (
         type="checkbox"
         className={`w-4 h-4 rounded border mx-2 checkmark-streamdal border-streamdalPurple appearance-none checked:bg-streamdalPurple flex justify-center items-center`}
         checked={checked}
+        title={`${pipeline.name}`}
       />
       <Tooltip
         targetId={`attach-detach-pipeline-${pipeline.id}`}
