@@ -63,7 +63,7 @@ test.describe("Streamdal Console", () => {
 
     // Sleep for 20 seconds to allow demo-client to compile/start
     // TODO: can we move compile to a make command that runs before tests
-    await page.waitForTimeout(60000);
+    await page.waitForTimeout(40000);
 
     // See demo-client producer on page
     await page.goto(console_url);
