@@ -144,7 +144,7 @@ func (d *Dependencies) setupBackends(cfg *config.Config) error {
 		Protocol: 3,
 	})
 
-	if err := client.ClientInfo(d.ShutdownContext).Err(); err != nil {
+	if err := client.Ping(d.ShutdownContext).Err(); err != nil {
 		return errors.Wrap(err, "unable to connect to redis")
 	}
 
