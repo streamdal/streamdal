@@ -20,11 +20,11 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
+	"github.com/golang/protobuf/jsonpb"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/protobuf/encoding/protojson"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,6 +32,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	crdv1 "github.com/streamdal/streamdal/apps/operator/api/v1"
 	"github.com/streamdal/streamdal/apps/operator/util"
@@ -270,7 +272,12 @@ func (r *StreamdalConfigReconciler) handleReconcileRequest(
 	for _, cfgItem := range rr.Config.Spec.Configs {
 		// Attempt to load config in CR / wanted config
 		wantedConfig := &protos.Config{}
-		if err := protojson.Unmarshal([]byte(cfgItem.Config), wantedConfig); err != nil {
+
+		m := jsonpb.Unmarshaler{
+			AllowUnknownFields: true,
+		}
+
+		if err := m.Unmarshal(strings.NewReader(cfgItem.Config), wantedConfig); err != nil {
 			return ctrl.Result{}, nil, fmt.Errorf("failed to unmarshal wanted config '%s': %s", cfgItem.Name, err)
 		}
 

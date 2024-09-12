@@ -1,5 +1,6 @@
+VERSION ?= $(shell git rev-parse --short=8 HEAD)
 # Image URL to use all building/pushing image targets
-IMG ?= streamdal/operator:latest
+IMG ?= streamdal/operator
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.29.0
 
@@ -91,7 +92,10 @@ run: manifests generate fmt vet ## Run a controller from your host.
 # More info: https://docs.docker.com/develop/develop-images/build_enhancements/
 .PHONY: docker-build
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build -t ${IMG} .
+	$(CONTAINER_TOOL) build --push \
+		-t ${IMG}:latest \
+		-t ${IMG}:${VERSION} \
+		-f ./Dockerfile .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.

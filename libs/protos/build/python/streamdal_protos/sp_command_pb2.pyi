@@ -10,18 +10,26 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Command(_message.Message):
-    __slots__ = ["audience", "keep_alive", "kv", "set_pipelines", "tail"]
+    __slots__ = ["audience", "delete_audiences", "keep_alive", "kv", "set_pipelines", "tail"]
     AUDIENCE_FIELD_NUMBER: _ClassVar[int]
+    DELETE_AUDIENCES_FIELD_NUMBER: _ClassVar[int]
     KEEP_ALIVE_FIELD_NUMBER: _ClassVar[int]
     KV_FIELD_NUMBER: _ClassVar[int]
     SET_PIPELINES_FIELD_NUMBER: _ClassVar[int]
     TAIL_FIELD_NUMBER: _ClassVar[int]
     audience: _sp_common_pb2.Audience
+    delete_audiences: DeleteAudiencesCommand
     keep_alive: KeepAliveCommand
     kv: KVCommand
     set_pipelines: SetPipelinesCommand
     tail: TailCommand
-    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ...) -> None: ...
+    def __init__(self, audience: _Optional[_Union[_sp_common_pb2.Audience, _Mapping]] = ..., set_pipelines: _Optional[_Union[SetPipelinesCommand, _Mapping]] = ..., keep_alive: _Optional[_Union[KeepAliveCommand, _Mapping]] = ..., kv: _Optional[_Union[KVCommand, _Mapping]] = ..., tail: _Optional[_Union[TailCommand, _Mapping]] = ..., delete_audiences: _Optional[_Union[DeleteAudiencesCommand, _Mapping]] = ...) -> None: ...
+
+class DeleteAudiencesCommand(_message.Message):
+    __slots__ = ["audiences"]
+    AUDIENCES_FIELD_NUMBER: _ClassVar[int]
+    audiences: _containers.RepeatedCompositeFieldContainer[_sp_common_pb2.Audience]
+    def __init__(self, audiences: _Optional[_Iterable[_Union[_sp_common_pb2.Audience, _Mapping]]] = ...) -> None: ...
 
 class KVCommand(_message.Message):
     __slots__ = ["instructions", "overwrite"]

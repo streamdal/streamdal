@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path"
 	"strings"
 	"sync"
 	"testing"
@@ -258,7 +259,7 @@ var _ = Describe("Streamdal", func() {
 		It("processes successfully in compiler mode", func() {
 			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
-			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -311,7 +312,7 @@ var _ = Describe("Streamdal", func() {
 		It("processes successfully in interpreter mode", func() {
 			aud := createAudience("mysvc-interpreter", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic-interpreter")
 
-			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -385,7 +386,7 @@ var _ = Describe("Streamdal", func() {
 		It("fails on a detective match and aborts entire pipeline", func() {
 			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
-			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -451,7 +452,7 @@ var _ = Describe("Streamdal", func() {
 		It("returns error when wasm errors", func() {
 			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
-			wasmData, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			wasmData, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -510,10 +511,10 @@ var _ = Describe("Streamdal", func() {
 		It("succeeds with multiple threads", func() {
 			aud := createAudience("mysvc1", "kafka", protos.OperationType_OPERATION_TYPE_PRODUCER, "mytopic")
 
-			wasmDetective, err := os.ReadFile("test-assets/wasm/detective.wasm")
+			wasmDetective, err := os.ReadFile(path.Join(WasmDir, "detective.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
-			transformDetective, err := os.ReadFile("test-assets/wasm/transform.wasm")
+			transformDetective, err := os.ReadFile(path.Join(WasmDir, "transform.wasm"))
 			Expect(err).ToNot(HaveOccurred())
 
 			pipeline := &protos.Pipeline{
@@ -677,7 +678,7 @@ func createStreamdalClient() (*Streamdal, *kv.KV, error) {
 }
 
 func createWASMRequestForKV(action shared.KVAction, key string, value []byte, mode steps.KVMode) (*protos.WASMRequest, error) {
-	wasmData, err := os.ReadFile("test-assets/wasm/kv.wasm")
+	wasmData, err := os.ReadFile(path.Join(WasmDir, "kv.wasm"))
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to read wasm file")
 	}

@@ -2,9 +2,8 @@ streamdal-server
 ================
 [![Release](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-release.yml)
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/apps-server-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/apps-server-pr.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/streamdal/apps/server)](https://goreportcard.com/report/github.com/streamdal/streamdal/apps/server)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
-<!-- TODO: NEED TO UPDATE GOREPORTCARD -->
-<!-- [![Go Report Card](https://goreportcard.com/badge/github.com/streamdal/server)](https://goreportcard.com/report/github.com/streamdal/server) -->
 
 _**Go server used for facilitating communications between SDKs and Console.**_
 

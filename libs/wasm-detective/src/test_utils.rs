@@ -56,7 +56,8 @@ pub const SAMPLE_JSON: &str = r#"{
             "unionpay": {
                 "valid": "6200000000000005",
                 "invalid": "6200000000000006"
-            }
+            },
+            "false_positive": "2024-05-30T18:25:47.647138766Z stdout F {"@timestamp":"2024-05-30T18:25:47.647Z","@version":"1","message":"Request: method=GET,path=/api/SE194/condensed","logger_name":"com.streamdal.cache.service.HttpLoggerImpl","thread_name":"http-nio-14444-exec-8","level":"INFO","level_value":20000,"msgId":"d6438565-a83a-4e5f-9a01-d7dea8cae2f3","trace_id":"2f2025462a332f834211856ed6e0d03b","trace_flags":"01","span_id":"c49b93ce47e367cd"}"
         },
         "ssn_valid": "111-22-3456",
         "ssn_invalid": "111-222-3456",

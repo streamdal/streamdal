@@ -26,10 +26,11 @@ setup:
 .PHONY: test
 test:
 	@echo "Running tests..."
-	make test/wasm
-	pytest --cov=streamdal
-
-.PHONY: test/wasm
-test/wasm: description = Pull latest release of wasm
-test/wasm:
 	bash ./init_wasm.sh
+	pytest
+
+.PHONY: test/coverage
+test/coverage:
+	@echo "Running tests with coverage..."
+	bash ./init_wasm.sh
+	pytest --cov=streamdal

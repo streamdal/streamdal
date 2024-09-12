@@ -98,7 +98,7 @@ func AudienceFromStr(s string) *protos.Audience {
 		return nil
 	}
 
-	opType := protos.OperationType_OPERATION_TYPE_UNSET
+	var opType protos.OperationType
 
 	if parts[1] == strings.ToLower(protos.OperationType_OPERATION_TYPE_CONSUMER.String()) {
 		opType = protos.OperationType_OPERATION_TYPE_CONSUMER

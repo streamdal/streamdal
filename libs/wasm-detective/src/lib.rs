@@ -1,7 +1,8 @@
 #![feature(test)]
 
+use streamdal_gjson::{Kind, Value};
+
 use crate::error::CustomError;
-use streamdal_gjson::{Value, Kind};
 
 pub mod detective;
 pub mod error;
@@ -10,7 +11,7 @@ pub mod matcher_numeric;
 pub mod matcher_pii;
 pub mod matcher_pii_payments;
 pub mod matcher_pii_cloud;
-
+pub mod matcher_pii_phone;
 pub mod matcher_pii_keywords;
 
 mod keywords;
@@ -43,6 +44,10 @@ mod matcher_pii_cloud_tests;
 #[cfg(test)]
 #[path = "matcher_pii_payments_tests.rs"]
 mod matcher_pii_payments_tests;
+
+#[cfg(test)]
+#[path = "matcher_pii_phone_tests.rs"]
+mod matcher_pii_phone_tests;
 
 
 pub trait FromValue<'a>

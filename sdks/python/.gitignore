@@ -6,6 +6,5 @@
 *.egg-info
 dist/*
 htmlcov/*
-coverage.xml
 coverage/*
 test-assets/wasm/*

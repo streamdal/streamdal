@@ -1,0 +1,17 @@
+{
+  "name": "integration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.45.0",
+    "@types/node": "^20.14.9"
+  },
+  "dependencies": {
+    "redis": "^4.6.15"
+  }
+}

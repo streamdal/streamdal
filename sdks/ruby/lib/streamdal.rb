@@ -8,11 +8,11 @@ require 'sp_sdk_pb'
 require 'sp_common_pb'
 require 'sp_info_pb'
 require 'sp_internal_pb'
-require "sp_internal_services_pb"
+require 'sp_internal_services_pb'
 require 'sp_pipeline_pb'
-require "sp_wsm_pb"
-require "steps/sp_steps_httprequest_pb"
-require "steps/sp_steps_kv_pb"
+require 'sp_wsm_pb'
+require 'steps/sp_steps_httprequest_pb'
+require 'steps/sp_steps_kv_pb'
 require 'timeout'
 require 'google/protobuf'
 require_relative 'audiences'
@@ -31,7 +31,6 @@ DEFAULT_HEARTBEAT_INTERVAL = 1 # 1 second
 MAX_PAYLOAD_SIZE = 1024 * 1024 # 1 megabyte
 
 module Streamdal
-
   OPERATION_TYPE_PRODUCER = 2
   OPERATION_TYPE_CONSUMER = 1
   CLIENT_TYPE_SDK = 1
@@ -39,7 +38,6 @@ module Streamdal
 
   # Data class to hold instantiated wasm functions
   class WasmFunction
-
     ##
     # Instance of an initialized wasm module and associated memory store
 
@@ -65,7 +63,6 @@ module Streamdal
       )
     end
   end
-
 
   class Client
 
@@ -117,20 +114,14 @@ module Streamdal
 
       # Exit any remaining threads
       @workers.each do |w|
-        if w.running?
-          w.exit
-        end
+        w.exit if w.running?
       end
     end
 
     def process(data, audience)
-      if data.length == 0
-        raise "data is required"
-      end
+      raise 'data is required' if data.empty?
 
-      if audience.nil?
-        raise "audience is required"
-      end
+      raise 'audience is required' if audience.nil?
 
       resp = Streamdal::Protos::SDKResponse.new
       resp.status = :EXEC_STATUS_TRUE
@@ -144,8 +135,8 @@ module Streamdal
         "operation_type": aud.operation_type,
         "operation": aud.operation_name,
         "component": aud.component_name,
-        "pipeline_name": "",
-        "pipeline_id": "",
+        "pipeline_name": '',
+        "pipeline_id": '',
       }
 
       # TODO: metrics
@@ -166,7 +157,7 @@ module Streamdal
       if payload_size > MAX_PAYLOAD_SIZE
         # TODO: add metrics
         resp.status = :EXEC_STATUS_ERROR
-        resp.error = "payload size exceeds maximum allowed size"
+        resp.error = 'payload size exceeds maximum allowed size'
         resp
       end
 
@@ -174,8 +165,8 @@ module Streamdal
       original_data = data
 
       pipelines = _get_pipelines(aud)
-      if pipelines.length == 0
-        _send_tail(aud, "", original_data, original_data)
+      if pipelines.empty?
+        _send_tail(aud, '', original_data, original_data)
         return resp
       end
 
@@ -215,13 +206,9 @@ module Streamdal
               break
             end
 
-            if @cfg[:dry_run]
-              @log.debug "Running step '#{step.name}' in dry-run mode"
-            end
+            @log.debug "Running step '#{step.name}' in dry-run mode" if @cfg[:dry_run]
 
-            if wasm_resp.output_payload.length > 0
-              resp.data = wasm_resp.output_payload
-            end
+            resp.data = wasm_resp.output_payload if wasm_resp.output_payload.length.positive?
 
             _handle_schema(aud, step, wasm_resp)
 
@@ -296,10 +283,10 @@ module Streamdal
         end # pipelines.each
       end # timeout
 
-      _send_tail(aud, "", original_data, resp.data)
+      _send_tail(aud, '', original_data, resp.data)
 
       if @cfg[:dry_run]
-        @log.debug "Dry-run, setting response data to original data"
+        @log.debug 'Dry-run, setting response data to original data'
         resp.data = original_data
       end
 
@@ -309,42 +296,32 @@ module Streamdal
     private
 
     def _validate_cfg(cfg)
-      if cfg[:streamdal_url].nil? || cfg[:streamdal_url].empty?
-        raise "streamdal_url is required"
-      end
+      raise 'streamdal_url is required' if cfg[:streamdal_url].nil? || cfg[:streamdal_url].empty?
 
-      if cfg[:streamdal_token].nil? || cfg[:streamdal_token].empty?
-        raise "streamdal_token is required"
-      end
+      raise 'streamdal_token is required' if cfg[:streamdal_token].nil? || cfg[:streamdal_token].empty?
 
-      if cfg[:service_name].nil? || cfg[:streamdal_token].empty?
-        raise "service_name is required"
-      end
+      raise 'service_name is required' if cfg[:service_name].nil? || cfg[:streamdal_token].empty?
 
       if cfg[:log].nil? || cfg[:streamdal_token].empty?
-        logger = Logger.new(STDOUT)
+        logger = Logger.new($stdout)
         logger.level = Logger::ERROR
         cfg[:log] = logger
       end
 
-      if cfg[:pipeline_timeout].nil?
-        cfg[:pipeline_timeout] = DEFAULT_PIPELINE_TIMEOUT
-      end
+      cfg[:pipeline_timeout] = DEFAULT_PIPELINE_TIMEOUT if cfg[:pipeline_timeout].nil?
 
-      if cfg[:step_timeout].nil?
-        cfg[:step_timeout] = DEFAULT_STEP_TIMEOUT
-      end
+      cfg[:step_timeout] = DEFAULT_STEP_TIMEOUT if cfg[:step_timeout].nil?
     end
 
     def _handle_command(cmd)
       case cmd.command.to_s
-      when "kv"
+      when 'kv'
         _handle_kv(cmd)
-      when "tail"
+      when 'tail'
         _handle_tail_request(cmd)
-      when "set_pipelines"
+      when 'set_pipelines'
         _set_pipelines(cmd)
-      when "keep_alive"
+      when 'keep_alive'
         # Do nothing
       else
         @log.error "unknown command type #{cmd.command}"
@@ -378,13 +355,11 @@ module Streamdal
     end
 
     def _set_pipelines(cmd)
-      if cmd.nil?
-        raise "cmd is required"
-      end
+      raise 'cmd is required' if cmd.nil?
 
       cmd.set_pipelines.pipelines.each_with_index { |p, pIdx|
         p.steps.each_with_index { |step, idx|
-          if step._wasm_bytes == ""
+          if step._wasm_bytes == ''
             if cmd.set_pipelines.wasm_modules.has_key?(step._wasm_id)
               step._wasm_bytes = cmd.set_pipelines.wasm_modules[step._wasm_id].bytes
               cmd.set_pipelines.pipelines[pIdx].steps[idx] = step
@@ -416,19 +391,17 @@ module Streamdal
     def _get_function(step)
       # We cache functions so we can eliminate the wasm bytes from steps to save on memory
       # And also to avoid re-initializing the same function multiple times
-      if @functions.key?(step._wasm_id)
-        return @functions[step._wasm_id]
-      end
+      return @functions[step._wasm_id] if @functions.key?(step._wasm_id)
 
       engine = Wasmtime::Engine.new
       mod = Wasmtime::Module.new(engine, step._wasm_bytes)
       linker = Wasmtime::Linker.new(engine, wasi: true)
 
-      linker.func_new("env", "httpRequest", [:i32, :i32], [:i64]) do |caller, ptr, len|
+      linker.func_new('env', 'httpRequest', %i[i32 i32], [:i64]) do |caller, ptr, len|
         @hostfunc.http_request(caller, ptr, len)
       end
 
-      linker.func_new("env", "kvExists", [:i32, :i32], [:i64]) do |caller, ptr, len|
+      linker.func_new('env', 'kvExists', %i[i32 i32], [:i64]) do |caller, ptr, len|
         @hostfunc.kv_exists(caller, ptr, len)
       end
 
@@ -442,8 +415,6 @@ module Streamdal
 
       instance = linker.instantiate(store, mod)
 
-      # TODO: host funcs
-
       # Store in cache
       func = WasmFunction.new
       func.instance = instance
@@ -454,17 +425,11 @@ module Streamdal
     end
 
     def _call_wasm(step, data, isr)
-      if step.nil?
-        raise "step is required"
-      end
+      raise 'step is required' if step.nil?
 
-      if data.nil?
-        raise "data is required"
-      end
+      raise 'data is required' if data.nil?
 
-      if isr.nil?
-        isr = Streamdal::Protos::InterStepResult.new
-      end
+      isr = Streamdal::Protos::InterStepResult.new if isr.nil?
 
       req = Streamdal::Protos::WASMRequest.new
       req.step = step.clone
@@ -480,8 +445,8 @@ module Streamdal
         resp = Streamdal::Protos::WASMResponse.new
         resp.exit_code = :WASM_EXIT_CODE_ERROR
         resp.exit_msg = "Failed to execute WASM: #{e}"
-        resp.output_payload = ""
-        return resp
+        resp.output_payload = ''
+        resp
       end
     end
 
@@ -500,9 +465,9 @@ module Streamdal
 
       ci = Streamdal::Protos::ClientInfo.new
       ci.client_type = :CLIENT_TYPE_SDK
-      ci.library_name = "ruby-sdk"
-      ci.library_version = "0.0.1"
-      ci.language = "ruby"
+      ci.library_name = 'ruby-sdk'
+      ci.library_version = '0.0.1'
+      ci.language = 'ruby'
       ci.arch = arch
       ci.os = os
 
@@ -511,23 +476,21 @@ module Streamdal
 
     # Returns metadata for gRPC requests to the internal gRPC API
     def _metadata
-      { "auth-token" => @cfg[:streamdal_token].to_s }
+      { 'auth-token' => @cfg[:streamdal_token].to_s }
     end
 
     def _register
-      @log.info("register started")
+      @log.info('register started')
 
       # Register with Streamdal External gRPC API
       resps = @stub.register(_gen_register_request, metadata: _metadata)
       resps.each do |r|
-        if @exit
-          break
-        end
+        break if @exit
 
         _handle_command(r)
       end
 
-      @log.info("register exited")
+      @log.info('register exited')
     end
 
     def _exec_wasm(req)
@@ -535,14 +498,14 @@ module Streamdal
 
       # Empty out _wasm_bytes, we don't need it anymore
       # TODO: does this actually update the original object?
-      req.step._wasm_bytes = ""
+      req.step._wasm_bytes = ''
 
       data = req.to_proto
 
-      memory = wasm_func.instance.export("memory").to_memory
-      alloc = wasm_func.instance.export("alloc").to_func
-      dealloc = wasm_func.instance.export("dealloc").to_func
-      f = wasm_func.instance.export("f").to_func
+      memory = wasm_func.instance.export('memory').to_memory
+      alloc = wasm_func.instance.export('alloc').to_func
+      dealloc = wasm_func.instance.export('dealloc').to_func
+      f = wasm_func.instance.export('f').to_func
 
       start_ptr = alloc.call(data.length)
 
@@ -568,9 +531,7 @@ module Streamdal
 
       _add_audience(aud)
 
-      if @pipelines.key?(aud_str)
-        return @pipelines[aud_str]
-      end
+      return @pipelines[aud_str] if @pipelines.key?(aud_str)
 
       []
     end
@@ -581,7 +542,7 @@ module Streamdal
         req.session_id = @session_id
         req.audiences = Google::Protobuf::RepeatedField.new(:message, Streamdal::Protos::Audience, [])
 
-        @audiences.each do |_, aud|
+        @audiences.each_value do |aud|
           req.audiences.push(aud)
         end
 
@@ -616,18 +577,14 @@ module Streamdal
 
     def _get_active_tails_for_audience(aud)
       aud_str = aud_to_str(aud)
-      if @tails.key?(aud_str)
-        return @tails[aud_str].values
-      end
+      return @tails[aud_str].values if @tails.key?(aud_str)
 
       []
     end
 
     def _send_tail(aud, pipeline_id, original_data, new_data)
       tails = _get_active_tails_for_audience(aud)
-      if tails.length == 0
-        return nil
-      end
+      return nil if tails.empty?
 
       tails.each do |tail|
         req = Streamdal::Protos::TailResponse.new
@@ -644,19 +601,13 @@ module Streamdal
     end
 
     def _notify_condition(pipeline, step, aud, cond, data, cond_type)
-      if cond.nil?
-        return nil
-      end
+      return nil if cond.nil?
 
-      if cond.notification.nil?
-        return nil
-      end
+      return nil if cond.notification.nil?
 
-      @log.debug "Notifying"
+      @log.debug 'Notifying'
 
-      if @cfg[:dry_run]
-        return nil
-      end
+      return nil if @cfg[:dry_run]
 
       @metrics.incr(CounterEntry.new(Metrics::COUNTER_NOTIFY, aud, {
         "service": @cfg[:service_name],
@@ -706,15 +657,12 @@ module Streamdal
       t.start_tail_workers
 
       _set_active_tail(t)
-
     end
 
     def _set_active_tail(tail)
       key = aud_to_str(tail.request.audience)
 
-      unless @tails.key?(key)
-        @tails[key] = {}
-      end
+      @tails[key] = {} unless @tails.key?(key)
 
       @tails[key][tail.request.id] = tail
     end
@@ -722,9 +670,7 @@ module Streamdal
     def _set_paused_tail(tail)
       key = aud_to_str(tail.request.aud)
 
-      unless @paused_tails.key?(key)
-        @paused_tails[key] = {}
-      end
+      @paused_tails[key] = {} unless @paused_tails.key?(key)
 
       @paused_tails[key][tail.request.id] = tail
     end
@@ -739,18 +685,14 @@ module Streamdal
         # Remove from active tails
         @tails[key].delete(cmd.tail.request.id)
 
-        if @tails[key].length == 0
-          @tails.delete(key)
-        end
+        @tails.delete(key) if @tails[key].empty?
       end
 
-      if @paused_tails.key?(key) && @paused_tails[key].key?(cmd.tail.request.id)
-        @paused_tails[key].delete(cmd.tail.request.id)
+      return unless @paused_tails.key?(key) && @paused_tails[key].key?(cmd.tail.request.id)
 
-        if @paused_tails[key].length == 0
-          @paused_tails.delete(key)
-        end
-      end
+      @paused_tails[key].delete(cmd.tail.request.id)
+
+      @paused_tails.delete(key) if @paused_tails[key].empty?
     end
 
     def _stop_all_tails
@@ -766,9 +708,7 @@ module Streamdal
           t.stop_tail
           tails[aud].delete(tail.request.id)
 
-          if tails[aud].length == 0
-            tails.delete(aud)
-          end
+          tails.delete(aud) if tails[aud].empty?
         end
       end
     end
@@ -799,54 +739,30 @@ module Streamdal
     def _remove_active_tail(aud, tail_id)
       key = aud_to_str(aud)
 
-      if @tails.key?(key) && @tails[key].key?(tail_id)
-        t = @tails[key][tail_id]
-        t.stop_tail
+      return unless @tails.key?(key) && @tails[key].key?(tail_id)
 
-        @tails[key].delete(tail_id)
+      t = @tails[key][tail_id]
+      t.stop_tail
 
-        if @tails[key].length == 0
-          @tails.delete(key)
-        end
+      @tails[key].delete(tail_id)
 
-        t
-      end
+      @tails.delete(key) if @tails[key].empty?
+
+      t
     end
 
     def _remove_paused_tail(aud, tail_id)
       key = aud_to_str(aud)
 
-      if @paused_tails.key?(key) && @paused_tails[key].key?(tail_id)
-        t = @paused_tails[key][tail_id]
+      return unless @paused_tails.key?(key) && @paused_tails[key].key?(tail_id)
 
-        @paused_tails[key].delete(tail_id)
+      t = @paused_tails[key][tail_id]
 
-        if @paused_tails[key].length == 0
-          @paused_tails.delete(key)
-        end
+      @paused_tails[key].delete(tail_id)
 
-        t
-      end
+      @paused_tails.delete(key) if @paused_tails[key].empty?
+
+      t
     end
-
-    # Called by host functions to write memory to wasm instance so that
-    # the wasm module can read the result of a host function call
-    def write_to_memory(caller, res)
-      alloc = caller.export("alloc").to_func
-      memory = caller.export("memory").to_memory
-
-      # Serialize protobuf message
-      resp = res.to_proto
-
-      # Allocate memory for response
-      resp_ptr = alloc.call(resp.length)
-
-      # Write response to memory
-      memory.write(resp_ptr, resp)
-
-      # return 64bit integer where first 32 bits is the pointer, and the last 32 is the length
-      resp_ptr << 32 | resp.length
-    end
-
   end
 end

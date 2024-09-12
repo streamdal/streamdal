@@ -2,6 +2,8 @@
 [![Release](https://github.com/streamdal/streamdal/actions/workflows/sdks-ruby-release.yml/badge.svg)](https://github.com/streamdal/streamdal/actions/workflows/sdks-ruby-release.yml)
 [![Pull Request](https://github.com/streamdal/streamdal/actions/workflows/sdks-ruby-pr.yml/badge.svg)](https://github.com/streamdal/streamdal/blob/main/.github/workflows/sdks-ruby-pr.yml)
 [![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
+[![codecov](https://codecov.io/github/streamdal/streamdal/graph/badge.svg?token=yYbG9PCM2k&flag=ruby-sdk)](https://app.codecov.io/github/streamdal/streamdal?flags[0]=ruby-sdk)
+
 
 _**Golang SDK for [Streamdal](https://streamdal.com).**_
 

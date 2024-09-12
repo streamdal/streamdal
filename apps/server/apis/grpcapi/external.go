@@ -15,10 +15,11 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
 	"github.com/streamdal/streamdal/apps/server/types"
@@ -114,6 +115,7 @@ func (s *ExternalServer) GetAllStream(req *protos.GetAllRequest, server protos.E
 
 	// Cleanup after Listen()
 	requestID := util.CtxRequestId(server.Context())
+	changesCh := s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID)
 	defer s.Options.PubSubService.Close(types.PubSubChangesTopic, requestID)
 
 	sendInProgress := false
@@ -130,7 +132,8 @@ MAIN:
 		case <-s.Options.ShutdownContext.Done():
 			llog.Debug("server shutting down")
 			break MAIN
-		case <-s.Options.PubSubService.Listen(types.PubSubChangesTopic, requestID):
+		case <-changesCh:
+
 			s.log.Debug("received update on the changes pubsub topic")
 
 			if sendInProgress {

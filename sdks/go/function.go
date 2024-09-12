@@ -230,7 +230,8 @@ func (s *Streamdal) createWASMInstance(step *protos.PipelineStep) (api.Module, e
 	switch s.config.WazeroExecutionMode {
 	case WazeroExecutionModeCompiler:
 		rCfg = wazero.NewRuntimeConfig().
-			WithMemoryLimitPages(1000) // (1 page = 64KB, 1000 pages = ~62MB)
+			WithMemoryLimitPages(1000). // (1 page = 64KB, 1000 pages = ~62MB)
+			WithCompilationCache(s.wazeroCache)
 	case WazeroExecutionModeInterpreter:
 		rCfg = wazero.NewRuntimeConfigInterpreter().
 			WithMemoryLimitPages(1000)

@@ -132,7 +132,7 @@ func (k *KV) Create(ctx context.Context, kvs []*protos.KVObject, overwrite bool)
 			_, err = k.Options.RedisBackend.Set(ctx, KVKey(kv.Key), serialized, 0).Result()
 		} else {
 			// check if key exists
-			if _, err := k.Options.RedisBackend.Get(ctx, KVKey(kv.Key)).Result(); err == nil {
+			if _, err = k.Options.RedisBackend.Get(ctx, KVKey(kv.Key)).Result(); err == nil {
 				return errors.Errorf("key '%s' already exists", kv.Key)
 			} else {
 				_, err = k.Options.RedisBackend.Set(ctx, KVKey(kv.Key), serialized, 0).Result()

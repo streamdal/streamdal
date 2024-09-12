@@ -34,3 +34,28 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake test
+
+  coverage:
+    name: Generate code coverage report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Ruby 3.3
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+      - name: Run coverage
+        run: |
+            bundle exec rake test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ruby-sdk
+          files: coverage/coverage.xml

@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
 	"github.com/streamdal/streamdal/libs/protos/build/go/protos"
 
 	"github.com/streamdal/streamdal/apps/server/services/store"
@@ -144,8 +145,8 @@ func (b *Bus) handleDeletePipelineRequest(ctx context.Context, req *protos.Delet
 
 // Send a SetPipelines command with empty pipelines to all sessions that have
 // the audience specified in request.
-func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.DeleteAudienceRequest) error {
-	llog := b.log.WithField("method", "handleDeleteAudienceRequest")
+func (b *Bus) handleDeleteAudiencesRequest(ctx context.Context, req *protos.DeleteAudienceRequest) error {
+	llog := b.log.WithField("method", "handleDeleteAudiencesRequest")
 	llog.Debugf("handling delete audience request bus event: %v", req)
 
 	b.options.PubSub.Publish(types.PubSubChangesTopic, "changes detected via delete audience broadcast handler")
@@ -162,7 +163,45 @@ func (b *Bus) handleDeleteAudienceRequest(ctx context.Context, req *protos.Delet
 		return errors.Wrap(err, "error sending SetPipelines command")
 	}
 
+	if _, err := b.sendDeleteAudiencesCommand(ctx, req.Audience, sessionIDs); err != nil {
+		llog.Errorf("unable to send DeleteAudiences command: %v", err)
+		return errors.Wrap(err, "error sending DeleteAudiences command")
+	}
+
 	return nil
+}
+
+func (b *Bus) sendDeleteAudiencesCommand(_ context.Context, aud *protos.Audience, sessionIDs []string) (int, error) {
+	llog := b.log.WithFields(logrus.Fields{
+		"method": "sendDeleteAudiencesCommand",
+	})
+
+	var sent int
+
+	cmd := &protos.Command{
+		Audience: aud,
+		Command: &protos.Command_DeleteAudiences{
+			DeleteAudiences: &protos.DeleteAudiencesCommand{
+				Audiences: []*protos.Audience{aud},
+			},
+		},
+	}
+
+	for _, sessionID := range sessionIDs {
+		ch := b.options.Cmd.GetChannel(sessionID)
+		if ch == nil {
+			llog.Errorf("expected cmd channel to exist for session id '%s' but none found - skipping", sessionID)
+			continue
+		}
+
+		llog.Debugf("sending DeleteAudiences command to session id '%s' on node '%s'", sessionID, b.options.NodeName)
+
+		ch <- cmd
+
+		sent += 1
+	}
+
+	return sent, nil
 }
 
 // Checks if the SetPipelines request is for an audience that has an active
