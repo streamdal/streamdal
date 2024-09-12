@@ -1,0 +1,95 @@
+2024-06-04T16:16:33.645Z [INFO] [Main]: Server is listening at port 4000
+2024-06-04T16:16:33.688Z [INFO] [Main]: [SOAP Client] Soap is listening at /api/wsdl
+2024-06-04T16:16:33.784Z [DEBUG] [Main]: [SOAP Client] TRAIN client is initialized
+2024-06-04T16:16:33.784Z [DEBUG] [Main]: [SOAP Client] WORLD client is initialized
+2024-06-04T16:16:33.821Z [INFO] [Main]: [PostgreSQL] PostgreSQL is initialized
+2024-06-04T16:16:12.721Z [INFO] [Warehouse][we-have-everything]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=we-have-everything | ROLE=warehouse
+
+2024-06-04T16:16:12.728Z [INFO] [Warehouse][we-have-everything]: Server is listening at port 4021
+2024-06-04T16:16:13.919Z [INFO] [Warehouse][attic]:
+    JSON | XML ✅ | SOAP
+    WHO_AM_I=attic | ROLE=warehouse
+
+2024-06-04T16:16:13.984Z [INFO] [Warehouse][attic]: Server is listening at port 4022
+2024-06-04T16:16:15.104Z [INFO] [Warehouse][big-world]:
+    JSON | XML | SOAP ✅
+    WHO_AM_I=big-world | ROLE=warehouse
+
+2024-06-04T16:16:15.112Z [INFO] [Warehouse][big-world]: Server is listening at port 4023
+2024-06-04T16:16:15.180Z [INFO] [Warehouse][big-world]: [SOAP Client] Soap is listening at /big-world/wsdl
+2024-06-04T16:16:16.309Z [INFO] [Warehouse][swedish-house]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=swedish-house | ROLE=warehouse
+
+2024-06-04T16:16:16.317Z [INFO] [Warehouse][swedish-house]: Server is listening at port 4024
+2024-06-04T16:16:17.491Z [INFO] [Courier][moscow-delivery]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=moscow-delivery | ROLE=courier
+
+2024-06-04T16:16:17.498Z [INFO] [Courier][moscow-delivery]: Server is listening at port 4031
+2024-06-04T16:16:18.603Z [INFO] [Courier][fast-delivery]:
+    JSON | XML ✅ | SOAP
+    WHO_AM_I=fast-delivery | ROLE=courier
+
+2024-06-04T16:16:18.610Z [INFO] [Courier][fast-delivery]: Server is listening at port 4032
+2024-06-04T16:16:19.814Z [INFO] [Courier][train-noises]:
+    JSON | XML | SOAP ✅
+    WHO_AM_I=train-noises | ROLE=courier
+
+2024-06-04T16:16:19.822Z [INFO] [Courier][train-noises]: Server is listening at port 4033
+2024-06-04T16:16:19.886Z [INFO] [Courier][train-noises]: [SOAP Client] Soap is listening at /train-noises/wsdl
+2024-06-04T16:16:20.790Z [INFO] [Courier][on-a-broomstick]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=on-a-broomstick | ROLE=courier
+
+2024-06-04T16:16:20.798Z [INFO] [Courier][on-a-broomstick]: Server is listening at port 4034
+morty@755205ae81c4:~/generallogs$ grep -Pzo '(?s)^.*\[INFO\].*?(?=\n\S|$)' test.log
+2024-06-04T16:16:33.645Z [INFO] [Main]: Server is listening at port 4000
+2024-06-04T16:16:33.688Z [INFO] [Main]: [SOAP Client] Soap is listening at /api/wsdl
+2024-06-04T16:16:33.784Z [DEBUG] [Main]: [SOAP Client] TRAIN client is initialized
+2024-06-04T16:16:33.784Z [DEBUG] [Main]: [SOAP Client] WORLD client is initialized
+2024-06-04T16:16:33.821Z [INFO] [Main]: [PostgreSQL] PostgreSQL is initialized
+2024-06-04T16:16:12.721Z [INFO] [Warehouse][we-have-everything]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=we-have-everything | ROLE=warehouse
+
+2024-06-04T16:16:12.728Z [INFO] [Warehouse][we-have-everything]: Server is listening at port 4021
+2024-06-04T16:16:13.919Z [INFO] [Warehouse][attic]:
+    JSON | XML ✅ | SOAP
+    WHO_AM_I=attic | ROLE=warehouse
+
+2024-06-04T16:16:13.984Z [INFO] [Warehouse][attic]: Server is listening at port 4022
+2024-06-04T16:16:15.104Z [INFO] [Warehouse][big-world]:
+    JSON | XML | SOAP ✅
+    WHO_AM_I=big-world | ROLE=warehouse
+
+2024-06-04T16:16:15.112Z [INFO] [Warehouse][big-world]: Server is listening at port 4023
+2024-06-04T16:16:15.180Z [INFO] [Warehouse][big-world]: [SOAP Client] Soap is listening at /big-world/wsdl
+2024-06-04T16:16:16.309Z [INFO] [Warehouse][swedish-house]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=swedish-house | ROLE=warehouse
+
+2024-06-04T16:16:16.317Z [INFO] [Warehouse][swedish-house]: Server is listening at port 4024
+2024-06-04T16:16:17.491Z [INFO] [Courier][moscow-delivery]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=moscow-delivery | ROLE=courier
+
+2024-06-04T16:16:17.498Z [INFO] [Courier][moscow-delivery]: Server is listening at port 4031
+2024-06-04T16:16:18.603Z [INFO] [Courier][fast-delivery]:
+    JSON | XML ✅ | SOAP
+    WHO_AM_I=fast-delivery | ROLE=courier
+
+2024-06-04T16:16:18.610Z [INFO] [Courier][fast-delivery]: Server is listening at port 4032
+2024-06-04T16:16:19.814Z [INFO] [Courier][train-noises]:
+    JSON | XML | SOAP ✅
+    WHO_AM_I=train-noises | ROLE=courier
+
+2024-06-04T16:16:19.822Z [INFO] [Courier][train-noises]: Server is listening at port 4033
+2024-06-04T16:16:19.886Z [INFO] [Courier][train-noises]: [SOAP Client] Soap is listening at /train-noises/wsdl
+2024-06-04T16:16:20.790Z [INFO] [Courier][on-a-broomstick]:
+    JSON ✅ | XML | SOAP
+    WHO_AM_I=on-a-broomstick | ROLE=courier
+
+2024-06-04T16:16:20.798Z [INFO] [Courier][on-a-broomstick]: Server is listening at port 4034

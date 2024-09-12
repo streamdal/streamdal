@@ -45,7 +45,7 @@ services:
 
   # Used by server for storage
   streamdal-redis:
-    image: redis:latest
+    image: redis:6.2.6 
     command: redis-server --appendonly yes
     volumes:
       - streamdal-redis-data:/data
