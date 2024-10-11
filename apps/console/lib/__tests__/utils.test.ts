@@ -1,26 +1,26 @@
-import { assertEquals, assert } from "$std/testing/asserts.ts";
+import { assert, assertEquals } from "$std/testing/asserts.ts";
 import { Audience, OperationType } from "streamdal-protos/protos/sp_common.ts";
 
 import {
-  titleCase,
+  audienceFromKey,
+  audienceKey,
+  bigIntStringify,
+  componentKey,
+  edgeKey,
   formatBytes,
   formatNumber,
-  isNumeric,
-  getAudienceOpRoute,
-  getAudienceFromParams,
-  getOpRoute,
-  audienceKey,
-  audienceFromKey,
-  edgeKey,
-  serviceKey,
-  componentKey,
-  operationKey,
-  groupKey,
-  lower,
   getAttachedPipelines,
-  bigIntStringify,
-  longDateFormat,
+  getAudienceFromParams,
+  getAudienceOpRoute,
+  getOpRoute,
+  groupKey,
   humanDateFormat,
+  isNumeric,
+  longDateFormat,
+  lower,
+  operationKey,
+  serviceKey,
+  titleCase,
 } from "../utils.ts";
 import { PipelinesType } from "root/lib/fetch.ts";
 import { Pipeline } from "streamdal-protos/protos/sp_pipeline.ts";
@@ -84,7 +84,7 @@ Deno.test("getAudienceOpRoute - should generate correct route", () => {
 
   assertEquals(
     getAudienceOpRoute(audience),
-    "/service/service1/component/component1/PRODUCER/op/op1"
+    "/service/service1/component/component1/PRODUCER/op/op1",
   );
 });
 
@@ -106,13 +106,13 @@ Deno.test(
     };
 
     assertEquals(getAudienceFromParams(params), expectedAudience);
-  }
+  },
 );
 
 Deno.test("getOpRoute - should generate correct operation route", () => {
   assertEquals(
     getOpRoute("service1", "component1", OperationType.CONSUMER, "op1"),
-    "/service/service1/component/component1/CONSUMER/op/op1"
+    "/service/service1/component/component1/CONSUMER/op/op1",
   );
 });
 
@@ -136,7 +136,7 @@ Deno.test(
       operationType: OperationType.CONSUMER,
       operationName: "op1",
     });
-  }
+  },
 );
 
 Deno.test(
@@ -159,7 +159,7 @@ Deno.test(
       operationType: OperationType.PRODUCER,
       operationName: "op2",
     });
-  }
+  },
 );
 
 Deno.test(
@@ -174,16 +174,16 @@ Deno.test(
 
     assertEquals(
       edgeKey(audience),
-      "service1/operation_type_consumer/component1"
+      "service1/operation_type_consumer/component1",
     );
     assertEquals(serviceKey(audience), "service1-service");
     assertEquals(componentKey(audience), "component1-component");
     assertEquals(
       operationKey(audience),
-      "service1:operation_type_consumer:op1:component1-operation"
+      "service1:operation_type_consumer:op1:component1-operation",
     );
     assertEquals(groupKey(audience), "service1-consumer-component1-group");
-  }
+  },
 );
 
 Deno.test("lower - should convert string to lowercase", () => {
@@ -225,7 +225,7 @@ Deno.test(
 
     const attached = getAttachedPipelines(audience, pipelines);
     assertEquals(attached, [{ id: "p1" } as Pipeline]);
-  }
+  },
 );
 
 Deno.test(
@@ -254,7 +254,7 @@ Deno.test(
 
     const attached = getAttachedPipelines(audience, pipelines);
     assertEquals(attached, []);
-  }
+  },
 );
 
 Deno.test(
@@ -271,7 +271,7 @@ Deno.test(
 
     const json = bigIntStringify(obj);
     assertEquals(json, '{"a":1,"b":"2","c":"test","d":{"e":"3"}}');
-  }
+  },
 );
 
 Deno.test("bigIntStringify - should stringify arrays with bigint", () => {
@@ -292,7 +292,7 @@ Deno.test(
       minute: "numeric",
       fractionalSecondDigits: 3,
     });
-  }
+  },
 );
 
 Deno.test(
@@ -306,5 +306,5 @@ Deno.test(
       hour12: true,
       minute: "numeric",
     });
-  }
+  },
 );

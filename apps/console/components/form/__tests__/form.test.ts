@@ -33,7 +33,7 @@ Deno.test(
     const notify = 1;
     const updated = setValue(formData, ["steps", 1, "onSuccess", 1], notify);
     assertEquals(updated.steps[1].onSuccess[1], notify);
-  }
+  },
 );
 
 Deno.test(
@@ -41,7 +41,7 @@ Deno.test(
   () => {
     const value: any = resolveValue(formData, "steps.1.onSuccess.1");
     assertEquals(value, 1);
-  }
+  },
 );
 
 Deno.test(
@@ -49,7 +49,7 @@ Deno.test(
   () => {
     const value: any = parsePath("steps.1.onSuccess.1");
     assertEquals(value, ["steps", "1", "onSuccess", "1"]);
-  }
+  },
 );
 
 Deno.test(
@@ -60,7 +60,7 @@ Deno.test(
     const updatedValue = "updated-value";
     updateData(formData, setData, ["steps", 1, "attribute"], updatedValue);
     assertEquals(updatedData?.steps[1].attribute, updatedValue);
-  }
+  },
 );
 
 Deno.test("updateData adds new nested property", () => {
