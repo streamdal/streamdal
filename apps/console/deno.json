@@ -2,7 +2,7 @@
   "lock": true,
   "tasks": {
     "start": "deno run -A --watch=static/,routes/ dev.ts",
-    "test": "deno test -A --parallel tests/*",
+    "test": "deno test -A --parallel",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts",
