@@ -1,4 +1,4 @@
-export const ServerError = ({ message }: { message: string }) => (
+export const ServerError = ({ message }: { message?: string }) => (
   <div class="z-40 absolute top-[60px] mx-4 px-4 flex flex-row justify-between bg-white border-1 border-gray-100 shadow-md items-center rounded">
     <img src="/images/error.png" class="w-[40px] mr-4" />
     <div class="flex flex-col my-3">
@@ -17,14 +17,12 @@ export const ServerError = ({ message }: { message: string }) => (
           href="https://github.com/streamdal/streamdal"
         >
           here
-        </a>.
-        <span class="mx-1">Try</span>
-        <a
-          href="/"
-          class="text-underline cursor-pointer"
-        >
+        </a>
+        .<span class="mx-1">Try</span>
+        <a href="/" class="text-underline cursor-pointer">
           reloading
-        </a>.
+        </a>
+        .
       </div>
     </div>
   </div>
