@@ -5,7 +5,7 @@ import {
   setup,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assertEquals, assertExists } from "$std/testing/asserts.ts";
 
 import { TailRateModal } from "../tailRateModal.tsx";
 import { opModal } from "../../serviceMap/opModalSignal.ts";
@@ -21,7 +21,7 @@ describe("components/modals/tailRateModal.tsx", () => {
   it("should render the modal correctly", () => {
     const { getByText } = render(<TailRateModal />);
     const formTitle = getByText(
-      "Rate is the number of messages to sample per the Interval in seconds you specify."
+      "Rate is the number of messages to sample per the Interval in seconds you specify.",
     );
     assertExists(formTitle);
   });
@@ -37,7 +37,7 @@ describe("components/modals/tailRateModal.tsx", () => {
   it("should close the modal when the close button is clicked", () => {
     const { container, getByRole } = render(<TailRateModal />);
     const closeButton = container.querySelector(
-      'button[type="button"]'
+      'button[type="button"]',
     ) as HTMLButtonElement;
     assertExists(closeButton);
 

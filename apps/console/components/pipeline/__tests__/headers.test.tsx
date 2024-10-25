@@ -5,8 +5,8 @@ import {
   setup,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assertExists, assertEquals, assert } from "$std/testing/asserts.ts";
-import { HeadersType, Headers } from "../headers.tsx";
+import { assert, assertEquals, assertExists } from "$std/testing/asserts.ts";
+import { Headers, HeadersType } from "../headers.tsx";
 
 describe("components/pipeline/headers.tsx", () => {
   beforeAll(setup);
@@ -106,7 +106,7 @@ describe("components/pipeline/headers.tsx", () => {
     const { getByPlaceholderText } = render(<Headers {...emptyKeyProps} />);
 
     const valueInput = getByPlaceholderText(
-      "enter key first"
+      "enter key first",
     ) as HTMLInputElement;
     assertExists(valueInput);
     assert(valueInput.disabled);

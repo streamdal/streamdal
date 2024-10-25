@@ -5,7 +5,7 @@ import {
   setup,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assertEquals, assertExists } from "$std/testing/asserts.ts";
 import { ServerError } from "../server.tsx";
 
 describe("components/error/server.tsx", () => {
@@ -15,12 +15,12 @@ describe("components/error/server.tsx", () => {
   it("should display default error message when no message is provided", () => {
     const { getByText } = render(<ServerError />);
     const defaultMessage = getByText(
-      "There was a problem completing the operation. Please try again later"
+      "There was a problem completing the operation. Please try again later",
     );
     assertExists(defaultMessage);
     assertEquals(
       defaultMessage.textContent?.trim(),
-      "There was a problem completing the operation. Please try again later"
+      "There was a problem completing the operation. Please try again later",
     );
   });
 
@@ -47,7 +47,7 @@ describe("components/error/server.tsx", () => {
     assertEquals(hereLink.tagName, "A");
     assertEquals(
       hereLink.getAttribute("href"),
-      "https://github.com/streamdal/streamdal"
+      "https://github.com/streamdal/streamdal",
     );
     assertEquals(hereLink.getAttribute("target"), "_new"); // Verify target attribute
   });

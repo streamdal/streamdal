@@ -5,7 +5,7 @@ import {
   setup,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assertEquals, assertExists } from "$std/testing/asserts.ts";
 import { CustomError } from "../custom.tsx";
 
 describe("components/error/custom.tsx", () => {
@@ -15,19 +15,19 @@ describe("components/error/custom.tsx", () => {
   it("should render default error message when no children are provided", () => {
     const { getByText } = render(<CustomError />);
     const defaultMessage = getByText(
-      `"There was a problem completing the operation. Please try again later"`
+      `"There was a problem completing the operation. Please try again later"`,
     );
     assertExists(defaultMessage);
     assertEquals(
       defaultMessage.textContent?.trim(),
-      `"There was a problem completing the operation. Please try again later"`
+      `"There was a problem completing the operation. Please try again later"`,
     );
   });
 
   it("should render custom error message when children are provided", () => {
     const customMessageText = "This is a custom error message.";
     const { getByText } = render(
-      <CustomError>{customMessageText}</CustomError>
+      <CustomError>{customMessageText}</CustomError>,
     );
     const customMessage = getByText(customMessageText);
     assertExists(customMessage);

@@ -5,7 +5,7 @@ import {
   setup,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assertEquals, assertExists } from "$std/testing/asserts.ts";
 import { RoutedActionModal } from "../routedActionModal.tsx";
 
 describe("components/modals/routedActionModal.tsx", () => {
@@ -20,7 +20,7 @@ describe("components/modals/routedActionModal.tsx", () => {
         message={customMessage}
         actionText="Confirm"
         cancelUrl="/cancel"
-      />
+      />,
     );
 
     const messageElement = getByText(customMessage);
@@ -35,7 +35,7 @@ describe("components/modals/routedActionModal.tsx", () => {
         message="Are you sure you want to proceed?"
         actionText="Confirm"
         cancelUrl="/cancel"
-      />
+      />,
     );
 
     const iconElement = container.querySelector('[data-testid="custom-icon"]');
@@ -49,7 +49,7 @@ describe("components/modals/routedActionModal.tsx", () => {
         message="Are you sure you want to proceed?"
         actionText="Confirm"
         cancelUrl="/cancel"
-      />
+      />,
     );
 
     const actionButton = getByText("Confirm") as HTMLButtonElement;
@@ -67,7 +67,7 @@ describe("components/modals/routedActionModal.tsx", () => {
         actionText="Delete"
         cancelUrl="/cancel"
         destructive={true}
-      />
+      />,
     );
 
     const actionButton = getByText("Delete") as HTMLButtonElement;
@@ -85,7 +85,7 @@ describe("components/modals/routedActionModal.tsx", () => {
         message="Are you sure you want to proceed?"
         actionText="Confirm"
         cancelUrl={cancelUrl}
-      />
+      />,
     );
 
     const cancelButtons = getAllByText("Cancel") as HTMLButtonElement[];
@@ -104,11 +104,11 @@ describe("components/modals/routedActionModal.tsx", () => {
         message="Are you sure you want to proceed?"
         actionText="Confirm"
         cancelUrl={cancelUrl}
-      />
+      />,
     );
 
     const closeButton = container.querySelector(
-      'button[type="button"]'
+      'button[type="button"]',
     ) as HTMLButtonElement;
     assertExists(closeButton);
     const parentLink = closeButton.closest("a") as HTMLAnchorElement;
@@ -123,7 +123,7 @@ describe("components/modals/routedActionModal.tsx", () => {
         message="Are you sure you want to proceed?"
         actionText="Confirm"
         cancelUrl="/cancel"
-      />
+      />,
     );
 
     const formElement = container.querySelector("form") as HTMLFormElement;

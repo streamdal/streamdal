@@ -5,7 +5,7 @@ import {
   setup,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assertExists, assertEquals, assert } from "$std/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "$std/testing/asserts.ts";
 import { Tooltip } from "../tooltip.tsx";
 
 describe("components/tooltip/tooltip.tsx", () => {
