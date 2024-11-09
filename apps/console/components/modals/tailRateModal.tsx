@@ -10,29 +10,27 @@ import {
 } from "root/components/tail/signals.ts";
 import { showToast } from "root/islands/toasts.tsx";
 
-export const SampleRateSchema = z.object({
-  rate: z.coerce.number().int().min(1),
-  intervalSeconds: z.coerce.number().int().min(1),
-}).refine(
-  (data) => {
-    return data.rate / data.intervalSeconds <=
-      defaultTailSampleRate.maxRate;
-  },
-  {
-    message: `Max rate is ${defaultTailSampleRate.maxRate}/second`,
-    path: ["rate"],
-  },
-);
+export const SampleRateSchema = z
+  .object({
+    rate: z.coerce.number().int().min(1),
+    intervalSeconds: z.coerce.number().int().min(1),
+  })
+  .refine(
+    (data) => {
+      return data.rate / data.intervalSeconds <= defaultTailSampleRate.maxRate;
+    },
+    {
+      message: `Max rate is ${defaultTailSampleRate.maxRate}/second`,
+      path: ["rate"],
+    },
+  );
 
 export const TailRateModal = () => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const clickAway = (event: any) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target)
-      ) {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
         opModal.value = { ...opModal.value, tailRateModal: false };
       }
     };
@@ -57,9 +55,7 @@ export const TailRateModal = () => {
 
     tailSamplingSignal.value = {
       rate: Number(data.get("rate")),
-      intervalSeconds: Number(
-        data.get("intervalSeconds"),
-      ),
+      intervalSeconds: Number(data.get("intervalSeconds")),
       default: false,
     };
 
@@ -83,20 +79,18 @@ export const TailRateModal = () => {
             <button
               type="button"
               className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center"
-              onClick={() =>
-                opModal.value = { ...opModal.value, tailRateModal: false }}
+              onClick={() => (opModal.value = {
+                ...opModal.value,
+                tailRateModal: false,
+              })}
             >
               <IconX class="w-6 h-6" />
             </button>
           </a>
         </div>
         <div class="p-6 text-center">
-          <form
-            onSubmit={submitSampleRate}
-          >
-            <div
-              className={`mb-4`}
-            >
+          <form onSubmit={submitSampleRate}>
+            <div className={`mb-4`}>
               Rate is the number of messages to sample per the Interval in
               seconds you specify.
             </div>
@@ -111,6 +105,7 @@ export const TailRateModal = () => {
                 Rate
               </label>
               <input
+                id="rate"
                 name="rate"
                 className={`h-[32px] border mr-2 px-1 ${
                   sampleErrors && sampleErrors["rate"]
@@ -133,6 +128,7 @@ export const TailRateModal = () => {
               </label>
 
               <input
+                id="intervalSeconds"
                 name="intervalSeconds"
                 className={`h-[32px] border mr-1 text-sm px-1 ${
                   sampleErrors?.intervalSeconds ? "border-streamdalRed" : ""
@@ -145,15 +141,14 @@ export const TailRateModal = () => {
             </div>
             <button
               className="btn-secondary mr-2"
-              onClick={() =>
-                opModal.value = { ...opModal.value, tailRateModal: false }}
+              onClick={() => (opModal.value = {
+                ...opModal.value,
+                tailRateModal: false,
+              })}
             >
               Cancel
             </button>
-            <button
-              className="btn-heimdal"
-              type="submit"
-            >
+            <button className="btn-heimdal" type="submit">
               Set Rate
             </button>
           </form>

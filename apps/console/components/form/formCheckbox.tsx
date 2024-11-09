@@ -25,7 +25,7 @@ export const FormCheckbox = ({
         checked={checked}
         onChange={() => setChecked(!checked)}
       />
-      <label class="text-web font-medium text-[14px]">
+      <label class="text-web font-medium text-[14px]" htmlFor={path}>
         {display}
       </label>
     </div>

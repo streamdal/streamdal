@@ -7,11 +7,7 @@ export type FormCheckboxType = {
   display: string;
 };
 
-export const FormBoolean = ({
-  name,
-  data,
-  display,
-}: FormCheckboxType) => {
+export const FormBoolean = ({ name, data, display }: FormCheckboxType) => {
   const value = resolveValue(data, name);
   const [checked, setChecked] = useState(value);
 
@@ -26,7 +22,7 @@ export const FormBoolean = ({
         checked={checked}
         onChange={() => setChecked(!checked)}
       />
-      <label class="text-web font-medium text-[14px] mt-1">
+      <label class="text-web font-medium text-[14px] mt-1" htmlFor={name}>
         {display}
       </label>
     </div>

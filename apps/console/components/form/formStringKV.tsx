@@ -23,9 +23,14 @@ export type FormKVType = {
  *         [key: string]: string;
  *     };
  */
-export const FormStringKV = (
-  { name, label, description, data, errors, readonly }: FormKVType,
-) => {
+export const FormStringKV = ({
+  name,
+  label,
+  description,
+  data,
+  errors,
+  readonly,
+}: FormKVType) => {
   const existingData = resolveValue(data, name);
   const [pairs, setPairs] = useState(
     Object.entries(
@@ -38,19 +43,12 @@ export const FormStringKV = (
   return (
     <div class="my-2">
       <div class="flex flex-row justify-start items-center mb-1">
-        <label
-          className={`text-xs `}
-        >
-          {label}
-        </label>
+        <label className={`text-xs `}>{label}</label>
         <IconInfoCircle
           class="w-4 h-4 ml-1"
           data-tooltip-target={`${name}-tooltip`}
         />
-        <Tooltip
-          targetId={`${name}-tooltip`}
-          message={description}
-        />
+        <Tooltip targetId={`${name}-tooltip`} message={description} />
       </div>
       <div className="flex flex-col mb-2 border rounded-sm px-2 w-full">
         {pairs.map(([k, v], i) => {
@@ -65,12 +63,11 @@ export const FormStringKV = (
                 }%]`}
               >
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
-                  <label
-                    className={`text-xs mb-[3px] `}
-                  >
+                  <label className={`text-xs mb-[3px] `} htmlFor={k}>
                     Key
                   </label>
                   <input
+                    id={k}
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight `}
                     value={k}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -86,16 +83,15 @@ export const FormStringKV = (
                   </div>
                 </div>
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
-                  <label
-                    className={`text-xs mb-[3px] `}
-                  >
+                  <label htmlFor={v as string} className={`text-xs mb-[3px] `}>
                     Value
                   </label>
                   <input
-                    {...k && { name: `${name}.${k}` }}
+                    {...(k && { name: `${name}.${k}` })}
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight ${
                       errors[`${name}.${k}`] && "border-streamdalRed"
                     } `}
+                    id={v as string}
                     value={v as string}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setPairs(
@@ -124,20 +120,19 @@ export const FormStringKV = (
                       : setPairs(pairs.filter((_, index) => index !== i))}
                 />
               )}
-              {!readonly &&
-                (
-                  <>
-                    <IconPlus
-                      data-tooltip-target={`${name}-add-${i}`}
-                      class="w-5 h-5 mt-3 mx-2 cursor-pointer"
-                      onClick={() => setPairs([...pairs, ["", ""]])}
-                    />
-                    <Tooltip
-                      targetId={`${name}-add-${i}`}
-                      message={`Add ${label}`}
-                    />
-                  </>
-                )}
+              {!readonly && (
+                <>
+                  <IconPlus
+                    data-tooltip-target={`${name}-add-${i}`}
+                    class="w-5 h-5 mt-3 mx-2 cursor-pointer"
+                    onClick={() => setPairs([...pairs, ["", ""]])}
+                  />
+                  <Tooltip
+                    targetId={`${name}-add-${i}`}
+                    message={`Add ${label}`}
+                  />
+                </>
+              )}
             </div>
           );
         })}
