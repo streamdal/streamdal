@@ -1,12 +1,12 @@
 import {
+  act,
   cleanup,
   fireEvent,
   render,
   setup,
-  act,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assert, assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "$std/testing/asserts.ts";
 import { ActionModal } from "../actionModal.tsx"; // Adjust the import path as necessary
 
 describe("components/actionmodal/ActionModal.tsx", () => {
@@ -35,7 +35,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         actionText={actionText}
         onAction={onAction}
         onClose={onClose}
-      />
+      />,
     );
 
     // Assert that the modal is rendered
@@ -56,7 +56,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       actionButton.textContent,
       actionText,
-      "Action button should display correct text"
+      "Action button should display correct text",
     );
   });
 
@@ -79,7 +79,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         onAction={onAction}
         onClose={onClose}
         destructive={destructive}
-      />
+      />,
     );
 
     const actionButton = getByTestId("action-modal-action");
@@ -87,7 +87,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       actionButton.classList.contains("btn-delete"),
       true,
-      "Action button should have class 'btn-delete' when destructive is true"
+      "Action button should have class 'btn-delete' when destructive is true",
     );
   });
 
@@ -110,7 +110,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         onAction={onAction}
         onClose={onClose}
         destructive={destructive}
-      />
+      />,
     );
 
     const actionButton = getByTestId("action-modal-action");
@@ -118,7 +118,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       actionButton.classList.contains("btn-heimdal"),
       true,
-      "Action button should have class 'btn-heimdal' when destructive is false"
+      "Action button should have class 'btn-heimdal' when destructive is false",
     );
   });
 
@@ -145,7 +145,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         actionText={actionText}
         onAction={onAction}
         onClose={onClose}
-      />
+      />,
     );
 
     const closeButton = getByTestId("action-modal-close");
@@ -158,12 +158,12 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       onCloseCalled,
       1,
-      "onClose should be called once when close button is clicked"
+      "onClose should be called once when close button is clicked",
     );
     assertEquals(
       onActionCalled,
       0,
-      "onAction should not be called when close button is clicked"
+      "onAction should not be called when close button is clicked",
     );
   });
 
@@ -190,7 +190,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         actionText={actionText}
         onAction={onAction}
         onClose={onClose}
-      />
+      />,
     );
 
     const cancelButton = getByTestId("action-modal-cancel");
@@ -203,12 +203,12 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       onCloseCalled,
       1,
-      "onClose should be called once when cancel button is clicked"
+      "onClose should be called once when cancel button is clicked",
     );
     assertEquals(
       onActionCalled,
       0,
-      "onAction should not be called when cancel button is clicked"
+      "onAction should not be called when cancel button is clicked",
     );
   });
 
@@ -218,7 +218,9 @@ describe("components/actionmodal/ActionModal.tsx", () => {
   it("calls onAction when the action button is clicked", async () => {
     const mockIcon = <span>Icon</span>;
     const mockMessage = (
-      <p>Perform the action by clicking the action button.</p>
+      <p>
+        Perform the action by clicking the action button.
+      </p>
     );
     const actionText = "Confirm";
     let onActionCalled = 0;
@@ -237,7 +239,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         actionText={actionText}
         onAction={onAction}
         onClose={onClose}
-      />
+      />,
     );
 
     const actionButton = getByTestId("action-modal-action");
@@ -250,12 +252,12 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       onActionCalled,
       1,
-      "onAction should be called once when action button is clicked"
+      "onAction should be called once when action button is clicked",
     );
     assertEquals(
       onCloseCalled,
       0,
-      "onClose should not be called when action button is clicked"
+      "onClose should not be called when action button is clicked",
     );
   });
 
@@ -276,7 +278,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
         actionText={actionText}
         onAction={onAction}
         onClose={onClose}
-      />
+      />,
     );
 
     const actionButton = getByTestId("action-modal-action");
@@ -284,7 +286,7 @@ describe("components/actionmodal/ActionModal.tsx", () => {
     assertEquals(
       actionButton.classList.contains("btn-heimdal"),
       true,
-      "Action button should have class 'btn-heimdal' when destructive prop is not provided"
+      "Action button should have class 'btn-heimdal' when destructive prop is not provided",
     );
   });
 });

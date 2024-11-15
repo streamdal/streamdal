@@ -1,13 +1,13 @@
 import {
+  act,
   cleanup,
   fireEvent,
   render,
   setup,
-  act,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assert, assertExists, assertEquals } from "$std/testing/asserts.ts";
-import { Toasts, showToast, ToastType, toastsSignal } from "../toasts.tsx";
+import { assert, assertEquals, assertExists } from "$std/testing/asserts.ts";
+import { showToast, Toasts, toastsSignal, ToastType } from "../toasts.tsx";
 import { delay } from "$std/async/delay.ts"; // Importing delay from Deno's standard library
 
 describe("components/toasts/toasts.tsx", () => {

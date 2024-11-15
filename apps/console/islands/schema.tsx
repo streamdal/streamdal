@@ -9,15 +9,19 @@ import { humanDateFormat } from "root/lib/utils.ts";
 
 const SchemaDate = ({ updatedDate }: { updatedDate?: string }) => {
   try {
-    return updatedDate ? (
-      <img
-        class="ml-2"
-        alt="Schema Version"
-        src={`https://img.shields.io/badge/updated-${new Date(
-          updatedDate
-        ).toLocaleDateString("en-us", humanDateFormat)}-4595e6`}
-      />
-    ) : null;
+    return updatedDate
+      ? (
+        <img
+          class="ml-2"
+          alt="Schema Version"
+          src={`https://img.shields.io/badge/updated-${
+            new Date(
+              updatedDate,
+            ).toLocaleDateString("en-us", humanDateFormat)
+          }-4595e6`}
+        />
+      )
+      : null;
   } catch (e) {
     console.error("error getting schema updated date", e);
   }
@@ -59,11 +63,9 @@ export const Schema = ({
               data-tooltip-target="tail-fullscreen"
               onClick={() => setFullScreen(!fullScreen)}
             >
-              {fullScreen ? (
-                <IconWindowMinimize class="h-6 w-6 text-white" />
-              ) : (
-                <IconWindowMaximize class="h-6 w-6 text-white" />
-              )}
+              {fullScreen
+                ? <IconWindowMinimize class="h-6 w-6 text-white" />
+                : <IconWindowMaximize class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-fullscreen"
                 message={fullScreen ? "Smaller" : "Fullscreen"}

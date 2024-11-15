@@ -1,14 +1,14 @@
 // notifications.test.tsx
 
 import {
+  act,
   cleanup,
   fireEvent,
   render,
   setup,
-  act,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assert, assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "$std/testing/asserts.ts";
 import Notifications from "../notifications.tsx"; // Adjust the import path as necessary
 import {
   NotificationConfig,
@@ -44,7 +44,7 @@ describe("components/notifications/notifications.tsx", () => {
 
     // Render the Notifications component with existing notifications
     const { findByText, getAllByText } = render(
-      <Notifications notifications={existingNotifications} />
+      <Notifications notifications={existingNotifications} />,
     );
 
     // Assert that each notification name is rendered
@@ -79,7 +79,7 @@ describe("components/notifications/notifications.tsx", () => {
 
     // Render the Notifications component with existing notifications
     const { findByText, getByText } = render(
-      <Notifications notifications={existingNotifications} />
+      <Notifications notifications={existingNotifications} />,
     );
 
     // Assert that the notification name is rendered

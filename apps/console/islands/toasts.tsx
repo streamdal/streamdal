@@ -38,7 +38,7 @@ const addToast = (toast: ToastType) => {
 
 const removeToast = (toast: ToastType) => {
   toastsSignal.value = toastsSignal.value.filter(
-    (t: ToastType) => t.id !== toast.id
+    (t: ToastType) => t.id !== toast.id,
   );
 };
 
@@ -67,11 +67,11 @@ export const Toasts = () => {
                       : "text-green-500 bg-green"
                   }  rounded-lg`}
                 >
-                  {type === "error" ? (
-                    <IconExclamationCircle class="w-6 h-6 text-streamdalRed" />
-                  ) : (
-                    <IconCheck class="w-6 h-6 text-streamdalGreen" />
-                  )}
+                  {type === "error"
+                    ? (
+                      <IconExclamationCircle class="w-6 h-6 text-streamdalRed" />
+                    )
+                    : <IconCheck class="w-6 h-6 text-streamdalGreen" />}
                 </div>
                 <div class="ml-3 text-sm font-normal w-full">{message}</div>
                 <button
@@ -83,7 +83,7 @@ export const Toasts = () => {
                 </button>
               </div>
             </div>
-          )
+          ),
         )}
       </div>
     </div>

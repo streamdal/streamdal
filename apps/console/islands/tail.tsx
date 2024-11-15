@@ -147,11 +147,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
               data-tooltip-target="tail-pause-play"
               onClick={() => setPaused(!paused)}
             >
-              {paused ? (
-                <IconPlayerPlayFilled class="h-6 w-6 text-white" />
-              ) : (
-                <IconPlayerPauseFilled class="h-6 w-6 text-white" />
-              )}
+              {paused
+                ? <IconPlayerPlayFilled class="h-6 w-6 text-white" />
+                : <IconPlayerPauseFilled class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-pause-play"
                 message={paused ? "Resume Tail" : "Pause Tail"}
@@ -162,11 +160,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
               data-tooltip-target="tail-diff"
               onClick={() => (tailDiffSignal.value = !tailDiffSignal.value)}
             >
-              {tailDiffSignal.value ? (
-                <IconColumns1 class="h-6 w-6 text-white" />
-              ) : (
-                <IconColumns2 class="h-6 w-6 text-white" />
-              )}
+              {tailDiffSignal.value
+                ? <IconColumns1 class="h-6 w-6 text-white" />
+                : <IconColumns2 class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-diff"
                 message={`${
@@ -179,11 +175,9 @@ export const Tail = ({ audience }: { audience: Audience }) => {
               data-tooltip-target="tail-fullscreen"
               onClick={() => setFullScreen(!fullScreen)}
             >
-              {fullScreen ? (
-                <IconWindowMinimize class="h-6 w-6 text-white" />
-              ) : (
-                <IconWindowMaximize class="h-6 w-6 text-white" />
-              )}
+              {fullScreen
+                ? <IconWindowMinimize class="h-6 w-6 text-white" />
+                : <IconWindowMaximize class="h-6 w-6 text-white" />}
               <Tooltip
                 targetId="tail-fullscreen"
                 message={fullScreen ? "Smaller" : "Fullscreen"}

@@ -1,14 +1,14 @@
 // navbar.test.tsx
 
 import {
+  act,
   cleanup,
   fireEvent,
   render,
   setup,
-  act,
 } from "$fresh-testing-library/components.ts";
 import { afterEach, beforeAll, describe, it } from "$std/testing/bdd.ts";
-import { assert, assertExists, assertEquals } from "$std/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "$std/testing/asserts.ts";
 import { NavBar } from "../nav.tsx"; // Adjust the import path as necessary
 import { showNav } from "root/components/nav/signals.ts"; // Adjust the import path as necessary
 
@@ -55,7 +55,7 @@ describe("components/navbar/navbar.tsx", () => {
     navMenu = getByTestId("nav-menu");
     assertExists(
       navMenu,
-      "Navigation menu should be visible after clicking the menu button"
+      "Navigation menu should be visible after clicking the menu button",
     );
 
     // Click the menu button again to close the navigation menu
