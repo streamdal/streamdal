@@ -7,35 +7,30 @@ import IconX from "tabler-icons/tsx/x.tsx";
 import { Tooltip } from "../components/tooltip/tooltip.tsx";
 import { humanDateFormat } from "root/lib/utils.ts";
 
-const SchemaDate = (
-  { updatedDate }: { updatedDate?: string },
-) => {
+const SchemaDate = ({ updatedDate }: { updatedDate?: string }) => {
   try {
-    return (
-      updatedDate
-        ? (
-          <img
-            class="ml-2"
-            alt="Schema Version"
-            src={`https://img.shields.io/badge/updated-${
-              new Date(updatedDate).toLocaleDateString(
-                "en-us",
-                humanDateFormat,
-              )
-            }-4595e6`}
-          />
-        )
-        : null
-    );
+    return updatedDate ? (
+      <img
+        class="ml-2"
+        alt="Schema Version"
+        src={`https://img.shields.io/badge/updated-${new Date(
+          updatedDate
+        ).toLocaleDateString("en-us", humanDateFormat)}-4595e6`}
+      />
+    ) : null;
   } catch (e) {
     console.error("error getting schema updated date", e);
   }
   return null;
 };
 
-export const Schema = (
-  { audience, schema }: { audience: Audience; schema: SchemaType },
-) => {
+export const Schema = ({
+  audience,
+  schema,
+}: {
+  audience: Audience;
+  schema: SchemaType;
+}) => {
   const [fullScreen, setFullScreen] = useState(false);
 
   return (
@@ -49,9 +44,7 @@ export const Schema = (
           <span className="opacity-50">Home</span> / Schema
         </div>
       )}
-      <div
-        class={`flex h-full flex-col bg-white px-12`}
-      >
+      <div class={`flex h-full flex-col bg-white px-12`}>
         <div
           class={`flex flew-row item-center my-4 mt-6 justify-between text-3xl font-medium`}
         >
@@ -66,9 +59,11 @@ export const Schema = (
               data-tooltip-target="tail-fullscreen"
               onClick={() => setFullScreen(!fullScreen)}
             >
-              {fullScreen
-                ? <IconWindowMinimize class="h-6 w-6 text-white" />
-                : <IconWindowMaximize class="h-6 w-6 text-white" />}
+              {fullScreen ? (
+                <IconWindowMinimize class="h-6 w-6 text-white" />
+              ) : (
+                <IconWindowMaximize class="h-6 w-6 text-white" />
+              )}
               <Tooltip
                 targetId="tail-fullscreen"
                 message={fullScreen ? "Smaller" : "Fullscreen"}
@@ -96,18 +91,15 @@ export const Schema = (
               alt="Schema Version"
               src={`https://img.shields.io/badge/version-${schema?.version}-956CFF`}
             />
-            <SchemaDate
-              updatedDate={schema?.lastUpdated}
-            />
+            <SchemaDate updatedDate={schema?.lastUpdated} />
           </div>
           <pre className={"h-[150px]"}>
-          <code>
-            <div
+            <code>
+              <div
                 class={"font-sm "}
-                dangerouslySetInnerHTML={{__html: schema.schema}}
-            >
-            </div>
-          </code>
+                dangerouslySetInnerHTML={{ __html: schema.schema }}
+              ></div>
+            </code>
           </pre>
         </div>
       </div>
