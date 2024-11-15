@@ -13,10 +13,7 @@ export const NavBar = () => {
 
   useEffect(() => {
     const clickAway = (event: any) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         showNav.value = false;
       }
     };
@@ -29,10 +26,11 @@ export const NavBar = () => {
   return (
     <div ref={menuRef}>
       <ul
+        data-testid="nav-menu"
         class={`${
           showNav.value ? "" : "hidden"
         } z-50 fixed mt-[70px] top-0 left-0 font-medium bg-white ml-4 w-72 rounded border shadow`}
-        onClick={() => showNav.value = false}
+        onClick={() => (showNav.value = false)}
       >
         <li>
           <a
@@ -71,9 +69,7 @@ export const NavBar = () => {
             href="/configs"
           >
             <IconFileDownload class="w-6 h-6" />
-            <span class="ml-3 text-gray-900">
-              Download Configs
-            </span>
+            <span class="ml-3 text-gray-900">Download Configs</span>
           </a>
         </li>
         <li className="cursor-not-allowed">
@@ -90,10 +86,12 @@ export const NavBar = () => {
         </li>
       </ul>
       <div
+        data-testid="navbar-header"
         className="sticky top-0 left-0 flex flex-row items-center w-full h-16 bg-white border-1 border-gray-100 shadow-sm rounded-br-lg"
-        onClick={() => showNav.value = false}
+        onClick={() => (showNav.value = false)}
       >
         <IconMenu2
+          data-testid="menu-button"
           class="w-6 h-6 ml-4 cursor-pointer"
           onClick={(e: MouseEvent) => {
             e.stopPropagation();

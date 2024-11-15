@@ -132,9 +132,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
           <span className="opacity-50">Home</span> / Tail
         </div>
       )}
-      <div
-        class={`flex h-full flex-col bg-white px-12`}
-      >
+      <div class={`flex h-full flex-col bg-white px-12`}>
         <div
           class={`flex flew-row item-center my-4 mt-6 justify-between text-3xl font-medium`}
         >
@@ -147,7 +145,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             <div
               class="bg-streamdalPurple flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-pause-play"
-              onClick={() => (setPaused(!paused))}
+              onClick={() => setPaused(!paused)}
             >
               {paused
                 ? <IconPlayerPlayFilled class="h-6 w-6 text-white" />
@@ -160,7 +158,7 @@ export const Tail = ({ audience }: { audience: Audience }) => {
             <div
               class="bg-streamdalPurple ml-2 flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-[50%]"
               data-tooltip-target="tail-diff"
-              onClick={() => tailDiffSignal.value = !tailDiffSignal.value}
+              onClick={() => (tailDiffSignal.value = !tailDiffSignal.value)}
             >
               {tailDiffSignal.value
                 ? <IconColumns1 class="h-6 w-6 text-white" />
