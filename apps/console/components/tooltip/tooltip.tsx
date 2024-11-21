@@ -1,6 +1,10 @@
-export const Tooltip = (
-  { targetId, message }: { targetId: string; message: string },
-) => (
+export const Tooltip = ({
+  targetId,
+  message,
+}: {
+  targetId: string;
+  message: string;
+}) => (
   <div
     id={targetId}
     role="tooltip"

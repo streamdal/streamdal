@@ -1,6 +1,6 @@
 export const EmptyService = () => (
   <div class="z-40 absolute top-[60px] mx-4 px-4 flex flex-row justify-between h-16 bg-white border-1 border-gray-100 shadow-md items-center rounded">
-    <img src="/images/help.png" class="w-[40px] mr-4" />
+    <img src="/images/help.png" class="w-[40px] mr-4" alt="helping image" />
     No services defined. Create a service in Streamdal by connecting an SDK
     client! Read more
     <a
@@ -9,6 +9,7 @@ export const EmptyService = () => (
       href="https://github.com/streamdal/streamdal#instrument"
     >
       here
-    </a>.
+    </a>
+    .
   </div>
 );

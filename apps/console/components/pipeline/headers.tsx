@@ -12,9 +12,7 @@ export type HeadersType = {
   errors: ErrorType;
 };
 
-export const Headers = (
-  { name, data, errors }: HeadersType,
-) => {
+export const Headers = ({ name, data, errors }: HeadersType) => {
   const existingHeaders = resolveValue(data, name);
   const [headers, setHeaders] = useState(
     Object.entries(
@@ -27,11 +25,7 @@ export const Headers = (
   return (
     <div class="my-2">
       <div class="flex flex-row justify-start items-center mb-1">
-        <label
-          className={`text-xs `}
-        >
-          Headers
-        </label>
+        <label className={`text-xs `}>Headers</label>
         <IconInfoCircle
           class="w-4 h-4 ml-1"
           data-tooltip-target={`${name}-headers-tooltip`}
@@ -50,12 +44,11 @@ export const Headers = (
             >
               <div className="flex flex-row justify-start items-start w-[80%]">
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
-                  <label
-                    className={`text-xs mb-[3px] `}
-                  >
+                  <label htmlFor={k} className={`text-xs mb-[3px] `}>
                     Key
                   </label>
                   <input
+                    id={k}
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight `}
                     value={k}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -72,13 +65,12 @@ export const Headers = (
                   </div>
                 </div>
                 <div class={`flex flex-col mr-4 my-2 w-[50%]`}>
-                  <label
-                    className={`text-xs mb-[3px] `}
-                  >
+                  <label htmlFor={v as string} className={`text-xs mb-[3px] `}>
                     Value
                   </label>
                   <input
-                    {...k && { name: `${name}.${k}` }}
+                    id={v as string}
+                    {...(k && { name: `${name}.${k}` })}
                     className={`rounded-sm border outline-0 px-2 pe-6 h-[47px] border-twilight ${
                       errors[`${name}.${k}`] && "border-streamdalRed"
                     } `}
