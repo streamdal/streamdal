@@ -1,0 +1,69 @@
+name: Console - Coverage
+
+on:
+  pull_request:
+    paths:
+      - 'apps/console/**'
+      - '.github/workflows/apps-console-pr.yml'
+
+defaults:
+  run:
+    working-directory: ./apps/console
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Setup Deno
+      - name: Setup Deno
+        uses: denoland/setup-deno@v3
+        with:
+          deno-version: v1.43.1  # Specify your required Deno version
+
+      # 3. Install lcov
+      - name: Install lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      # 4. Run Tests with Coverage
+      - name: Run Tests with Coverage
+        run: deno test --coverage=coverage
+
+      # 5. Generate LCOV Report
+      - name: Generate LCOV Report
+        run: deno coverage coverage --lcov > coverage.lcov
+
+      # 6. List Coverage Summary using lcov --list
+      - name: List Coverage Summary
+        run: |
+          lcov --list coverage.lcov > coverage_summary.txt
+          cat coverage_summary.txt
+
+      # 7. Upload LCOV Report as Artifact
+      - name: Upload LCOV Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lcov-report
+          path: coverage.lcov
+
+      # 8. Upload Coverage Summary as Artifact
+      - name: Upload Coverage Summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-summary
+          path: coverage_summary.txt
+
+      # 9. (Optional) Post Coverage Summary to PR
+      - name: Post Coverage Summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v4
+        with:
+          message: |
+            ### Coverage Summary
+            ```
+            $(cat coverage_summary.txt)
+            ```
+            **Coverage Report Artifact**: [Download](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
