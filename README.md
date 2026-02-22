@@ -1,9 +1,25 @@
+> [!CAUTION]
+> ## This project is no longer actively maintained
+>
+> **Streamdal has been acquired.** The acquisition was for an undisclosed amount and the acquirer cannot be named due to NDA obligations. The founders and engineers have moved on.
+>
+> **This repository is now read-only / archived.** It will remain available for reference and forking.
+>
+> **The Discord server is being shut down.** Unfortunately, the server has been heavily infiltrated by spam bots posting illegal content. It will be set to read-only before final closure.
+>
+> **We encourage the community to fork this project!** The codebase provides an outstanding foundation for PII handling and data observability. We'd love to see the community carry this work forward.
+>
+> **Founder contact info:**
+> - [Daniel Selans](https://www.linkedin.com/in/dselans/) — CTO & Co-founder
+> - [Ustin Zarubin](https://www.linkedin.com/in/ustin-zarubin-319659a2/) — CEO & Co-founder
+
+---
+
 <div align="center">
-   
-<img src="./assets/img/streamdal-logo-dark.png#gh-dark-mode-only"><img src="./assets/img/streamdal-logo-light.png#gh-light-mode-only">  
+
+<img src="./assets/img/streamdal-logo-dark.png#gh-dark-mode-only"><img src="./assets/img/streamdal-logo-light.png#gh-light-mode-only">
 
 [![GitHub](https://img.shields.io/github/license/streamdal/streamdal)](https://github.com/streamdal/streamdal)
-[![Discord](https://img.shields.io/badge/Community-Discord-4c57e8.svg)](https://discord.gg/streamdal)
 
 </div>  
 
@@ -186,17 +202,14 @@ When running in production, verify versions of the components against this list:
 
 # Community
 
-We're building Streamdal in the open and we'd love for you to join us!
-
-Join our [Discord](https://discord.gg/streamdal)!
+> [!NOTE]
+> The Streamdal Discord server is no longer active and is being shut down due to spam/bot issues. See the notice at the top of this README for details.
 
 ### Getting Help
 
-Stuck? Something not working right? Have questions?
-
-* First and _easiest_ way to get help is to join our [Discord](https://discord.gg/streamdal)
-* If you're not in the mood to chat - there's [docs](https://docs.streamdal.com)
-* If all else fails, [open an issue](https://github.com/streamdal/streamdal/issues/new)!
+* Check the [docs](https://docs.streamdal.com)
+* [Open an issue](https://github.com/streamdal/streamdal/issues/new) (note: this repo is archived and may not receive responses)
+* Reach out to the founders via LinkedIn (links at the top of this README)
 
 ### Roadmap
 
