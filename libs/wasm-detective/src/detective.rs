@@ -16,12 +16,12 @@ use crate::matcher_core as core;
 use crate::matcher_core::{ip_address, mac_address};
 use crate::matcher_numeric as numeric;
 use crate::matcher_pii as pii;
-use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, ssn, uk_nino, vin_number};
+use crate::matcher_pii::{canada_sin, email, hashed_password, jwt, rsa_key, ssn, uk_nino, vin_number};
 use crate::matcher_pii_cloud as pii_cloud;
 use crate::matcher_pii_cloud::aws_key_id;
 use crate::matcher_pii_keywords as pii_keywords;
 use crate::matcher_pii_payments as pii_payments;
-use crate::matcher_pii_payments::credit_card;
+use crate::matcher_pii_payments::{credit_card, stripe_key};
 use crate::matcher_pii_phone::phone;
 
 type MatcherFunc = fn(&Request, gjson::Value) -> Result<bool, CustomError>;
@@ -465,6 +465,8 @@ impl Detective {
             (hashed_password as MatcherFunc, "Credentials"),
             (mac_address as MatcherFunc, "Device"),
             (ip_address as MatcherFunc, "IP_Information"),
+            (rsa_key as MatcherFunc, "Credentials"),
+            (stripe_key as MatcherFunc, "Billing"),
         ]);
 
         let mut found: Vec<Word> = Vec::new();
